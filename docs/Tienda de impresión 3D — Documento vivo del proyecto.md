@@ -831,8 +831,8 @@ Estados iniciales posibles: `pending`, `confirmed`, `in-production`, `completed`
 
 | Fase | Objetivo | Entregable | Verificación | Estado |
 |---|---|---|---|---|
-| Fase 0 — Preparación | Crear la base técnica | Repositorio ejecutable y primer push | Base Vite/React/JS y Tailwind verificada | Pendiente |
-| Fase 1 — Producto y requisitos | Definir el brief real del cliente | Brief, requisitos y alcance del MVP | Problema, usuario y alcance claros | Pendiente |
+| Fase 0 — Preparación | Crear la base técnica | Repositorio ejecutable y primer push | Base Vite/React/JS y Tailwind verificada | Completa |
+| Fase 1 — Producto y requisitos | Definir el brief real del cliente | Brief, requisitos y alcance del MVP | Problema, usuario y alcance claros | Completa |
 | Fase 2 — Investigación y dirección visual | Crear una identidad propia | Dirección visual y referencias | Decisiones visuales justificadas | Pendiente |
 | Fase 3 — UX, user flow y mockup | Diseñar la experiencia | Flujos, wireframes y mockups | Flujo principal comprensible | Pendiente |
 | Fase 4 — Design system | Mantener consistencia | Tokens, componentes y estados | Sistema reutilizable definido | Pendiente |
