@@ -1,64 +1,121 @@
-# Fase 3 — UX, user flow y mockup
+# Fase 3 — UX, User Flow y Mockup
 
 ## 1. Propósito de esta fase
 
-Esta fase define la experiencia de la tienda antes de implementarla. Las decisiones se basan en el brief de la Fase 1 y en la dirección visual de la Fase 2.
+Esta fase define cómo se comporta y se recorre la tienda antes de entrar al diseño visual de alta fidelidad y a la implementación.
+
+Las decisiones se basan en:
+
+- Fase 1 — Producto y Requisitos.
+- Fase 2 — Investigación y Dirección Visual.
 
 La tienda tiene dos modelos de negocio que deben convivir sin confundirse:
 
 1. **Compra de productos terminados**, dirigida principalmente al consumidor casual.
 2. **Solicitud de impresión personalizada**, dirigida principalmente al cliente técnico, estudiante, hobbista o corporativo.
 
-Ambos caminos tendrán el mismo peso en la entrada de la aplicación, pero cada uno conservará su lógica operativa. El carrito podrá mostrar productos y solicitudes, aunque cada tipo tendrá un checkout separado.
+Ambos caminos tendrán presencia equivalente desde la entrada de la aplicación, pero conservarán sus propias reglas operativas.
 
-La interfaz debe transmitir **tecnología de precisión con accesibilidad local**: premium para el inversor, clara para el comprador casual y suficientemente técnica para quien solicita una pieza personalizada.
+El carrito podrá contener productos y solicitudes, pero cada tipo utilizará su propio flujo de checkout.
 
-## 2. Decisiones UX consolidadas
+La experiencia debe comunicar:
+
+> **Tecnología de precisión con accesibilidad local.**
+
+Debe sentirse suficientemente premium para un inversor, clara para un comprador casual y suficientemente técnica para quien solicita una pieza personalizada.
+
+---
+
+# 2. Principios UX
+
+La experiencia seguirá estos principios:
+
+### 2.1 Claridad
+
+Cada pantalla debe responder rápidamente:
+
+- ¿Dónde estoy?
+- ¿Qué estoy viendo?
+- ¿Qué puedo hacer?
+- ¿Cuál es el siguiente paso?
+
+### 2.2 Descubrimiento antes que complejidad
+
+El catálogo debe priorizar el descubrimiento visual.
+
+La información técnica debe aparecer cuando el usuario realmente la necesita.
+
+### 2.3 Dos modelos de negocio, una experiencia
+
+Compra y personalización deben sentirse parte de la misma marca y plataforma.
+
+No deben parecer aplicaciones separadas.
+
+### 2.4 Tecnología sin frialdad
+
+Los elementos técnicos pueden utilizar recursos visuales relacionados con CAD, precisión y fabricación digital, pero sin convertir toda la experiencia en una interfaz industrial.
+
+### 2.5 Conversión sin presión
+
+Las llamadas a la acción deben ser claras y visibles sin saturar la interfaz.
+
+### 2.6 Mobile-first en las decisiones de interacción
+
+La experiencia debe funcionar correctamente en escritorio, tablet y móvil desde el diseño inicial.
+
+---
+
+# 3. Decisiones UX consolidadas
 
 | Tema | Decisión | Justificación |
 |---|---|---|
-| Entrada principal | El hero presenta dos caminos equivalentes: comprar productos y solicitar una impresión personalizada | Representa los dos modelos de negocio desde el primer contacto |
-| Navegación principal | Inicio, Catálogo, Carrito y Cuenta | Mantiene el encabezado limpio y reserva Personalizado para momentos contextuales |
-| CTA personalizado | Aparece destacado en el hero y dentro del catálogo | El cliente técnico encuentra su flujo sin sobrecargar permanentemente la navegación |
-| Inicio | Home editorial con hero, manifiesto de marca, destacados y categorías | Refuerza identidad y descubrimiento sin convertir la portada en un dashboard de opciones |
-| Categorías | Gadgets, Figuras, Juguetes, Decoración y Piezas funcionales | Organiza el catálogo con una clasificación comprensible para públicos distintos |
-| Catálogo | Descubrimiento visual primero; resultados dedicados después | Evita una cuadrícula fría y permite explorar antes de filtrar |
-| Tarjetas | Imagen, nombre y precio | Mantiene la exploración limpia; detalles técnicos quedan para el producto |
-| Búsqueda | Consulta al backend con debounce | Escala mejor y evita peticiones por cada pulsación |
-| URL del catálogo | Búsqueda y categoría en query params; filtros avanzados en estado interno | Permite compartir y recuperar búsquedas sin crear URLs excesivamente complejas |
-| Detalle | Comprar y personalizar tienen el mismo peso | Conecta catálogo y fabricación a medida |
-| Especificaciones | Bloque expandible “Especificaciones técnicas” | Atiende al cliente técnico sin saturar al consumidor casual |
-| Variantes | Cantidad, color y material | Son decisiones reales del producto y deben quedar representadas en el carrito |
-| Galería | Miniaturas en escritorio; carrusel táctil en móvil | Aprovecha el espacio de cada dispositivo |
-| Disponibilidad | Solo visible dentro del detalle | Conserva tarjetas limpias |
-| Producto no disponible | Sigue visible, sin acción alternativa en esta versión | Conserva el descubrimiento sin agregar una funcionalidad no definida |
-| Error de imagen | Placeholder propio con rejilla CAD sutil | Mantiene la dirección visual y evita stock genérico |
-| Agregar al carrito | Feedback inline y contador actualizado | Confirma la acción sin interrumpir el descubrimiento |
-| Carrito | Un resumen que separa visualmente Productos y Solicitudes | Conserva el modelo híbrido sin mezclar conceptos |
-| Checkout | Dos botones separados en el carrito | Productos y cotizaciones no pueden compartir el mismo cálculo de precio |
-| Checkout de productos | Datos → entrega → revisión | Reduce errores y da claridad antes de confirmar |
-| Checkout de solicitudes | Datos → entrega → revisión, adaptado a enviar solicitud | Mantiene un patrón común y deja claro que el importe está pendiente |
-| Invitados | Pueden explorar y completar datos, pero no confirmar | La compra y la solicitud requieren una cuenta real |
-| Login | Modal sobre la pantalla actual | Conserva el contexto del carrito o checkout |
-| Registro | Pantalla dedicada `/registro` | Permite explicar el registro y solicitar datos con espacio suficiente |
-| Registro inicial | Nombre, correo y contraseña | Reduce fricción; dirección y teléfono se completan después |
-| Cuenta | Perfil, edición de datos e historial unificado | Permite gestionar pedidos y solicitudes desde un mismo lugar |
-| Historial | Resumen unificado con filtros por tipo | Muestra toda la actividad sin duplicar pantallas |
-| Solicitud personalizada | Tres pasos: archivo/ayuda → requisitos técnicos → contacto y revisión | Reduce carga cognitiva y sirve tanto a usuarios preparados como a quienes necesitan orientación |
-| Archivo 3D | Dos entradas: “Tengo archivo” y “Necesito ayuda con el diseño” | No todos los clientes técnicos llegan con un modelo listo |
-| Autenticación en solicitud | Se exige solo antes de enviar | Permite avanzar sin fricción y mantiene la asociación con el usuario autenticado |
-| Datos al iniciar sesión | Autocompletar campos vacíos y permitir revisar diferencias | Evita sobrescribir información específica del pedido |
-| Borrador | Guardado local del formulario y del archivo cuando sea posible | Evita perder una solicitud extensa por recarga o salida accidental |
-| Precio personalizado | “Pendiente de cotización” y explicación de factores | No se inventa un precio antes de revisar material, tamaño, complejidad, cantidad y tiempo |
-| Solicitud enviada | Estado “Recibida” → “En revisión” y contacto por WhatsApp | Comunica progreso y ofrece un canal directo |
-| WhatsApp | Botón flotante en Inicio, Catálogo, Detalle y Solicitud | Apoya conversión donde hay dudas sin invadir cuenta o checkout |
-| Móvil | Menú desplegable general y barra inferior contextual en Catálogo y Checkout | Conserva espacio y facilita acciones durante tareas de alta intención |
-| Admin | Administrador único, preparado para roles futuros | Mantiene el MVP simple sin cerrar la evolución de permisos |
-| Panel admin | Dashboard completo más bandejas operativas | Combina visión general y trabajo inmediato |
+| Entrada principal | El hero presenta dos caminos equivalentes: comprar productos y solicitar impresión personalizada | Representa los dos modelos de negocio desde el primer contacto |
+| Navegación principal | Inicio, Catálogo, Carrito y Cuenta | Mantiene el encabezado limpio |
+| CTA personalizado | Destacado en hero y catálogo | Permite acceder al servicio técnico sin saturar la navegación |
+| Inicio | Home editorial con hero, manifiesto, destacados y categorías | Refuerza marca y descubrimiento |
+| Categorías | Gadgets, Figuras, Juguetes, Decoración y Piezas funcionales | Amplía la clasificación inicial del brief |
+| Catálogo | Descubrimiento visual primero | Evita una cuadrícula fría |
+| Tarjeta | Imagen, nombre y precio | Mantiene la exploración limpia |
+| Búsqueda | Consulta al backend con debounce | Evita peticiones innecesarias y permite escalar |
+| URL catálogo | `q` y `categoria` como query params | Permite compartir y recuperar búsquedas |
+| Filtros avanzados | Estado interno de la interfaz | Evita URLs excesivamente complejas |
+| Detalle | Comprar y personalizar tienen presencia clara | Conecta catálogo y fabricación personalizada |
+| Especificaciones | Bloque expandible | Reduce saturación visual |
+| Variantes | Cantidad, color y material | Son decisiones reales del producto |
+| Galería | Miniaturas desktop, carrusel táctil mobile | Se adapta al dispositivo |
+| Disponibilidad | Visible principalmente en detalle | Mantiene tarjetas limpias |
+| Producto no disponible | Permanece visible sin acción alternativa en esta versión | Conserva descubrimiento |
+| Error de imagen | Placeholder propio con rejilla CAD sutil | Mantiene identidad |
+| Agregar al carrito | Feedback inline + contador actualizado | Confirma la acción sin interrumpir |
+| Carrito | Productos y solicitudes separados visualmente | Mantiene claridad |
+| Checkout | Unificado conceptualmente pero separado operativamente | Ambos flujos pertenecen a la misma experiencia, pero manejan datos diferentes |
+| Checkout producto | Datos → Entrega → Revisión → Confirmación | Flujo de compra tradicional |
+| Checkout solicitud | Datos → Entrega → Revisión → Enviar solicitud | Flujo de cotización |
+| Invitados | Pueden explorar y avanzar; requieren cuenta antes de confirmar/enviar | Reduce fricción sin perder autenticación real |
+| Login | Modal sobre contexto actual | Evita perder el proceso |
+| Registro | Pantalla dedicada `/registro` | Permite explicar el registro |
+| Registro inicial | Nombre, correo y contraseña | Reduce fricción |
+| Cuenta | Perfil, datos e historial unificado | Centraliza actividad |
+| Historial | Unificado con filtros por tipo | Evita duplicación |
+| Solicitud personalizada | Tres pasos | Reduce carga cognitiva |
+| Entrada personalizada | Tengo archivo / Necesito ayuda con el diseño | Incluye usuarios con y sin modelo listo |
+| Archivo | `.stl` y `.obj` | Formatos definidos inicialmente |
+| Autenticación | Obligatoria antes de enviar | Permite asociar solicitud y usuario |
+| Datos de usuario | Autocompletado de campos vacíos después de autenticación | Evita sobrescritura innecesaria |
+| Borrador | Guardado local cuando sea posible | Reduce pérdida de trabajo |
+| Precio personalizado | “Pendiente de cotización” | Evita inventar precios |
+| Solicitud enviada | Recibida → En revisión | Comunica progreso |
+| WhatsApp | Disponible en Inicio, Catálogo, Detalle y Solicitud | Canal rápido de contacto |
+| Tema | Dark Mode principal + Light Mode mediante toggle | Respeta la Fase 2 |
+| Mobile | Menú general + navegación contextual durante tareas | Mejora uso en pantallas pequeñas |
+| Admin | Administrador único preparado para roles futuros | Mantiene el MVP manejable |
+| Panel admin | Dashboard + bandejas operativas | Combina supervisión y ejecución |
 
-## 3. Mapa de navegación completo
+---
 
-### 3.1 Navegación pública y comercial
+# 4. Arquitectura de navegación
+
+## 4.1 Navegación pública
 
 ```text
 /
@@ -75,22 +132,17 @@ La interfaz debe transmitir **tecnología de precisión con accesibilidad local*
 │   └── /solicitud/ayuda-diseno
 ├── /carrito
 ├── /checkout/productos
-│   ├── /checkout/productos/datos
-│   ├── /checkout/productos/entrega
-│   └── /checkout/productos/revision
 ├── /checkout/solicitud
-│   ├── /checkout/solicitud/datos
-│   ├── /checkout/solicitud/entrega
-│   └── /checkout/solicitud/revision
 ├── /registro
 ├── /pedido/:id
 └── /cuenta
-    └── actividad con filtros por tipo
 ```
 
-El login se presenta como modal y no necesita una ruta pública propia para las acciones iniciadas desde la tienda. El registro sí tiene la ruta `/registro` porque es una pantalla dedicada.
+El login se presenta como modal.
 
-### 3.2 Navegación administrativa
+No es necesario crear una ruta pública de login para el flujo normal de la tienda.
+
+## 4.2 Navegación administrativa
 
 ```text
 /admin
@@ -100,7 +152,6 @@ El login se presenta como modal y no necesita una ruta pública propia para las 
 │   └── /admin/solicitudes/:id
 ├── /admin/catalogo
 │   ├── /admin/catalogo/nuevo
-│   ├── /admin/catalogo/:id
 │   ├── /admin/catalogo/:id/editar
 │   ├── /admin/catalogo/categorias
 │   ├── /admin/catalogo/archivos
@@ -110,539 +161,1149 @@ El login se presenta como modal y no necesita una ruta pública propia para las 
 └── /admin/actividad
 ```
 
-Configuración y roles futuros quedan como submódulos del área administrativa, no como elementos principales de la navegación inicial.
+Configuración y futuros roles administrativos no forman parte de la navegación principal del MVP.
 
-### 3.3 Navegación principal por contexto
+---
 
-| Contexto | Navegación visible |
+# 5. Navegación por contexto
+
+| Contexto | Navegación |
 |---|---|
 | Público | Inicio, Catálogo, Carrito, Cuenta |
-| Catálogo en móvil | Menú desplegable más barra inferior contextual |
-| Checkout en móvil | Menú reducido más barra inferior contextual |
-| Cuenta | Perfil, actividad unificada, edición de datos, cerrar sesión |
+| Catálogo mobile | Menú general + acciones contextuales |
+| Checkout mobile | Menú reducido + navegación contextual |
+| Cuenta | Perfil, actividad, edición de datos, cerrar sesión |
 | Administración | Dashboard, Pedidos, Solicitudes, Catálogo, Clientes, Actividad |
 
-## 4. User flow del consumidor casual
+---
 
-### 4.1 Recorrido principal
+# 6. User Flow — Consumidor casual
+
+## 6.1 Flujo principal
 
 ```text
 Inicio
-  ↓
+↓
 Comprar productos
-  ↓
-Descubrimiento: destacados y categorías
-  ↓
+↓
+Destacados / Categorías
+↓
 Catálogo
-  ↓
-Búsqueda, categoría o filtros
-  ↓
-Resultados dentro de /catalogo
-  ↓
+↓
+Búsqueda / Categoría / Filtros
+↓
+Resultados
+↓
 Detalle del producto
-  ↓
-Seleccionar cantidad, color y material
-  ↓
+↓
+Cantidad / Color / Material
+↓
 Agregar al carrito
-  ↓
-Feedback inline + contador actualizado
-  ↓
+↓
+Feedback inline
+↓
 Carrito
-  ↓
+↓
 Checkout de productos
-  ↓
+↓
 Datos
-  ↓
+↓
 Entrega
-  ↓
+↓
 Revisión
-  ↓
-Login modal o registro si no existe cuenta
-  ↓
+↓
+Login / Registro si es necesario
+↓
 Confirmación
-  ↓
-/pedido/:id
-  ↓
-Redirección automática a /cuenta con actividad actualizada
+↓
+Pedido
+↓
+Cuenta / Actividad
 ```
 
-### 4.2 Decisiones del recorrido
+## 6.2 Reglas
 
-El usuario no entra directamente a una cuadrícula extensa. Primero encuentra una selección de productos destacados y categorías visuales. Si busca algo concreto, puede usar el buscador, que consulta el backend con debounce.
+El usuario no entra directamente en una cuadrícula extensa como primera experiencia.
 
-La búsqueda no crea una ruta adicional. La misma ruta `/catalogo` representa tanto el descubrimiento como los resultados, utilizando `q` y `categoria` en la URL.
+La Home introduce los productos destacados y las categorías.
 
-La tarjeta no intenta vender toda la especificación técnica. Su función es provocar exploración. El detalle es el lugar donde el usuario conoce material, dimensiones, tiempo de impresión, disponibilidad y variantes.
+La misma ruta `/catalogo` representa descubrimiento y resultados.
 
-El usuario puede avanzar como visitante hasta la revisión, pero el botón de confirmación exige autenticación. El login aparece en modal y conserva el pedido ya construido.
-
-## 5. User flow del cliente técnico
-
-### 5.1 Recorrido con archivo
+La búsqueda utiliza:
 
 ```text
-Inicio o Catálogo
-  ↓
-CTA “Solicitar una impresión personalizada”
-  ↓
-Pantalla de solicitud
-  ↓
-“Ya tengo mi archivo” / “Tengo archivo”
-  ↓
-Paso 1: cargar archivo .stl/.obj
-  ↓
-Paso 2: requisitos técnicos
-       material, color, relleno, cantidad, dimensiones,
-       tolerancias, uso y notas
-  ↓
-Paso 3: contacto y revisión
-  ↓
-Autocompletar datos si inicia sesión
-  ↓
-Revisar diferencias y editar
-  ↓
-Agregar al carrito como “Pendiente de cotización”
-  ↓
-Carrito: sección Solicitudes
-  ↓
-Botón “Continuar con solicitud de cotización”
-  ↓
-Checkout de solicitud: datos → entrega → revisión
-  ↓
-Login modal o registro antes de enviar
-  ↓
+/catalogo?q=...
+```
+
+Las categorías utilizan:
+
+```text
+/catalogo?categoria=...
+```
+
+El detalle concentra las especificaciones técnicas.
+
+El usuario puede avanzar como visitante, pero debe autenticarse antes de confirmar el pedido.
+
+---
+
+# 7. User Flow — Cliente técnico
+
+## 7.1 Con archivo
+
+```text
+Inicio / Catálogo
+↓
+Solicitar impresión personalizada
+↓
+Tengo un archivo
+↓
+Paso 1 — Cargar archivo
+↓
+Paso 2 — Requisitos técnicos
+↓
+Paso 3 — Contacto y revisión
+↓
+Revisión
+↓
+Agregar al carrito
+↓
+Solicitud marcada como “Pendiente de cotización”
+↓
+Carrito
+↓
+Checkout de solicitud
+↓
+Datos
+↓
+Entrega
+↓
+Revisión
+↓
+Login / Registro
+↓
 Enviar solicitud
-  ↓
-/pedido/:id o confirmación de solicitud
-  ↓
-Cuenta: actividad con estado “Recibida”
-  ↓
-Estado posterior: “En revisión” + WhatsApp
+↓
+Solicitud recibida
+↓
+Cuenta
+↓
+En revisión
 ```
 
-### 5.2 Recorrido sin archivo
+## 7.2 Sin archivo
 
 ```text
-Inicio o Catálogo
-  ↓
-CTA de solicitud personalizada
-  ↓
-“Necesito ayuda con el diseño”
-  ↓
-Paso 1: descripción o referencia
-  ↓
-Paso 2: requisitos técnicos
-  ↓
-Paso 3: contacto y revisión
-  ↓
-Agregar al carrito como solicitud pendiente
-  ↓
-Checkout específico de solicitud
-  ↓
-Autenticación antes de enviar
-  ↓
-Estado “Recibida” → “En revisión”
+Inicio / Catálogo
+↓
+Solicitar impresión personalizada
+↓
+Necesito ayuda con el diseño
+↓
+Paso 1 — Descripción / Referencia
+↓
+Paso 2 — Requisitos técnicos
+↓
+Paso 3 — Contacto y revisión
+↓
+Agregar solicitud
+↓
+Checkout de solicitud
+↓
+Login / Registro
+↓
+Enviar solicitud
+↓
+Recibida
+↓
+En revisión
 ```
 
-### 5.3 Reglas del recorrido técnico
+## 7.3 Datos técnicos
 
-El archivo no es la única puerta de entrada. La tienda acepta tanto al usuario que ya tiene un `.stl` o `.obj` como al que necesita ayuda para definir el diseño.
+El flujo puede solicitar:
 
-El formulario funciona por pasos. En escritorio, el resumen final ofrece enlaces directos para editar cada sección. En móvil, la navegación vuelve a los pasos para conservar una interacción clara y cómoda.
+- material;
+- color;
+- cantidad;
+- relleno;
+- dimensiones;
+- tolerancias;
+- uso;
+- notas adicionales.
 
-El formulario se guarda como borrador local cuando sea posible. El archivo puede no sobrevivir en todos los navegadores o contextos, por lo que la interfaz debe informar si necesita volver a seleccionarse.
+Estos campos deben adaptarse al contexto y no deben obligar al usuario a definir información que todavía desconoce.
 
-## 6. User flow del administrador
+---
 
-### 6.1 Acceso y dashboard
+# 8. Solicitud personalizada
+
+## 8.1 Selección inicial
+
+La pantalla `/solicitud` debe presentar claramente:
 
 ```text
-/login administrativo
-  ↓
-Validación de administrador
-  ↓
+Solicita una impresión personalizada
+
+[ Tengo un archivo ]
+
+Ya tengo mi modelo 3D
+
+
+[ Necesito ayuda con el diseño ]
+
+No tengo un modelo terminado
+```
+
+Ambas opciones tienen la misma importancia visual.
+
+## 8.2 Paso 1 — Archivo
+
+Permite:
+
+- seleccionar archivo;
+- ver nombre;
+- ver tamaño;
+- eliminar;
+- volver a seleccionar;
+- continuar.
+
+Formatos iniciales:
+
+```text
+.stl
+.obj
+```
+
+El MVP debe validar formato y tamaño.
+
+No se incluye en esta fase un visor 3D ni cotización geométrica automática.
+
+## 8.3 Paso 1 — Ayuda de diseño
+
+Debe permitir explicar:
+
+- qué necesita;
+- para qué se utilizará;
+- dimensiones aproximadas si las conoce;
+- referencias;
+- notas adicionales.
+
+## 8.4 Paso 2 — Requisitos
+
+Incluye los datos técnicos conocidos por el cliente.
+
+Cuando no tenga una respuesta, debe poder indicar que necesita asesoría.
+
+## 8.5 Paso 3 — Contacto y revisión
+
+Debe mostrar:
+
+```text
+Datos personales
+Archivo / descripción
+Requisitos técnicos
+Entrega
+Estado de cotización
+```
+
+Cada sección debe poder editarse.
+
+---
+
+# 9. Precio y cotización
+
+Una solicitud personalizada no debe mostrar un precio inventado.
+
+Debe utilizar:
+
+```text
+Precio
+Pendiente de cotización
+```
+
+La explicación puede indicar que el valor depende de:
+
+- material;
+- tamaño;
+- complejidad;
+- cantidad;
+- tiempo de impresión.
+
+En el carrito:
+
+```text
+Solicitud personalizada
+Pendiente de cotización
+```
+
+No se debe representar la solicitud como:
+
+```text
+₡0
+```
+
+ni como una compra con precio definitivo.
+
+---
+
+# 10. Carrito híbrido
+
+El carrito representa una experiencia unificada, pero visualmente diferencia dos tipos de operación.
+
+## 10.1 Productos
+
+```text
+PRODUCTOS
+
+Producto
+Cantidad
+Color
+Material
+Precio
+Subtotal
+```
+
+## 10.2 Solicitudes
+
+```text
+SOLICITUDES DE COTIZACIÓN
+
+Solicitud personalizada
+Pendiente de cotización
+Resumen técnico
+Estado
+```
+
+## 10.3 Checkout
+
+Debe existir una acción independiente para cada tipo:
+
+```text
+[ Continuar compra ]
+```
+
+```text
+[ Continuar con solicitud de cotización ]
+```
+
+La experiencia es una sola tienda, pero los procesos operativos son diferentes.
+
+---
+
+# 11. Checkout
+
+## 11.1 Checkout de productos
+
+```text
+Datos
+↓
+Entrega
+↓
+Revisión
+↓
+Confirmación
+```
+
+La revisión debe mostrar:
+
+- productos;
+- variantes;
+- cantidades;
+- subtotal;
+- entrega;
+- total;
+- datos del cliente.
+
+## 11.2 Checkout de solicitudes
+
+```text
+Datos
+↓
+Entrega
+↓
+Revisión
+↓
+Enviar solicitud
+```
+
+La revisión debe mostrar:
+
+- archivo o descripción;
+- requisitos;
+- datos del cliente;
+- entrega;
+- estado pendiente de cotización.
+
+El CTA final debe ser:
+
+```text
+Enviar solicitud de cotización
+```
+
+No:
+
+```text
+Pagar
+```
+
+---
+
+# 12. Autenticación
+
+La autenticación real es requisito del proyecto.
+
+## 12.1 Login
+
+Se presenta como modal cuando el usuario ya está realizando una acción.
+
+Ejemplo:
+
+```text
+Revisión
+↓
+Confirmar / Enviar
+↓
+Login
+↓
+Continuar
+```
+
+El modal debe permitir acceder a:
+
+```text
+Iniciar sesión
+Crear cuenta
+```
+
+## 12.2 Registro
+
+Ruta:
+
+```text
+/registro
+```
+
+Datos iniciales:
+
+- nombre;
+- correo;
+- contraseña.
+
+Dirección y otros datos de envío pueden completarse posteriormente.
+
+## 12.3 Conservación del contexto
+
+El usuario no debe perder:
+
+- carrito;
+- información del checkout;
+- datos de la solicitud;
+- paso actual.
+
+La implementación técnica decidirá posteriormente cómo persistir ese contexto.
+
+---
+
+# 13. Cuenta
+
+La cuenta centraliza:
+
+```text
+Cuenta
+├── Información personal
+├── Editar datos
+├── Pedidos
+├── Solicitudes
+└── Actividad
+```
+
+La actividad será unificada.
+
+Ejemplo:
+
+```text
+Actividad
+
+Todos
+Pedidos
+Solicitudes
+
+Pedido #1024
+Confirmado
+
+Solicitud #1032
+En revisión
+
+Pedido #1018
+Completado
+```
+
+Los filtros permiten cambiar el tipo de actividad sin crear múltiples sistemas independientes.
+
+---
+
+# 14. User Flow — Administrador
+
+## 14.1 Dashboard
+
+```text
+Login administrativo
+↓
+Validación
+↓
 /admin
-  ├── Métricas generales
-  ├── Alertas
-  ├── Acciones rápidas
-  ├── Pedidos recientes
-  ├── Solicitudes pendientes
-  ├── Productos agotados o no publicados
-  ├── Actividad reciente
-  └── Accesos a bandejas
 ```
 
-Habrá un administrador único en esta versión. La arquitectura de permisos debe dejar espacio para roles futuros, aunque no se diseñen todavía permisos separados para operadores.
+El dashboard debe mostrar:
 
-### 6.2 Gestión de pedidos
+- métricas;
+- alertas;
+- pedidos recientes;
+- solicitudes pendientes;
+- productos agotados o no publicados;
+- actividad reciente;
+- accesos rápidos.
+
+## 14.2 Pedidos
 
 ```text
 /admin/pedidos
-  ↓
-Buscar, filtrar y ordenar
-  ↓
-/admin/pedidos/:id
-  ├── Datos del cliente
-  ├── Productos y variantes
-  ├── Dirección
-  ├── Estado
-  ├── Actividad
-  ├── Editar pedido
-  ├── Cambiar estado
-  ├── Cancelar
-  └── Simular reembolso
+↓
+Buscar
+↓
+Filtrar
+↓
+Ordenar
+↓
+Detalle
 ```
 
-Las acciones de pago y reembolso son simuladas porque el MVP no integra una pasarela real.
+En detalle:
 
-### 6.3 Gestión de solicitudes
+```text
+Cliente
+Productos
+Variantes
+Dirección
+Estado
+Actividad
+
+Acciones:
+Editar
+Cambiar estado
+Cancelar
+Simular reembolso
+```
+
+Las operaciones de pago y reembolso se simulan porque no existe una pasarela de pagos real en el MVP.
+
+## 14.3 Solicitudes
 
 ```text
 /admin/solicitudes
-  ↓
-Buscar, filtrar por estado y ordenar
-  ↓
-/admin/solicitudes/:id
-  ├── Archivo 3D y descarga
-  ├── Datos técnicos
-  ├── Datos del cliente
-  ├── Notas internas
-  ├── Cotización
-  ├── Tiempo estimado
-  ├── Contacto por WhatsApp
-  ├── Aprobar archivo
-  ├── Rechazar archivo con motivo
-  ├── Cambiar estado
-  └── Convertir en pedido
+↓
+Buscar
+↓
+Filtrar
+↓
+Ordenar
+↓
+Detalle
 ```
 
-### 6.4 Gestión de catálogo
+El administrador puede:
 
-```text
-/admin/catalogo
-  ├── Listado de productos
-  ├── Crear producto
-  ├── Editar producto
-  ├── Publicar u ocultar
-  ├── Gestionar categorías
-  ├── Gestionar imágenes
-  ├── Gestionar variantes
-  ├── Gestionar materiales
-  ├── Gestionar precios
-  ├── Gestionar disponibilidad
-  └── Importar/exportar datos
-```
+- revisar archivos;
+- descargar archivos;
+- revisar datos técnicos;
+- consultar cliente;
+- añadir notas;
+- preparar cotización;
+- modificar precio o tiempo estimado;
+- contactar por WhatsApp;
+- aprobar archivo;
+- rechazar archivo con motivo;
+- cambiar estado;
+- convertir una solicitud aprobada en pedido.
 
-### 6.5 Gestión de clientes y actividad
+## 14.4 Catálogo
 
-```text
-/admin/clientes
-  ↓
-Buscar y filtrar clientes
-  ↓
-/admin/clientes/:id
-  ├── Perfil
-  ├── Editar datos
-  ├── Pedidos
-  └── Solicitudes
+El catálogo administrativo incluye:
 
-/admin/actividad
-  ├── Cambios de catálogo
-  ├── Cambios de pedidos
-  ├── Cambios de solicitudes
-  └── Acciones administrativas
-```
+- productos;
+- categorías;
+- imágenes;
+- variantes;
+- materiales;
+- precios;
+- disponibilidad;
+- publicación/ocultamiento;
+- importación masiva;
+- exportación masiva.
 
-El administrador podrá consultar y editar datos de clientes, además de ver sus pedidos y solicitudes. No se incluye en esta decisión suspender cuentas ni revisar actividad de acceso.
+## 14.5 Clientes
 
-## 7. Rutas definitivas de la aplicación
+El administrador puede:
+
+- consultar clientes;
+- buscar;
+- filtrar;
+- editar datos;
+- ver pedidos;
+- ver solicitudes.
+
+No forman parte de esta versión:
+
+- suspensión de cuentas;
+- reactivación de cuentas;
+- revisión de actividad de acceso/login.
+
+## 14.6 Actividad
+
+La actividad administrativa registra de forma comprensible:
+
+- cambios de catálogo;
+- cambios de pedidos;
+- cambios de solicitudes;
+- acciones administrativas.
+
+---
+
+# 15. Rutas definitivas
 
 | Ruta | Acceso | Propósito |
 |---|---|---|
-| `/` | Público | Home editorial con hero, manifiesto, destacados y categorías |
-| `/catalogo` | Público | Descubrimiento, búsqueda, categorías y resultados |
-| `/producto/:id` | Público | Detalle, variantes, especificaciones y acciones |
-| `/solicitud` | Público | Explicación breve y elección entre archivo o ayuda de diseño |
-| `/solicitud/archivo` | Público | Inicio de solicitud con archivo 3D |
-| `/solicitud/ayuda-diseno` | Público | Inicio de solicitud sin archivo listo |
-| `/carrito` | Público | Resumen separado de productos y solicitudes |
+| `/` | Público | Home |
+| `/catalogo` | Público | Catálogo, búsqueda y filtros |
+| `/producto/:id` | Público | Detalle |
+| `/solicitud` | Público | Selección del tipo de solicitud |
+| `/solicitud/archivo` | Público | Solicitud con archivo |
+| `/solicitud/ayuda-diseno` | Público | Solicitud con ayuda |
+| `/carrito` | Público | Carrito híbrido |
 | `/checkout/productos` | Público hasta confirmar | Checkout de productos |
-| `/checkout/solicitud` | Público hasta enviar | Checkout de solicitudes pendientes |
-| `/registro` | Público | Creación de cuenta |
-| `/pedido/:id` | Autenticado | Confirmación inicial del pedido o solicitud |
-| `/cuenta` | Autenticado | Perfil, edición de datos y actividad unificada |
-| `/admin` | Administrador | Dashboard completo |
-| `/admin/pedidos` | Administrador | Bandeja de pedidos |
-| `/admin/pedidos/:id` | Administrador | Detalle y operaciones del pedido |
-| `/admin/solicitudes` | Administrador | Bandeja de cotizaciones |
-| `/admin/solicitudes/:id` | Administrador | Revisión operativa de solicitud |
-| `/admin/catalogo` | Administrador | Gestión del catálogo |
-| `/admin/catalogo/nuevo` | Administrador | Crear producto |
+| `/checkout/solicitud` | Público hasta enviar | Checkout de solicitudes |
+| `/registro` | Público | Registro |
+| `/pedido/:id` | Autenticado | Confirmación y estado |
+| `/cuenta` | Autenticado | Perfil y actividad |
+| `/admin` | Administrador | Dashboard |
+| `/admin/pedidos` | Administrador | Pedidos |
+| `/admin/pedidos/:id` | Administrador | Detalle de pedido |
+| `/admin/solicitudes` | Administrador | Solicitudes |
+| `/admin/solicitudes/:id` | Administrador | Detalle de solicitud |
+| `/admin/catalogo` | Administrador | Catálogo |
+| `/admin/catalogo/nuevo` | Administrador | Nuevo producto |
 | `/admin/catalogo/:id/editar` | Administrador | Editar producto |
-| `/admin/clientes` | Administrador | Gestión de clientes |
+| `/admin/catalogo/categorias` | Administrador | Categorías |
+| `/admin/catalogo/archivos` | Administrador | Archivos del catálogo |
+| `/admin/catalogo/importar-exportar` | Administrador | Importación/exportación |
+| `/admin/clientes` | Administrador | Clientes |
 | `/admin/clientes/:id` | Administrador | Detalle de cliente |
-| `/admin/actividad` | Administrador | Registro de actividad administrativa |
+| `/admin/actividad` | Administrador | Actividad administrativa |
 
-Los estados de checkout pueden representarse internamente como pasos de la misma ruta o como subrutas. La decisión visual es que el usuario perciba un flujo continuo de tres pasos.
+Los pasos de checkout pueden representarse mediante subrutas o mediante estado interno. Eso queda para arquitectura.
 
-## 8. Descripción de pantallas y estados
+La experiencia visible debe mantenerse como:
 
-### 8.1 Home `/`
+```text
+Datos → Entrega → Revisión
+```
 
-**Contenido:** hero con dos CTAs equivalentes, manifiesto de marca, productos destacados cargados desde backend, categorías estáticas y elementos editoriales.
+y posteriormente:
 
-**Estados:** carga de destacados, destacados cargados, error contextual con reintento, ausencia de destacados, navegación normal y WhatsApp visible.
+```text
+Confirmar
+```
 
-**Decisión:** la home no incluye testimonios ni una sección extensa de “cómo funciona” en esta fase. La marca y el descubrimiento son su trabajo principal.
+o:
 
-### 8.2 Catálogo `/catalogo`
+```text
+Enviar solicitud
+```
 
-**Contenido:** categorías, buscador, filtros, resultados y tarjetas con imagen, nombre y precio.
+según el flujo.
 
-**Estados:** carga inicial, catálogo cargado, búsqueda con debounce, resultados encontrados, sin resultados, error con reintento y paginación o carga de más.
+---
 
-**Estado vacío:** muestra categorías sugeridas, opción para limpiar filtros y CTA hacia solicitud personalizada.
+# 16. Estados UX
 
-### 8.3 Detalle `/producto/:id`
+Todas las pantallas que dependen de datos deben contemplar los estados relevantes.
 
-**Contenido:** galería, nombre, precio, disponibilidad, variantes, CTA de carrito, CTA personalizado y especificaciones expandibles.
+## 16.1 Loading
 
-**Estados:** carga, producto cargado, producto no encontrado, error con reintento y retorno al catálogo, imagen cargando, imagen fallida y producto no disponible.
+Ejemplos:
 
-**Responsive:** miniaturas en escritorio y carrusel táctil en móvil.
+```text
+Cargando productos...
+Cargando solicitud...
+Guardando...
+```
 
-### 8.4 Solicitud `/solicitud`
+Puede utilizarse skeleton cuando aporte valor.
 
-**Contenido:** explicación breve del proceso y dos caminos: “Tengo archivo” y “Necesito ayuda con el diseño”.
+## 16.2 Success
 
-**Estados:** inicial, selección de camino, borrador recuperado, borrador descartado y error de recuperación.
+Ejemplos:
 
-### 8.5 Solicitud con archivo `/solicitud/archivo`
+```text
+Producto agregado al carrito.
+Solicitud enviada correctamente.
+Cambios guardados.
+```
 
-**Contenido:** carga de `.stl` o `.obj`, límite de peso, validación y avance a requisitos.
+## 16.3 Empty
 
-**Estados:** vacío, archivo seleccionado, carga, archivo válido, formato inválido, tamaño excedido, error de carga, archivo eliminado y archivo recuperado desde borrador.
+Ejemplos:
 
-### 8.6 Solicitud con ayuda `/solicitud/ayuda-diseno`
+```text
+No hay productos con estos filtros.
+Tu carrito está vacío.
+No tienes solicitudes todavía.
+```
 
-**Contenido:** descripción, referencias, uso previsto y requisitos disponibles.
+El estado vacío debe orientar al usuario.
 
-**Estados:** formulario vacío, datos parciales, datos válidos, validación, borrador recuperado y error de guardado local.
+## 16.4 Error
 
-### 8.7 Requisitos técnicos
+Ejemplo:
 
-**Contenido:** material, color, relleno, cantidad, dimensiones, tolerancias, uso, fecha deseada y notas.
+```text
+No pudimos cargar los productos.
+Intentá nuevamente.
+```
 
-**Estados:** incompleto, validación de campos, completo, archivo incompatible con requisitos y recuperación de borrador.
+Cuando sea posible:
 
-### 8.8 Contacto y revisión
+```text
+[ Reintentar ]
+```
 
-**Contenido:** datos de contacto, entrega, archivo o referencia, requisitos, factores que afectan la cotización y acciones de edición.
+## 16.5 Validación
 
-**Estados:** visitante, campos autocompletados tras login, diferencias entre formulario y perfil, revisión válida, datos incompletos y solicitud lista para agregar al carrito.
+Los errores deben aparecer cerca del campo correspondiente y explicar cómo corregirlo.
 
-### 8.9 Carrito `/carrito`
+Ejemplos:
 
-**Contenido:** sección Productos, sección Solicitudes, variantes, cantidades, subtotales, mensajes de cotización pendiente y dos botones de checkout separados.
+```text
+El archivo supera el tamaño permitido.
+```
 
-**Estados:** vacío, solo productos, solo solicitudes, productos y solicitudes juntos, producto agotado, solicitud pendiente, carrito recuperado de `localStorage` y conflicto de sincronización.
+```text
+El formato del archivo no es compatible.
+```
 
-**Sincronización:** al iniciar sesión, si existe un carrito guardado en cuenta y otro de invitado, se ofrecen tres opciones: conservar invitado, conservar cuenta o combinar.
+```text
+La contraseña no es válida.
+```
 
-### 8.10 Checkout de productos
+## 16.6 Processing
 
-**Paso 1 — Datos:** datos del cliente y aviso visible de que se requiere una cuenta para confirmar.
+Durante operaciones importantes:
 
-**Paso 2 — Entrega:** dirección, teléfono y preferencias necesarias.
+```text
+Enviando solicitud...
+Guardando cambios...
+Procesando pedido...
+```
 
-**Paso 3 — Revisión:** productos, variantes, entrega, total, condiciones y confirmación.
+La interfaz debe impedir múltiples envíos accidentales.
 
-**Estados:** avance, retroceso, validación, login modal, registro, error de datos, error de creación, confirmación pendiente y éxito.
+---
 
-### 8.11 Checkout de solicitudes
+# 17. Responsive UX
 
-Usa los mismos tres pasos, pero sustituye el total confirmado por una explicación de **“Pendiente de cotización”**.
+## 17.1 Desktop
 
-**Contenido adicional:** factores que definirán el precio: material, tamaño, complejidad, cantidad y tiempo de impresión.
+Prioridades:
 
-**Acción final:** “Enviar solicitud”, no “Pagar” ni “Confirmar compra”.
+- navegación completa;
+- galerías amplias;
+- composición por columnas;
+- resúmenes laterales;
+- filtros visibles;
+- tablas administrativas.
 
-### 8.12 Login modal
+## 17.2 Tablet
 
-**Contenido:** correo, contraseña, recuperación futura y enlace “Crear cuenta”.
+Prioridades:
 
-**Estados:** inicial, validación, credenciales incorrectas, carga, éxito, error de red y cierre.
+- jerarquía clara;
+- columnas cuando exista espacio;
+- filtros agrupados;
+- formularios cómodos.
 
-**Regla:** al elegir crear cuenta, se navega a `/registro`.
+## 17.3 Mobile
 
-### 8.13 Registro `/registro`
+Prioridad:
 
-**Contenido:** nombre, correo y contraseña. La dirección y el teléfono se completan después.
+```text
+Contenido
+↓
+Acción principal
+↓
+Información complementaria
+```
 
-**Estados:** formulario inicial, validación, correo existente, contraseña inválida, carga, registro exitoso y error de red.
+Se utilizarán:
 
-### 8.14 Pedido `/pedido/:id`
+- menú desplegable;
+- navegación contextual;
+- carruseles táctiles;
+- formularios de una sola columna;
+- botones adecuados para interacción táctil.
 
-**Contenido:** resultado completo para usuario autenticado, resumen, estado inicial, productos o solicitud, y próximos pasos.
+---
 
-**Estados:** carga, pedido encontrado, pedido no encontrado, error y confirmación.
+# 18. Tema visual aplicado a UX
 
-Después de la primera confirmación, el sistema redirige automáticamente a `/cuenta` con la actividad actualizada.
+La Fase 2 define dos temas:
 
-### 8.15 Cuenta `/cuenta`
+## Dark Mode
 
-**Contenido:** perfil básico, edición de datos, dirección, teléfono y resumen unificado de pedidos y solicitudes.
+Es el tema principal y la experiencia visual de referencia.
 
-**Estados:** autenticado, carga de perfil, edición, guardado exitoso, error de guardado, actividad vacía y filtros por tipo.
+Debe mantener:
 
-### 8.16 Dashboard `/admin`
+```text
+#0A0E1A
+#111827
+#1F2937
+#00D4FF
+#0EA5E9
+#F1F5F9
+#94A3B8
+```
 
-**Contenido:** métricas, alertas, pedidos recientes, solicitudes pendientes, productos agotados/no publicados, actividad reciente y accesos rápidos.
+## Light Mode
 
-**Estados:** carga, dashboard cargado, datos parciales, error por widget, sin actividad y permisos insuficientes.
+Disponible mediante toggle.
 
-### 8.17 Bandeja administrativa
+La estructura y jerarquía deben permanecer iguales entre ambos temas.
 
-**Pedidos:** filtros, búsqueda, orden, estados, acciones y acceso al detalle.
+El diseño visual de Fase 4 será responsable de convertir esta decisión en tokens y componentes concretos.
 
-**Solicitudes:** filtros por Recibida, En revisión, Cotizada, Aprobada, Rechazada y Convertida; acceso a archivos y acciones operativas.
+---
 
-**Estados comunes:** carga, resultados, vacío, error, selección, acción en proceso, éxito y confirmación de acción destructiva.
+# 19. Accesibilidad
 
-### 8.18 Catálogo administrativo
+La experiencia debe contemplar:
 
-**Contenido:** productos, categorías, imágenes, variantes, materiales, precios, disponibilidad e importación/exportación.
+- navegación por teclado;
+- labels en formularios;
+- mensajes de error asociados a campos;
+- texto alternativo para imágenes informativas;
+- contraste suficiente;
+- estados que no dependan únicamente del color;
+- botones con nombres claros;
+- modales accesibles;
+- foco visible;
+- respeto a `prefers-reduced-motion`.
 
-**Estados:** listado, búsqueda, creación, edición, guardado, publicación, ocultamiento, eliminación, importación válida, importación inválida, exportación y error.
+---
 
-### 8.19 Clientes y actividad administrativa
+# 20. Microcopy
 
-**Clientes:** búsqueda, filtros, perfil, edición, pedidos y solicitudes.
+El tono debe ser:
 
-**Actividad:** eventos administrativos ordenados cronológicamente.
+- claro;
+- directo;
+- profesional;
+- cercano.
 
-**Estados:** carga, vacío, error, cliente encontrado, cliente inexistente, guardado exitoso y cambios pendientes.
+Debe evitarse:
 
-## 9. Decisiones de mockup y composición
+- lenguaje excesivamente corporativo;
+- jerga técnica innecesaria;
+- mensajes ambiguos;
+- textos excesivamente largos.
 
-### 9.1 Home
+Ejemplos:
 
-- Fondo dark mode `#0A0E1A`.
-- Hero dividido: mensaje a la izquierda y visual de producto o fabricación a la derecha.
-- Dos CTAs equivalentes, sin convertir uno en acción secundaria.
-- Rejilla CAD con opacidad baja únicamente en el hero.
-- Manifiesto breve que explique fabricación local con alcance global.
-- Productos destacados como una selección curada, no como todo el catálogo.
-- Categorías como bloques visuales enlazables.
+```text
+Agregar al carrito
+```
 
-### 9.2 Catálogo
+```text
+Solicitar impresión personalizada
+```
 
-- Contenedor de hasta 1280px y grid de 12 columnas.
-- Buscador visible sin dominar la pantalla.
-- Tarjetas limpias con imagen, nombre y precio.
-- Cian reservado para acciones y estados importantes.
-- Categorías accesibles desde bloques y menú desplegable.
-- Sin badge de disponibilidad en tarjeta.
+```text
+Enviar solicitud de cotización
+```
 
-### 9.3 Detalle
+```text
+Pendiente de cotización
+```
 
-- Galería como primer ancla visual.
-- Información comercial y acciones junto a la imagen.
-- Especificaciones en acordeón.
-- Dos CTAs con jerarquía equivalente.
-- Variantes visibles antes de agregar al carrito.
-- Glow solo en interacción y acciones principales.
+```text
+En revisión
+```
 
-### 9.4 Formularios
+---
 
-- Flujo por pasos con indicador de avance.
-- Secciones cortas y agrupadas por intención.
-- Validación cercana al campo.
-- Errores claros y accionables.
-- Resumen editable antes de enviar.
-- En móvil, navegación paso a paso; en escritorio, enlaces directos de edición.
+# 21. Mockup — Qué debe demostrar
 
-### 9.5 Panel administrativo
+El mockup de esta fase debe demostrar:
 
-- Layout de aplicación, diferente al marketing público.
-- Navegación lateral persistente en escritorio.
-- Dashboard con tarjetas métricas y bandejas operativas.
-- Tablas o listas con filtros y acciones claras.
-- Confirmación para cancelar, eliminar, rechazar o simular reembolso.
-- Mismo lenguaje visual, pero con mayor densidad de información.
+- jerarquía;
+- estructura;
+- navegación;
+- recorridos;
+- acciones;
+- separación entre compra y solicitud;
+- comportamiento responsive.
 
-## 10. Lo que se descartó y por qué
+No es todavía el diseño visual definitivo del sistema.
 
-| Propuesta descartada | Motivo |
-|---|---|
-| “Personalizado” como elemento permanente principal del header | La navegación debe mantenerse limpia; el CTA funciona mejor en hero y catálogo |
-| Catálogo completo como primera vista | Perjudica el descubrimiento visual y se siente como una cuadrícula genérica |
-| Especificaciones técnicas visibles en cada tarjeta | Satura al consumidor casual |
-| Mini-resumen flotante al agregar al carrito | Interrumpe la exploración; el feedback inline es suficiente |
-| Login obligatorio al entrar al checkout | Aumenta fricción antes de que el usuario comprenda el pedido |
-| Compras o solicitudes como invitado | El proyecto requiere cuenta real para asociar datos e historial |
-| Registro dentro de modal | El registro necesita una pantalla dedicada |
-| Formulario personalizado en una sola pantalla | Demasiados campos y archivo aumentan carga cognitiva |
-| Archivo 3D obligatorio | Excluye a quienes necesitan ayuda para definir su diseño |
-| Precio estimado automático | Sin análisis real del modelo, el precio podría ser engañoso |
-| Un solo checkout indistinto | Productos tienen precio confirmado y solicitudes tienen precio pendiente |
-| Dos carritos completamente separados | Se pierde la visión unificada de actividad antes de elegir checkout |
-| Un solo botón de checkout para todo el carrito | No permite distinguir compra de cotización |
-| Confirmación genérica para invitados | No existen confirmaciones sin cuenta |
-| Categorías únicamente en bloques | El menú desplegable mejora el acceso cuando el catálogo crezca |
-| Filtros avanzados en la URL | Harían las rutas demasiado complejas en esta versión |
-| Badge de disponibilidad en todas las tarjetas | Rompe la composición visual; la información vive en el detalle |
-| Ocultar productos no disponibles | Se pierde descubrimiento; se mantienen visibles sin acción alternativa |
-| Imagen genérica de stock cuando falla una imagen | Contradice la dirección visual y la identidad propia |
-| Partículas en loop y glow generalizado | Distraen, cansan y eliminan el impacto de los efectos |
-| Pasarela de pagos real | Está fuera del alcance del MVP |
-| Cotizador automático con visor 3D | Fuera del prototipo inicial y requiere infraestructura adicional |
-| Roles administrativos múltiples desde el inicio | Se usará un administrador único, dejando la estructura preparada para roles futuros |
-| Gestión de suspensión de clientes y actividad de login | No es necesaria para el panel administrativo inicial |
-| Importación/exportación masiva del catálogo | Sí se incluye, porque el administrador la seleccionó como parte de la gestión completa |
+El detalle visual final corresponde a la Fase 4.
 
-## 11. Dependencias con las siguientes fases
+---
 
-La Fase 3 deja definidas las pantallas y flujos, pero la implementación requerirá confirmar durante la Fase 5 y 6:
+# 22. Pantallas mínimas a representar
 
-- Estructura definitiva de entidades de pedido y solicitud.
-- Estados exactos de una cotización.
-- Estrategia de almacenamiento de archivos 3D.
-- Persistencia del borrador local.
-- Reglas de combinación de carritos.
-- Permisos del administrador y futura extensión de roles.
-- Respuestas de API para dashboard y bandejas.
-- Formato de importación y exportación masiva.
+## Público
 
-Estas decisiones no bloquean el mockup. Se documentarán como contratos antes de construir los componentes.
+```text
+Home
+Catálogo
+Detalle de producto
+Selección de solicitud
+Solicitud con archivo
+Solicitud sin archivo
+Carrito
+Checkout de productos
+Checkout de solicitud
+Login modal
+Registro
+Cuenta
+Pedido / solicitud
+```
 
-## 12. Criterio de verificación de la Fase 3
+## Administración
 
-La fase se considera completa cuando:
+```text
+Dashboard
+Pedidos
+Detalle de pedido
+Solicitudes
+Detalle de solicitud
+Catálogo
+Nuevo producto
+Editar producto
+Clientes
+Detalle de cliente
+Actividad
+```
 
-- [x] El mapa de navegación contempla consumidor, cliente técnico y administrador.
-- [x] El consumidor casual tiene un flujo completo desde Inicio hasta Cuenta.
-- [x] El cliente técnico puede iniciar con archivo o con ayuda de diseño.
-- [x] Productos y solicitudes conviven en el carrito sin compartir checkout indebidamente.
-- [x] La cuenta es obligatoria antes de confirmar o enviar.
-- [x] Las rutas definitivas están identificadas.
-- [x] Cada pantalla tiene estados de carga, vacío, error y éxito cuando corresponda.
-- [x] Las decisiones visuales respetan la Fase 2.
-- [x] El panel administrativo tiene dashboard y módulos operativos.
-- [x] Las acciones descartadas tienen una razón registrada.
-- [x] El documento puede servir como base para wireframes y mockups de alta fidelidad.
+---
 
-**Estado:** Fase 3 — UX, user flow y mockup: **definición completada; pendiente de traducir a wireframes/mockups visuales**.
+# 23. Orden recomendado para construir los mockups
 
-## 13. Referencias útiles
+```text
+1. Home
+2. Catálogo
+3. Detalle de producto
+4. Solicitud personalizada
+5. Carrito
+6. Checkout
+7. Login / Registro
+8. Cuenta
+9. Pedido / Solicitud
+10. Administración
+```
 
-[1]: https://react.dev/ "React official documentation"
-[2]: https://reactrouter.com/ "React Router documentation"
-[3]: https://developer.mozilla.org/en-US/docs/Web/API/AbortController "MDN AbortController documentation"
-[4]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "MDN URLSearchParams documentation"
-[5]: https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage "MDN localStorage documentation"
-[6]: https://developer.mozilla.org/en-US/docs/Web/Accessibility "MDN accessibility documentation"
-[7]: https://tailwindcss.com/docs/responsive-design "Tailwind CSS responsive design"
-[8]: https://tailwindcss.com/docs/dark-mode "Tailwind CSS dark mode"
-[9]: https://www.w3.org/WAI/ARIA/apg/ "WAI-ARIA Authoring Practices Guide"
-[10]: https://web.dev/learn/performance "Web performance learning resources"
+Las primeras pantallas deben establecer el lenguaje visual público.
+
+La solicitud personalizada debe definirse inmediatamente después porque representa el segundo modelo de negocio.
+
+---
+
+# 24. Decisiones que quedan para fases posteriores
+
+La Fase 3 no decide todavía:
+
+- componentes React definitivos;
+- estructura final de carpetas;
+- contratos completos de API;
+- base de datos definitiva;
+- estrategia JWT;
+- almacenamiento de archivos;
+- implementación de upload;
+- estrategia exacta de persistencia del carrito;
+- estrategia exacta de persistencia del borrador;
+- reglas técnicas de importación/exportación;
+- cálculo real de cotización;
+- despliegue.
+
+Estas decisiones corresponden a arquitectura, datos, API e implementación.
+
+La UX solamente define el comportamiento esperado.
+
+---
+
+# 25. Fuera de esta fase
+
+No se incorporan como parte de la UX actual:
+
+- visor 3D interactivo;
+- cotización automática en tiempo real;
+- pagos reales;
+- logística automatizada;
+- inventario empresarial avanzado;
+- marketplace;
+- múltiples roles administrativos operativos;
+- gestión avanzada de seguridad de cuentas;
+- suspensión/reactivación de clientes.
+
+---
+
+# 26. Checklist de validación
+
+## Navegación
+
+- [ ] Navegación pública definida.
+- [ ] Navegación administrativa definida.
+- [ ] Rutas definidas.
+- [ ] Contextos de navegación definidos.
+
+## Compra
+
+- [ ] Home definida.
+- [ ] Catálogo definido.
+- [ ] Detalle definido.
+- [ ] Variantes definidas.
+- [ ] Carrito definido.
+- [ ] Checkout definido.
+- [ ] Autenticación integrada.
+
+## Personalización
+
+- [ ] Entrada con archivo.
+- [ ] Entrada sin archivo.
+- [ ] Formulario por pasos.
+- [ ] Requisitos técnicos.
+- [ ] Precio pendiente.
+- [ ] Checkout separado.
+- [ ] Estado posterior definido.
+
+## Cuenta
+
+- [ ] Registro.
+- [ ] Login.
+- [ ] Perfil.
+- [ ] Datos.
+- [ ] Actividad.
+
+## Administración
+
+- [ ] Dashboard.
+- [ ] Pedidos.
+- [ ] Solicitudes.
+- [ ] Catálogo.
+- [ ] Importación/exportación.
+- [ ] Clientes.
+- [ ] Actividad.
+
+## Responsive
+
+- [ ] Desktop.
+- [ ] Tablet.
+- [ ] Mobile.
+- [ ] Menú móvil.
+- [ ] Navegación contextual.
+- [ ] Formularios móviles.
+
+## Accesibilidad
+
+- [ ] Navegación por teclado.
+- [ ] Labels.
+- [ ] Estados de error.
+- [ ] Contraste.
+- [ ] Focus.
+- [ ] Reduced motion.
+
+---
+
+# 27. Estado de la Fase 3
+
+**Estado: UX DEFINIDA**
+
+La experiencia funcional está suficientemente definida para pasar a la siguiente etapa.
+
+La Fase 3 establece:
+
+```text
+Qué pantallas existen
+↓
+Cómo se conectan
+↓
+Qué puede hacer el usuario
+↓
+Qué puede hacer el administrador
+↓
+Cómo funcionan los dos modelos de negocio
+↓
+Qué ocurre en móvil
+↓
+Qué estados debe contemplar la interfaz
+```
+
+---
+
+# 28. Handoff a Fase 4
+
+La siguiente fase es:
+
+# Fase 4 — Design System y Diseño Visual
+
+La Fase 4 debe transformar las decisiones UX en una interfaz visual de alta fidelidad.
+
+Debe definir:
+
+- colores finales;
+- tokens visuales;
+- tipografía;
+- escala tipográfica;
+- espaciado;
+- grid;
+- border radius;
+- sombras;
+- glow;
+- glassmorphism;
+- iconografía;
+- botones;
+- inputs;
+- cards;
+- badges;
+- modales;
+- dropdowns;
+- navegación;
+- componentes de formulario;
+- estados;
+- layouts;
+- responsive;
+- variantes Dark/Light.
+
+Los mockups de alta fidelidad deberán respetar la dirección visual de la Fase 2.
+
+La Fase 4 será también la etapa donde se utilizarán las herramientas de diseño asistido por IA y/o Figma para transformar esta especificación UX en pantallas visuales.
+
+---
+
+# 29. Regla de continuidad del proyecto
+
+Las siguientes fases deben utilizar como fuente de verdad:
+
+```text
+Fase 1
++
+Fase 2
++
+Fase 3
+```
+
+No se deben volver a abrir decisiones ya establecidas en estos documentos salvo que aparezca una contradicción real, una nueva necesidad del negocio o una limitación técnica comprobada.
+
+La próxima decisión principal del proyecto es visual, no funcional:
+
+> **Diseñar cómo se ve la experiencia ya definida.**
