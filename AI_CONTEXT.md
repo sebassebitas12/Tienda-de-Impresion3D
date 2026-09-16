@@ -71,7 +71,7 @@ El desarrollador acordó este orden antes de tocar código:
 
 | Documento | Ubicación | Para qué sirve |
 |-----------|-----------|----------------|
-| Documento vivo del proyecto | `docs/Tienda de impresión 3D — Documento vivo del proyecto.md` | Historia completa del proyecto, fases, decisiones |
+| Documento vivo del proyecto | `docs/PROYECTO_VIVO.md` | Historia completa del proyecto, fases, decisiones |
 | Requisitos funcionales | `docs/REQUIREMENTS.md` | 34 RF priorizados con MoSCoW |
 | Arquitectura | `docs/ARCHITECTURE.md` | Estructura de carpetas, responsabilidades, flujo de datos |
 | Lógica de negocio | `docs/BUSINESS-LOGIC.md` | Reglas del negocio, cálculos, estados |
@@ -95,6 +95,9 @@ Estas decisiones ya fueron discutidas y aprobadas. No se reabren salvo que el de
 | 2026-09-16 | El asistente de IA orienta al cliente (material, dimensiones, tiempo, precio orientativo) pero nunca da precio final — eso lo confirma el admin |
 | 2026-09-16 | Librería de gráficos para el dashboard: **Recharts** |
 | 2026-09-16 | Anteproyecto redactado con Gemini 2.0 Flash Thinking; revisión y ajustes pendientes |
+| 2026-09-16 | Nombre comercial de la tienda: **Vértice CR** |
+| 2026-09-16 | Proyecto de dos personas: desarrollador frontend + especialista en impresión 3D |
+| 2026-09-16 | Valores de marca: confianza, seguridad, calidad, "encontrarás lo que necesitás" |
 
 ---
 
