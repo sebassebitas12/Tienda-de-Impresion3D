@@ -22,6 +22,13 @@ No es un side project libre. Tiene una **rúbrica académica** que exige: React 
 
 **Última actualización:** 2026-09-16
 
+### Deadlines académicos
+
+| Entregable | Fecha límite |
+|------------|-------------|
+| Anteproyecto escrito + mockups anexados | **21 de septiembre de 2026** |
+| Entrega final del sistema completo | Según calendario del curso |
+
 ### Fases y su estado
 
 | Fase | Descripción | Estado |
@@ -30,9 +37,9 @@ No es un side project libre. Tiene una **rúbrica académica** que exige: React 
 | Fase 1 | Producto y requisitos | ✅ Completa |
 | Fase 2 | Investigación y dirección visual | ✅ Completa (documentada, pendiente de formalizar en libro de marca) |
 | Fase 3 | UX, user flows y mockups | ✅ Documentada en `docs/fase3_ux_user_flows_mockup.md`, pendiente de mockups de alta fidelidad |
-| **Anteproyecto** | Documento académico formal del proyecto final | 🔄 **Próximo entregable** |
+| **Anteproyecto** | Documento académico formal — borrador generado con Gemini, pendiente de: nombre del estudiante, definir IA como asistente de cotización, adjuntar mockups | 🔄 **En progreso** |
 | Libro de marca | Formalización de identidad visual | ⏳ Después del anteproyecto |
-| Mockups HF | Alta fidelidad basada en wireframes existentes | ⏳ Después del libro de marca |
+| Mockups HF | Alta fidelidad basada en wireframes existentes — **requeridos como anexo del anteproyecto antes del 21 de sept.** | 🔄 **Urgente** |
 | Fase 4 | Design system en código | ⏳ Pendiente |
 | Fase 5 | Arquitectura en código | ⏳ Pendiente |
 | Fase 6 | Modelo de datos y contrato de API | ⏳ Pendiente |
@@ -76,6 +83,37 @@ El desarrollador acordó este orden antes de tocar código:
 
 ---
 
+## Decisiones tomadas y confirmadas
+
+Estas decisiones ya fueron discutidas y aprobadas. No se reabren salvo que el desarrollador lo indique explícitamente.
+
+| Fecha | Decisión |
+|-------|----------|
+| 2026-09-16 | Se crea `AI_CONTEXT.md` como archivo de orientación obligatorio para cualquier IA |
+| 2026-09-16 | Orden de trabajo: anteproyecto → libro de marca → mockups HF → implementación |
+| 2026-09-16 | Integración de IA definida: **asistente de cotización para impresión personalizada** |
+| 2026-09-16 | El asistente de IA orienta al cliente (material, dimensiones, tiempo, precio orientativo) pero nunca da precio final — eso lo confirma el admin |
+| 2026-09-16 | Librería de gráficos para el dashboard: **Recharts** |
+| 2026-09-16 | Anteproyecto redactado con Gemini 2.0 Flash Thinking; revisión y ajustes pendientes |
+
+---
+
+## Integración de IA — Detalle
+
+**Qué hace:** Asistente conversacional en la página de solicitud de impresión personalizada.
+
+**Flujo:**
+1. Cliente describe en lenguaje natural lo que quiere imprimir.
+2. El asistente responde con: material recomendado y justificación, dimensiones aproximadas, tiempo estimado de producción, rango de precio orientativo.
+3. El asistente aclara siempre que el precio final lo confirma el administrador (`PENDING_QUOTE`).
+4. El cliente puede continuar el diálogo para ajustar detalles antes de enviar la solicitud formal.
+
+**Implementación:** Llamada a API de IA (Claude o Gemini) con system prompt definido, desde `src/services/aiService.js`. No expone la API key en el cliente.
+
+**Por qué esta integración:** Es útil para el modelo de negocio real, es demostrable en presentación, y conecta directamente con la regla de `PENDING_QUOTE`. Cumple el requisito de "obligatorio y lo más importante" de la rúbrica.
+
+---
+
 ## Reglas que el desarrollador ya definió y no se negocian
 
 1. JavaScript/JSX. Sin TypeScript.
@@ -85,6 +123,17 @@ El desarrollador acordó este orden antes de tocar código:
 5. Ninguna rama estable se rompe. El trabajo nuevo se valida antes de mergear.
 6. Sin secretos en el repositorio.
 7. La IA explica cada cambio que propone. No se acepta código que el desarrollador no pueda leer y mantener.
+
+---
+
+## Tareas pendientes concretas (próximos pasos)
+
+En este orden exacto:
+
+1. **Mockups HF** — generar al menos vista escritorio y vista móvil antes del 21 de sept. Herramienta: Stitch u otra IA. Se adjuntan como Anexo A y Anexo B del anteproyecto.
+2. **Anteproyecto** — completar el borrador de Gemini: poner nombre del estudiante, cambiar "alguna librería de gráficos" por Recharts, precisar la IA como asistente de cotización, definir los 2 flujos N8N, adjuntar mockups.
+3. **Libro de marca** — después de entregar el anteproyecto.
+4. **Implementación** — después de tener libro de marca y mockups HF aprobados.
 
 ---
 
