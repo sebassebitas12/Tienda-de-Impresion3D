@@ -20,7 +20,7 @@ No es un side project libre. Tiene una **rúbrica académica** que exige: React 
 
 ## Estado actual del proyecto
 
-**Última actualización:** 2026-09-16
+**Última actualización:** 2026-09-17
 
 ### Deadlines académicos
 
@@ -35,35 +35,42 @@ No es un side project libre. Tiene una **rúbrica académica** que exige: React 
 |------|-------------|--------|
 | Fase 0 | Preparación del entorno (repo, Vite, estructura base) | ✅ Completa |
 | Fase 1 | Producto y requisitos | ✅ Completa |
-| Fase 2 | Investigación y dirección visual | ✅ Completa (documentada, pendiente de formalizar en libro de marca) |
-| Fase 3 | UX, user flows y mockups | ✅ Documentada en `docs/fase3_ux_user_flows_mockup.md`, pendiente de mockups de alta fidelidad |
-| **Anteproyecto** | Documento académico formal — borrador generado con Gemini, pendiente de: nombre del estudiante, definir IA como asistente de cotización, adjuntar mockups | 🔄 **En progreso** |
-| Libro de marca | Formalización de identidad visual | ⏳ Después del anteproyecto |
-| Mockups HF | Alta fidelidad basada en wireframes existentes — **requeridos como anexo del anteproyecto antes del 21 de sept.** | 🔄 **Urgente** |
+| Fase 2 | Investigación y dirección visual | ✅ Investigación completada; identidad todavía en consolidación |
+| Fase 3 | UX, user flows y mockups | 🔄 Mockups HF en construcción |
+| **Identidad visual** | Concepto, lenguaje visual, interacción y movimiento de Vértice CR | 🔄 En construcción |
+| **Anteproyecto** | Documento académico formal — pendientes administrativos/documentales indicados en la documentación | 🔄 En progreso |
+| Libro de marca | Formalización de identidad visual validada | ⏳ Posterior a la validación visual |
+| Mockups HF | Desktop + mobile de las vistas necesarias | 🔄 **Urgente** antes del 21 de septiembre |
 | Fase 4 | Design system en código | ⏳ Pendiente |
 | Fase 5 | Arquitectura en código | ⏳ Pendiente |
 | Fase 6 | Modelo de datos y contrato de API | ⏳ Pendiente |
 | Fase 7–11 | Implementación, optimización, calidad, deploy, docs | ⏳ Pendiente |
 
-### Qué hay en el repo ahora mismo
+---
+
+## Qué hay en el repo ahora mismo
 
 - `src/App.jsx` — **es el template de inicio de Vite**. No hay código de la tienda todavía.
 - `db.json` — base de datos simulada completa y lista para JSON Server.
-- `docs/` — documentación extensa: requisitos, arquitectura, métricas, UX, wireframes, dirección visual.
+- `docs/` — documentación extensa: requisitos, arquitectura, métricas, UX, wireframes, dirección visual e identidad en construcción.
 - No existe todavía: `src/pages/`, `src/features/`, `src/components/`, `src/services/`, `src/hooks/`, `src/context/`, `src/utils/`.
 
 ---
 
-## Orden de trabajo acordado
+## Orden de trabajo vigente
 
-El desarrollador acordó este orden antes de tocar código:
+El orden general se mantiene, pero la identidad visual se está refinando sobre el mockup base antes de formalizarla:
 
-1. **Anteproyecto** — documento académico completo y coherente con lo que realmente se va a desarrollar.
-2. **Libro de marca** — formalizar nombre, concepto, paleta, tipografías, logo, iconografía a partir de la dirección visual ya investigada.
-3. **Mockups de alta fidelidad** — convertir los wireframes existentes en pantallas reales con la identidad del libro de marca.
-4. **Implementación** — recién aquí se empieza a codear, usando los mockups como referencia.
+1. **Anteproyecto** — completar y dejar coherente con el producto real.
+2. **Identidad visual en construcción** — auditar y evolucionar el mockup base hasta consolidar el lenguaje visual.
+3. **Mockups de alta fidelidad** — completar desktop + mobile y validar todos los flujos necesarios.
+4. **Libro de marca** — formalizar las decisiones visuales que ya hayan sido validadas.
+5. **Design system** — convertir las decisiones estables en tokens, componentes y reglas.
+6. **Implementación** — recién aquí se empieza a codear usando los mockups y el sistema visual como referencia.
 
-**⚠️ No saltes a codear.** Si el anteproyecto, libro de marca o mockups no están marcados como completos arriba, la siguiente tarea es trabajar en el primero que esté pendiente.
+**⚠️ No saltes a codear.** La implementación permanece bloqueada mientras la identidad y los mockups HF no estén aprobados.
+
+Para el detalle exacto del recorrido visual utilizar `docs/IDENTITY-ROADMAP.md`.
 
 ---
 
@@ -71,33 +78,68 @@ El desarrollador acordó este orden antes de tocar código:
 
 | Documento | Ubicación | Para qué sirve |
 |-----------|-----------|----------------|
+| Roadmap de identidad | `docs/IDENTITY-ROADMAP.md` | Recorrido completo desde Base V0 hasta identidad cerrada y preparación para implementación |
+| Identidad visual en construcción | `docs/VISUAL-IDENTITY-WORKING.md` | Criterios visuales vigentes, auditoría y reglas de refinamiento |
+| Mockups HF | `docs/fase3_mockups_hf.md` | Registro y estado de cada mockup |
 | Documento vivo del proyecto | `docs/PROYECTO_VIVO.md` | Historia completa del proyecto, fases, decisiones |
 | Requisitos funcionales | `docs/REQUIREMENTS.md` | 34 RF priorizados con MoSCoW |
 | Arquitectura | `docs/ARCHITECTURE.md` | Estructura de carpetas, responsabilidades, flujo de datos |
 | Lógica de negocio | `docs/BUSINESS-LOGIC.md` | Reglas del negocio, cálculos, estados |
 | Métricas | `docs/METRICS.md` | Fórmulas puras para el dashboard |
-| Dirección visual | `docs/fase2_investigacion_direccion_visual.md` | Paleta, tipografía, personalidad de marca |
-| UX y wireframes | `docs/fase3_ux_user_flows_mockup.md` | Flujos de usuario, wireframes, componentes UI |
+| Dirección visual | `docs/fase2_investigacion_direccion_visual.md` | Investigación visual histórica y decisiones de referencia |
+| UX y wireframes | `docs/fase3_ux_user_flows_mockup.md` | Flujos de usuario, navegación y criterios UX |
 | Testing | `docs/TESTING.md` | Guía de pruebas, cobertura mínima 70% |
 | Base de datos | `db.json` | Datos simulados: usuarios, categorías, productos, pedidos |
 
 ---
 
-## Decisiones tomadas y confirmadas
+## Decisiones confirmadas
 
 Estas decisiones ya fueron discutidas y aprobadas. No se reabren salvo que el desarrollador lo indique explícitamente.
 
 | Fecha | Decisión |
 |-------|----------|
 | 2026-09-16 | Se crea `AI_CONTEXT.md` como archivo de orientación obligatorio para cualquier IA |
-| 2026-09-16 | Orden de trabajo: anteproyecto → libro de marca → mockups HF → implementación |
-| 2026-09-16 | Integración de IA definida: **asistente de cotización para impresión personalizada** |
-| 2026-09-16 | El asistente de IA orienta al cliente (material, dimensiones, tiempo, precio orientativo) pero nunca da precio final — eso lo confirma el admin |
-| 2026-09-16 | Librería de gráficos para el dashboard: **Recharts** |
-| 2026-09-16 | Anteproyecto redactado con Gemini 2.0 Flash Thinking; revisión y ajustes pendientes |
 | 2026-09-16 | Nombre comercial de la tienda: **Vértice CR** |
+| 2026-09-16 | Integración de IA definida: **asistente de cotización para impresión personalizada** |
+| 2026-09-16 | El asistente orienta al cliente (material, dimensiones, tiempo, precio orientativo) pero nunca da precio final — eso lo confirma el admin |
+| 2026-09-16 | Librería de gráficos para el dashboard: **Recharts** |
 | 2026-09-16 | Proyecto de dos personas: desarrollador frontend + especialista en impresión 3D |
 | 2026-09-16 | Valores de marca: confianza, seguridad, calidad, "encontrarás lo que necesitás" |
+| 2026-09-17 | El mockup de v0 se considera **Base V0 / referencia visual**, no implementación final |
+| 2026-09-17 | La creatividad de herramientas generativas se puede conservar si aporta valor; se audita y adapta en lugar de descartarla por su origen |
+| 2026-09-17 | La identidad final se construye mediante auditoría, refinamiento, interacción, movimiento, validación y documentación |
+| 2026-09-17 | Cada decisión, duda, descarte o experimento que pueda afectar diseño o implementación debe quedar documentado |
+
+---
+
+## Identidad visual — reglas vigentes
+
+Vértice CR busca una identidad elegante, futurista, técnica, industrial y creativa, con sensación premium y lenguaje accesible.
+
+La dirección actualmente explorada parte de una estética oscura con naranja/lava y materialidad volcánica, pero **la paleta final todavía no está cerrada**.
+
+La identidad no dependerá únicamente de color. Debe construirse con:
+
+```text
+color
++
+materialidad
++
+geometría
++
+tipografía
++
+profundidad
++
+iluminación
++
+interacción
++
+movimiento
+```
+
+El mockup base de v0 es un benchmark visual válido. No se debe migrar mecánicamente de TypeScript a JSX: primero se estudian y documentan sus decisiones visuales y técnicas, y posteriormente se reconstruyen en el stack real.
 
 ---
 
@@ -113,7 +155,7 @@ Estas decisiones ya fueron discutidas y aprobadas. No se reabren salvo que el de
 
 **Implementación:** Llamada a API de IA (Claude o Gemini) con system prompt definido, desde `src/services/aiService.js`. No expone la API key en el cliente.
 
-**Por qué esta integración:** Es útil para el modelo de negocio real, es demostrable en presentación, y conecta directamente con la regla de `PENDING_QUOTE`. Cumple el requisito de "obligatorio y lo más importante" de la rúbrica.
+**Por qué esta integración:** Es útil para el modelo de negocio real, es demostrable en presentación, y conecta directamente con la regla de `PENDING_QUOTE`.
 
 ---
 
@@ -126,28 +168,51 @@ Estas decisiones ya fueron discutidas y aprobadas. No se reabren salvo que el de
 5. Ninguna rama estable se rompe. El trabajo nuevo se valida antes de mergear.
 6. Sin secretos en el repositorio.
 7. La IA explica cada cambio que propone. No se acepta código que el desarrollador no pueda leer y mantener.
+8. No se asume una decisión que no esté documentada.
 
 ---
 
-## Tareas pendientes concretas (próximos pasos)
+## Tareas actuales
 
-En este orden exacto:
+### Prioridad 1 — Identidad visual + mockups HF
 
-1. **Mockups HF** — generar al menos vista escritorio y vista móvil antes del 21 de sept. Herramienta: Stitch u otra IA. Se adjuntan como Anexo A y Anexo B del anteproyecto.
-2. **Anteproyecto** — completar el borrador de Gemini: poner nombre del estudiante, cambiar "alguna librería de gráficos" por Recharts, precisar la IA como asistente de cotización, definir los 2 flujos N8N, adjuntar mockups.
-3. **Libro de marca** — después de entregar el anteproyecto.
-4. **Implementación** — después de tener libro de marca y mockups HF aprobados.
+Seguir `docs/IDENTITY-ROADMAP.md` en este orden:
+
+1. Auditar las ocho piezas de la Base V0.
+2. Consolidar concepto, color, tipografía, geometría, materialidad e iluminación.
+3. Definir sistema de interacción.
+4. Definir sistema de movimiento.
+5. Construir conceptualmente Home V1.
+6. Completar mockups públicos.
+7. Completar auth, cliente y admin.
+8. Ejecutar auditoría de coherencia global.
+9. Formalizar libro de marca.
+10. Preparar design system.
+
+### Prioridad 2 — Anteproyecto
+
+Mantenerlo sincronizado con las decisiones reales y adjuntar los mockups requeridos.
+
+### No hacer todavía
+
+- implementar la tienda;
+- migrar el código de v0 directamente;
+- instalar dependencias solo porque aparezcan en un mockup;
+- cerrar prematuramente la paleta o las animaciones;
+- crear funciones fuera del MVP.
 
 ---
 
 ## Cómo actualizar este archivo
 
-Cuando termines una fase o entregable, actualiza la tabla de estado arriba cambiando el emoji:
+Cuando cambie el estado real del proyecto, actualizar la fecha, la tabla de fases, las tareas actuales y las decisiones relevantes.
 
-- `⏳ Pendiente` — no ha comenzado
-- `🔄 En progreso` — trabajo activo ahora mismo
-- `👀 En revisión` — hecho, verificando
-- `✅ Completa` — verificada y cerrada
-- `🚫 Bloqueada` — falta algo antes de continuar (anota qué)
+Estados permitidos:
 
-Y actualiza la fecha de "Última actualización" al inicio de la sección de estado.
+- `⏳ Pendiente`
+- `🔄 En progreso`
+- `👀 En revisión`
+- `✅ Completa`
+- `🚫 Bloqueada`
+
+**Regla:** si algo cambió en el proyecto y este archivo no lo refleja, el contexto está desactualizado.
