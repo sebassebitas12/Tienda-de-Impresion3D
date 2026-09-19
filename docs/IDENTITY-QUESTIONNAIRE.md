@@ -195,7 +195,7 @@ algo propio de la marca primero debe hacerse el logo y todo eso, pero podemos ha
 
 **Por qué: me gustaria que tivieran ciertos textos movimiento pero no el texto sino una textura de letras no en el fondo, sino que el color de las letras resaltadas tengan fluidez y movimiento**
 
-### 6.6 Paleta aprobada o en exploración //lo rellenas tu
+### 6.6 Paleta aprobada o en exploración // lo rellena la IA
 
 | Token / función | Color | Estado | Razón |
 |---|---|---|---|
@@ -230,7 +230,7 @@ algo propio de la marca primero debe hacerse el logo y todo eso, pero podemos ha
 
 ### 7.5 Reglas tipográficas decididas
 
-**Respuesta: definelas tu**
+**Respuesta: definelas tu IA**
 
 ---
 
@@ -245,7 +245,7 @@ algo propio de la marca primero debe hacerse el logo y todo eso, pero podemos ha
 - [ ] Ejes
 - [ ] Planos
 - [ ] Curvas
-- [ ] Otras: 
+- [ ] Otras: lo de las formas mmm me gustan más las curvas pero no entiendo  como se repetirian, me gustaria tener varias opciones para saber como se verian esas formas de manera repetida
 
 **Por qué: la vdd no entiendo y no visualizo realmente como las veria dentro de la pagina**
 
@@ -281,11 +281,11 @@ algo propio de la marca primero debe hacerse el logo y todo eso, pero podemos ha
 
 ### 9.3 ¿Qué tratamiento de imagen está permitido?
 
-**Respuesta:**
+**Respuesta: no entiendo el tratamiendo de imagen**
 
 ### 9.4 ¿Qué tratamiento de imagen está prohibido?
 
-**Respuesta:**
+**Respuesta: no entiendo el tratamiento de imagen**
 
 ---
 
@@ -293,33 +293,33 @@ algo propio de la marca primero debe hacerse el logo y todo eso, pero podemos ha
 
 ### 10.1 ¿Qué acciones deberían sentirse especialmente satisfactorias?
 
-**Respuesta:**
+**Respuesta: al comprar, al ver un producto tiupo al entrar a la tarjeta del producto y ver los detalles las opciones que hay, recomendaciones, comentarios, cuando estoy pidiendo mi diseño personalizado **
 
 ### 10.2 ¿Qué puede moverse y qué debe permanecer estable?
 
-**Respuesta:**
+**Respuesta: no necesitamos movimientos exagerados pero si movimietnos modernos, usa varios ejemplos de plantillas bien calificadas o repos en github o ejemplo apps como v0 que tienen plantillas, podemos agarrar de ahi, si es necesario puedo darme vueltas por ahi y agarrar codigos de referencias**
 
 ### 10.3 ¿El movimiento de Vértice CR debe sentirse más…?
 
 - [ ] Preciso
 - [ ] Mecánico
-- [ ] Fluido
+- [X] Fluido
 - [ ] Pesado
 - [ ] Energético
-- [ ] Sutil
-- [ ] Otro: 
+- [X] Sutil
+- [ ] Otro: Tecnologico maybe
 
 ### 10.4 ¿Qué interacción del mockup base vale la pena conservar?
 
-**Respuesta:**
+**Respuesta: la interaccion del hero donde hay un scroll de productos puede ser mejor calificados, más comprados y asi, pero no la categoria sino el producto **
 
 ### 10.5 ¿Qué interacción sería puro adorno y debe evitarse?
 
-**Respuesta:**
+**Respuesta: hayq eu eevitar que alguna interaccion o funcion o boton sea solo adorno, los adornos son esos pequeños detalles de la identidad de la pagina, evitemos poner cosas solo porque si, debe haber coherencia**
 
 ### 10.6 Regla para reducir movimiento
 
-**Respuesta:**
+**Respuesta: no entiendo esta regla**
 
 ---
 
@@ -327,38 +327,38 @@ algo propio de la marca primero debe hacerse el logo y todo eso, pero podemos ha
 
 ### 11.1 ¿Qué debe ser lo primero que se vea en la Home?
 
-**Respuesta:**
+**Respuesta: la idea de los productos con scroll y movimiento + no se agreaga algo y revisa las referencias aunque esa paginas son feas las de las referencias https://acro3dprint.com/ esta coincide bastante con la estructura de una tienda 3d con servicios varios como los nuestros, pero el diseño no es como lo que yo quiero transmititr en cuanto a modernidad, la paleta debe incluir negros y girses junto con la lava recuerdalo**
 
 ### 11.2 ¿Qué elemento debe convertirse en la firma visual de la marca?
 
-**Respuesta:**
+**Respuesta: Letra V con diseño referenciando la marca**
 
 ### 11.3 ¿Cómo debe verse un producto dentro del sitio?
 
-**Respuesta:**
+**Respuesta: la tarjeta de producto debe incluir nombre con categorias e imagen, al pasar el mouse encima de la tarjeta se pueden ver las demas imagenes del producot o sus variaciones, al dar click se redirige a una pagina par ael producto donde este toda su info y tal **
 
 ### 11.4 ¿Cómo debe verse el flujo de cotización?
 
-**Respuesta:**
+**Respuesta: Busca referencias no tengo idea**
 
 ### 11.5 ¿Qué diferencia visual debe existir entre comprar un producto y solicitar una impresión personalizada?
 
-**Respuesta:**
+**Respuesta: el producto ya esta listo para comprar y esperar, la impresion personalizada lleva una elaboracion de tiempo y habla con el cliente, asi que dedice que es mejor, tirar esos pedidos a whatsapp o hacer alguna automatizacion en n8n ya que es necesario tal vez no sale en la rubrica pero n8n es necesario para el resultado final de este front end proximo a produccion **
 
 ### 11.6 Componentes que necesitan reglas de identidad
 
-- [ ] Logo / wordmark
-- [ ] Navegación
-- [ ] Hero
-- [ ] Botones
-- [ ] Cards
-- [ ] Etiquetas técnicas
-- [ ] Estados de formulario
-- [ ] Cotización
-- [ ] Carrito
-- [ ] Checkout
-- [ ] Cuenta
-- [ ] Panel administrativo
+- [x] Logo / wordmark
+- [x] Navegación
+- [x] Hero
+- [x] Botones
+- [x] Cards
+- [x] Etiquetas técnicas
+- [x] Estados de formulario
+- [x] Cotización
+- [x] Carrito
+- [x] Checkout
+- [x] Cuenta
+- [x] Panel administrativo
 
 ---
 
@@ -366,30 +366,30 @@ algo propio de la marca primero debe hacerse el logo y todo eso, pero podemos ha
 
 ### 12.1 ¿Qué tendría que pasar para considerar aprobada la identidad?
 
-**Respuesta:**
+**Respuesta: email verificado pero eso solo en produccion, para el front end sera el ususario admin y que no haya un usuario demo sino que haya que crearlo desde registrarse que se quede en la base de datos y listo verificado puede pedir y asi**
 
 ### 12.2 ¿Qué decisiones no debe tomar una herramienta, plantilla o IA por nosotros?
 
-**Respuesta:**
+**Respuesta: no entiendo **
 
 ### 12.3 ¿Quién aprueba una decisión visual?
 
-**Respuesta:**
+**Respuesta: yo el administrador/programdor**
 
 ### 12.4 ¿Qué se debe probar antes de llevar la identidad a código?
 
-**Respuesta:**
+**Respuesta: mockups de cada detalle, muchas referencias antes de entrelazar todo y seguir guardando lo importante en referencias/ dentro crear una carpeta de identidad donde estaran los diseños definitivos**
 
 ### 12.5 Lista de cosas que Vértice CR nunca debe parecer
 
-1. 
-2. 
-3. 
+1. Emojis como iconos o de cualquier manera se ven muy genericos creados por IA
+2. aunque el codigo compile por build o lint la coherencia visual hecha por la IA no siempre es buena a veces pesima asi que se debe hacer coherencia visual antes de solo programar
+3. nunca poner botones o paginas o links que no lleven a nada, no tengan funcion, los detalles visuales deben tambien tener coherencia con toda la pagina
 
 ---
 
 ## 13. Resumen aprobado
-
+no sabria que poner rellenalo y yo lo apruebo para la IA que me vaya a ayudar el 19/09/2026 17:50 hora CR
 Esta sección se llena únicamente después de responder y revisar las preguntas anteriores.
 
 ### Esencia
