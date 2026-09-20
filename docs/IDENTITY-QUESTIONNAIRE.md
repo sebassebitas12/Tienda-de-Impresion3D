@@ -4,7 +4,7 @@
 >
 > Este documento no propone respuestas automáticas. Las decisiones deben salir del criterio del creador de la marca y luego traducirse a documentación, diseño y código.
 
-**Estado:** Sin responder  
+**Estado:** En revisión — respuestas consolidadas, pendiente de aprobación  
 **Fecha:** 2026-09-17  
 **Responsable de las decisiones:** Creador de Vértice CR  
 
@@ -388,46 +388,111 @@ algo propio de la marca primero debe hacerse el logo y todo eso, pero podemos ha
 
 ---
 
-## 13. Resumen aprobado
-no sabria que poner rellenalo y yo lo apruebo para la IA que me vaya a ayudar el 19/09/2026 17:50 hora CR
-Esta sección se llena únicamente después de responder y revisar las preguntas anteriores.
+## 13. Resumen propuesto para aprobación — 2026-09-19
+
+> **Estado: En revisión — NO aprobado todavía.**
+>
+> Esta síntesis traduce las respuestas del creador a reglas utilizables por diseño. No fija decisiones que aún están en exploración.
 
 ### Esencia
-
-**Pendiente.**
+**Vértice CR es un mundo de impresión 3D y creatividad**, capaz de atender desde necesidades casuales hasta necesidades técnicas especializadas.
 
 ### Personalidad
-
-**Pendiente.**
+- Técnica, pero cercana.
+- Creativa y experimental.
+- Moderna y tecnológica sin parecer genérica.
+- Local y cercana a Costa Rica.
+- Premium en percepción, sin volverse inaccesible.
+- Directa, con comentarios útiles y discretos.
+- La personalidad nunca debe sacrificar claridad.
 
 ### Público principal
+Cliente casual, personas con necesidades específicas, ingenieros, profesionales como médicos, empresas y emprendedores que requieren producción por volumen.
 
-**Pendiente.**
+La interfaz debe ser accesible para usuarios no técnicos y suficientemente informativa para usuarios técnicos.
 
 ### Promesa
+**Encontrar o crear lo que necesitas mediante impresión 3D**, desde productos listos para comprar hasta soluciones personalizadas.
 
-**Pendiente.**
+La confianza debe construirse especialmente alrededor de encargos y envíos.
+
+### Diferenciación
+Vértice CR debe ocupar un punto entre **lo casual y lo altamente técnico**.
+
+La Home debe mostrar productos desde el primer momento y utilizar el descubrimiento visual para dirigir hacia productos relevantes, populares, recomendados o en tendencia.
 
 ### Paleta
+**Dirección actual:** base de negros y grises con naranja lava brillante como acento.
 
-**Pendiente.**
+El naranja debe funcionar como acento y firma, no inundar toda la interfaz. Evitar el blanco como fondo dominante.
+
+**Pendiente:** HEX finales, proporciones de uso, colores de estados y evaluación de la alternativa azul.
 
 ### Tipografía
+Prioridad absoluta: **legibilidad**.
 
-**Pendiente.**
+Debe sentirse moderna y tecnológica, pero ser comprensible a primera vista.
+
+**Pendiente:** comparar familias concretas y aprobar la selección.
 
 ### Formas y materialidad
+La interfaz debe sentirse **fluida, interactiva y ordenada**. Las formas deben inspirarse en impresión 3D sin caer en una estética industrial genérica.
 
-**Pendiente.**
+Materialidad sugerida: **plástico de alta calidad / acabado premium**.
+
+**Pendiente:** explorar visualmente curvas, vértices, capas, retículas y otros recursos antes de escogerlos.
 
 ### Interacción y movimiento
+Dirección: **fluida, sutil, tecnológica, moderna y funcional**.
 
-**Pendiente.**
+La interacción debe tener propósito. Se evita la animación decorativa.
+
+La firma inicial es un **Hero con productos en desplazamiento/rotación vertical**, mostrando productos concretos y no categorías.
+
+El criterio exacto para ordenar esos productos queda pendiente.
+
+Debe contemplarse **reduced motion**.
 
 ### Firma visual
+**La letra V** como recurso gráfico propio de Vértice CR.
 
-**Pendiente.**
+Logo, wordmark, recursos derivados y posible mascota se explorarán como parte de la identidad; ninguno queda aprobado automáticamente.
+
+### Producto dentro del sitio
+La tarjeta debe incluir imagen, nombre, categoría e información necesaria para compra.
+
+Al pasar el cursor, puede mostrar otras imágenes o variaciones cuando existan. Al seleccionar, lleva al detalle completo.
+
+Se priorizan fotografías reales para generar confianza.
+
+### Compra vs. impresión personalizada
+Deben percibirse como dos caminos distintos:
+
+- **Comprar producto:** producto terminado, listo para compra y envío.
+- **Impresión personalizada:** elaboración/cotización que requiere información del cliente y puede requerir comunicación.
+
+WhatsApp/n8n queda como **decisión técnica pendiente**, no como decisión visual aprobada.
 
 ### Decisiones descartadas
+- Emojis como iconografía.
+- Estética genérica de plantilla/IA.
+- Botones, páginas o enlaces sin función real.
+- Decoración sin propósito.
+- Animación exagerada.
+- Copiar referencias sin adaptarlas a Vértice CR.
+- Implementar una decisión visual solo porque una IA o plantilla la propone.
 
-**Pendiente.**
+### Próximo paso
+Antes de HF-01:
+
+1. Explorar referencias visuales reales.
+2. Proponer logo/V y dirección de marca.
+3. Comparar rutas de color y materialidad.
+4. Comparar tipografías.
+5. Mostrar visualmente opciones de formas repetidas.
+6. Definir reglas de movimiento.
+7. Consolidar la identidad en el Libro de Marca.
+8. Obtener aprobación del creador.
+
+**Solo después se retoma HF-01.**
+
