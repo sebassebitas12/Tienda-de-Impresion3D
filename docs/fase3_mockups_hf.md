@@ -1,65 +1,24 @@
 # Fase 3 — Registro maestro de mockups de alta fidelidad
 
-> Documento de control de la etapa HF. Registra qué pantallas existen, cuáles faltan, qué referencia se utiliza y qué debe aprobarse antes de implementación.
-
-**Fecha:** 2026-09-17  
-**Rama:** `Pruebas`  
-**Estado:** 🔄 En progreso  
-
----
+**Fecha:** 2026-09-19  \
+**Rama:** `Pruebas`  \
+**Estado:** 🔄 En progreso — deadline urgente 21 de septiembre de 2026
 
 ## 1. Objetivo
 
-Completar los mockups de alta fidelidad necesarios para representar la experiencia pública y administrativa definida en Fase 3, con versiones desktop y móvil cuando corresponda.
+Completar los mockups HF necesarios para representar la experiencia pública y administrativa definida en Fase 3, con versiones desktop y móvil cuando corresponda.
 
-Los mockups deben validar simultáneamente:
+Los mockups validan UX, identidad visual, jerarquía, interacción, estados, responsive, movimiento y coherencia entre pantallas.
 
-- UX y navegación;
-- identidad visual;
-- jerarquía;
-- interacción;
-- estados;
-- responsive;
-- lenguaje de movimiento;
-- coherencia entre pantallas.
-
-Los mockups son referencia de diseño. No son todavía la implementación React definitiva.
+**No son todavía la implementación React definitiva.**
 
 ---
 
-## 2. Mockup base existente
-
-### Home / Landing — V0 de referencia
-
-**Fuente:** mockup generado con v0 y entregado como `landing-page-vertice-cr.zip`.  
-**Estado:** 🟡 Base recibida — pendiente de refinamiento y aprobación HF.
-
-### Secciones presentes
-
-1. Navbar sticky con blur y menú hamburger móvil.
-2. Hero con titular, gradiente naranja, halos ambientales y dos CTAs.
-3. ProductShowcase con carrusel vertical y efecto de despiece 3D en hover mediante CSS.
-4. Catalog con productos destacados, precios en colones y hover.
-5. Precision con cuatro métricas técnicas y divisores.
-6. Process con cuatro pasos conectados visualmente.
-7. PrintRequest con drag & drop, material, calidad, color y resumen sticky.
-8. CtaFooter.
-
-### Tratamiento
-
-La propuesta se considera una **base visual fuerte**, no un diseño definitivo.
-
-Se conserva como referencia la capacidad de interacción, profundidad y composición. Se auditará para convertirla en una experiencia propia de Vértice CR.
-
-No se hará una conversión mecánica de TypeScript a JSX.
-
----
-
-## 3. Matriz de pantallas HF
+## 2. Estado de producción
 
 | ID | Pantalla | Desktop | Móvil | Estado |
 |---|---|---:|---:|---|
-| HF-01 | Home / Landing | Sí | Sí | 🟡 Base V0 recibida |
+| HF-01 | Home / Landing | Sí | Sí | 🟡 **Base HTML propia construida — en refinamiento** |
 | HF-02 | Catálogo | Sí | Sí | ⏳ Pendiente |
 | HF-03 | Detalle de producto | Sí | Sí | ⏳ Pendiente |
 | HF-04 | Selección de solicitud | Sí | Sí | ⏳ Pendiente |
@@ -77,126 +36,190 @@ No se hará una conversión mecánica de TypeScript a JSX.
 | HF-16 | Admin — Catálogo | Sí | Sí | ⏳ Pendiente |
 | HF-17 | Admin — Clientes | Sí | Sí | ⏳ Pendiente |
 
-La cantidad exacta de pantallas puede ajustarse si una pantalla HF representa varios estados de una misma ruta sin perder claridad para la revisión académica.
-
 ---
 
-## 4. Orden de producción
+## 3. HF-01 — Home / Landing
 
-Se trabajará en este orden:
+### Estado
 
-```text
-HF-01 Home
+**Desktop:** 🟡 Base HTML+CSS propia funcional — pendiente de refinamiento visual.  
+**Mobile:** ⏳ Pendiente.
+
+La base fue construida directamente con HTML + CSS, sin Gemini, v0 ni generación automática de código. Se utilizó una exploración generada por Gemini únicamente como **referencia visual del showcase oval y su iluminación perimetral**, reinterpretada en estructura propia.
+
+### Dirección visual
+
+**02 — Lava Orgánica** como base de trabajo.
+
+Esto significa:
+
+- carbón/obsidiana;
+- lava naranja como acento;
+- formas fluidas y orgánicas;
+- profundidad y materialidad tipo plástico premium;
+- precisión técnica dentro de una composición orgánica;
+- glow ambiental controlado;
+- producto como protagonista;
+- sin estética gamer, infantil o genérica de IA.
+
+**Importante:** esta dirección **no equivale a identidad final aprobada**.
+
+### Estructura aprobada para HF-01
+
+```
+Navbar (sticky, blur, translúcido)
 ↓
-HF-02 Catálogo
+Hero
+  ├─ izquierda: badge + H1 + subtítulo + 2 CTAs
+  └─ derecha: showcase oval orgánico con scroll infinito de productos
 ↓
-HF-03 Detalle
+Precision (4 bloques técnicos en grid con divisores)
 ↓
-HF-04–06 Solicitud personalizada
+Process (4 pasos con línea SVG orgánica)
 ↓
-HF-07 Carrito
+Print CTA (copy + flujo visual + badge "Pendiente de cotización")
 ↓
-HF-08–09 Checkout
-↓
-HF-10 Auth
-↓
-HF-11–12 Cuenta / pedidos
-↓
-HF-13–17 Administración
+Footer (logo + copyright en mono)
 ```
 
-El orden puede cambiar únicamente si una dependencia UX lo justifica y queda documentado.
+### Decisiones específicas
 
----
+1. **No existe sección "Productos destacados" en Home.**
+   Los productos destacados pertenecen a `/catalogo`.
+2. **El showcase oval es el único display de productos en Home.**
+3. **No se muestran precios en Home.**
+4. El showcase contiene productos ficticios/placeholder hasta disponer de imágenes reales.
+5. La navegación incluye Inicio, Catálogo, Impresión personalizada, carrito, cuenta y CTA "Cotizar".
+6. La Home conserva la idea de experiencia guiada para impresión personalizada.
 
-## 5. Ficha obligatoria de cada mockup
+### Contenido actual
 
-Cada pantalla deberá registrar antes de considerarse aprobada:
+**Navbar**
+- Vértice CR
+- Inicio
+- Catálogo
+- Impresión personalizada
+- carrito
+- cuenta
+- Cotizar
 
-- objetivo de la pantalla;
-- usuario/contexto;
-- ruta prevista;
-- acción primaria;
-- acciones secundarias;
-- contenido requerido;
-- estados necesarios;
-- comportamiento responsive;
-- comportamiento de interacción;
-- animaciones previstas;
-- elementos de identidad utilizados;
-- elementos descartados y motivo cuando sea relevante;
-- relación con pantallas anteriores y siguientes.
+**Hero**
+- Badge: "Fabricación digital · Costa Rica"
+- H1: "De una idea, a algo real."
+- Subtítulo: "Productos impresos en 3D y soluciones personalizadas, diseñadas para convertir ideas en objetos."
+- CTA: "Explorar catálogo"
+- CTA: "Solicitar impresión"
 
-No se deben asumir detalles faltantes.
+**Showcase**
+- PRT-01 — Organizador
+- ARQ-04 — Arquitectura
+- RPT-03 — Mecánica
+- DEC-05 — Decorativo
+- HOG-06 — Funcional
+- scroll infinito y pausa en hover
 
-Si algo todavía no está definido, debe anotarse como **pendiente de decisión**.
+**Precision**
+- Tolerancia dimensional — ±0.2 mm
+- Altura de capa — 0.1 mm
+- Materiales — PLA · PETG · Resina
+- Entrega express — 48 h
 
----
+> Estas métricas proceden de la base del prototipo y deben validarse contra requisitos/datos reales antes de presentarse como capacidades definitivas del negocio.
 
-## 6. Auditoría visual del mockup V0
+**Process**
+- 01 Elige
+- 02 Personaliza
+- 03 Solicita
+- 04 Recibe
+- conexión mediante path SVG orgánico
 
-### Conservables inicialmente
+**Print CTA**
+- "¿Tenés una idea?"
+- "Contanos qué necesitás y revisamos tu solicitud."
+- Subís archivo → Objeto 3D → Cotización
+- "Pendiente de cotización"
+- "Solicitar impresión"
 
-- profundidad espacial del ProductShowcase;
-- interacción de despiece;
-- navegación sticky con blur;
-- atmósfera oscura;
-- iluminación cálida/naranja;
-- PrintRequest como experiencia interactiva;
-- uso de información técnica como parte de la composición;
-- estructura editorial de la Home.
+**Footer**
+- Vértice CR
+- "© 2026 Vértice CR · Fabricación digital · Costa Rica"
+
+### Tokens experimentales usados en el mockup
+
+```css
+--bg:        #0D0B09;
+--surface:   #141412;
+--surface-2: #1E1C19;
+--border:    #2A2420;
+--text:      #EDE8E0;
+--muted:     #6B6560;
+--accent:    #FF5A1F;
+--magma:     #E03D00;
+--ember:     #FF8C5A;
+```
+
+Tipografía:
+- Space Grotesk
+- JetBrains Mono
+
+Estos colores son **experimentales**, no tokens definitivos del libro de marca.
 
 ### Pendientes de refinamiento
 
-- identidad visual propia de Vértice CR;
-- consistencia geométrica entre secciones;
-- variedad controlada de superficies y formas;
-- jerarquía del glow;
-- relación entre luz, producto y fondo;
-- continuidad del movimiento entre secciones;
-- responsive de las interacciones complejas;
-- estados completos;
-- accesibilidad y reduced motion;
-- coherencia con los flujos definitivos de Fase 3.
-
-### No debe asumirse
-
-- que la paleta naranja ya es definitiva;
-- que todos los efectos actuales deben conservarse;
-- que las métricas mostradas son datos reales;
-- que la estructura técnica de Next.js/TypeScript será utilizada en el proyecto;
-- que una dependencia utilizada por v0 debe instalarse en Vértice.
+- reemplazar placeholders geométricos por imágenes reales de productos cuando estén disponibles;
+- aumentar profundidad visual del showcase oval;
+- usar como referencia el marco oval iluminado de la exploración de Gemini;
+- evaluar H1 más grande/agresivo en desktop;
+- reforzar glow ambiental del hero sin saturarlo;
+- completar hover/focus/disabled/processing;
+- explorar iconografía técnica en Precision;
+- construir y validar versión mobile;
+- validar accesibilidad y reduced motion;
+- revisar las métricas contra fuentes definitivas antes de tratarlas como datos reales.
 
 ---
 
-## 7. Proceso de aprobación
+## 4. Referencia visual externa de esta iteración
 
-Una pantalla pasa de `⏳ Pendiente` a `🔄 En revisión` cuando existe una propuesta HF completa.
+La exploración de Gemini se utilizó exclusivamente como referencia visual para:
 
-Pasa a `✅ Aprobada` cuando se revisa contra:
+- marco oval;
+- iluminación naranja perimetral;
+- profundidad del showcase;
+- atmósfera cálida.
 
-1. requisitos de Fase 1;
-2. dirección visual de Fase 2;
-3. UX y user flows de Fase 3;
-4. `VISUAL-IDENTITY-WORKING.md`;
-5. estados e interacción;
-6. desktop y móvil;
-7. accesibilidad relevante.
-
-Si falla un criterio, permanece en revisión y se registra el cambio requerido.
+No se copió código ni se adoptó automáticamente la salida generativa.
 
 ---
 
-## 8. Regla contra decisiones implícitas
+## 5. Orden inmediato
 
-Toda nueva decisión visual, interacción, animación, componente, contenido, estado o herramienta que se incorpore al diseño debe quedar registrada en este documento o en el documento específico correspondiente.
+```
+HF-01 Desktop — refinamiento
+↓
+HF-01 Mobile
+↓
+HF-02 Catálogo
+↓
+HF-13 Admin Dashboard
+↓
+Actualizar Anteproyecto
+↓
+Revisión HF global
+```
+
+---
+
+## 6. Criterio de aprobación
+
+HF-01 solo podrá pasar a ✅ Aprobado después de revisar:
+
+1. requisitos;
+2. dirección visual vigente;
+3. UX/user flows;
+4. estados e interacción;
+5. desktop + mobile;
+6. accesibilidad;
+7. coherencia con las demás pantallas.
 
 **Lo que no está documentado no se considera aprobado.**
-
----
-
-## 9. Relación con implementación
-
-No iniciar implementación definitiva mientras los mockups HF necesarios no estén aprobados.
-
-Una vez aprobados, se usarán como referencia para construir el design system y posteriormente la implementación en React + Vite + JavaScript/JSX.
