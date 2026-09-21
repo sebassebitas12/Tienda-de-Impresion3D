@@ -180,8 +180,14 @@ La identidad visual de **Vértice CR** responde al concepto **Lava Orgánica / H
 
 1. **Isotipo Oficial (Símbolo 'V'):**  
    Doble trazo diagonal ascendente con ángulo agudo en naranja lava (`#FF5A1F`), simulando filamento extruido por capas superpuestas. Disponible en formato vectorial `public/favicon.svg`.
+
+![Isotipo Oficial — Favicon](file:///c:/Documentos/proyecto%20react%20impresion3D/Tienda-de-Impresion3D/Tienda/public/favicon-512.png)
+
 2. **Logotipo Completo (Isotipo + Logomarca):**  
    Isotipo a la izquierda acompañado de la palabra **VÉRTICE CR** en mayúsculas sostenidas, blanco humo (`#F5F5F5`), con tracking espaciado (`letter-spacing: 4.5px`). Disponible en `public/logo.svg`.
+
+![Logotipo Completo — Vértice CR](file:///c:/Documentos/proyecto%20react%20impresion3D/Tienda-de-Impresion3D/Tienda/mockups/favicon.jpg)
+
 3. **Favicon del Sitio Web:**  
    Versión estilizada del isotipo optimizada para legibilidad en 16x16, 32x32 y 64x64 píxeles.
 
@@ -195,37 +201,37 @@ Los mockups desarrollados representan la guía visual y de interacción definiti
 * **Archivo:** `mockups/mainpage.jpg`
 * **Descripción:** Barra de navegación superior con logotipo y enlaces principales, sección Hero con encabezado de alta precisión, botón de llamada a la acción ("Ver tienda"), indicadores de valor diferencial (Alta precisión, Materiales resistentes, Diseño personalizado) y showcase interactivo de piezas 3D destacadas con selector lateral (01 al 04).
 
-![Anexo A — Vista Home Desktop](../mockups/mainpage.jpg)
+![Anexo A — Vista Home Desktop](file:///c:/Documentos/proyecto%20react%20impresion3D/Tienda-de-Impresion3D/Tienda/mockups/mainpage.jpg)
 
 ### Anexo B: Vista Tienda / Catálogo Desktop (`tienda.jpg`)
 * **Archivo:** `mockups/tienda.jpg`
 * **Descripción:** Interfaz de comercio electrónico con panel lateral izquierdo de filtros avanzados (Búsqueda por categoría, deslizador de rango de precio de $0 a $150, selector de materiales PLA/PETG/Resina/Flex, conmutador de estado En Stock/Bajo Pedido, y tipo de tecnología FDM/SLA). Cuadrícula de productos con fotografía en alta resolución, etiqueta técnica, precio y botón de acción directa.
 
-![Anexo B — Vista Tienda Catálogo](../mockups/tienda.jpg)
+![Anexo B — Vista Tienda Catálogo](file:///c:/Documentos/proyecto%20react%20impresion3D/Tienda-de-Impresion3D/Tienda/mockups/tienda.jpg)
 
 ### Anexo C: Vista de Contacto y Cotización Desktop (`contactenos.jpg`)
 * **Archivo:** `mockups/contactenos.jpg`
 * **Descripción:** Pantalla de comunicación directa con canales oficiales (correo hola@verticecr.com, teléfono, ubicación en San José, Costa Rica) con placa de garantía de respuesta en 24h y formulario interactivo con campos de nombre, correo y mensaje detallado con botón "Enviar mensaje".
 
-![Anexo C — Formulario de Contacto y Cotización](../mockups/contactenos.jpg)
+![Anexo C — Formulario de Contacto y Cotización](file:///c:/Documentos/proyecto%20react%20impresion3D/Tienda-de-Impresion3D/Tienda/mockups/contactenos.jpg)
 
 ### Anexo D: Menú Contextual Desplegable (`lista plegable.jpg`)
 * **Archivo:** `mockups/lista plegable.jpg`
 * **Descripción:** Desplegable del perfil de usuario y control administrativo para `Javier A. (Admin)`, con acceso a notificaciones con contador visual numérico, panel de configuración, facturación, soporte y opción de cierre de sesión seguro.
 
-![Anexo D — Menú Contextual Desplegable](../mockups/lista%20plegable.jpg)
+![Anexo D — Menú Contextual Desplegable](file:///c:/Documentos/proyecto%20react%20impresion3D/Tienda-de-Impresion3D/Tienda/mockups/lista%20plegable.jpg)
 
 ### Anexo E: Vista Móvil Responsive (~375px) (`vista_movil.jpg`)
 * **Archivo:** `mockups/vista_movil.jpg`
 * **Descripción:** Adaptación para smartphones (~375px) respetando la jerarquía visual de Vértice CR: barra superior compacta con menú hamburguesa, visualizador principal centrado, llamada a la acción accesible con una mano ("Ver tienda"), carrusel horizontal inferior con navegación táctil entre modelos 01 a 04 y bloques de valor apilados verticalmente.
 
-![Anexo E — Vista Móvil Responsive](../mockups/vista_movil.jpg)
+![Anexo E — Vista Móvil Responsive](file:///c:/Documentos/proyecto%20react%20impresion3D/Tienda-de-Impresion3D/Tienda/mockups/vista_movil.jpg)
 
 ### Anexo F: Isotipo y Favicon Oficial (`favicon.jpg`)
 * **Archivo:** `mockups/favicon.jpg`
 * **Descripción:** Diseño del isotipo tridimensional en forma de "V" en cinta de filamento naranja lava con acabado satinado. A partir de este diseño se crearon los assets de producción: `public/favicon.png` (fondo transparente aislado en alta resolución, 512x512, 192x192, 32x32), `public/favicon.svg` y `public/favicon-squircle.png` (versión redondeada para Apple Touch Icon y web apps).
 
-![Anexo F — Isotipo Oficial](../mockups/favicon.jpg)
+![Anexo F — Isotipo Oficial](file:///c:/Documentos/proyecto%20react%20impresion3D/Tienda-de-Impresion3D/Tienda/mockups/favicon.jpg)
 
 ---
 
