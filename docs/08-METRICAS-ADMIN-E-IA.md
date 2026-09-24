@@ -77,3 +77,25 @@ calculateDashboardMetrics(data, period) sin React, HTTP ni efectos secundarios.
 ## Criterio
 
 Una gráfica entra al MVP solo si ayuda a detectar un problema, comparar evolución o ejecutar una acción.
+
+
+## Integración del resumen IA con N8N
+
+El módulo **Resumen operativo IA** puede implementarse mediante un Webhook de N8N consumido desde React.
+
+Flujo:
+1. Dashboard calcula KPIs y datos de origen.
+2. React solicita `mode: "admin_summary"`.
+3. N8N recibe período + métricas.
+4. AI Agent resume únicamente la información recibida/consultada mediante herramientas autorizadas.
+5. React muestra la respuesta en un módulo compacto.
+
+Reglas del resumen:
+- nunca reemplaza los KPI;
+- nunca inventa cifras;
+- debe indicar el período;
+- distingue datos de interpretación;
+- debe permitir volver a los datos origen;
+- ante información insuficiente, declara la limitación.
+
+El chatbot general puede usar el mismo patrón con `mode: "chat"`; ambos casos siguen siendo capacidades distintas aunque compartan workflow/infraestructura.
