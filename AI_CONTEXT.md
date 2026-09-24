@@ -66,3 +66,24 @@ Si un documento contradice una decisión posterior, prevalece la decisión poste
 - React puede consumir un Webhook de N8N directamente para el chatbot y/o resumen IA sin añadir un backend intermedio para ese caso.
 - El frontend consume el endpoint del workflow; no se conecta directamente al nodo AI Agent.
 - Chatbot y resumen Admin pueden compartir infraestructura mediante un campo `mode`, manteniendo contratos y permisos separados.
+
+
+## Navegación de trabajo para esta fase — 2026-09-24
+
+### Dónde estamos
+HF-07 fue revisado nuevamente con Gemini después de una iteración de UXMagic. La estructura de negocio está correcta y el resultado quedó en **ajustes menores**, no reconstrucción.
+
+### Qué falta para cerrar este bloque
+1. Una iteración final de HF-07 en UXMagic.
+2. Resolver explícitamente los estados `QUOTED` / `APPROVED`.
+3. Eliminar microcopy redundante y aplicar refinamientos visuales.
+4. Verificar HF-07 desktop.
+5. Pasar a HF-08, que continúa siendo bloqueador.
+
+### Próximos caminos posibles
+- Recomendado: **HF-07 → HF-08** y cerrar primero el flujo de compra/cotización.
+- Alternativa: cerrar Dark/Light + accesibilidad transversal antes de seguir mockups.
+- Alternativa: cerrar Admin + resumen IA/N8N.
+- Alternativa: definir API externa + JWT.
+
+Cuando el usuario pregunte "¿qué hacemos ahora?", responder primero con el estado actual y luego ofrecer los siguientes pasos posibles. Si existe una opción claramente recomendada por el roadmap, señalarla de forma explícita.
