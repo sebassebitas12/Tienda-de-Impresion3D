@@ -200,7 +200,7 @@ Para:
 
 - top productos;
 - top categorías;
-- clientes con mayor actividad.
+- productos más vendidos.
 
 ### Sparklines
 
