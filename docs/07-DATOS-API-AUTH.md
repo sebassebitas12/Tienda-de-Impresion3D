@@ -76,3 +76,45 @@ Cada service debe conocer:
 request → response → error.
 
 Los componentes no conocen URLs, claves ni formatos crudos de proveedores.
+
+
+## Integración React → N8N
+
+Para esta práctica, React puede consumir directamente un **Webhook de N8N** para una capacidad concreta sin agregar Node/Express como backend intermedio para ese caso.
+
+Arquitectura:
+
+`React → POST Webhook N8N → AI Agent / Tools → respuesta JSON → React`
+
+El frontend no se conecta directamente al nodo AI Agent; consume el endpoint de entrada del workflow.
+
+### Chatbot Vértice CR
+
+Primera integración propuesta:
+- UI de chatbot en React.
+- POST al Webhook de N8N.
+- Payload mínimo: `mode: "chat"`, `message` y sesión/usuario cuando corresponda.
+- N8N ejecuta el AI Agent y las herramientas permitidas.
+- Respuesta normalizada: `reply`, estado y metadatos mínimos.
+
+### Resumen Admin con IA
+
+La misma infraestructura puede exponer `mode: "admin_summary"` para el módulo **Resumen operativo IA**.
+
+React envía métricas ya calculadas y el período; N8N genera una síntesis operativa. La IA no debe inventar números.
+
+Ejemplo conceptual:
+
+`{ mode: "admin_summary", period: "30d", metrics: {...} }`
+
+Respuesta conceptual:
+
+`{ summary: "...", alerts: [...], period: "30d", generatedAt: "..." }`
+
+El contrato definitivo se validará durante la implementación del workflow.
+
+### Seguridad
+
+Un webhook público no sustituye autenticación/autorización. Si el endpoint se usa para información privada del admin, debe existir una estrategia de autenticación/autorización y validación del usuario/rol. Las claves de proveedores de IA nunca van en React.
+
+N8N no es fuente de verdad del negocio.
