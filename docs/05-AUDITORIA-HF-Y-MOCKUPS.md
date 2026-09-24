@@ -119,3 +119,32 @@ HF-07 todavía debe representar el ciclo completo de la solicitud:
 - 375px: productos de catálogo pasan de tabla a cards verticales; resumen se convierte en bloque inferior o barra sticky de pago.
 - 768px: layout de dos columnas colapsa a una columna; resumen debajo o colapsable.
 - Estos mockups se producirán después de aprobar desktop.
+
+
+## HF-07 — APROBADO Y CONGELADO (2026-09-24)
+
+La segunda iteración de UXMagic fue revisada mediante una validación visual final con Gemini. Resultado: **APROBADO**.
+
+### Criterios cerrados
+
+- Separación inequívoca entre productos de catálogo y solicitudes personalizadas.
+- `PENDING_QUOTE` sin precio final, cantidad ni subtotal.
+- `QUOTED` con monto presupuestado y acción `Revisar cotización`.
+- `APPROVED` con monto aprobado y acción `Pagar cotización`.
+- Las solicitudes personalizadas no usan `quantity × unitPrice`.
+- El total de productos se mantiene separado del flujo de cotizaciones.
+- Navbar de Stitch/Vértice conservado.
+- Identidad Obsidian Precision Forge + Lava Orgánica consistente.
+- Microcopy redundante eliminado.
+- Estructura preparada para responsive 375px/768px.
+
+### Decisión
+
+HF-07 no requiere otra iteración de diseño antes de pasar a la siguiente pantalla. Se considera **pantalla aprobada/congelada** para implementación futura.
+
+### Pendientes trasladados a HF-08
+
+- Revisar el detalle de una cotización disponible.
+- Pago de una cotización aprobada.
+- Excepciones: cotización rechazada, caducada o no disponible.
+- Definir claramente si el flujo de pago de cotización es independiente del checkout de productos.
