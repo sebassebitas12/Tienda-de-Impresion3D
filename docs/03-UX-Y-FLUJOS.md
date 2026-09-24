@@ -62,3 +62,47 @@ Mobile/tablet se mockupearán después de cerrar desktop, pero la estructura deb
 ## Regla
 
 La interfaz nunca representa una capacidad técnica que backend/datos no puedan sostener.
+
+
+## Navbar y footer: regla global
+
+### Navbar público
+
+El navbar visual de Stitch se conserva como **referencia base oficial de la navegación pública**. No se reemplaza por otro concepto visual durante esta fase. Solo se permiten ajustes de:
+- labels y rutas reales;
+- estado autenticado/no autenticado;
+- acceso a cuenta/carrito;
+- accesibilidad, foco y teclado;
+- Dark/Light;
+- pequeños refinamientos de spacing, iconografía o responsive.
+
+No se debe reconstruir el navbar desde cero salvo que una prueba real de usabilidad demuestre un problema.
+
+### Navegación administrativa
+
+Los dashboards y pantallas `/admin/*` usan navegación administrativa propia y orientada a tareas. No necesitan copiar el navbar comercial del cliente ni sus CTAs de compra.
+
+### Footer público
+
+El **footer completo de marca** aplica a páginas públicas/cliente donde la navegación comercial y el contenido institucional tienen sentido: Home, Catálogo, Producto, Solicitud, FAQ, About, Contacto y páginas públicas equivalentes.
+
+### Footer en dashboards
+
+El footer comercial completo **no es obligatorio en dashboards**. En `/admin/*` la prioridad es densidad informativa, operaciones y foco; puede existir un footer técnico compacto (versión, soporte, privacidad, accesibilidad) o no existir cuando la interfaz no lo necesite.
+
+En `/cuenta` y pantallas autenticadas orientadas al cliente puede usarse un footer compacto si no interfiere con pedidos, cotizaciones y acciones principales.
+
+### Regla de los mockups
+
+Que los mockups de Stitch/UXMagic muestren footer en todas las pantallas **no obliga a implementarlo literalmente en todas las rutas**. El mockup es referencia visual; la implementación respeta el contexto de cada área.
+
+### Clave de consistencia
+
+El usuario debe sentir que público, cuenta y admin pertenecen a Vértice CR mediante:
+- misma identidad Obsidian + Lava;
+- mismos tokens y estados;
+- tipografía coherente;
+- componentes compartidos;
+- navegación específica por contexto.
+
+La consistencia no significa que todas las áreas tengan exactamente la misma densidad ni el mismo chrome.
