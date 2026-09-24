@@ -258,7 +258,102 @@ Si encuentras una contradicción:
 
 Nunca "resolver" una contradicción simplemente ignorándola.
 
-## 14. Forma de trabajar con el usuario
+## 14. Protocolo de respuesta del agente
+
+Toda respuesta al usuario debe separar claramente:
+
+**TRABAJO HECHO**
+- Cambios realmente realizados en el repositorio, archivos, commits, investigación o validaciones.
+- Nunca afirmar implementación si solo se razonó o propuso algo.
+
+**EXPLICACIÓN**
+- Contexto, hallazgos, decisiones o recomendaciones cuando no hubo modificación real.
+
+Si hubo ambas cosas, usar ambas secciones. Mantener la respuesta breve y práctica. El usuario quiere saber cuánto trabajo real se hizo frente a cuánto se explicó.
+
+Cuando el agente investigue referencias externas, indicar qué fuentes se consultaron y qué decisión concreta aportó cada una. No usar una referencia solo por popularidad.
+
+## 15. Investigación y referencias externas
+
+El agente tiene permiso para investigar a fondo antes de tomar decisiones de diseño, UX, arquitectura o implementación cuando la investigación pueda mejorar el resultado.
+
+Jerarquía:
+
+1. Documentación oficial / repositorio original.
+2. Implementaciones reales de productos reconocidos.
+3. Estudios, guías técnicas y fuentes especializadas.
+4. Galerías de inspiración.
+5. Redes sociales como fuente de descubrimiento, nunca como prueba de calidad.
+
+Para referencias de diseño:
+
+- Analizar **qué problema resuelve** el patrón.
+- Separar inspiración de evidencia.
+- No copiar una marca completa.
+- Extraer principios, composición, interacción, motion, accesibilidad y trade-offs.
+- Verificar licencia antes de reutilizar código/assets.
+- Registrar referencias útiles en el documento de referencias del proyecto.
+- Si una herramienta promete "mejor UI" pero no hay evidencia suficiente, tratarla como experimento, no como autoridad.
+
+Fuentes de inspiración visual como Instagram, TikTok, Awwwards o galerías sirven para descubrir patrones; no convierten automáticamente un patrón en una buena decisión para Vértice.
+
+## 16. Stack de criterio recomendado
+
+Estas referencias han sido auditadas para este proyecto:
+
+### Incorporar como criterio
+
+- **Emil Kowalski / skills** — motion, microinteractions y decisiones de animación. Útil especialmente para transiciones, hover, enter/exit y reduced motion. urlRepositorio oficialhttps://github.com/emilkowalski/skills
+- **Impeccable** — auditoría anti-slop, lenguaje de diseño, refinamiento y detección de patrones genéricos. Muy útil para revisar Vértice antes de implementar. urlRepositorio oficialhttps://github.com/pbakaus/impeccable
+- **UI/UX Pro Max** — catálogo estructurado de estilos, paletas, tipografías, UX, charts, iconografía y stacks. Útil como fuente de búsqueda, no como identidad automática. urlRepositorio oficialhttps://github.com/nextlevelbuilder/ui-ux-pro-max-skill
+- **senlindesign/taste-skill** — reverse engineering de sitios: tokens + decisiones + razones. Especialmente útil cuando encontremos una referencia real que queramos estudiar sin copiarla. urlRepositorio oficialhttps://github.com/senlindesign/taste-skill
+- **Google DESIGN.md** — formato para mantener identidad visual persistente entre agentes. Es la referencia conceptual para nuestro futuro `DESIGN.md`. urlEspecificación oficialhttps://github.com/google-labs-code/design.md
+- **VoltAgent/awesome-design-md** — biblioteca de DESIGN.md basados en productos reales; útil para estudiar patrones y comparar sistemas. urlColección oficialhttps://github.com/VoltAgent/awesome-design-md
+- **Spec Kit** — disciplina spec → plan → tasks → implementación → verificación. Útil para la fase de arquitectura e implementación, no para decidir estética. urlRepositorio oficialhttps://github.com/github/spec-kit
+- **React Bits** — biblioteca de componentes/animaciones React. Útil como catálogo de ideas y componentes candidatos; usar solo lo que encaje con la identidad y nuestro stack JS. urlSitio oficialhttps://reactbits.dev/
+- **Refero Styles** — referencias de sistemas visuales reales y extracción de DESIGN.md/tokens. Útil para estudiar marcas y patrones concretos. urlRefero Styleshttps://styles.refero.design/
+- **Godly** — galería curada de sitios reales para descubrir layout, ecommerce, motion y composición. Útil para investigación visual. urlGodlyhttps://godly.design/
+- **Awwwards** — fuente de inspiración y tendencias; útil para descubrir ideas, pero no tratar sus ganadores como autoridad UX por sí solos. urlAwwwardshttps://www.awwwards.com/
+
+### Útiles, pero no parte del núcleo
+
+- **Leonxlnx/taste-skill** — potente para evitar interfaces genéricas y explorar estilos, pero su alcance es amplio y la versión actual se describe como experimental. Usarlo como referencia secundaria, no como regla absoluta. urlRepositorio oficialhttps://github.com/Leonxlnx/taste-skill
+- **hardikpandya/stop-slop** — útil como idea anti-slop; no lo convertir en autoridad de diseño. Revisar antes de adoptar reglas. urlRepositorio oficialhttps://github.com/hardikpandya/stop-slop
+- **Egonex-AI/Understand-Anything** — útil cuando el proyecto crezca y necesitemos comprender un codebase grande mediante grafo; no aporta directamente al diseño actual. urlRepositorio oficialhttps://github.com/Egonex-AI/Understand-Anything
+- **Humanizer** — útil para texto generado por IA, no para UI/UX. No debe alterar el tono técnico de Vértice automáticamente. urlRepositorio oficialhttps://github.com/blader/humanizer
+
+### No convertir en dependencias del proyecto ahora
+
+Estas referencias se usarán como investigación/catálogo, no se instalarán automáticamente. No agregar skills, librerías, CLI, MCPs o dependencias solo porque aparezcan en una referencia.
+
+## 17. DESIGN.md
+
+El proyecto debe tener un `DESIGN.md` como fuente visual persistente cuando la identidad esté suficientemente cerrada. Debe contener tokens + intención + reglas de uso + anti-patrones, no una copia de una marca externa.
+
+Debe complementar a `AGENTS.md`:
+
+- `AGENTS.md` = cómo pensar y trabajar.
+- `DESIGN.md` = cómo debe verse y comportarse visualmente.
+- `AI_CONTEXT.md` = estado y memoria del proyecto.
+
+No duplicar el contenido completo entre los tres.
+
+## 18. Criterio de selección de referencias
+
+Una referencia entra al proyecto solo si aporta al menos uno de:
+
+- mejor jerarquía;
+- mejor interacción;
+- mejor accesibilidad;
+- mejor responsive;
+- mejor motion;
+- mejor conversión/claridad;
+- mejor consistencia de sistema;
+- mejor comprensión del negocio.
+
+La pregunta no es "¿se ve bonito?", sino **"¿qué aprendemos de esto y dónde lo aplicamos?"**.
+
+## 19. Forma de trabajar con el usuario
 
 El usuario prefiere respuestas breves y prácticas, normalmente de un párrafo salvo que el trabajo requiera más.
 
@@ -273,7 +368,7 @@ Si tiene acceso al repositorio:
 
 No decir que algo fue implementado si solo se explicó.
 
-## 15. Criterio de seniority
+## 20. Criterio de seniority
 
 No optimizar para "más features".
 
@@ -283,7 +378,7 @@ Optimizar para:
 
 Una solución sencilla y coherente es preferible a una solución grande pero artificial.
 
-## 16. Regla de continuidad
+## 21. Regla de continuidad
 
 Antes de continuar una sesión, revisar el estado real del repositorio y no confiar únicamente en el último mensaje del usuario.
 
