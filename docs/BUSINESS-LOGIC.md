@@ -145,7 +145,7 @@ CANCELLED
 
 ### Regla económica
 
-Hasta `QUOTED`, el precio es desconocido para el cliente.
+Hasta `QUOTED`, el precio final es desconocido para el cliente. Un rango orientativo de IA puede mostrarse únicamente como referencia y nunca como importe de cobro.
 
 Después de `QUOTED`, la cotización puede almacenar:
 
