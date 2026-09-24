@@ -4,7 +4,7 @@
 
 **Fecha:** 2026-09-17  
 **Rama:** `Pruebas`  
-**Estado:** 🔄 En progreso
+**Estado:** 🔄 En progreso — identidad consolidada conceptualmente; validación HF pendiente
 
 ---
 
@@ -433,8 +433,8 @@ La salida puede convertirse en referencia, pero toda decisión relevante debe pa
 | Área | Estado | Decisión |
 |---|---|---|
 | Concepto de marca | 🔄 | Pendiente de consolidar a partir de la auditoría |
-| Paleta | 🔄 | Naranja/volcánica en exploración; cian de Fase 2 queda como antecedente histórico |
-| Tipografía | 🔄 | Pendiente de consolidar |
+| Paleta | 🟡 | Obsidian + thermal orange + calibrated emerald; formalización final pendiente de validación HF |
+| Tipografía | 🟡 | Space Grotesk + JetBrains Mono como base vigente; falta formalizar tokens |
 | Geometría | 🔄 | Pendiente de consolidar |
 | Materialidad | 🔄 | Pendiente de consolidar |
 | Iluminación | 🔄 | Pendiente de consolidar |
