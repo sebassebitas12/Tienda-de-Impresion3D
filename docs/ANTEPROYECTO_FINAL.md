@@ -69,10 +69,10 @@ src/
 
 1. **Backend simulado con JSON Server (`db.json`):**  
    Simula un backend RESTful completo escuchando en `http://localhost:3001` con las siguientes colecciones normalizadas:
-   * `/users`: Perfiles de usuarios con contraseñas simuladas y campo `role` (`admin` | `client`).
+   * `/users`: Perfiles de usuarios con campo `role` (`admin` | `customer`).
    * `/products`: Artículos de catálogo con atributos técnicos (material, tiempo de impresión, filamento utilizado, dimensiones, precio y stock).
    * `/categories`: Categorías del catálogo (Piezas Técnicas, Coleccionables, Arquitectura, Gadgets).
-   * `/custom_requests`: Solicitudes de cotización personalizada con estado inicial `PENDING_QUOTE`.
+   * `/custom_requests`: Solicitudes de cotización personalizada con ciclo `PENDING_QUOTE → IN_REVIEW → QUOTED → AWAITING_APPROVAL → APPROVED → PAID`, además de `REJECTED`, `EXPIRED` y `CANCELLED`.
    * `/orders`: Pedidos confirmados y su trazabilidad de entrega.
 
 2. **Endpoint Externo Real (Servicio de Diseños 3D Comunitarios):**  
@@ -98,11 +98,11 @@ El diseño se implementa con CSS puro modular mediante diseño fluido (*fluid de
 * **Rutas Públicas:** Inicio (`/`), Catálogo (`/tienda`), Detalle de Producto (`/producto/:id`), Solicitud de Cotización (`/cotizar`), Contacto (`/contacto`), Login (`/login`) y Registro (`/registro`).
 * **Rutas Privadas de Cliente:** Perfil de usuario (`/mi-cuenta`), Historial de pedidos (`/mis-pedidos`), Seguimiento de cotizaciones (`/mis-cotizaciones`).
 * **Rutas Privadas de Administrador (`role === 'admin'`):**
-  * `/admin/dashboard`: Métricas generales y gráficos.
+  * `/admin/dashboard`: Ventas cobradas, pedidos activos, solicitudes pendientes, stock bajo y gráficas operativas derivadas de `db.json`.
   * `/admin/productos`: CRUD de productos.
-  * `/admin/solicitudes`: Revisión, aprobación y asignación de precios a cotizaciones.
+  * `/admin/solicitudes`: Revisión, emisión y seguimiento de cotizaciones personalizadas; el precio final solo existe desde `QUOTED`.
   * `/admin/pedidos`: Actualización de estados logísticos.
-  * `/admin/usuarios`: Gestión de cuentas y roles.
+  * `/admin/usuarios`: Gestión de cuentas y roles, solo si la implementación del MVP requiere esta operación.
 * **Persistencia:** La sesión del usuario se mantiene mediante `AuthContext` sincronizado con `localStorage`, interceptando cualquier intento de navegación no autorizada mediante componentes `ProtectedRoute` y `AdminRoute`.
 
 ### 4.5 Operaciones CRUD en Administración
