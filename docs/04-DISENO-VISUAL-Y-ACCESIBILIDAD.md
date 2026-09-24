@@ -72,3 +72,12 @@ Badge, StatusBadge, PriceTag, ProductCard, Gallery, selectors, FileDropzone, Quo
 ## Regla visual
 
 Producto e información útil son protagonistas. Los efectos nunca deben ocultar estados, precios, acciones o accesibilidad.
+
+
+## Chrome de aplicación: navbar y footer
+
+El navbar público tomado de Stitch se conserva como referencia visual aprobada. Los cambios deben ser quirúrgicos: rutas, autenticación, accesibilidad, tema y pequeños ajustes de espaciado/iconografía. No crear una estética de navegación nueva sin una razón UX documentada.
+
+El footer de marca funciona como componente de contexto público. No debe forzarse dentro de dashboards administrativos cuando reduzca el espacio útil o compita con la operación. El admin puede utilizar un footer técnico compacto o prescindir de él.
+
+La reutilización visual se logra mediante tokens y componentes compartidos, no mediante copiar literalmente toda la estructura de una página a otra.
