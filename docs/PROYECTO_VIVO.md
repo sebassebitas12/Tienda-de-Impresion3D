@@ -18,7 +18,7 @@ El **MVP** es la primera versión mínima viable que permite comprobar el flujo 
 
 ### Incluido en el MVP
 
-- Página de inicio con propuesta de valor y productos destacados.
+- Página de inicio con propuesta de valor y showcase de productos, sin precio en Home.
 - Catálogo de productos de impresión 3D.
 - Consulta de productos por categoría, búsqueda o filtros básicos.
 - Página de detalle de un producto específico.
@@ -531,13 +531,14 @@ README, documentación técnica, backlog de evolución, decisiones registradas y
 
 | Ruta | Propósito | Datos que necesita |
 |---|---|---|
-| `/` | Presentar la tienda, la propuesta de valor y productos destacados | Categorías resumidas, productos destacados y contenido visual |
+| `/` | Presentar la tienda, la propuesta de valor y showcase visual | Contenido visual y productos seleccionados para el hero |
 | `/catalogo` | Explorar el catálogo completo | Lista paginada, filtros, categorías y metadatos de resultados |
 | `/producto/:id` | Mostrar un producto específico | Un producto por `id`, sus variantes y disponibilidad |
 | `/carrito` | Revisar productos seleccionados | Elementos del carrito, cantidades y precios calculados |
-| `/pedido` | Enviar una solicitud o pedido simulado | Elementos del carrito, datos del cliente y resumen del total |
-| `/pedido/:id` | Mostrar la confirmación de un pedido | Un pedido por `id`, estado y resumen |
-| `/admin` | Reservar una pantalla para gestión futura o práctica | Datos resumidos que se definan para el MVP administrativo |
+| `/checkout/productos` | Checkout de productos de catálogo | Ítems de catálogo, cliente, entrega y pago |
+| `/checkout/solicitud` | Pago de una cotización personalizada aprobada | Solicitud, cotización aprobada, cliente y pago |
+| `/pedidos/:id` | Mostrar la confirmación y estado de un pedido | Un pedido por `id`, estado y resumen |
+| `/admin` | Operación diaria del negocio | Ventas, pedidos activos, solicitudes pendientes y stock bajo |
 
 Las rutas no deben cargar datos globales por comodidad. Cada página solicitará los recursos que necesita mediante servicios específicos.
 
@@ -797,7 +798,7 @@ El carrito puede mantenerse inicialmente en estado local y, si se necesita compa
 | `status` | string | Estado del pedido |
 | `createdAt` | string | Fecha de creación |
 
-Estados iniciales posibles: `pending`, `confirmed`, `in-production`, `completed` y `cancelled`. El MVP puede comenzar utilizando únicamente `pending` y `confirmed`.
+Estados operativos del pedido: `PENDING`, `CONFIRMED`, `IN_PRODUCTION`, `QUALITY`, `SHIPPED`, `DELIVERED` y `CANCELLED`, según el flujo implementado.
 
 ## 11. Criterios para considerar terminada la primera versión
 
