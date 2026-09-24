@@ -79,6 +79,8 @@ src/
    Consumido directamente desde `src/services/external3dService.js`. La integración externa de modelos 3D queda **por definir durante la fase de arquitectura**. No se debe presentar un proveedor concreto como implementado hasta validar disponibilidad, licencia, autenticación y compatibilidad con el MVP.  
    * **Función en el sistema:** Permite al cliente que no dispone de un archivo STL/OBJ propio buscar e importar modelos 3D comunitarios certificados para cotizar su impresión con un solo clic, aumentando la tasa de conversión de la tienda.
 
+  debe ser enpoint externo
+
 ### 4.3 Diseño Responsive y Prácticas de Accesibilidad
 
 El diseño se implementa con CSS puro modular mediante diseño fluido (*fluid design*), flexbox y CSS grid, garantizando cumplimiento estricto de accesibilidad:
