@@ -19,9 +19,10 @@ Definir el comportamiento visible de las vistas antes de implementarlas. Cada pa
 
 ## Home
 
-- Carga: skeleton de hero y productos destacados.
-- Error de destacados: conservar el hero y mostrar reintentar en la sección.
+- Carga: skeleton del hero y del showcase de productos.
+- Error de showcase: conservar el hero y ofrecer reintentar sin inventar productos.
 - Acción CTA: feedback inmediato al navegar.
+- No mostrar precios en Home.
 
 ## Catálogo
 
