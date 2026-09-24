@@ -8,7 +8,7 @@ Frontend escalable para una tienda real de impresión 3D costarricense. El proye
 
 **Rama de trabajo actual:** `Pruebas`.
 
-**Deadline anteproyecto:** 21 de septiembre de 2026.
+**Estado:** Fase 3 — auditoría HF y consolidación visual; React aún bloqueado.
 
 ## Identidad
 
@@ -16,7 +16,7 @@ Frontend escalable para una tienda real de impresión 3D costarricense. El proye
 **Valores:** confianza, seguridad, calidad, "encontrarás lo que necesitás"
 **Personalidad:** taller creativo de alta tecnología con identidad costarricense
 **Tema:** Dark mode por defecto con toggle a light
-**Paleta principal:** negro azulado profundo + cian eléctrico (`#00D4FF`)
+**Dirección visual:** Obsidian Precision Forge + Lava Orgánica; carbón/obsidiana, naranja térmico y lenguaje técnico
 **Tipografías:** Space Grotesk (interfaz) + JetBrains Mono (datos técnicos)
 
 ## Modelo de negocio
@@ -69,18 +69,21 @@ Organizado por familias de métricas calculadas desde `db.json` con funciones pu
 
 Las fórmulas están documentadas en [`docs/METRICS.md`](docs/METRICS.md).
 
-## Documentación
+## Documentación activa
 
 | Documento | Propósito |
 |---|---|
-| [`AI_CONTEXT.md`](AI_CONTEXT.md) | Estado actual del proyecto — leer primero |
-| [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md) | Requisitos, MoSCoW, criterios de aceptación |
-| [`docs/BUSINESS-LOGIC.md`](docs/BUSINESS-LOGIC.md) | Entidades, estados, reglas de negocio |
-| [`docs/METRICS.md`](docs/METRICS.md) | KPIs, fórmulas, gráficos y alertas |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Estructura técnica y responsabilidades |
-| [`docs/TESTING.md`](docs/TESTING.md) | Estrategia Jest + cobertura mínima 70% |
-| [`docs/fase2_investigacion_direccion_visual.md`](docs/fase2_investigacion_direccion_visual.md) | Paleta, tipografía, personalidad de marca |
-| [`docs/fase3_ux_user_flows_mockup.md`](docs/fase3_ux_user_flows_mockup.md) | Flujos de usuario y wireframes |
+| [`AI_CONTEXT.md`](AI_CONTEXT.md) | Fuente principal de contexto y decisiones |
+| [`docs/DECISIONES-HF-POST-AUDITORIA-2026-09-24.md`](docs/DECISIONES-HF-POST-AUDITORIA-2026-09-24.md) | Auditoría y decisiones cerradas |
+| [`docs/fase3_mockups_hf.md`](docs/fase3_mockups_hf.md) | Registro de mockups HF |
+| [`docs/IDENTITY-ROADMAP.md`](docs/IDENTITY-ROADMAP.md) | Cierre de identidad |
+| [`docs/VISUAL-IDENTITY-WORKING.md`](docs/VISUAL-IDENTITY-WORKING.md) | Dirección visual |
+| [`docs/fase3_ux_user_flows_mockup.md`](docs/fase3_ux_user_flows_mockup.md) | UX y flujos |
+| [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md) | Requisitos |
+| [`docs/BUSINESS-LOGIC.md`](docs/BUSINESS-LOGIC.md) | Reglas de negocio |
+| [`docs/METRICS.md`](docs/METRICS.md) | Métricas |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Arquitectura |
+| [`docs/TESTING.md`](docs/TESTING.md) | Testing |
 
 ## Rúbrica integrada
 
