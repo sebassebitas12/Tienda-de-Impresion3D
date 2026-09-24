@@ -223,3 +223,26 @@ HF-01 solo podrá pasar a ✅ Aprobado después de revisar:
 7. coherencia con las demás pantallas.
 
 **Lo que no está documentado no se considera aprobado.**
+
+
+---
+
+## Actualización 2026-09-24 — Decisiones posteriores a auditoría
+
+La auditoría HF del 2026-09-24 supersede las decisiones visuales que entren en conflicto con los mockups actuales.
+
+### Dirección visual vigente
+
+**Obsidian Precision Forge** es el lenguaje visual principal y **Lava Orgánica** funciona como capa de materialidad, iluminación y energía. El showcase oval deja de ser obligatorio; puede conservarse cuando aporte valor a la composición.
+
+### Ajustes obligatorios antes de aprobación
+
+- HF-01 elimina precios del Home.
+- HF-05 y HF-06 refuerzan la jerarquía de "orientativo / sujeto a validación" para cualquier rango generado por IA.
+- HF-07 separa visual y funcionalmente productos de catálogo de solicitudes personalizadas.
+- HF-08 utiliza dos flujos conceptuales: productos y solicitudes cotizadas.
+- HF-12 elimina terminología de infraestructura del login de cliente.
+- HF-14 se rehace con lenguaje visual Vértice.
+- HF-17 requiere revisión posterior al cierre del modelo de datos de solicitudes.
+
+La implementación continúa bloqueada hasta cerrar estos cambios y validar desktop/mobile/estados/accesibilidad.
