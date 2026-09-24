@@ -225,7 +225,7 @@ Cuenta / Actividad
 
 El usuario no entra directamente en una cuadrícula extensa como primera experiencia.
 
-La Home introduce los showcase de productos y las categorías.
+La Home presenta un showcase visual de producto y deriva el descubrimiento comercial al Catálogo. No existe una sección independiente de "Productos destacados" en Home.
 
 La misma ruta `/catalogo` representa descubrimiento y resultados.
 
@@ -551,7 +551,7 @@ Pagar
 
 # 12. Autenticación
 
-La autenticación real es requisito del proyecto.
+La autenticación es requisito funcional del proyecto; su implementación será académica y no debe presentarse como seguridad empresarial mientras JSON Server y el frontend sean la infraestructura.
 
 ## 12.1 Login
 
@@ -784,7 +784,7 @@ La actividad administrativa registra de forma comprensible:
 | `/checkout/productos` | Público hasta confirmar | Checkout de productos |
 | `/checkout/solicitud` | Público hasta enviar | Checkout de solicitudes |
 | `/registro` | Público | Registro |
-| `/pedido/:id` | Autenticado | Confirmación y estado |
+| `/pedidos/:id` | Autenticado | Confirmación y estado |
 | `/cuenta` | Autenticado | Perfil y actividad |
 | `/admin` | Administrador | Dashboard |
 | `/admin/pedidos` | Administrador | Pedidos |
