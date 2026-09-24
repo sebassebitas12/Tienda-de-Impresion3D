@@ -159,8 +159,7 @@ Los gráficos nunca deben consultar `db.json` directamente.
 /admin/solicitudes
 /admin/catalogo
 /admin/clientes
-/admin/reseñas
-/admin/cupones
+/admin/solicitudes
 ```
 
 Los guards verifican autenticación y rol antes de renderizar módulos privados.
@@ -216,7 +215,7 @@ Evitar:
 
 ```text
 UI → fetch directo
-UI → db.json
+UI → Pages/Features → Services/Utils → JSON Server (`db.json`)
 UI → cálculo de negocio
 ```
 
