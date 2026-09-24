@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>Vértice CR - Manufactura Aditiva &amp; CAD</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-tertiary-container":"#003316","primary-fixed":"#ffdbd0","secondary-fixed":"#ffdbcf","secondary-container":"#a03600","tertiary-container":"#00a857","on-primary":"#5e1700","on-primary-fixed":"#3a0b00","on-secondary-fixed":"#380d00","surface-container":"#221f1d","surface-bright":"#3c3936","on-tertiary-fixed":"#00210c","secondary-fixed-dim":"#ffb59a","error":"#ffb4ab","surface-tint":"#ffb59e","on-secondary":"#5b1b00","inverse-on-surface":"#33302d","primary":"#ffb59e","surface":"#151311","on-surface":"#e8e1dd","outline-variant":"#5b4038","on-error-container":"#ffdad6","primary-fixed-dim":"#ffb59e","surface-dim":"#151311","surface-container-lowest":"#100e0c","tertiary":"#4ae183","inverse-primary":"#ae3200","error-container":"#93000a","surface-variant":"#373432","on-tertiary":"#003919","surface-container-high":"#2c2927","surface-container-low":"#1e1b19","on-error":"#690005","on-primary-container":"#541400","surface-container-highest":"#373432","primary-container":"#ff5a1f","on-tertiary-fixed-variant":"#005228","on-background":"#e8e1dd","tertiary-fixed-dim":"#4ae183","tertiary-fixed":"#6bfe9c","on-surface-variant":"#e4beb3","on-secondary-fixed-variant":"#802900","on-secondary-container":"#ffc4af","secondary":"#ffb59a","background":"#151311","on-primary-fixed-variant":"#852400","outline":"#ab897f","inverse-surface":"#e8e1dd"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-md":"1rem","space-lg":"1.5rem","space-xl":"2.5rem","gutter":"1.5rem","margin":"3rem","margin-mobile":"1.25rem","space-xs":"0.25rem","space-sm":"0.5rem","gutter-mobile":"1rem"},"fontFamily":{"body-sm":["Space Grotesk"],"headline-xl":["Space Grotesk"],"display-hero":["Space Grotesk"],"tech-data-lg":["JetBrains Mono"],"headline-xl-mobile":["Space Grotesk"],"headline-md":["Space Grotesk"],"body-md":["Space Grotesk"],"display-hero-mobile":["Space Grotesk"],"tech-micro":["JetBrains Mono"],"body-lg":["Space Grotesk"],"tech-label-sm":["JetBrains Mono"],"tech-data-md":["JetBrains Mono"],"headline-lg":["Space Grotesk"]},"fontSize":{"body-sm":["13px",{"lineHeight":"18px","fontWeight":"400"}],"headline-xl":["40px",{"lineHeight":"48px","letterSpacing":"-0.02em","fontWeight":"700"}],"display-hero":["56px",{"lineHeight":"64px","letterSpacing":"-0.03em","fontWeight":"700"}],"tech-data-lg":["18px",{"lineHeight":"24px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-xl-mobile":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"700"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"0em","fontWeight":"600"}],"body-md":["15px",{"lineHeight":"22px","fontWeight":"400"}],"display-hero-mobile":["36px",{"lineHeight":"44px","letterSpacing":"-0.02em","fontWeight":"700"}],"tech-micro":["10px",{"lineHeight":"14px","letterSpacing":"0.08em","fontWeight":"700"}],"body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}],"tech-label-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.06em","fontWeight":"500"}],"tech-data-md":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"500"}],"headline-lg":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"600"}]}}}};</script></head><body class="bg-surface text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.6)]"><div class="h-28 max-w-7xl mx-auto px-6 lg:px-12 flex flex-col justify-between pt-3 pb-2"><div class="flex items-center justify-between gap-4"><div class="flex items-center gap-3"><img alt="favicon.png" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WXRUngdiIwUcVItqnjxvAJ9V_LgPItQMeLLRLNT6w5RHfJ0jyJOXq3G-LzCtQuX-IK9uC8P-3BQBMcGuGj5-MIKpMPKck-gQFPUVklNdmEIPq1jOZ12Il9bkc9sKGU2kbN2c9PAyF-y2WyZGi9W4Gc3iF3jUxO_i_JjLwxoHAC9sx3bfWS3FG8IlPTqlEBXQPn7n6-okUT1nF5Nyk-tGssEy9_AXrknORu-q54i7KjYbcE0qe7pU1mLE6ErrVmwqsHVhpB7bRqjg"/><div class="flex flex-col"><div class="flex items-center gap-1.5 leading-none"><span class="font-headline-md text-headline-md tracking-tight text-on-surface font-bold">VÉRTICE</span><span class="font-headline-md text-headline-md tracking-tight text-primary-container font-bold">CR</span></div><span class="font-tech-micro text-tech-micro text-outline tracking-wider uppercase mt-0.5">MANUFACTURA ADITIVA &amp; CAD</span></div></div><nav class="hidden lg:flex items-center gap-6 xl:gap-8" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-lg shadow-[0_0_12px_rgba(255,90,31,0.35)]"><a aria-current="page" class="uppercase transition-colors py-1 px-2.5 bg-primary-container text-on-primary-container font-bold rounded-lg shadow-[0_0_12px_rgba(255,90,31,0.35)]" data-path="inicio" href="#">INICIO</a><a class="font-tech-label-sm text-tech-label-sm uppercase text-on-surface-variant hover:text-primary transition-colors py-1 px-2.5 rounded" data-path="tienda" href="#">TIENDA</a><a class="font-tech-label-sm text-tech-label-sm uppercase text-on-surface-variant hover:text-primary transition-colors py-1 px-2.5 rounded" data-path="sobre-nosotros" href="#">SOBRE NOSOTROS</a><a class="font-tech-label-sm text-tech-label-sm uppercase text-on-surface-variant hover:text-primary transition-colors py-1 px-2.5 rounded" data-path="contactenos" href="#">CONTÁCTENOS</a><a class="font-tech-label-sm text-tech-label-sm uppercase text-on-surface-variant hover:text-primary transition-colors py-1 px-2.5 rounded" data-path="preguntas-frecuentes" href="#">PREGUNTAS FRECUENTES</a></nav><div class="flex items-center gap-3"><a class="hidden sm:inline-flex items-center gap-2 bg-primary-container hover:bg-primary text-on-primary-container hover:text-on-primary font-tech-data-md text-tech-data-md font-bold px-4 py-2 rounded-xl transition-all shadow-[0_4px_16px_rgba(255,90,31,0.3)]" data-path="cotizador-3d" href="#"><span>COTIZAR 3D</span><span class="font-bold">&gt;</span></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><button aria-label="Abrir menú" class="lg:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-surface-container text-on-surface hover:text-primary hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-xl">menu</span></button></div></div><div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-outline-variant/30 text-on-surface-variant"><div class="flex items-center gap-2 font-tech-micro text-tech-micro text-outline"><span class="text-primary-container font-bold">ADMINISTRACIÓN</span><span>//</span><span>GESTIÓN DE CATÁLOGO &amp; INVENTARIO ADITIVO</span></div><div class="flex items-center gap-2 font-tech-micro text-tech-micro text-tertiary"><span class="inline-block w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span><span>CATÁLOGO CENTRALIZADO · SINCRONIZADO CON TIENDA HF-02</span></div></div></div></header><main class="w-full pt-28 bg-surface min-h-[calc(100vh-28rem)]"><div class="flex flex-col w-full relative">
+<!-- Dynamic Atmospheric Background Layer using https://lh3.googleusercontent.com/aida/AEtjO1XROPmQFnNb4vwFQTX41NngCPkcECBY-mdJ59pCFAcf-Px7BhAzQd7pWSOiB8h3tqrUcWPqcIgn9SY_2LhYiOnPN__vJz3X75mVULXI-vXPpq2V4GQYG2PyUetX0rvVheEOV1EgzX347xYOhYOvX_lDCvv5xzZWbB3t-B0MhHCPb_61vcnur3j95GbLOn9A-9dUb-zpk35VJYU-sVx4AtT_I7Ly-lWD0XvD3ASG0AoyahztRQ8z1Bt47Q -->
+<div class="absolute inset-0 -z-10 pointer-events-none overflow-hidden opacity-25">
+<img alt="Technical Additive Lab Ambient Background" class="w-full h-full object-cover object-center filter grayscale contrast-125" src="https://lh3.googleusercontent.com/aida/AEtjO1XROPmQFnNb4vwFQTX41NngCPkcECBY-mdJ59pCFAcf-Px7BhAzQd7pWSOiB8h3tqrUcWPqcIgn9SY_2LhYiOnPN__vJz3X75mVULXI-vXPpq2V4GQYG2PyUetX0rvVheEOV1EgzX347xYOhYOvX_lDCvv5xzZWbB3t-B0MhHCPb_61vcnur3j95GbLOn9A-9dUb-zpk35VJYU-sVx4AtT_I7Ly-lWD0XvD3ASG0AoyahztRQ8z1Bt47Q"/>
+<div class="absolute inset-0 bg-gradient-to-b from-surface via-surface/90 to-surface"></div>
+<div class="absolute inset-0 bg-radial-at-t from-primary-container/10 via-transparent to-transparent"></div>
+</div>
+<div class="max-w-7xl mx-auto px-6 py-8 w-full">
+<!-- Header Section with Tactical CAD styling -->
+<header class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-outline-variant/30">
+<div class="flex flex-col gap-2 max-w-3xl">
+<div class="flex items-center gap-2.5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-tech-micro text-tech-micro uppercase tracking-wider border border-primary-container/30">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span>
+            ADMINISTRACIÓN INDUSTRIAL // GESTIÓN DE PRODUCTOS Y PIEZAS 3D
+          </span>
+<span class="font-tech-micro text-tech-micro text-outline tracking-widest hidden sm:inline-block">SYS_NODE_HF-16::REV.4</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight font-bold">
+          CATÁLOGO DE PRODUCTOS &amp; CONTROL DE STOCK
+        </h1>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+          Administración centralizada del inventario de productos terminados, especificaciones de manufactura aditiva (FDM, SLA 8K, SLS Láser), conversión cambiaria en tiempo real (CRC/USD) y sincronización con el escaparate digital de Vértice CR.
+        </p>
+</div>
+<!-- Action Group -->
+<div class="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
+<button class="flex items-center gap-2 bg-surface-container-high hover:bg-surface-variant text-on-surface hover:text-primary transition-all duration-200 px-4 py-2.5 rounded-xl border border-outline-variant/40 font-tech-label-sm text-tech-label-sm shadow-md" id="syncStoreBtn">
+<span class="material-symbols-outlined text-base text-primary">sync</span>
+<span>SINCRONIZAR TIENDA HF-02</span>
+</button>
+<button class="flex items-center gap-2 bg-primary-container hover:bg-primary text-on-primary-container hover:text-on-primary transition-all duration-200 px-5 py-2.5 rounded-xl font-tech-data-md text-tech-data-md font-bold shadow-[0_0_20px_rgba(255,90,31,0.35)]" id="openCreateModalBtn">
+<span class="material-symbols-outlined text-lg">add_box</span>
+<span>+ NUEVO PRODUCTO</span>
+</button>
+</div>
+</header>
+<!-- KPI Metric Cards Grid (No green, warm amber / obsidian / copper palette) -->
+<section aria-label="Indicadores Clave de Desempeño" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 py-8">
+<!-- KPI 1 -->
+<div class="bg-surface-container-low rounded-xl p-5 border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden group hover:border-primary-container/40 transition-colors">
+<div class="flex items-center justify-between mb-3">
+<span class="font-tech-micro text-tech-micro text-outline uppercase tracking-wider">TOTAL PRODUCTOS ACTIVOS</span>
+<span class="material-symbols-outlined text-primary-container/80 text-xl">inventory_2</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-on-surface font-bold">48</span>
+<span class="font-tech-data-md text-tech-data-md text-primary">Referencias</span>
+</div>
+<span class="font-tech-micro text-tech-micro text-on-surface-variant mt-1">32 FDM · 12 SLA 8K · 4 SLS Nylon</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full mt-4 overflow-hidden">
+<div class="bg-primary-container h-full w-[85%] rounded-full"></div>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="bg-surface-container-low rounded-xl p-5 border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden group hover:border-secondary-container/40 transition-colors">
+<div class="flex items-center justify-between mb-3">
+<span class="font-tech-micro text-tech-micro text-outline uppercase tracking-wider">EN STOCK INMEDIATO</span>
+<span class="material-symbols-outlined text-secondary-fixed text-xl">local_shipping</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-on-surface font-bold">38</span>
+<span class="font-tech-data-md text-tech-data-md text-secondary">Piezas Listas</span>
+</div>
+<span class="font-tech-micro text-tech-micro text-on-surface-variant mt-1">Despacho garantizado en 24h GAM</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full mt-4 overflow-hidden">
+<div class="bg-secondary h-full w-[78%] rounded-full"></div>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="bg-surface-container-low rounded-xl p-5 border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden group hover:border-primary-container/40 transition-colors">
+<div class="flex items-center justify-between mb-3">
+<span class="font-tech-micro text-tech-micro text-outline uppercase tracking-wider">BAJO PEDIDO / FABRICACIÓN</span>
+<span class="material-symbols-outlined text-outline text-xl">precision_manufacturing</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-on-surface font-bold">10</span>
+<span class="font-tech-data-md text-tech-data-md text-on-surface-variant">Modelos</span>
+</div>
+<span class="font-tech-micro text-tech-micro text-on-surface-variant mt-1">Tiempo de ciclo medio ~3-4h por lote</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full mt-4 overflow-hidden">
+<div class="bg-outline h-full w-[22%] rounded-full"></div>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="bg-surface-container-low rounded-xl p-5 border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden group hover:border-primary-container/40 transition-colors">
+<div class="flex items-center justify-between mb-3">
+<span class="font-tech-micro text-tech-micro text-outline uppercase tracking-wider">VALOR TOTAL INVENTARIO</span>
+<span class="material-symbols-outlined text-primary text-xl">payments</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-tech-data-lg text-tech-data-lg text-primary font-bold">₡4,820,500</span>
+<span class="font-tech-micro text-tech-micro text-outline">CRC</span>
+</div>
+<span class="font-tech-micro text-tech-micro text-on-surface-variant mt-1">≈ $9,270.19 USD (Taller Rohrmoser)</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full mt-4 overflow-hidden">
+<div class="bg-gradient-to-r from-primary-container to-secondary h-full w-full rounded-full"></div>
+</div>
+</div>
+</section>
+<!-- Search, Categorization, and Filtering Toolbar -->
+<div class="bg-surface-container-low rounded-xl p-4 border border-outline-variant/30 mb-6 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+<!-- Search Input -->
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-lg pointer-events-none">search</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-container rounded-lg border border-outline-variant/40 font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" id="productSearchInput" placeholder="Buscar por nombre de producto, SKU, categoría o filamento..." type="text"/>
+</div>
+<!-- Select Filters -->
+<div class="flex flex-wrap items-center gap-3">
+<!-- Category Filter -->
+<div class="relative">
+<select class="appearance-none bg-surface-container pl-3.5 pr-8 py-2.5 rounded-lg border border-outline-variant/40 font-tech-label-sm text-tech-label-sm text-on-surface hover:border-outline focus:outline-none focus:border-primary-container cursor-pointer">
+<option value="all">Todas las categorías</option>
+<option value="tecnicas">Piezas Técnicas</option>
+<option value="figuras">Figuras &amp; Coleccionables</option>
+<option value="robotica">Drones &amp; Robótica</option>
+<option value="arquitectura">Arquitectura &amp; Maquetas</option>
+<option value="iot">Electrónica &amp; IoT</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-outline text-base pointer-events-none">expand_more</span>
+</div>
+<!-- Material Filter -->
+<div class="relative">
+<select class="appearance-none bg-surface-container pl-3.5 pr-8 py-2.5 rounded-lg border border-outline-variant/40 font-tech-label-sm text-tech-label-sm text-on-surface hover:border-outline focus:outline-none focus:border-primary-container cursor-pointer">
+<option value="all">Todos los materiales</option>
+<option value="petg">PETG Reforzado</option>
+<option value="sla">Resina Óptica 8K</option>
+<option value="sls">Nylon PA12 Sinterizado</option>
+<option value="cf15">Nylon CF15 Carbono</option>
+<option value="pla">PLA Arquitectura</option>
+<option value="tpu">TPU 95A Flexible</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-outline text-base pointer-events-none">expand_more</span>
+</div>
+<!-- Status Filter -->
+<div class="relative">
+<select class="appearance-none bg-surface-container pl-3.5 pr-8 py-2.5 rounded-lg border border-outline-variant/40 font-tech-label-sm text-tech-label-sm text-on-surface hover:border-outline focus:outline-none focus:border-primary-container cursor-pointer">
+<option value="all">Todos los estados</option>
+<option value="stock">En Stock Inmediato</option>
+<option value="ondemand">Bajo Pedido</option>
+<option value="out">Sin Stock</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-outline text-base pointer-events-none">expand_more</span>
+</div>
+<!-- Sort -->
+<div class="relative">
+<select class="appearance-none bg-surface-container pl-3.5 pr-8 py-2.5 rounded-lg border border-outline-variant/40 font-tech-label-sm text-tech-label-sm text-on-surface hover:border-outline focus:outline-none focus:border-primary-container cursor-pointer">
+<option value="popular">Más vendidos</option>
+<option value="price_asc">Precio: Menor a Mayor</option>
+<option value="price_desc">Precio: Mayor a Menor</option>
+<option value="newest">Recientes</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-outline text-base pointer-events-none">swap_vert</span>
+</div>
+</div>
+</div>
+<!-- Main Content Area: Split Grid with Product Table and Form Section -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+<!-- Left Panel: Precision Product Table (7 Cols or 8 Cols) -->
+<div class="xl:col-span-8 flex flex-col gap-4">
+<div class="bg-surface-container-low rounded-xl border border-outline-variant/30 overflow-hidden shadow-2xl">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse" id="productsCatalogTable">
+<thead>
+<tr class="bg-surface-container border-b border-outline-variant/40">
+<th class="py-3 px-4 font-tech-label-sm text-tech-label-sm text-outline uppercase tracking-wider">PRODUCTO / SKU</th>
+<th class="py-3 px-3 font-tech-label-sm text-tech-label-sm text-outline uppercase tracking-wider">CATEGORÍA</th>
+<th class="py-3 px-3 font-tech-label-sm text-tech-label-sm text-outline uppercase tracking-wider">TECNOLOGÍA &amp; MATERIAL</th>
+<th class="py-3 px-3 font-tech-label-sm text-tech-label-sm text-outline uppercase tracking-wider">PRECIO (USD / CRC)</th>
+<th class="py-3 px-3 font-tech-label-sm text-tech-label-sm text-outline uppercase tracking-wider">STOCK</th>
+<th class="py-3 px-3 font-tech-label-sm text-tech-label-sm text-outline uppercase tracking-wider">ESTADO</th>
+<th class="py-3 px-4 font-tech-label-sm text-tech-label-sm text-outline uppercase tracking-wider text-right">ACCIONES</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20 font-body-sm text-body-sm text-on-surface">
+<!-- Product Row 1 -->
+<tr class="hover:bg-surface-container/60 transition-colors group">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high border border-outline-variant/40 flex items-center justify-center shrink-0 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Dark obsidian technical modular precision bracket engineered in reinforced carbon PETG resting on a CNC calibration surface, lit by dramatic orange neon workshop lighting, industrial macro photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDt5w9layhw8U8uyvJVIfDXJzxm-cXUrDsnNQiRfVHEB293rAjR2yFE_D1Iv-DUZawoU-fPIOKs6vhsV_GH_CdsZSZwh3iMEuHkwOgXEeSad2rriJ4HEsna2WuPVjPIhOoIDy78PSTPYLbVKa6M4h4z7q9sEAdDmT9uLoCxzXvaZ1eDgp98TVEU0HtvUxSnxS87f2ooJscENTmpUe8gCM9_Y20Jr0ZzAg1JPBLwJOL6s065dqfjAjQp"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-md text-[14px] font-bold text-on-surface truncate group-hover:text-primary transition-colors">Soporte de Alta Precisión Modular</span>
+<span class="font-tech-micro text-tech-micro text-outline">SKU: VCR-MEC-0894</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-block px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-tech-micro text-tech-micro uppercase">
+                      Piezas Técnicas
+                    </span>
+</td>
+<td class="py-3.5 px-3">
+<div class="flex flex-col gap-0.5">
+<span class="font-tech-label-sm text-tech-label-sm text-primary font-semibold">FDM Industrial</span>
+<span class="font-tech-micro text-tech-micro text-outline">PETG Reforzado Obsidian</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="flex flex-col">
+<span class="font-tech-data-md text-tech-data-md font-bold text-on-surface">$48.00 USD</span>
+<span class="font-tech-micro text-tech-micro text-outline">≈ ₡24,720 CRC</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-secondary-container/20 text-secondary-fixed border border-secondary-container/40 font-tech-micro text-tech-micro font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
+<span>8 uds listas</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-highest text-primary font-tech-micro text-tech-micro font-bold border border-primary-container/20">
+                      ACTIVO
+                    </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" onclick="editProduct('VCR-MEC-0894', 'Soporte de Alta Precisión Modular', 'tecnicas', 'FDM Industrial', 'PETG Reforzado Obsidian', 48.00, 8, '3.5h')" title="Editar producto">
+<span class="material-symbols-outlined text-base">edit</span>
+</button>
+<button class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" title="Duplicar ficha">
+<span class="material-symbols-outlined text-base">content_copy</span>
+</button>
+<a class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" data-path="tienda-hf-03" href="#" title="Visualizar en Tienda">
+<span class="material-symbols-outlined text-base">visibility</span>
+</a>
+</div>
+</td>
+</tr>
+<!-- Product Row 2 -->
+<tr class="hover:bg-surface-container/60 transition-colors group">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high border border-outline-variant/40 flex items-center justify-center shrink-0 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Complex geometric articulated dragon printed in high-precision matte dark resin on SLA 8K equipment, sharp micro-faceted scales, dark aerospace workshop atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQyvNXn3i34UCsdek4FQIRs8KgNumbaEgPBpE6IuCegCCyueV1hqCHsPYwouNQ64cZQ7IJEn7ZZLNqidpLUAONBDCu7ag8eNSpn4K4NB2WAJEZJE5DOElKp0J1A6cb1e7ybiOVbeJXOVqDf4vsv16f8SsoRi4K9gRPvvNjGe2TNHyEnouFrJ7DuDujd9-Ye5UzYvfcPOtXSoBOaIvP5LQlPsYTvV5ZI2SW2XPK2xBIVbKVH8DQqyto"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-md text-[14px] font-bold text-on-surface truncate group-hover:text-primary transition-colors">Dragón de Colección Geométrico</span>
+<span class="font-tech-micro text-tech-micro text-outline">SKU: VCR-ART-1042</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-block px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-tech-micro text-tech-micro uppercase">
+                      Figuras &amp; Colección
+                    </span>
+</td>
+<td class="py-3.5 px-3">
+<div class="flex flex-col gap-0.5">
+<span class="font-tech-label-sm text-tech-label-sm text-primary font-semibold">SLA Óptica</span>
+<span class="font-tech-micro text-tech-micro text-outline">Resina SLA 8K Grey</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="flex flex-col">
+<span class="font-tech-data-md text-tech-data-md font-bold text-on-surface">$54.00 USD</span>
+<span class="font-tech-micro text-tech-micro text-outline">≈ ₡27,810 CRC</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-secondary-container/20 text-secondary-fixed border border-secondary-container/40 font-tech-micro text-tech-micro font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
+<span>12 uds listas</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-highest text-primary font-tech-micro text-tech-micro font-bold border border-primary-container/20">
+                      ACTIVO
+                    </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" onclick="editProduct('VCR-ART-1042', 'Dragón de Colección Geométrico', 'figuras', 'SLA Óptica', 'Resina SLA 8K Grey', 54.00, 12, '6h')" title="Editar producto">
+<span class="material-symbols-outlined text-base">edit</span>
+</button>
+<button class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" title="Duplicar ficha">
+<span class="material-symbols-outlined text-base">content_copy</span>
+</button>
+<a class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" data-path="tienda-hf-03" href="#" title="Visualizar en Tienda">
+<span class="material-symbols-outlined text-base">visibility</span>
+</a>
+</div>
+</td>
+</tr>
+<!-- Product Row 3 -->
+<tr class="hover:bg-surface-container/60 transition-colors group">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high border border-outline-variant/40 flex items-center justify-center shrink-0 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Industrial spur gear printed in laser sintered PA12 Nylon with powdered mechanical texture, resting on engineering blueprints with measurement calipers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD45s3ODaYDdDKBuVRX8Zapdj4TasrJc8gHF0s51Llv6-WvKwtEO0YmBJskDUjXHWnDoVEa4-7kCE5OG8i2G893o78W97hPW3Ok2VGkzc_Gghhnj5AJw1cpYKmVfYIVMiaX1tnr6F2DOrNnfnmAN8GfZKo_vgi4x-bwT584ZjzzWeN-Gc6IwUbodhQGe3f1BJVaSTcIOThZ9Z1lJdbCK5_Ec4GMSiJVxbbYnYDc5OPlrWb8xuA6rcrC"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-md text-[14px] font-bold text-on-surface truncate group-hover:text-primary transition-colors">Engranaje de Nylon de Precisión M2</span>
+<span class="font-tech-micro text-tech-micro text-outline">SKU: VCR-ENG-0204</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-block px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-tech-micro text-tech-micro uppercase">
+                      Piezas Técnicas
+                    </span>
+</td>
+<td class="py-3.5 px-3">
+<div class="flex flex-col gap-0.5">
+<span class="font-tech-label-sm text-tech-label-sm text-primary font-semibold">SLS Láser</span>
+<span class="font-tech-micro text-tech-micro text-outline">Nylon PA12 Sinterizado</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="flex flex-col">
+<span class="font-tech-data-md text-tech-data-md font-bold text-on-surface">$42.00 USD</span>
+<span class="font-tech-micro text-tech-micro text-outline">≈ ₡21,630 CRC</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-surface-container-high text-on-surface-variant border border-outline-variant/40 font-tech-micro text-tech-micro font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+<span>Bajo Pedido (4h)</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-highest text-primary font-tech-micro text-tech-micro font-bold border border-primary-container/20">
+                      ACTIVO
+                    </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" onclick="editProduct('VCR-ENG-0204', 'Engranaje de Nylon de Precisión M2', 'tecnicas', 'SLS Láser', 'Nylon PA12 Sinterizado', 42.00, 0, '4.0h')" title="Editar producto">
+<span class="material-symbols-outlined text-base">edit</span>
+</button>
+<button class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" title="Duplicar ficha">
+<span class="material-symbols-outlined text-base">content_copy</span>
+</button>
+<a class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" data-path="tienda-hf-03" href="#" title="Visualizar en Tienda">
+<span class="material-symbols-outlined text-base">visibility</span>
+</a>
+</div>
+</td>
+</tr>
+<!-- Product Row 4 -->
+<tr class="hover:bg-surface-container/60 transition-colors group">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high border border-outline-variant/40 flex items-center justify-center shrink-0 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Racing quadcopter lightweight arm structural spar printed in carbon fiber reinforced nylon CF15 matte black weave texture in a robotics laboratory" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2jvTGDLKK3rU3zu48lXjThwN233JI1UuO56DQFCGh7hF2lB67oU08TiISTQnSiQNlkfHGoYcbaLF7bGjrnEbcqR3C9MbIB2hx9bKdlvzvrN63G8a2oGLMS1aJrsICSxta1DQUhEJJobzVpxcPk8a3WSMBCXYscMf_Ooxx-rMS9ViEU0A3zwt1KS-1kQG461T3QnLZGjFF3r-n9-bDy4p560wyrJ-S0kO5yFhWsJiEcjtTKr0KfY-V"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-md text-[14px] font-bold text-on-surface truncate group-hover:text-primary transition-colors">Brazo de Chasis de Drone Pro</span>
+<span class="font-tech-micro text-tech-micro text-outline">SKU: VCR-AER-5510</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-block px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-tech-micro text-tech-micro uppercase">
+                      Drones &amp; Robótica
+                    </span>
+</td>
+<td class="py-3.5 px-3">
+<div class="flex flex-col gap-0.5">
+<span class="font-tech-label-sm text-tech-label-sm text-primary font-semibold">FDM Carbono</span>
+<span class="font-tech-micro text-tech-micro text-outline">Nylon CF15 Fibra Carbono</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="flex flex-col">
+<span class="font-tech-data-md text-tech-data-md font-bold text-on-surface">$52.00 USD</span>
+<span class="font-tech-micro text-tech-micro text-outline">≈ ₡26,780 CRC</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-secondary-container/20 text-secondary-fixed border border-secondary-container/40 font-tech-micro text-tech-micro font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
+<span>5 uds listas</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-highest text-primary font-tech-micro text-tech-micro font-bold border border-primary-container/20">
+                      ACTIVO
+                    </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" onclick="editProduct('VCR-AER-5510', 'Brazo de Chasis de Drone Pro', 'robotica', 'FDM Carbono', 'Nylon CF15 Fibra de Carbono', 52.00, 5, '2.5h')" title="Editar producto">
+<span class="material-symbols-outlined text-base">edit</span>
+</button>
+<button class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" title="Duplicar ficha">
+<span class="material-symbols-outlined text-base">content_copy</span>
+</button>
+<a class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" data-path="tienda-hf-03" href="#" title="Visualizar en Tienda">
+<span class="material-symbols-outlined text-base">visibility</span>
+</a>
+</div>
+</td>
+</tr>
+<!-- Product Row 5 -->
+<tr class="hover:bg-surface-container/60 transition-colors group">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high border border-outline-variant/40 flex items-center justify-center shrink-0 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Architectural conceptual scale model skyscraper with complex parametric facade geometries 3D printed in matte off-white PLA, warm spotlight reflections" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7ikvcq2KyhahWlw5ailF_S9mvDo1FtNQ-Hdf1xBQYYBI320SEFafAcuG2Qs59r4E2uE6GBEsP-rYrD0CFCEB6CXtQ_-nE2-TZ8TMZZRvJtzsWLZAjn50s2syG_LFSf8JWiNrS21g-XgC2xQJBpjKdESs3y2pmE44SOdzbe_ysDDCsGqgQwdT-ZktumlPeKbRj4HcUsoFZnQrZ_HmVExEVS7TdQ3TP9YMQYQSYFr_obKP2cUoYc2FF"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-md text-[14px] font-bold text-on-surface truncate group-hover:text-primary transition-colors">Maqueta de Rascacielos Cúbico</span>
+<span class="font-tech-micro text-tech-micro text-outline">SKU: VCR-ARQ-3011</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-block px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-tech-micro text-tech-micro uppercase">
+                      Arquitectura
+                    </span>
+</td>
+<td class="py-3.5 px-3">
+<div class="flex flex-col gap-0.5">
+<span class="font-tech-label-sm text-tech-label-sm text-primary font-semibold">FDM Arquitectura</span>
+<span class="font-tech-micro text-tech-micro text-outline">PLA Architect High-Detail</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="flex flex-col">
+<span class="font-tech-data-md text-tech-data-md font-bold text-on-surface">$64.00 USD</span>
+<span class="font-tech-micro text-tech-micro text-outline">≈ ₡32,960 CRC</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-secondary-container/20 text-secondary-fixed border border-secondary-container/40 font-tech-micro text-tech-micro font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
+<span>3 uds listas</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-highest text-primary font-tech-micro text-tech-micro font-bold border border-primary-container/20">
+                      ACTIVO
+                    </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" onclick="editProduct('VCR-ARQ-3011', 'Maqueta de Rascacielos Cúbico', 'arquitectura', 'FDM Arquitectura', 'PLA Architect High-Detail', 64.00, 3, '12h')" title="Editar producto">
+<span class="material-symbols-outlined text-base">edit</span>
+</button>
+<button class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" title="Duplicar ficha">
+<span class="material-symbols-outlined text-base">content_copy</span>
+</button>
+<a class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" data-path="tienda-hf-03" href="#" title="Visualizar en Tienda">
+<span class="material-symbols-outlined text-base">visibility</span>
+</a>
+</div>
+</td>
+</tr>
+<!-- Product Row 6 -->
+<tr class="hover:bg-surface-container/60 transition-colors group">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high border border-outline-variant/40 flex items-center justify-center shrink-0 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Ruggedized waterproof sensor enclosure housing with rubberized sealing gasket dual material 3D print in dark PETG and orange TPU on a clean engineering inspection bench" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDV2tA-KWYX0sSJImncNDvNj21XciAr_tADbgrCFMf5pM26bdi2MajP5DNUkSNHSiYY14oEVXcRsFoRTbTY4_PeTe0zICYyPssW2FvGBXROuni6bf9jjli__Rcm-v44OcA1ZniT7kMeV_gqhU90jDp5Lc63o9tiQCeVOHGB_JquXJ8s8eyAE-kjW5qCEFTRmEcTbg12S1hX1fwTfw9mychhfECPvwQ6eq6U8CCZwUDifjrOKOovvjs6"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-md text-[14px] font-bold text-on-surface truncate group-hover:text-primary transition-colors">Caja de Sensores IP54 Hermética</span>
+<span class="font-tech-micro text-tech-micro text-outline">SKU: VCR-IOT-8821</span>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-block px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-tech-micro text-tech-micro uppercase">
+                      Electrónica &amp; IoT
+                    </span>
+</td>
+<td class="py-3.5 px-3">
+<div class="flex flex-col gap-0.5">
+<span class="font-tech-label-sm text-tech-label-sm text-primary font-semibold">FDM Dual</span>
+<span class="font-tech-micro text-tech-micro text-outline">PETG + Sello TPU 95A</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="flex flex-col">
+<span class="font-tech-data-md text-tech-data-md font-bold text-on-surface">$36.00 USD</span>
+<span class="font-tech-micro text-tech-micro text-outline">≈ ₡18,540 CRC</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-secondary-container/20 text-secondary-fixed border border-secondary-container/40 font-tech-micro text-tech-micro font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
+<span>15 uds listas</span>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-highest text-primary font-tech-micro text-tech-micro font-bold border border-primary-container/20">
+                      ACTIVO
+                    </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" onclick="editProduct('VCR-IOT-8821', 'Caja de Sensores IP54 Hermética', 'iot', 'FDM Dual', 'PETG + Sello TPU 95A', 36.00, 15, '1.8h')" title="Editar producto">
+<span class="material-symbols-outlined text-base">edit</span>
+</button>
+<button class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" title="Duplicar ficha">
+<span class="material-symbols-outlined text-base">content_copy</span>
+</button>
+<a class="p-1.5 hover:bg-surface-variant text-on-surface-variant hover:text-primary rounded transition-colors" data-path="tienda-hf-03" href="#" title="Visualizar en Tienda">
+<span class="material-symbols-outlined text-base">visibility</span>
+</a>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Pagination Footer -->
+<div class="bg-surface-container/80 px-4 py-3 border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+<span class="font-tech-micro text-tech-micro text-on-surface-variant">
+              Mostrando <strong class="text-on-surface">1 - 6</strong> de <strong class="text-on-surface">48</strong> productos registrados
+            </span>
+<div class="flex items-center gap-1.5">
+<button class="px-2.5 py-1 rounded bg-surface-container text-outline hover:text-on-surface font-tech-label-sm text-tech-label-sm border border-outline-variant/40 hover:border-outline transition-colors disabled:opacity-40" disabled="">
+                &lt; Anterior
+              </button>
+<button class="w-8 h-8 rounded bg-primary-container text-on-primary-container font-tech-label-sm text-tech-label-sm font-bold flex items-center justify-center shadow-[0_0_10px_rgba(255,90,31,0.3)]">
+                1
+              </button>
+<button class="w-8 h-8 rounded bg-surface-container text-on-surface hover:bg-surface-container-high font-tech-label-sm text-tech-label-sm flex items-center justify-center border border-outline-variant/30 transition-colors">
+                2
+              </button>
+<button class="w-8 h-8 rounded bg-surface-container text-on-surface hover:bg-surface-container-high font-tech-label-sm text-tech-label-sm flex items-center justify-center border border-outline-variant/30 transition-colors">
+                3
+              </button>
+<button class="w-8 h-8 rounded bg-surface-container text-on-surface hover:bg-surface-container-high font-tech-label-sm text-tech-label-sm flex items-center justify-center border border-outline-variant/30 transition-colors">
+                4
+              </button>
+<button class="px-2.5 py-1 rounded bg-surface-container text-on-surface hover:text-primary font-tech-label-sm text-tech-label-sm border border-outline-variant/40 hover:border-outline transition-colors">
+                Siguiente &gt;
+              </button>
+</div>
+</div>
+</div>
+<!-- System Batch Log Specimen -->
+<div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/30 flex items-center justify-between font-tech-micro text-tech-micro text-outline">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<span>API SYNC CR_BAC_NODE: 2025-05-18 10:44 UTC-6</span>
+</div>
+<div class="flex items-center gap-4">
+<span>TASA REF BCCR: ₡515.00 CRC/USD</span>
+<span class="text-primary-container font-bold">SLICER ENGINE: CURA 5.6 PROFILER OK</span>
+</div>
+</div>
+</div>
+<!-- Right Panel: Creation / Edition Technical Form (Explicit form section) -->
+<aside class="xl:col-span-4 w-full">
+<div class="bg-surface-container-low rounded-xl border border-primary-container/30 p-6 shadow-2xl relative" id="productFormContainer">
+<!-- Subtle corner accent -->
+<div class="absolute top-0 right-0 w-12 h-12 overflow-hidden pointer-events-none">
+<div class="w-16 h-1 bg-primary-container transform rotate-45 translate-x-3 -translate-y-1"></div>
+</div>
+<!-- Form Header -->
+<div class="flex items-start justify-between pb-4 border-b border-outline-variant/30 mb-5">
+<div class="flex flex-col">
+<span class="font-tech-micro text-tech-micro text-primary-container uppercase font-bold tracking-wider" id="formActionBadge">
+                [ MÓDULO // NUEVA REFERENCIA ]
+              </span>
+<h2 class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight" id="formTitle">
+                Panel de Especificación Técnica &amp; Producto
+              </h2>
+</div>
+<button class="text-outline hover:text-on-surface text-sm font-tech-micro p-1 rounded" id="resetFormBtn" title="Limpiar formulario" type="button">
+<span class="material-symbols-outlined text-lg">restart_alt</span>
+</button>
+</div>
+<!-- Product Form -->
+<form class="space-y-4" id="productEditForm" onsubmit="event.preventDefault(); handleFormSubmit();">
+<!-- Product Name -->
+<div class="space-y-1">
+<label class="block font-tech-label-sm text-tech-label-sm text-on-surface uppercase" for="prodName">
+                Nombre del Producto *
+              </label>
+<input class="w-full px-3 py-2 bg-surface-container rounded-lg border border-outline-variant/40 font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" id="prodName" placeholder="Ej. Soporte de Alta Precisión Modular" required="" type="text"/>
+</div>
+<!-- SKU and Category Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div class="space-y-1">
+<label class="block font-tech-label-sm text-tech-label-sm text-on-surface uppercase" for="prodSKU">
+                  SKU / Código *
+                </label>
+<input class="w-full px-3 py-2 bg-surface-container rounded-lg border border-outline-variant/40 font-tech-data-md text-tech-data-md text-on-surface uppercase focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" id="prodSKU" placeholder="VCR-MEC-0894" required="" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="block font-tech-label-sm text-tech-label-sm text-on-surface uppercase" for="prodCategory">
+                  Categoría *
+                </label>
+<select class="w-full px-3 py-2 bg-surface-container rounded-lg border border-outline-variant/40 font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary-container transition-all" id="prodCategory">
+<option value="tecnicas">Piezas Técnicas</option>
+<option value="figuras">Figuras &amp; Coleccionables</option>
+<option value="robotica">Drones &amp; Robótica</option>
+<option value="arquitectura">Arquitectura &amp; CAD</option>
+<option value="iot">Electrónica &amp; IoT</option>
+</select>
+</div>
+</div>
+<!-- Technology & Material Pickers -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div class="space-y-1">
+<label class="block font-tech-label-sm text-tech-label-sm text-on-surface uppercase" for="prodTech">
+                  Tecnología Fab.
+                </label>
+<select class="w-full px-3 py-2 bg-surface-container rounded-lg border border-outline-variant/40 font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary-container transition-all" id="prodTech">
+<option value="FDM Industrial">FDM Industrial (Extrusión)</option>
+<option value="SLA Óptica">SLA Óptica (Estereolitografía)</option>
+<option value="SLS Láser">SLS Láser (Sinterizado Polvo)</option>
+<option value="FDM Carbono">FDM Carbono (Ingeniería)</option>
+</select>
+</div>
+<div class="space-y-1">
+<label class="block font-tech-label-sm text-tech-label-sm text-on-surface uppercase" for="prodMaterial">
+                  Material Polímero
+                </label>
+<select class="w-full px-3 py-2 bg-surface-container rounded-lg border border-outline-variant/40 font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary-container transition-all" id="prodMaterial">
+<option value="PETG Reforzado Obsidian">PETG Reforzado</option>
+<option value="Resina SLA 8K Grey">Resina SLA 8K</option>
+<option value="Nylon PA12 Sinterizado">Nylon PA12 SLS</option>
+<option value="Nylon CF15 Fibra Carbono">Nylon CF15 Carbono</option>
+<option value="PLA Architect High-Detail">PLA Arquitectura</option>
+<option value="PETG + Sello TPU 95A">PETG + TPU 95A</option>
+</select>
+</div>
+</div>
+<!-- Price in USD with Automatic CRC Calculation -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-surface-container/60 rounded-lg border border-outline-variant/30">
+<div class="space-y-1">
+<label class="block font-tech-label-sm text-tech-label-sm text-on-surface uppercase" for="prodPriceUSD">
+                  Precio Base ($ USD) *
+                </label>
+<div class="relative">
+<span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-outline font-tech-data-md">$</span>
+<input class="w-full pl-7 pr-3 py-1.5 bg-surface rounded border border-outline-variant/40 font-tech-data-md text-tech-data-md text-on-surface focus:outline-none focus:border-primary-container transition-all" id="prodPriceUSD" oninput="calculateCRC(this.value)" placeholder="48.00" required="" step="0.5" type="number"/>
+</div>
+</div>
+<div class="space-y-1">
+<label class="block font-tech-label-sm text-tech-label-sm text-outline uppercase" for="prodPriceCRC">
+                  Equivalente (₡ CRC)
+                </label>
+<input class="w-full px-3 py-1.5 bg-surface-container-highest rounded border border-outline-variant/20 font-tech-data-md text-tech-data-md text-primary font-bold focus:outline-none" id="prodPriceCRC" readonly="" type="text" value="₡24,720 CRC"/>
+</div>
+</div>
+<!-- Stock & Manufacturing Cycle -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div class="space-y-1">
+<label class="block font-tech-label-sm text-tech-label-sm text-on-surface uppercase" for="prodStock">
+                  Stock Físico Inmediato
+                </label>
+<input class="w-full px-3 py-2 bg-surface-container rounded-lg border border-outline-variant/40 font-tech-data-md text-tech-data-md text-on-surface focus:outline-none focus:border-primary-container transition-all" id="prodStock" min="0" type="number" value="8"/>
+</div>
+<div class="space-y-1">
+<label class="block font-tech-label-sm text-tech-label-sm text-on-surface uppercase" for="prodPrintTime">
+                  Tiempo Impresión Est.
+                </label>
+<input class="w-full px-3 py-2 bg-surface-container rounded-lg border border-outline-variant/40 font-tech-data-md text-tech-data-md text-on-surface focus:outline-none focus:border-primary-container transition-all" id="prodPrintTime" placeholder="3h 30m" type="text" value="3.5h"/>
+</div>
+</div>
+<!-- CAD / Render Dropzone Asset Pipeline -->
+<div class="space-y-1">
+<label class="block font-tech-label-sm text-tech-label-sm text-on-surface uppercase">
+                Render Fotográfico / Archivo STEP / STL
+              </label>
+<div class="border border-dashed border-outline-variant hover:border-primary-container/70 rounded-lg p-4 bg-surface-container/40 flex flex-col items-center justify-center text-center cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-2xl mb-1">cloud_upload</span>
+<span class="font-tech-label-sm text-tech-label-sm text-on-surface group-hover:text-primary transition-colors">
+                  Arrastrar fotos 4K o malla CAD STL
+                </span>
+<span class="font-tech-micro text-tech-micro text-outline mt-0.5">
+                  PNG, JPG o STL hasta 45MB por modelo
+                </span>
+</div>
+</div>
+<!-- Publication Toggle -->
+<div class="flex items-center justify-between p-3 bg-surface-container rounded-lg border border-outline-variant/30">
+<div class="flex flex-col">
+<span class="font-tech-data-md text-tech-data-md font-bold text-on-surface">Visibilidad en Tienda</span>
+<span class="font-tech-micro text-tech-micro text-outline">Publicar inmediatamente en escaparate HF-02 / HF-03</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" id="prodActiveToggle" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-primary-container after:border-outline after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<!-- Form Actions -->
+<div class="flex items-center gap-3 pt-2">
+<button class="flex-1 py-3 px-4 rounded-xl bg-primary-container hover:bg-primary text-on-primary-container hover:text-on-primary font-tech-data-md text-tech-data-md font-bold text-center transition-all shadow-[0_4px_16px_rgba(255,90,31,0.3)] flex items-center justify-center gap-2" type="submit">
+<span class="material-symbols-outlined text-lg">save</span>
+<span id="saveBtnLabel">Guardar Cambios de Producto</span>
+</button>
+<button class="py-3 px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-on-surface-variant hover:text-on-surface font-tech-data-md text-tech-data-md border border-outline-variant/40 transition-colors" onclick="resetFormState()" type="button">
+                Descartar
+              </button>
+</div>
+</form>
+<!-- Notification feedback banner (hidden by default) -->
+<div class="hidden mt-4 p-3 bg-secondary-container/20 border border-secondary-container text-secondary-fixed rounded-lg font-tech-data-md text-tech-data-md flex items-center gap-2 animate-fadeIn" id="statusToast">
+<span class="material-symbols-outlined text-base">check_circle</span>
+<span id="toastMessage">Catálogo Vértice CR actualizado con éxito.</span>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<script>
+  // Simple Currency converter utility (USD -> CRC @ 515)
+  function calculateCRC(usdVal) {
+    const rate = 515;
+    const usd = parseFloat(usdVal) || 0;
+    const crc = Math.round(usd * rate);
+    const formatted = new Intl.NumberFormat('es-CR').format(crc);
+    const crcInput = document.getElementById('prodPriceCRC');
+    if (crcInput) {
+      crcInput.value = '₡' + formatted + ' CRC';
+    }
+  }
+
+  // Populate form with row values for fast technical editing
+  function editProduct(sku, name, cat, tech, mat, priceUsd, stock, printTime) {
+    document.getElementById('formActionBadge').textContent = '[ MÓDULO // EDICIÓN SKU: ' + sku + ' ]';
+    document.getElementById('formTitle').textContent = 'Edición de Ficha Técnica';
+    document.getElementById('saveBtnLabel').textContent = 'Actualizar ' + sku;
+    
+    document.getElementById('prodName').value = name;
+    document.getElementById('prodSKU').value = sku;
+    document.getElementById('prodCategory').value = cat;
+    document.getElementById('prodTech').value = tech;
+    document.getElementById('prodMaterial').value = mat;
+    document.getElementById('prodPriceUSD').value = priceUsd;
+    calculateCRC(priceUsd);
+    document.getElementById('prodStock').value = stock;
+    document.getElementById('prodPrintTime').value = printTime;
+
+    // Scroll gently to the form on small devices
+    const formBox = document.getElementById('productFormContainer');
+    if (window.innerWidth < 1280 && formBox) {
+      formBox.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  // Reset form to default creation state
+  function resetFormState() {
+    document.getElementById('productEditForm').reset();
+    document.getElementById('formActionBadge').textContent = '[ MÓDULO // NUEVA REFERENCIA ]';
+    document.getElementById('formTitle').textContent = 'Panel de Especificación Técnica & Producto';
+    document.getElementById('saveBtnLabel').textContent = 'Guardar Cambios de Producto';
+    calculateCRC(48);
+  }
+
+  document.getElementById('resetFormBtn')?.addEventListener('click', resetFormState);
+  document.getElementById('openCreateModalBtn')?.addEventListener('click', () => {
+    resetFormState();
+    const formBox = document.getElementById('productFormContainer');
+    if (formBox) {
+      formBox.scrollIntoView({ behavior: 'smooth' });
+      formBox.classList.add('ring-2', 'ring-primary-container');
+      setTimeout(() => formBox.classList.remove('ring-2', 'ring-primary-container'), 1200);
+    }
+  });
+
+  // Client-side visual feedback for store synchronization
+  document.getElementById('syncStoreBtn')?.addEventListener('click', function() {
+    const btn = this;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="material-symbols-outlined text-base animate-spin text-primary">autorenew</span><span>SINCRONIZANDO HF-02...</span>';
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      showToast('Sincronización completa con Tienda Vértice CR HF-02.');
+    }, 1100);
+  });
+
+  // Submit Handler simulation
+  function handleFormSubmit() {
+    const sku = document.getElementById('prodSKU').value;
+    showToast('Producto [' + sku + '] guardado exitosamente en base técnica.');
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('statusToast');
+    const toastMsg = document.getElementById('toastMessage');
+    if (toast && toastMsg) {
+      toastMsg.textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 4000);
+    }
+  }
+
+  // Real-time table search filter simulation
+  document.getElementById('productSearchInput')?.addEventListener('input', function(e) {
+    const query = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#productsCatalogTable tbody tr');
+    rows.forEach(row => {
+      const text = row.innerText.toLowerCase();
+      row.style.display = text.includes(query) ? '' : 'none';
+    });
+  });
+</script></main><footer class="w-full bg-surface-container-lowest border-t border-outline-variant/20 pt-16 pb-8"><div class="max-w-7xl mx-auto px-6 lg:px-12"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12"><div class="flex flex-col gap-4"><div class="flex items-center gap-2.5"><div class="flex flex-col"><div class="flex items-center gap-1 leading-none"><span class="font-headline-md text-headline-md tracking-tight text-on-surface font-bold">VÉRTICE</span><span class="font-headline-md text-headline-md tracking-tight text-primary-container font-bold">CR</span></div><span class="font-tech-micro text-tech-micro text-outline uppercase mt-0.5">MANUFACTURA ADITIVA &amp; CAD</span></div></div><div class="inline-flex items-center gap-2 self-start bg-surface-container px-2.5 py-1 rounded-full text-tertiary border border-outline-variant/40"><span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-ping"></span><span class="font-tech-micro text-tech-micro font-bold tracking-wider">CORE FABRICATION DECK ACTIVE</span></div><p class="font-body-sm text-body-sm text-on-surface-variant">Plataforma líder en ingeniería aditiva, prototipado rápido industrial y producción en serie bajo demanda con entrega en todo el territorio costarricense.</p></div><div class="flex flex-col gap-3"><h4 class="font-tech-data-md text-tech-data-md text-on-surface font-bold tracking-wider uppercase flex items-center gap-2"><span class="w-1 h-3.5 bg-primary-container rounded-sm"></span><span>NAVEGACIÓN</span></h4><ul class="space-y-2 font-body-sm text-body-sm text-on-surface-variant"><li><a class="hover:text-primary transition-colors flex items-center gap-1.5" data-path="catalogo-de-materiales" href="#"><span class="text-primary-container text-xs">•</span>Catálogo de Materiales</a></li><li><a class="hover:text-primary transition-colors flex items-center gap-1.5" data-path="cotizador-cad-instantaneo" href="#"><span class="text-primary-container text-xs">•</span>Cotizador CAD Instantáneo</a></li><li><a class="hover:text-primary transition-colors flex items-center gap-1.5" data-path="biblioteca-de-modelos-stl" href="#"><span class="text-primary-container text-xs">•</span>Biblioteca de Modelos &amp; STL</a></li><li><a class="hover:text-primary transition-colors flex items-center gap-1.5" data-path="tolerancias-especificaciones" href="#"><span class="text-primary-container text-xs">•</span>Tolerancias &amp; Especificaciones</a></li><li><a class="hover:text-primary transition-colors flex items-center gap-1.5" data-path="documentacion-faq" href="#"><span class="text-primary-container text-xs">•</span>Documentación &amp; FAQ</a></li></ul></div><div class="flex flex-col gap-3"><h4 class="font-tech-data-md text-tech-data-md text-on-surface font-bold tracking-wider uppercase flex items-center gap-2"><span class="w-1 h-3.5 bg-primary-container rounded-sm"></span><span>SEDE COSTA RICA &amp; LOGÍSTICA</span></h4><div class="space-y-2.5 font-body-sm text-body-sm text-on-surface-variant"><div class="flex items-start gap-2"><span class="material-symbols-outlined text-outline text-lg shrink-0 mt-0.5">location_on</span><span>Talleres Técnicos: Rohrmoser &amp; Curridabat, San José</span></div><div class="flex items-start gap-2"><span class="material-symbols-outlined text-outline text-lg shrink-0 mt-0.5">local_shipping</span><span>Envíos vía Correos de Costa Rica EMS (cobertura nacional 24-48h)</span></div><div class="flex items-start gap-2"><span class="material-symbols-outlined text-outline text-lg shrink-0 mt-0.5">schedule</span><span>Atención técnica: Lun-Sáb 08:00 - 18:00 CR</span></div></div></div><div class="flex flex-col gap-3"><h4 class="font-tech-data-md text-tech-data-md text-on-surface font-bold tracking-wider uppercase flex items-center gap-2"><span class="w-1 h-3.5 bg-primary-container rounded-sm"></span><span>PAGOS &amp; FACTURACIÓN HACIENDA</span></h4><div class="space-y-2 font-body-sm text-body-sm text-on-surface-variant"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-tertiary text-base shrink-0">check_circle</span><span>SINPE Móvil inmediato 24/7</span></div><div class="flex items-center gap-2"><span class="material-symbols-outlined text-tertiary text-base shrink-0">receipt_long</span><span>Factura Electrónica ATV v4.3</span></div><div class="flex items-center gap-2"><span class="material-symbols-outlined text-outline text-base shrink-0">account_balance</span><span>Transferencias BAC San José IBAN</span></div><div class="pt-1 font-tech-micro text-tech-micro text-outline border-t border-outline-variant/30 mt-2"><span>CÉDULA JURÍDICA: 3-102-849102 S.R.L.</span></div></div></div></div><div class="border-t border-outline-variant/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 font-tech-micro text-tech-micro text-outline"><div>© 2025 VÉRTICE CR // TODOS LOS DERECHOS RESERVADOS</div><div class="flex items-center gap-3"><span>SISTEMA DE MANUFACTURA &amp; INGENIERÍA 4.0</span><span class="text-primary-container font-bold">•</span><span>SAN JOSÉ, CR</span></div></div></div></footer></body></html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_portal" name="shell-type"/>
+<title>HF-18 Login &amp; Registro // VÉRTICE CR - Portal de Clientes</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-variant": "#2a2724",
+            "inverse-primary": "#ae3200",
+            "on-secondary-fixed": "#380d00",
+            "on-secondary": "#5b1b00",
+            "outline": "#8a6f66",
+            "on-primary-fixed-variant": "#852400",
+            "secondary-container": "#943000",
+            "surface-container-lowest": "#0d0c0b",
+            "on-tertiary-fixed": "#380d00",
+            "primary-container": "#ff5a1f",
+            "on-surface-variant": "#d4c3bd",
+            "background": "#0d0c0b",
+            "on-tertiary-fixed-variant": "#852400",
+            "surface-tint": "#ffb59e",
+            "inverse-on-surface": "#2d2a27",
+            "secondary": "#ffb59a",
+            "secondary-fixed": "#ffdbcf",
+            "on-primary-fixed": "#3a0b00",
+            "on-secondary-container": "#ffc4af",
+            "on-error-container": "#ffdad6",
+            "surface-container-low": "#151311",
+            "on-primary": "#5e1700",
+            "on-background": "#f5eeea",
+            "on-error": "#690005",
+            "tertiary-container": "#943000",
+            "tertiary": "#ffb59a",
+            "outline-variant": "#443b37",
+            "surface-dim": "#0d0c0b",
+            "surface": "#131110",
+            "primary-fixed-dim": "#ffb59e",
+            "error-container": "#93000a",
+            "surface-bright": "#332f2c",
+            "tertiary-fixed": "#ffdbcf",
+            "surface-container": "#1c1917",
+            "on-tertiary": "#3a0b00",
+            "on-tertiary-container": "#ffc4af",
+            "primary-fixed": "#ffdbd0",
+            "tertiary-fixed-dim": "#ffb59a",
+            "on-primary-container": "#ffffff",
+            "surface-container-highest": "#2e2a27",
+            "inverse-surface": "#f5eeea",
+            "error": "#ffb4ab",
+            "on-secondary-fixed-variant": "#802900",
+            "primary": "#ffb59e",
+            "secondary-fixed-dim": "#ffb59a",
+            "on-surface": "#f5eeea",
+            "surface-container-high": "#24201e"
+          },
+          fontFamily: {
+            "headline-md": ["Space Grotesk", "sans-serif"],
+            "tech-data-md": ["JetBrains Mono", "monospace"],
+            "display-hero": ["Space Grotesk", "sans-serif"],
+            "tech-data-lg": ["JetBrains Mono", "monospace"],
+            "tech-label-sm": ["JetBrains Mono", "monospace"],
+            "headline-xl": ["Space Grotesk", "sans-serif"],
+            "body-lg": ["Space Grotesk", "sans-serif"],
+            "body-sm": ["Space Grotesk", "sans-serif"],
+            "tech-micro": ["JetBrains Mono", "monospace"],
+            "body-md": ["Space Grotesk", "sans-serif"],
+            "headline-lg": ["Space Grotesk", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-[#0d0c0b] font-body-md text-on-surface antialiased min-h-screen selection:bg-primary-container selection:text-white relative flex flex-col justify-between overflow-x-hidden">
+<!-- FONDO CINEMATOGRÁFICO DE TALLER INDUSTRIAL -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<img alt="Atmósfera Taller y Laboratorio Vértice CR" class="w-full h-full object-cover object-center filter blur-[4px] brightness-50 contrast-125 scale-105 opacity-40" src="https://lh3.googleusercontent.com/aida/AEtjO1XgTMOFfVfr4qsIHR8QNCVYYpysO4wnCLViTureZqEAFAKD1rI5whcub09q0Ys_zzh-WsuUSf-ntLE0WK2oRbcOW7twBsvolOOjlfIh5r9xCOZFjOAbZ4vfQ8aL529SZ2TK-O59cjdSJSu3A0RHIDNDAt8hGFnMP1g_QwMFkk3NQVjBsBA28zyoklubJ0GSP7SrRLS5JeU1YQJQ9OcTwgnHVN38k7XG0OUnwlj2-SmK4NEDo7MIKOYGhg"/>
+<!-- Gradiente de profundidad y viñeta técnica -->
+<div class="absolute inset-0 bg-gradient-to-b from-[#0d0c0b]/90 via-[#0d0c0b]/80 to-[#0d0c0b]"></div>
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#0d0c0b_90%)]"></div>
+</div>
+<!-- ESTRUCTURA PRINCIPAL -->
+<div class="relative z-10 flex flex-col min-h-screen">
+<!-- 1. NAVBAR INSTITUCIONAL TÉCNICO -->
+<header class="sticky top-0 z-50 w-full bg-[#0d0c0b]/90 backdrop-blur-xl border-b border-outline-variant/40">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+<!-- Izquierda: Brand / Logo VÉRTICE CR con logo oficial nítido -->
+<a class="flex items-center gap-3 group" href="#">
+<div class="w-11 h-11 rounded-xl bg-surface-container/90 border border-primary-container/30 flex items-center justify-center p-2 shadow-inner group-hover:border-primary-container group-hover:shadow-[0_0_18px_rgba(255,90,31,0.25)] transition-all">
+<img alt="Vértice CR Logo" class="w-full h-full object-contain filter drop-shadow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxkVgKHRKghdsKRyOKJIiuB_ajBbbCIiHHZbq4TSYWsCcxLAFLz9SCjkbWw7MWpgyUCHy7hNG2hefKo8l-blsm_PWbHUaPiszjh2vRohi1I8GzD4SPOTlW9U9DAuDC3_oPlFaMKwNxzTCyYhXaukJFrpgHR8Hdg9XK7Q1JSnVub9l2OsD1kUA2yc2NuwsNwKTUEnFlo86SpkLuUZEiFwXT8QDA0oghXCU6yVTb8f-8njY8DvhrQnoLzSsr775rsYGNlQ"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-xl font-bold tracking-tight uppercase text-white">VÉRTICE <span class="text-primary-container">CR</span></span>
+<span class="font-tech-micro text-[10px] text-on-surface-variant uppercase tracking-widest">Manufactura Aditiva &amp; CAD</span>
+</div>
+</a>
+<!-- Centro: Enlaces de navegación -->
+<nav class="hidden md:flex items-center gap-8 font-tech-label-sm text-xs uppercase tracking-wider text-on-surface-variant">
+<a class="hover:text-primary-container transition-colors" href="#">INICIO</a>
+<a class="hover:text-primary-container transition-colors" href="#">TIENDA</a>
+<a class="hover:text-primary-container transition-colors" href="#">SOBRE NOSOTROS</a>
+<a class="hover:text-primary-container transition-colors" href="#">CONTÁCTENOS</a>
+<a class="hover:text-primary-container transition-colors" href="#">PREGUNTAS FRECUENTES</a>
+</nav>
+<!-- Derecha: Cotizar 3D cobrizo & Menú Hamburguesa -->
+<div class="flex items-center gap-4">
+<a class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-primary-container to-[#e04810] text-white font-tech-label-sm text-xs uppercase font-bold tracking-wider hover:brightness-110 shadow-lg shadow-primary-container/25 transition-all" href="#">
+<span>COTIZAR 3D</span>
+<span class="material-symbols-outlined text-sm font-bold">chevron_right</span>
+</a>
+<button aria-label="Menú de Navegación" class="p-2 rounded-lg bg-surface-container/80 border border-outline-variant/60 text-on-surface hover:text-primary-container hover:border-primary-container/60 transition-all flex flex-col justify-center items-center gap-1.5 w-10 h-10" type="button">
+<span class="w-5 h-0.5 bg-current rounded-full"></span>
+<span class="w-5 h-0.5 bg-current rounded-full"></span>
+<span class="w-5 h-0.5 bg-current rounded-full"></span>
+</button>
+</div>
+</div>
+<!-- Sub-barra técnica de estado -->
+<div class="border-t border-outline-variant/20 bg-[#131110]/90 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-3 text-xs font-tech-micro uppercase">
+<div class="flex items-center gap-2 text-on-surface-variant tracking-wider">
+<span class="text-on-surface-variant">AUTENTICACIÓN</span>
+<span class="text-outline-variant">//</span>
+<span class="text-primary-container font-semibold">ACCESO DE CLIENTES Y ADMINISTRACIÓN</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="text-on-surface tracking-wider font-medium">CONEXIÓN CIFRADA SHA-256 · <span class="text-primary-container font-semibold">NODO CR-01 SAN JOSÉ</span></span>
+</div>
+</div>
+</div>
+</header>
+<!-- 2. CONTENIDO PRINCIPAL: CARD DE AUTENTICACIÓN CENTRADO -->
+<main class="flex-1 flex items-center justify-center px-4 sm:px-6 py-12 sm:py-16">
+<div class="w-full max-w-[500px] flex flex-col items-center">
+<!-- CARD PRINCIPAL DE ACCESO -->
+<div class="w-full bg-[#141210]/92 backdrop-blur-2xl rounded-2xl border border-outline-variant/40 shadow-2xl shadow-black/90 relative overflow-hidden transition-all">
+<!-- Acento cobrizo superior -->
+<div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-primary-container to-transparent"></div>
+<!-- Cabecera de la Card -->
+<div class="px-6 sm:px-8 pt-6 pb-4 border-b border-outline-variant/30 flex items-center justify-between bg-[#191614]/70">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-primary-container text-lg">terminal</span>
+<span class="font-tech-micro text-[11px] uppercase tracking-widest text-on-surface font-semibold">TERMINAL CR-01 // CLIENT ACCESS</span>
+</div>
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container border border-emerald-500/30 text-emerald-400 font-tech-micro text-[10px] uppercase tracking-wider font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+<span>ONLINE / SSL 256</span>
+</div>
+</div>
+<div class="p-6 sm:p-8 flex flex-col gap-6">
+<!-- Tabs limpios y modernos -->
+<div class="grid grid-cols-2 p-1 bg-[#0d0c0b] rounded-xl border border-outline-variant/35 gap-1">
+<button class="py-2.5 px-3 rounded-lg font-tech-label-sm text-xs uppercase font-bold tracking-wider flex items-center justify-center gap-2 bg-[#221e1b] text-white border border-primary-container/40 shadow-[0_0_14px_rgba(255,90,31,0.2)] transition-all cursor-pointer" id="tab-login" type="button">
+<span class="material-symbols-outlined text-sm text-primary-container">lock</span>
+<span>Iniciar Sesión</span>
+</button>
+<button class="py-2.5 px-3 rounded-lg font-tech-label-sm text-xs uppercase font-medium tracking-wider flex items-center justify-center gap-2 text-on-surface-variant hover:text-white hover:bg-surface-container-high transition-all cursor-pointer border border-transparent" id="tab-register" type="button">
+<span class="material-symbols-outlined text-sm">person_add</span>
+<span>Crear Cuenta</span>
+</button>
+</div>
+<!-- Título y subtítulo -->
+<div class="flex flex-col gap-1.5">
+<h1 class="font-headline-md text-2xl font-bold tracking-tight text-white" id="auth-heading">Acceso al Laboratorio y Cuenta</h1>
+<p class="font-body-sm text-xs text-on-surface-variant leading-relaxed" id="auth-subheading">
+Introduce tus credenciales autorizadas para enviar trabajos G-Code, cotizar archivos 3D y monitorear telemetría de producción.
+</p>
+</div>
+<!-- Formulario de Autenticación -->
+<form class="flex flex-col gap-4" id="auth-form" onsubmit="event.preventDefault();">
+<!-- Campo Nombre Completo (visible en Crear Cuenta) -->
+<div class="hidden flex flex-col gap-1.5" id="field-fullname">
+<div class="flex items-center justify-between">
+<label class="font-tech-label-sm text-[11px] uppercase tracking-wider text-on-surface font-semibold" for="fullname-input">
+Nombre Completo o Empresa
+</label>
+<span class="font-tech-micro text-[10px] text-on-surface-variant">IDENTIDAD TÉCNICA</span>
+</div>
+<div class="relative">
+<input class="w-full bg-[#171412] text-white font-tech-data-md text-xs px-4 py-3 rounded-lg border border-outline-variant/60 placeholder-outline/50 focus:border-primary-container focus:ring-1 focus:ring-primary-container focus:bg-[#1f1b18] outline-none transition-all" id="fullname-input" placeholder="Ing. Carlos Solano Alvarado" type="text"/>
+<span class="material-symbols-outlined absolute right-3.5 top-3 text-outline text-lg pointer-events-none">badge</span>
+</div>
+</div>
+<!-- Campo Correo -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<label class="font-tech-label-sm text-[11px] uppercase tracking-wider text-on-surface font-semibold" for="email-input">
+Correo Corporativo o Profesional
+</label>
+<span class="font-tech-micro text-[9px] uppercase tracking-wider text-primary-container bg-primary-container/10 border border-primary-container/30 px-2 py-0.5 rounded font-bold">
+SOPORTE SSO / LDAP
+</span>
+</div>
+<div class="relative">
+<input class="w-full bg-[#171412] text-white font-tech-data-md text-xs px-4 py-3 pr-10 rounded-lg border border-outline-variant/60 placeholder-outline/50 focus:border-primary-container focus:ring-1 focus:ring-primary-container focus:bg-[#1f1b18] outline-none transition-all" id="email-input" placeholder="ingenieria@verticecr.tech" required="" type="email"/>
+<span class="material-symbols-outlined absolute right-3.5 top-3 text-outline text-lg pointer-events-none">alternate_email</span>
+</div>
+</div>
+<!-- Campo Clave -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<label class="font-tech-label-sm text-[11px] uppercase tracking-wider text-on-surface font-semibold" for="pwd-input">
+Clave Cifrada
+</label>
+<span class="font-tech-micro text-[10px] text-on-surface-variant uppercase">MÍN. 10 CARACTERES</span>
+</div>
+<div class="relative">
+<input class="w-full bg-[#171412] text-white font-tech-data-md text-xs px-4 py-3 pr-11 rounded-lg border border-outline-variant/60 placeholder-outline/50 focus:border-primary-container focus:ring-1 focus:ring-primary-container focus:bg-[#1f1b18] outline-none transition-all tracking-wider" id="pwd-input" minlength="10" placeholder="••••••••••••" required="" type="password"/>
+<button aria-label="Alternar visibilidad de contraseña" class="absolute right-3.5 top-3 text-outline hover:text-primary-container transition-colors flex items-center justify-center p-0.5" id="toggle-pwd" type="button">
+<span class="material-symbols-outlined text-lg" id="pwd-icon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Fila de Recordar Sesión & Olvido de Clave -->
+<div class="flex items-center justify-between text-xs pt-1">
+<label class="flex items-center gap-2 cursor-pointer select-none group">
+<input checked="" class="w-4 h-4 rounded bg-[#1c1917] border-outline-variant text-primary-container focus:ring-0 focus:ring-offset-0 transition-colors accent-[#ff5a1f]" type="checkbox"/>
+<span class="font-body-sm text-xs text-on-surface-variant group-hover:text-on-surface transition-colors">Recordar sesión técnica</span>
+</label>
+<a class="font-tech-label-sm text-[11px] uppercase text-primary-container hover:underline font-semibold tracking-wide transition-colors" href="#">
+¿Olvidaste tu contraseña?
+</a>
+</div>
+<!-- Botón Cobrizo Destacado -->
+<button class="mt-2 w-full py-3.5 px-6 rounded-lg bg-gradient-to-r from-primary-container to-[#e04810] text-white font-tech-label-sm text-xs uppercase font-bold tracking-wider hover:brightness-110 shadow-lg shadow-primary-container/25 flex items-center justify-center gap-2 group transition-all cursor-pointer" id="submit-btn" type="submit">
+<span id="submit-text">INGRESAR AL LABORATORIO</span>
+<span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</form>
+<!-- Divisor O CONTINUAR CON -->
+<div class="flex items-center gap-3 my-0.5">
+<div class="flex-1 h-px bg-outline-variant/30"></div>
+<span class="font-tech-micro text-[10px] uppercase tracking-widest text-on-surface-variant px-2">O CONTINUAR CON</span>
+<div class="flex-1 h-px bg-outline-variant/30"></div>
+</div>
+<!-- Opciones SSO Corporativas con SVG Nítidos -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<!-- Botón Google -->
+<button class="flex items-center justify-center gap-3 py-2.5 px-4 rounded-lg bg-[#181513] hover:bg-[#221e1b] border border-outline-variant/40 hover:border-primary-container/50 text-on-surface font-tech-label-sm text-xs uppercase tracking-wider transition-all cursor-pointer" type="button">
+<svg class="w-4 h-4 shrink-0" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"></path>
+</svg>
+<span class="text-xs">Google Workspace</span>
+</button>
+<!-- Botón GitHub -->
+<button class="flex items-center justify-center gap-3 py-2.5 px-4 rounded-lg bg-[#181513] hover:bg-[#221e1b] border border-outline-variant/40 hover:border-primary-container/50 text-on-surface font-tech-label-sm text-xs uppercase tracking-wider transition-all cursor-pointer" type="button">
+<svg class="w-4 h-4 shrink-0 fill-current text-white" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fill-rule="evenodd"></path>
+</svg>
+<span class="text-xs">GitHub Enterprise</span>
+</button>
+</div>
+<!-- Micro-banner de Seguridad Técnico -->
+<div class="p-3.5 rounded-xl bg-[#181412] border border-outline-variant/30 flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-container text-lg shrink-0 mt-0.5">verified_user</span>
+<p class="font-tech-micro text-[10px] text-on-surface-variant uppercase tracking-wider leading-relaxed">
+Cifrado de grado industrial SHA-256 &amp; Protocolo NDA automático para todos los archivos 3D y especificaciones CAD. Servidores locales en San José, Costa Rica.
+</p>
+</div>
+</div>
+</div>
+<!-- Enlaces Auxiliares Discretos -->
+<div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-on-surface-variant font-tech-micro text-[11px] uppercase tracking-wider">
+<a class="hover:text-primary-container transition-colors flex items-center gap-1.5" href="#">
+<span class="material-symbols-outlined text-sm text-primary-container">support_agent</span>
+<span>Mesa de Soporte CAD</span>
+</a>
+<span class="text-outline-variant">•</span>
+<a class="hover:text-primary-container transition-colors flex items-center gap-1.5" href="#">
+<span class="material-symbols-outlined text-sm text-primary-container">policy</span>
+<span>Términos de Manufactura &amp; NDA</span>
+</a>
+</div>
+</div>
+</main>
+<!-- 3. FOOTER INSTITUCIONAL CANÓNICO DE 4 COLUMNAS (HF-01/HF-03) -->
+<footer class="mt-auto border-t border-outline-variant/30 bg-[#0d0c0b]/95 backdrop-blur-xl relative z-10 text-on-surface">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+<!-- Columna 1: Identidad con logo nítido y badge CORE FABRICATION DECK ACTIVE -->
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="w-11 h-11 rounded-xl bg-surface-container/90 border border-outline-variant/50 flex items-center justify-center p-2">
+<img alt="Vértice CR Logo" class="w-full h-full object-contain filter drop-shadow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgOCb7LdhbW6DQy3lCQxNoK6U2Ibs5CZ1FpFnSPxkAMwHeuNnECklwALtJeprJidr6uCsPnSluidIcwDQh1yy4_0tHMh49KVaNpsW3g2aiPv2fBAdEKd2oB9p4UVd6UMB4a_-CbotNcs2MKJ3wW7iHIOEI6f6J4Dr7eD58ZvHaGt4lANojtfQnvWpfP91IXkpu7EM49u-DO2Pla4PXup3bSTDHzkCiRTW4mTD5wL6DzEr07rmuzklfy3jcIvnc49gh0w"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-xl font-bold uppercase tracking-tight text-white">VÉRTICE <span class="text-primary-container">CR</span></span>
+<span class="font-tech-micro text-[10px] text-on-surface-variant uppercase tracking-widest">Tecnología de Manufactura 3D</span>
+</div>
+</div>
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container/15 border border-primary-container/40 w-fit">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+<span class="font-tech-micro text-[11px] uppercase tracking-wider text-primary-container font-bold">CORE FABRICATION DECK ACTIVE</span>
+</div>
+<p class="font-body-sm text-xs text-on-surface-variant leading-relaxed">
+Infraestructura técnica de impresión 3D industrial, ingeniería inversa y prototipado rápido en Costa Rica.
+</p>
+</div>
+<!-- Columna 2: Navegación -->
+<div class="flex flex-col gap-3 font-tech-label-sm text-xs uppercase tracking-wider">
+<span class="font-headline-md text-sm font-bold text-white normal-case mb-1 tracking-normal">Navegación</span>
+<a class="text-on-surface-variant hover:text-primary-container transition-colors" href="#">Catálogo de Materiales</a>
+<a class="text-on-surface-variant hover:text-primary-container transition-colors" href="#">Cotizador CAD Instantáneo</a>
+<a class="text-on-surface-variant hover:text-primary-container transition-colors" href="#">Biblioteca de Modelos &amp; STL</a>
+<a class="text-on-surface-variant hover:text-primary-container transition-colors" href="#">Tolerancias &amp; Especificaciones</a>
+<a class="text-on-surface-variant hover:text-primary-container transition-colors" href="#">Documentación &amp; FAQ</a>
+</div>
+<!-- Columna 3: Sede Costa Rica & Logística -->
+<div class="flex flex-col gap-3 font-tech-label-sm text-xs">
+<span class="font-headline-md text-sm font-bold text-white mb-1">Sede Costa Rica &amp; Logística</span>
+<div class="flex items-start gap-2.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary-container shrink-0 mt-0.5">location_on</span>
+<span class="font-body-sm text-xs">Rohrmoser &amp; Curridabat, San José, Costa Rica.</span>
+</div>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary-container shrink-0">local_shipping</span>
+<span class="font-body-sm text-xs">Envíos a todo el país vía Correos de Costa Rica (EMS)</span>
+</div>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary-container shrink-0">schedule</span>
+<span class="font-body-sm text-xs">Atención Taller: Lun–Sáb 08:00 – 18:00 CR</span>
+</div>
+</div>
+<!-- Columna 4: Pagos & Facturación Hacienda -->
+<div class="flex flex-col gap-3 font-tech-label-sm text-xs">
+<span class="font-headline-md text-sm font-bold text-white mb-1">Pagos &amp; Facturación Hacienda</span>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary-container shrink-0">point_of_sale</span>
+<span>SINPE Móvil: +(506) 8800-8378</span>
+</div>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary-container shrink-0">receipt_long</span>
+<span>Factura Electrónica ATV v4.3</span>
+</div>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary-container shrink-0">account_balance</span>
+<span>Transferencias BAC San José (IBAN)</span>
+</div>
+<p class="font-tech-micro text-[11px] text-on-surface-variant mt-1">
+Cédula Jurídica: 3-102-849102 S.R.L.
+</p>
+</div>
+</div>
+<div class="mt-12 pt-6 border-t border-outline-variant/20 flex flex-col sm:flex-row items-center justify-between gap-4 font-tech-micro text-[11px] text-on-surface-variant uppercase tracking-wider">
+<span>© 2025 VÉRTICE CR // TODOS LOS DERECHOS RESERVADOS</span>
+<span>SISTEMA DE MANUFACTURA &amp; INGENIERÍA 4.0</span>
+</div>
+</div>
+</footer>
+</div>
+<!-- INTERACTIVIDAD TABS & PASSWORD TOGGLE -->
+<script>
+  (function() {
+    const tabLogin = document.getElementById('tab-login');
+    const tabRegister = document.getElementById('tab-register');
+    const fieldFullName = document.getElementById('field-fullname');
+    const authHeading = document.getElementById('auth-heading');
+    const authSubheading = document.getElementById('auth-subheading');
+    const submitText = document.getElementById('submit-text');
+    const pwdInput = document.getElementById('pwd-input');
+    const togglePwd = document.getElementById('toggle-pwd');
+    const pwdIcon = document.getElementById('pwd-icon');
+
+    // Alternar visualización de clave
+    if (togglePwd && pwdInput && pwdIcon) {
+      togglePwd.addEventListener('click', function() {
+        const isPassword = pwdInput.getAttribute('type') === 'password';
+        pwdInput.setAttribute('type', isPassword ? 'text' : 'password');
+        pwdIcon.textContent = isPassword ? 'visibility_off' : 'visibility';
+      });
+    }
+
+    // Alternar entre Iniciar Sesión y Registro
+    if (tabLogin && tabRegister && fieldFullName && authHeading && authSubheading && submitText) {
+      tabLogin.addEventListener('click', function() {
+        tabLogin.className = 'py-2.5 px-3 rounded-lg font-tech-label-sm text-xs uppercase font-bold tracking-wider flex items-center justify-center gap-2 bg-[#221e1b] text-white border border-primary-container/40 shadow-[0_0_14px_rgba(255,90,31,0.2)] transition-all cursor-pointer';
+        tabRegister.className = 'py-2.5 px-3 rounded-lg font-tech-label-sm text-xs uppercase font-medium tracking-wider flex items-center justify-center gap-2 text-on-surface-variant hover:text-white hover:bg-surface-container-high transition-all cursor-pointer border border-transparent';
+        
+        fieldFullName.classList.add('hidden');
+        authHeading.textContent = 'Acceso al Laboratorio y Cuenta';
+        authSubheading.textContent = 'Introduce tus credenciales autorizadas para enviar trabajos G-Code, cotizar archivos 3D y monitorear telemetría de producción.';
+        submitText.textContent = 'INGRESAR AL LABORATORIO';
+      });
+
+      tabRegister.addEventListener('click', function() {
+        tabRegister.className = 'py-2.5 px-3 rounded-lg font-tech-label-sm text-xs uppercase font-bold tracking-wider flex items-center justify-center gap-2 bg-[#221e1b] text-white border border-primary-container/40 shadow-[0_0_14px_rgba(255,90,31,0.2)] transition-all cursor-pointer';
+        tabLogin.className = 'py-2.5 px-3 rounded-lg font-tech-label-sm text-xs uppercase font-medium tracking-wider flex items-center justify-center gap-2 text-on-surface-variant hover:text-white hover:bg-surface-container-high transition-all cursor-pointer border border-transparent';
+        
+        fieldFullName.classList.remove('hidden');
+        authHeading.textContent = 'Crear Cuenta de Comprador';
+        authSubheading.textContent = 'Abre tu terminal corporativo para recibir cotizaciones automáticas, trazabilidad de piezas y facturación electrónica ATV.';
+        submitText.textContent = 'CREAR CUENTA DE COMPRADOR';
+      });
+    }
+  })();
+</script>
+</body></html>

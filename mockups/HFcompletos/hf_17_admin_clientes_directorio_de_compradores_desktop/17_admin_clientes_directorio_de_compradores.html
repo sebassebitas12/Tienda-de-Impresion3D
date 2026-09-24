@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CRM Analítico &amp; Directorio de Compradores // VÉRTICE CR</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #100e0c; }
+    ::-webkit-scrollbar-thumb { background: #373432; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #ff5a1f; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-variant": "#221e1c",
+            "inverse-primary": "#ae3200",
+            "on-secondary-fixed": "#380d00",
+            "on-secondary": "#5b1b00",
+            "outline": "#ab897f",
+            "on-primary-fixed-variant": "#852400",
+            "secondary-container": "#a03600",
+            "surface-container-lowest": "#0a0908",
+            "primary-container": "#ff5a1f",
+            "on-surface-variant": "#bba49c",
+            "background": "#0d0c0b",
+            "secondary": "#ffb59a",
+            "secondary-fixed": "#ffdbcf",
+            "on-primary-fixed": "#3a0b00",
+            "on-secondary-container": "#ffc4af",
+            "surface-container-low": "#151311",
+            "on-primary": "#5e1700",
+            "on-background": "#e8e1dd",
+            "surface-dim": "#0d0c0b",
+            "surface": "#12100e",
+            "primary-fixed-dim": "#ffb59e",
+            "surface-bright": "#2c2927",
+            "surface-container": "#1c1917",
+            "primary-fixed": "#ffdbd0",
+            "on-primary-container": "#541400",
+            "surface-container-highest": "#2e2a27",
+            "primary": "#ff8c5a",
+            "secondary-fixed-dim": "#ffb59a",
+            "on-surface": "#ede6e2",
+            "surface-container-high": "#24201e",
+            "amber-copper": "#f59e0b",
+            "amber-copper-deep": "#b45309"
+          },
+          fontFamily: {
+            "headline-md": ["Space Grotesk", "sans-serif"],
+            "tech-data-md": ["JetBrains Mono", "monospace"],
+            "display-hero": ["Space Grotesk", "sans-serif"],
+            "tech-data-lg": ["JetBrains Mono", "monospace"],
+            "tech-label-sm": ["JetBrains Mono", "monospace"],
+            "headline-xl": ["Space Grotesk", "sans-serif"],
+            "body-lg": ["Space Grotesk", "sans-serif"],
+            "body-sm": ["Space Grotesk", "sans-serif"],
+            "tech-micro": ["JetBrains Mono", "monospace"],
+            "body-md": ["Space Grotesk", "sans-serif"],
+            "headline-lg": ["Space Grotesk", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-background font-body-md text-on-surface antialiased min-h-screen selection:bg-primary-container selection:text-white relative">
+<!-- FONDO CON IMAGEN DE MANFACTURA INDUSTRIAL CANÓNICA DATASTORE 63 -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<img alt="Vértice Industrial Cleanroom" class="w-full h-full object-cover object-center opacity-25 filter contrast-125 saturate-75 scale-105" src="https://lh3.googleusercontent.com/aida/AEtjO1Wrg86eRZOv7Dv4vT05s43zS6vCS-yshoQ4OovuCVscw2Tb20dcaDgD50MSeUru3gLm1oYyAT3TVUCCsfmx0SD3t534xDN3L9HWUSXaUhJMPyKvWQaueU19eqTug6WchTQMY-fYqhqM2q7CfW1XwrJsYvJ77-y7UwLjQL0H7LI8zC2Jx58ifPOwT1na506GdTgmTY-tkIG7618r4cvmcMkOnvHDODSWiuySQpLjxlVom-OJYRCwCdXlsQ"/>
+<!-- Gradientes superpuestos para contraste oscuro obsidiana y brillo cobre -->
+<div class="absolute inset-0 bg-gradient-to-t from-[#0d0c0b] via-[#0d0c0b]/90 to-[#0d0c0b]/80"></div>
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,90,31,0.08)_0%,transparent_65%)]"></div>
+</div>
+<div class="relative z-10 flex flex-col min-h-screen">
+<!-- 1. NAVBAR INSTITUCIONAL IDÉNTICO HF-01/HF-03 CON LOGO DATASTORE 115 -->
+<header class="sticky top-0 z-50 w-full bg-[#0d0c0b]/90 backdrop-blur-xl border-b border-white/5">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+<!-- Brand Logo VÉRTICE CR con logo exacto Image 115 -->
+<a class="flex items-center gap-3.5 group" href="#">
+<div class="w-11 h-11 rounded-lg bg-surface-container border border-primary-container/40 flex items-center justify-center p-1.5 shadow-lg shadow-primary-container/10 group-hover:border-primary-container transition-all">
+<img alt="Vértice CR Logo" class="w-full h-full object-contain group-hover:scale-105 transition-transform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDmrTRBiUYT8at419-85xbnvvYoNc8QVKPaG3gHp-2fXroElwhH8XuqxPwl_IqW4cCpj0LLaOHzUnnFBKzFkl_6RHUH_ZaTOUSD4qsjfUTt1qijBqHbUj0gkJJRcHKBPQfvqMJv_YwfN5tN7lrD3pkKHqVKBFLIokPLNE_Rvhtalb3ZauGdlunlCVPwCOl9hhiKdBhKazv1GrJ9G667unlbe_G5ddicTFjCalux_gHAX6U_CUqE114THeIHLpce4UGPQ"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-xl font-bold tracking-tight uppercase text-on-surface">VÉRTICE <span class="text-primary-container">CR</span></span>
+<span class="font-tech-micro text-[10px] text-on-surface-variant uppercase tracking-widest">Manufactura Aditiva &amp; CAD</span>
+</div>
+</a>
+<!-- Enlaces principales -->
+<nav class="hidden lg:flex items-center gap-8 font-tech-label-sm text-xs uppercase tracking-wider text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="#">INICIO</a>
+<a class="hover:text-primary transition-colors" href="#">TIENDA</a>
+<a class="hover:text-primary transition-colors" href="#">SOBRE NOSOTROS</a>
+<a class="hover:text-primary transition-colors" href="#">CONTÁCTENOS</a>
+<a class="hover:text-primary transition-colors" href="#">PREGUNTAS FRECUENTES</a>
+</nav>
+<!-- CTA & Menú Hamburguesa -->
+<div class="flex items-center gap-3.5">
+<a class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary-container text-white font-tech-label-sm text-xs uppercase font-bold tracking-wider hover:bg-orange-600 shadow-lg shadow-primary-container/25 transition-all transform hover:-translate-y-0.5" href="#">
+<span>COTIZAR 3D</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</a>
+<button aria-label="Menú" class="p-2 rounded-lg bg-surface-container border border-white/10 text-on-surface hover:text-primary hover:border-primary-container/50 transition-all flex flex-col justify-center items-center gap-1.5 w-10 h-10" type="button">
+<span class="w-5 h-0.5 bg-current"></span>
+<span class="w-5 h-0.5 bg-current"></span>
+<span class="w-5 h-0.5 bg-current"></span>
+</button>
+</div>
+</div>
+<!-- Sub-barra técnica de navegación -->
+<div class="border-t border-white/5 bg-[#12100e]/80 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs font-tech-micro uppercase">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="text-on-surface/90 font-medium">ADMINISTRACIÓN HF-17</span>
+<span class="text-primary-container font-semibold">//</span>
+<span class="text-primary-container font-semibold tracking-wide">CRM ANALÍTICO &amp; DIRECTORIO DE COMPRADORES</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant">
+<div class="flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-surface-container border border-white/5 text-xs text-on-surface">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+<span class="text-primary-container font-bold">HACIENDA DGT V4.3 ACTIVO</span>
+<span class="text-white/20">·</span>
+<span class="text-on-surface"><strong class="text-primary font-bold">146</strong> CLIENTES ACTIVOS</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- CONTENIDO PRINCIPAL CRM ANALÍTICO -->
+<main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+<div class="flex flex-col w-full gap-8">
+<!-- HEADER DE LA PÁGINA -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="flex flex-col gap-2 max-w-3xl">
+<div class="inline-flex items-center gap-2 text-primary-container font-tech-label-sm text-xs uppercase tracking-widest">
+<svg class="w-4 h-4 text-primary-container" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>CRM INDUSTRIAL // PANEL DE CLIENTES FAB-CR</span>
+</div>
+<h1 class="font-headline-xl text-3xl sm:text-4xl font-bold uppercase text-on-surface tracking-tight">
+              Directorio de Compradores &amp; Gestión Comercial
+            </h1>
+<p class="font-body-md text-on-surface-variant text-sm sm:text-base leading-relaxed">
+              Monitoreo analítico de clientes corporativos, volumen de facturación recurrente en colones (CRC), trazabilidad fiscal DGT v4.3 y control de ciclo de recompra de manufactura aditiva.
+            </p>
+</div>
+<div class="shrink-0 flex items-center gap-3">
+<button class="inline-flex items-center gap-2 px-4 py-3 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/10 text-on-surface font-tech-label-sm text-xs uppercase tracking-wider transition-all" type="button">
+<svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span>Reporte Facturas DGT</span>
+</button>
+<button class="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-primary-container text-white font-tech-label-sm text-xs uppercase font-bold tracking-wider hover:bg-orange-600 shadow-xl shadow-primary-container/30 transition-all hover:scale-[1.02] active:scale-95" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span>+ Nuevo Cliente B2B</span>
+</button>
+</div>
+</section>
+<!-- 1. MÉTRICAS SUPERIORES DE COMPRADORES (SOLICITADAS EXACTAMENTE) -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Métrica 1: Total Clientes Registrados -->
+<div class="bg-surface-container-low/75 backdrop-blur-md rounded-xl p-5 border border-white/5 shadow-lg relative overflow-hidden group hover:border-primary-container/40 transition-all">
+<div class="flex items-center justify-between mb-3">
+<span class="font-tech-micro text-[11px] text-on-surface-variant uppercase tracking-wider">Total Clientes Registrados</span>
+<div class="w-8 h-8 rounded-lg bg-surface-container border border-white/5 flex items-center justify-center text-primary">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-3xl font-bold text-on-surface">146</span>
+<span class="font-tech-micro text-xs text-primary-container uppercase font-semibold">Clientes Activos</span>
+</div>
+<span class="font-tech-micro text-[11px] text-on-surface-variant">Con expediente y KYC validado</span>
+</div>
+<div class="mt-4 w-full h-1 bg-surface-container-highest/60 rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[100%] rounded-full"></div>
+</div>
+</div>
+<!-- Métrica 2: Clientes VIP / Alto Volumen -->
+<div class="bg-surface-container-low/75 backdrop-blur-md rounded-xl p-5 border border-white/5 shadow-lg relative overflow-hidden group hover:border-amber-copper/40 transition-all">
+<div class="flex items-center justify-between mb-3">
+<span class="font-tech-micro text-[11px] text-on-surface-variant uppercase tracking-wider">Clientes VIP / Alto Volumen</span>
+<div class="w-8 h-8 rounded-lg bg-surface-container border border-white/5 flex items-center justify-center text-amber-copper">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-3xl font-bold text-on-surface">28</span>
+<span class="font-tech-micro text-xs text-amber-copper uppercase font-semibold">Cuentas B2B</span>
+</div>
+<span class="font-tech-micro text-[11px] text-on-surface-variant">Industria médica, aeroespacial &amp; TEC</span>
+</div>
+<div class="mt-4 w-full h-1 bg-surface-container-highest/60 rounded-full overflow-hidden">
+<div class="h-full bg-amber-copper w-[68%] rounded-full"></div>
+</div>
+</div>
+<!-- Métrica 3: Saldo Pendiente de Facturación Hacienda -->
+<div class="bg-surface-container-low/75 backdrop-blur-md rounded-xl p-5 border border-white/5 shadow-lg relative overflow-hidden group hover:border-primary-container/40 transition-all">
+<div class="flex items-center justify-between mb-3">
+<span class="font-tech-micro text-[11px] text-on-surface-variant uppercase tracking-wider">Pendiente Facturación Hacienda</span>
+<div class="w-8 h-8 rounded-lg bg-surface-container border border-white/5 flex items-center justify-center text-primary-container">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="font-headline-md text-2xl font-bold text-on-surface">₡1,240,000</span>
+<span class="font-tech-micro text-xs text-primary uppercase font-semibold">CRC</span>
+</div>
+<span class="font-tech-micro text-[11px] text-on-surface-variant">Validado DGT v4.3 en cola</span>
+</div>
+<div class="mt-4 w-full h-1 bg-surface-container-highest/60 rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[42%] rounded-full"></div>
+</div>
+</div>
+<!-- Métrica 4: Ciclo de Recompra Promedio -->
+<div class="bg-surface-container-low/75 backdrop-blur-md rounded-xl p-5 border border-white/5 shadow-lg relative overflow-hidden group hover:border-primary/40 transition-all">
+<div class="flex items-center justify-between mb-3">
+<span class="font-tech-micro text-[11px] text-on-surface-variant uppercase tracking-wider">Ciclo Recompra Promedio</span>
+<div class="w-8 h-8 rounded-lg bg-surface-container border border-white/5 flex items-center justify-center text-primary">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-3xl font-bold text-on-surface">18</span>
+<span class="font-tech-micro text-xs text-secondary uppercase font-semibold">Días</span>
+</div>
+<span class="font-tech-micro text-[11px] text-on-surface-variant">Por cliente recurrente activo</span>
+</div>
+<div class="mt-4 w-full h-1 bg-surface-container-highest/60 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[82%] rounded-full"></div>
+</div>
+</div>
+</section>
+<!-- 2. BARRA DE FILTROS COMERCIALES Y BÚSQUEDA -->
+<section class="bg-surface-container-low/80 backdrop-blur-md rounded-xl p-4 border border-white/5 shadow-xl flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+<!-- Búsqueda -->
+<div class="relative flex-1">
+<svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<input class="w-full bg-surface-container-lowest/90 text-on-surface placeholder:text-on-surface-variant/70 font-tech-data-md text-xs sm:text-sm pl-10 pr-4 py-2.5 rounded-lg border border-white/5 focus:border-primary-container focus:ring-1 focus:ring-primary-container outline-none transition-colors" id="crmSearchInput" placeholder="Buscar por cliente, empresa, cédula jurídica o teléfono..." type="text"/>
+</div>
+<!-- Filtros Específicos -->
+<div class="flex flex-wrap items-center gap-3">
+<!-- Tipo de Comprador -->
+<div class="flex items-center gap-2 bg-surface-container-lowest/90 border border-white/5 px-3 py-1.5 rounded-lg">
+<span class="font-tech-micro text-[11px] uppercase text-on-surface-variant font-semibold">Tipo Comprador:</span>
+<select class="bg-transparent text-on-surface font-tech-label-sm text-xs uppercase focus:ring-0 border-0 p-0 pr-6 cursor-pointer outline-none" id="buyerTypeFilter">
+<option class="bg-[#1c1917] text-on-surface" value="all">Todos los Tipos</option>
+<option class="bg-[#1c1917] text-on-surface" value="b2b">B2B Corporativo</option>
+<option class="bg-[#1c1917] text-on-surface" value="academic">Universitario / TEC</option>
+<option class="bg-[#1c1917] text-on-surface" value="maker">Maker / Particular</option>
+</select>
+</div>
+<!-- Volumen de Compra -->
+<div class="flex items-center gap-2 bg-surface-container-lowest/90 border border-white/5 px-3 py-1.5 rounded-lg">
+<span class="font-tech-micro text-[11px] uppercase text-on-surface-variant font-semibold">Volumen:</span>
+<select class="bg-transparent text-on-surface font-tech-label-sm text-xs uppercase focus:ring-0 border-0 p-0 pr-6 cursor-pointer outline-none" id="volumeFilter">
+<option class="bg-[#1c1917] text-on-surface" value="all">Cualquier Volumen</option>
+<option class="bg-[#1c1917] text-on-surface" value="high">Alto (&gt; ₡3M CRC)</option>
+<option class="bg-[#1c1917] text-on-surface" value="medium">Medio (₡500k - ₡3M)</option>
+<option class="bg-[#1c1917] text-on-surface" value="low">Base (&lt; ₡500k)</option>
+</select>
+</div>
+<!-- Estado Tributario -->
+<div class="flex items-center gap-2 bg-surface-container-lowest/90 border border-white/5 px-3 py-1.5 rounded-lg">
+<span class="font-tech-micro text-[11px] uppercase text-on-surface-variant font-semibold">Tributario:</span>
+<select class="bg-transparent text-on-surface font-tech-label-sm text-xs uppercase focus:ring-0 border-0 p-0 pr-6 cursor-pointer outline-none" id="taxStatusFilter">
+<option class="bg-[#1c1917] text-on-surface" value="all">Todos</option>
+<option class="bg-[#1c1917] text-on-surface" value="valid">Al Día DGT</option>
+<option class="bg-[#1c1917] text-on-surface" value="pending">Por Validar DGT</option>
+</select>
+</div>
+<!-- Exportar -->
+<button class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 hover:border-primary-container/40 text-on-surface font-tech-label-sm text-xs uppercase tracking-wider transition-all" type="button">
+<svg class="w-4 h-4 text-primary-container" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span>Exportar CRM</span>
+</button>
+</div>
+</section>
+<!-- 3. DIRECTORIO DE COMPRADORES Y CUENTAS CORPORATIVAS (TABLA AMPLIA) -->
+<section class="bg-[#12100e]/90 backdrop-blur-xl rounded-xl border border-white/5 shadow-2xl overflow-hidden flex flex-col">
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container/70 border-b border-white/5 text-on-surface-variant font-tech-micro text-[11px] uppercase tracking-wider">
+<th class="py-4 px-6">NOMBRE / EMPRESA</th>
+<th class="py-4 px-5">CONTACTO &amp; TELÉFONO</th>
+<th class="py-4 px-5">CÉDULA JURÍDICA / DGT</th>
+<th class="py-4 px-4 text-center">TOTAL ÓRDENES</th>
+<th class="py-4 px-5">GASTO ACUMULADO (₡)</th>
+<th class="py-4 px-4">FRECUENCIA DE COMPRA</th>
+<th class="py-4 px-4 text-center">ESTATUS DGT</th>
+<th class="py-4 px-6 text-right">ACCIONES</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5 font-body-md text-sm" id="buyersTableBody">
+<!-- Fila 1: Aerospace Devices CR (B2B Corporativo) -->
+<tr class="hover:bg-white/[0.02] transition-colors group" data-buyer-type="b2b" data-tax="valid" data-volume="high">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3.5">
+<div class="w-10 h-10 rounded-lg bg-surface-container border border-primary-container/30 text-primary-container flex items-center justify-center font-tech-data-md font-bold text-xs shadow-inner">
+                        AD
+                      </div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-md text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
+                          AEROSPACE DEVICES CR S.A.
+                        </span>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="inline-flex items-center px-1.5 py-0.5 rounded bg-primary-container/15 text-primary text-[10px] font-tech-micro uppercase font-bold">B2B Corporativo</span>
+<span class="text-on-surface-variant text-[11px] font-tech-micro">Zona Franca Coyol</span>
+</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="flex flex-col gap-0.5">
+<span class="text-on-surface font-medium">Ing. Andrey Valverde</span>
+<span class="text-on-surface-variant text-[11px] flex items-center gap-1">
+<svg class="w-3 h-3 text-secondary" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        +506 8722-1904
+                      </span>
+</div>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container border border-white/5 text-on-surface">
+<svg class="w-3.5 h-3.5 text-primary-container" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="font-medium">3-101-778942</span>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-tech-data-md text-xs">
+<span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-surface-container font-bold text-on-surface">
+                      34 ÓRDENES
+                    </span>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="flex flex-col gap-0.5">
+<span class="text-primary font-bold text-sm">₡7,840,200 CRC</span>
+<span class="font-tech-micro text-[10px] text-on-surface-variant">Ticket prom: ₡230,594</span>
+</div>
+</td>
+<td class="py-4 px-4 font-tech-micro text-xs">
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+<span class="font-semibold">Cada 10 días</span>
+</div>
+<span class="text-[10px] text-on-surface-variant">Última: hace 2 días</span>
+</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-tech-micro text-[10px] font-semibold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                      AL DÍA DGT
+                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<div class="flex items-center justify-end gap-1.5">
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-primary transition-all" title="Ver Historial de Órdenes" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-secondary transition-all" title="Descargar Facturas DGT" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-primary transition-all" title="Editar Permisos" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+</td>
+</tr>
+<!-- Fila 2: Orthotech Dental Labs (B2B Corporativo) -->
+<tr class="hover:bg-white/[0.02] transition-colors group" data-buyer-type="b2b" data-tax="pending" data-volume="high">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3.5">
+<div class="w-10 h-10 rounded-lg bg-surface-container border border-amber-copper/30 text-amber-copper flex items-center justify-center font-tech-data-md font-bold text-xs shadow-inner">
+                        OD
+                      </div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-md text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
+                          ORTHOTECH DENTAL LABS
+                        </span>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="inline-flex items-center px-1.5 py-0.5 rounded bg-primary-container/15 text-primary text-[10px] font-tech-micro uppercase font-bold">B2B Corporativo</span>
+<span class="text-on-surface-variant text-[11px] font-tech-micro">Escazú Corporate Center</span>
+</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="flex flex-col gap-0.5">
+<span class="text-on-surface font-medium">Dr. Carlos Fonseca Mora</span>
+<span class="text-on-surface-variant text-[11px] flex items-center gap-1">
+<svg class="w-3 h-3 text-secondary" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        +506 2289-5012
+                      </span>
+</div>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container border border-white/5 text-on-surface">
+<svg class="w-3.5 h-3.5 text-primary-container" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="font-medium">3-102-611980</span>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-tech-data-md text-xs">
+<span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-surface-container font-bold text-on-surface">
+                      18 ÓRDENES
+                    </span>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="flex flex-col gap-0.5">
+<span class="text-primary font-bold text-sm">₡3,450,000 CRC</span>
+<span class="font-tech-micro text-[10px] text-on-surface-variant">Ticket prom: ₡191,666</span>
+</div>
+</td>
+<td class="py-4 px-4 font-tech-micro text-xs">
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+<span class="font-semibold">Cada 15 días</span>
+</div>
+<span class="text-[10px] text-on-surface-variant">Última: hace 6 días</span>
+</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-copper font-tech-micro text-[10px] font-semibold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-copper animate-pulse"></span>
+                      PENDIENTE DGT
+                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<div class="flex items-center justify-end gap-1.5">
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-primary transition-all" title="Ver Historial de Órdenes" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-secondary transition-all" title="Descargar Facturas DGT" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-primary transition-all" title="Editar Permisos" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+</td>
+</tr>
+<!-- Fila 3: Laboratorio Mecatrónica TEC (Universitario / TEC) -->
+<tr class="hover:bg-white/[0.02] transition-colors group" data-buyer-type="academic" data-tax="valid" data-volume="medium">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3.5">
+<div class="w-10 h-10 rounded-lg bg-surface-container border border-white/10 text-on-surface-variant flex items-center justify-center font-tech-data-md font-bold text-xs shadow-inner">
+                        TEC
+                      </div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-md text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
+                          MECATRÓNICA TEC (CARTAGO)
+                        </span>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="inline-flex items-center px-1.5 py-0.5 rounded bg-surface-container text-secondary text-[10px] font-tech-micro uppercase font-bold">Universitario / TEC</span>
+<span class="text-on-surface-variant text-[11px] font-tech-micro">Escuela de Electromecánica</span>
+</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="flex flex-col gap-0.5">
+<span class="text-on-surface font-medium">Esteban Castro Brenes</span>
+<span class="text-on-surface-variant text-[11px] flex items-center gap-1">
+<svg class="w-3 h-3 text-secondary" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        +506 8412-9901
+                      </span>
+</div>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container border border-white/5 text-on-surface">
+<svg class="w-3.5 h-3.5 text-secondary" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="font-medium">4-000-042145</span>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-tech-data-md text-xs">
+<span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-surface-container font-bold text-on-surface">
+                      12 ÓRDENES
+                    </span>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="flex flex-col gap-0.5">
+<span class="text-on-surface font-bold text-sm">₡1,150,000 CRC</span>
+<span class="font-tech-micro text-[10px] text-on-surface-variant">Ticket prom: ₡95,833</span>
+</div>
+</td>
+<td class="py-4 px-4 font-tech-micro text-xs">
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="font-semibold">Cada 28 días</span>
+</div>
+<span class="text-[10px] text-on-surface-variant">Última: hace 14 días</span>
+</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-tech-micro text-[10px] font-semibold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                      AL DÍA DGT
+                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<div class="flex items-center justify-end gap-1.5">
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-primary transition-all" title="Ver Historial de Órdenes" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-secondary transition-all" title="Descargar Facturas DGT" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-primary transition-all" title="Editar Permisos" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+</td>
+</tr>
+<!-- Fila 4: Biomecánica Robótica CR (B2B Corporativo) -->
+<tr class="hover:bg-white/[0.02] transition-colors group" data-buyer-type="b2b" data-tax="valid" data-volume="high">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3.5">
+<div class="w-10 h-10 rounded-lg bg-primary-container/20 border border-primary-container/50 text-primary flex items-center justify-center font-tech-data-md font-bold text-xs shadow-inner">
+                        BM
+                      </div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-md text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
+                          BIOMECÁNICA ROBÓTICA CR LTDA
+                        </span>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="inline-flex items-center px-1.5 py-0.5 rounded bg-primary-container/15 text-primary text-[10px] font-tech-micro uppercase font-bold">B2B Corporativo</span>
+<span class="text-on-surface-variant text-[11px] font-tech-micro">Parque Industrial Barreal</span>
+</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="flex flex-col gap-0.5">
+<span class="text-on-surface font-medium">Dra. Natalia Solano</span>
+<span class="text-on-surface-variant text-[11px] flex items-center gap-1">
+<svg class="w-3 h-3 text-secondary" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        +506 7014-5589
+                      </span>
+</div>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container border border-white/5 text-on-surface">
+<svg class="w-3.5 h-3.5 text-primary-container" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="font-medium">3-102-882019</span>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-tech-data-md text-xs">
+<span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-surface-container font-bold text-on-surface">
+                      22 ÓRDENES
+                    </span>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="flex flex-col gap-0.5">
+<span class="text-primary font-bold text-sm">₡5,210,000 CRC</span>
+<span class="font-tech-micro text-[10px] text-on-surface-variant">Ticket prom: ₡236,818</span>
+</div>
+</td>
+<td class="py-4 px-4 font-tech-micro text-xs">
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+<span class="font-semibold">Cada 12 días</span>
+</div>
+<span class="text-[10px] text-on-surface-variant">Última: ayer</span>
+</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-tech-micro text-[10px] font-semibold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                      AL DÍA DGT
+                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<div class="flex items-center justify-end gap-1.5">
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-primary transition-all" title="Ver Historial de Órdenes" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-secondary transition-all" title="Descargar Facturas DGT" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-primary transition-all" title="Editar Permisos" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+</td>
+</tr>
+<!-- Fila 5: Gabriel Mora (Maker / Particular) -->
+<tr class="hover:bg-white/[0.02] transition-colors group" data-buyer-type="maker" data-tax="valid" data-volume="low">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3.5">
+<div class="w-10 h-10 rounded-lg bg-surface-container border border-white/10 text-on-surface-variant flex items-center justify-center font-tech-data-md font-bold text-xs shadow-inner">
+                        GM
+                      </div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-md text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
+                          Gabriel Mora Chaves
+                        </span>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="inline-flex items-center px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant text-[10px] font-tech-micro uppercase font-bold">Maker / Particular</span>
+<span class="text-on-surface-variant text-[11px] font-tech-micro">San Pedro, Montes de Oca</span>
+</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="flex flex-col gap-0.5">
+<span class="text-on-surface font-medium">Gabriel Mora</span>
+<span class="text-on-surface-variant text-[11px] flex items-center gap-1">
+<svg class="w-3 h-3 text-secondary" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        +506 8892-0041
+                      </span>
+</div>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container border border-white/5 text-on-surface">
+<svg class="w-3.5 h-3.5 text-secondary" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="font-medium">1-1640-0812</span>
+</div>
+</td>
+<td class="py-4 px-4 text-center font-tech-data-md text-xs">
+<span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-surface-container font-bold text-on-surface">
+                      5 ÓRDENES
+                    </span>
+</td>
+<td class="py-4 px-5 font-tech-data-md text-xs">
+<div class="flex flex-col gap-0.5">
+<span class="text-on-surface font-semibold text-sm">₡320,000 CRC</span>
+<span class="font-tech-micro text-[10px] text-on-surface-variant">Ticket prom: ₡64,000</span>
+</div>
+</td>
+<td class="py-4 px-4 font-tech-micro text-xs">
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+<span class="font-semibold">Ocasional</span>
+</div>
+<span class="text-[10px] text-on-surface-variant">Última: hace 21 días</span>
+</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-tech-micro text-[10px] font-semibold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                      AL DÍA DGT
+                    </span>
+</td>
+<td class="py-4 px-6 text-right">
+<div class="flex items-center justify-end gap-1.5">
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-primary transition-all" title="Ver Historial de Órdenes" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-secondary transition-all" title="Descargar Facturas DGT" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-white/5 text-on-surface-variant hover:text-primary transition-all" title="Editar Permisos" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- PAGINACIÓN Y ESTADO DEL CRM -->
+<div class="p-4 bg-surface-container/60 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 font-tech-micro text-xs">
+<div class="flex items-center gap-3 text-on-surface-variant">
+<span>Mostrando <span class="text-on-surface font-bold">1 - 5</span> de <span class="text-on-surface font-bold">146</span> compradores registrados</span>
+<span class="text-white/10">|</span>
+<span class="flex items-center gap-1.5 text-secondary">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                Hacienda DGT ATV v4.3 Sincronizado
+              </span>
+</div>
+<div class="flex items-center gap-1.5">
+<button class="w-8 h-8 rounded-full bg-surface-container border border-white/5 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:border-white/20 transition-all" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+<button class="w-8 h-8 rounded-full bg-primary-container text-white font-bold flex items-center justify-center shadow-md shadow-primary-container/25" type="button">
+                1
+              </button>
+<button class="w-8 h-8 rounded-full bg-surface-container border border-white/5 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:border-white/20 transition-all" type="button">
+                2
+              </button>
+<button class="w-8 h-8 rounded-full bg-surface-container border border-white/5 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:border-white/20 transition-all" type="button">
+                3
+              </button>
+<span class="px-1 text-on-surface-variant font-bold">...</span>
+<button class="w-8 h-8 rounded-full bg-surface-container border border-white/5 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:border-white/20 transition-all" type="button">
+                30
+              </button>
+<button class="w-8 h-8 rounded-full bg-surface-container border border-white/5 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:border-white/20 transition-all" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- 4. FOOTER INSTITUCIONAL CANÓNICO DE 4 COLUMNAS CON LOGO EXACTO DATASTORE 115 -->
+<footer class="mt-20 border-t border-white/5 bg-[#0a0908]/95 backdrop-blur-md relative z-10 text-on-surface">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+<!-- Columna 1: Identidad con badge naranja CORE FABRICATION DECK ACTIVE -->
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="w-11 h-11 rounded-lg bg-surface-container border border-primary-container/40 flex items-center justify-center p-1.5 shadow-lg shadow-primary-container/10">
+<img alt="Vértice CR Logo" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqkiqxu5ZkxI4bBSd7lZFTH8kZNRPr-k-6ErGyXK3s-bo8ZNIcv0fDcNkqQQEQODAHidjgUIidx2wzgVcuChsZe-Np96CSCzCAlG02fiGwnNLbYER2m_V5OrPJ4r6nwYy957lXTqqHTIqDXSYB1wxb_aj85qDF2CMER29pUkYPkrPHOAnpAEH7KRXfRy9_QGcFAIK-YKw51SaC0BxsgdR5VWEFdt6e8XJAKljwxC6NFOD3bk3lSMPgN1lqBbuDlg779w"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-xl font-bold uppercase tracking-tight text-on-surface">VÉRTICE <span class="text-primary-container">CR</span></span>
+<span class="font-tech-micro text-[10px] text-on-surface-variant uppercase tracking-widest">Tecnología de Manufactura 3D</span>
+</div>
+</div>
+<!-- Badge naranja canónico -->
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container/15 border border-primary-container/40 w-fit">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+<span class="font-tech-micro text-[11px] uppercase tracking-wider text-primary-container font-bold">CORE FABRICATION DECK ACTIVE</span>
+</div>
+<p class="font-body-sm text-xs text-on-surface-variant leading-relaxed">
+              Infraestructura técnica de impresión 3D industrial, ingeniería inversa y prototipado rápido en Costa Rica.
+            </p>
+</div>
+<!-- Columna 2: Navegación -->
+<div class="flex flex-col gap-3 font-tech-label-sm text-xs uppercase tracking-wider">
+<span class="font-headline-md text-sm font-bold text-on-surface normal-case mb-1 tracking-normal">Navegación</span>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Catálogo de Materiales</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Cotizador CAD Instantáneo</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Biblioteca de Modelos &amp; STL</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Tolerancias &amp; Especificaciones</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Documentación &amp; FAQ</a>
+</div>
+<!-- Columna 3: Sede Costa Rica & Logística Rohrmoser/Pavas -->
+<div class="flex flex-col gap-3 font-tech-label-sm text-xs">
+<span class="font-headline-md text-sm font-bold text-on-surface mb-1">Sede Costa Rica &amp; Logística</span>
+<div class="flex items-start gap-2.5 text-on-surface-variant">
+<svg class="w-4 h-4 text-primary-container shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="font-body-sm text-xs">Rohrmoser &amp; Pavas, San José, Costa Rica.</span>
+</div>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<svg class="w-4 h-4 text-primary-container shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="font-body-sm text-xs">Envíos a todo el país vía Correos de Costa Rica (EMS)</span>
+</div>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<svg class="w-4 h-4 text-primary-container shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="font-body-sm text-xs">Atención Taller: Lun–Sáb 08:00 – 18:00 CR</span>
+</div>
+</div>
+<!-- Columna 4: Pagos SINPE Móvil & Facturación Hacienda DGT -->
+<div class="flex flex-col gap-3 font-tech-label-sm text-xs">
+<span class="font-headline-md text-sm font-bold text-on-surface mb-1">Pagos &amp; Facturación Hacienda</span>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<svg class="w-4 h-4 text-primary-container shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span>SINPE Móvil: +(506) 8800-8378</span>
+</div>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<svg class="w-4 h-4 text-amber-copper shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span>Factura Electrónica ATV v4.3 DGT</span>
+</div>
+<div class="flex items-center gap-2.5 text-on-surface-variant">
+<svg class="w-4 h-4 text-amber-copper shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span>Transferencias BAC San José (IBAN)</span>
+</div>
+<p class="font-tech-micro text-[11px] text-on-surface-variant/80 mt-1">
+              Cédula Jurídica: 3-102-849102 S.R.L.
+            </p>
+</div>
+</div>
+<div class="mt-12 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 font-tech-micro text-[11px] text-on-surface-variant uppercase tracking-wider">
+<span>© 2025 VÉRTICE CR // TODOS LOS DERECHOS RESERVADOS</span>
+<span>SISTEMA DE MANUFACTURA &amp; INGENIERÍA 4.0</span>
+</div>
+</div>
+</footer>
+</div>
+<!-- Interactive Filtering Script for CRM -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('crmSearchInput');
+      const buyerTypeFilter = document.getElementById('buyerTypeFilter');
+      const volumeFilter = document.getElementById('volumeFilter');
+      const taxFilter = document.getElementById('taxStatusFilter');
+      const rows = document.querySelectorAll('#buyersTableBody tr');
+
+      function filterTable() {
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        const selectedType = buyerTypeFilter ? buyerTypeFilter.value : 'all';
+        const selectedVolume = volumeFilter ? volumeFilter.value : 'all';
+        const selectedTax = taxFilter ? taxFilter.value : 'all';
+
+        rows.forEach(row => {
+          const text = row.innerText.toLowerCase();
+          const matchesQuery = !query || text.includes(query);
+          
+          const rowType = row.getAttribute('data-buyer-type') || '';
+          const matchesType = selectedType === 'all' || rowType === selectedType;
+
+          const rowVolume = row.getAttribute('data-volume') || '';
+          const matchesVolume = selectedVolume === 'all' || rowVolume === selectedVolume;
+
+          const rowTax = row.getAttribute('data-tax') || '';
+          const matchesTax = selectedTax === 'all' || rowTax === selectedTax;
+
+          if (matchesQuery && matchesType && matchesVolume && matchesTax) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      }
+
+      if (searchInput) searchInput.addEventListener('input', filterTable);
+      if (buyerTypeFilter) buyerTypeFilter.addEventListener('change', filterTable);
+      if (volumeFilter) volumeFilter.addEventListener('change', filterTable);
+      if (taxFilter) taxFilter.addEventListener('change', filterTable);
+    });
+  </script>
+</body></html>

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_portal" name="shell-type"/>
+<title>Ventas, Clientes &amp; Rendimiento // Panel Administrador - VÉRTICE CR</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-variant": "#282523",
+            "outline": "#786d67",
+            "outline-variant": "#433c38",
+            "background": "#0d0c0b",
+            "surface": "#141210",
+            "surface-container-lowest": "#0a0908",
+            "surface-container-low": "#161412",
+            "surface-container": "#1c1917",
+            "surface-container-high": "#24211e",
+            "surface-container-highest": "#2e2b27",
+            "primary": "#ffb59e",
+            "primary-container": "#ff5a1f",
+            "on-primary": "#481200",
+            "on-primary-container": "#ffece7",
+            "secondary": "#f4a261",
+            "secondary-container": "#52250d",
+            "on-surface": "#f5ede8",
+            "on-surface-variant": "#d2c3bc",
+            "amber-tech": "#f59e0b"
+          },
+          fontFamily: {
+            "headline-xl": ["Space Grotesk", "sans-serif"],
+            "headline-lg": ["Space Grotesk", "sans-serif"],
+            "headline-md": ["Space Grotesk", "sans-serif"],
+            "body-lg": ["Space Grotesk", "sans-serif"],
+            "body-md": ["Space Grotesk", "sans-serif"],
+            "body-sm": ["Space Grotesk", "sans-serif"],
+            "tech-data-lg": ["JetBrains Mono", "monospace"],
+            "tech-data-md": ["JetBrains Mono", "monospace"],
+            "tech-label-sm": ["JetBrains Mono", "monospace"],
+            "tech-micro": ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-[#0d0c0b] font-body-md text-on-surface antialiased min-h-screen selection:bg-primary-container selection:text-white relative">
+<!-- FONDO CON IMAGEN DE TALLER CAD & OVERLAY OSCURO OBSIDIANA -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-screen filter contrast-125 brightness-90 scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida/AEtjO1XROPmQFnNb4vwFQTX41NngCPkcECBY-mdJ59pCFAcf-Px7BhAzQd7pWSOiB8h3tqrUcWPqcIgn9SY_2LhYiOnPN__vJz3X75mVULXI-vXPpq2V4GQYG2PyUetX0rvVheEOV1EgzX347xYOhYOvX_lDCvv5xzZWbB3t-B0MhHCPb_61vcnur3j95GbLOn9A-9dUb-zpk35VJYU-sVx4AtT_I7Ly-lWD0XvD3ASG0AoyahztRQ8z1Bt47Q');"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-[#0d0c0b]/90 via-[#0d0c0b]/95 to-[#0d0c0b]"></div>
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(255,90,31,0.12),rgba(13,12,11,0))]"></div>
+</div>
+<div class="relative z-10 flex flex-col min-h-screen">
+<!-- NAVBAR INSTITUCIONAL CANÓNICO VÉRTICE CR -->
+<header class="sticky top-0 z-50 w-full bg-[#0d0c0b]/85 backdrop-blur-xl border-b border-[#2e2b27]/80">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+<!-- Izquierda: Brand / Logo con isotipo oficial nítido -->
+<a class="flex items-center gap-3.5 group" href="#">
+<img alt="Vértice CR Logo" class="h-9 w-auto drop-shadow-[0_0_12px_rgba(255,90,31,0.35)] group-hover:scale-105 transition-transform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5tx8VRz59M4p8hW8J5gV3csenjJzRgGRj3kMJhJ2DYgrbhqvJKDhbpbJ04zGqt2p7VsMx_Ev_hNjIFbCoyDYpOXRUE5XtFmEuYAknailPOWvqHTn3xNaUoHAnw_jhciu4rD5SVfv0Hpu1_BfufUrzoVpLZZwnbDX9y1Cl_K6j53mgIV0c0P3-6Ol_lFuo4dLjfWSxrHL46C27qwpO5GCXc_leDALivG6Pk8eykqLygcTSSeM9i2AcNsPquxrUJQDQ7g"/>
+<div class="flex flex-col">
+<span class="font-headline-md text-xl font-bold tracking-tight uppercase text-on-surface">VÉRTICE <span class="text-primary-container font-black">CR</span></span>
+<span class="font-tech-micro text-[10px] text-on-surface-variant uppercase tracking-widest">Manufactura Aditiva &amp; CAD</span>
+</div>
+</a>
+<!-- Centro: Enlaces de navegación institucional -->
+<nav class="hidden md:flex items-center gap-7 font-tech-label-sm text-xs uppercase tracking-wider text-on-surface-variant">
+<a class="hover:text-primary-container transition-colors py-1" href="#">INICIO</a>
+<a class="hover:text-primary-container transition-colors py-1" href="#">TIENDA</a>
+<a class="hover:text-primary-container transition-colors py-1" href="#">SOBRE NOSOTROS</a>
+<a class="hover:text-primary-container transition-colors py-1" href="#">CONTÁCTENOS</a>
+<a class="hover:text-primary-container transition-colors py-1" href="#">PREGUNTAS FRECUENTES</a>
+</nav>
+<!-- Derecha: Cotizar 3D & Botón Menú -->
+<div class="flex items-center gap-3.5">
+<a class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary-container text-white font-tech-label-sm text-xs uppercase font-bold tracking-wider hover:bg-orange-600 shadow-[0_0_20px_rgba(255,90,31,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98]" href="#">
+<span>COTIZAR 3D</span>
+<span class="material-symbols-outlined text-sm font-bold">chevron_right</span>
+</a>
+<button aria-label="Menú" class="p-2 rounded-lg bg-surface-container border border-outline-variant/40 text-on-surface hover:text-primary-container hover:border-primary-container/60 transition-all flex flex-col justify-center items-center gap-1.5 w-10 h-10" type="button">
+<span class="w-5 h-0.5 bg-current"></span>
+<span class="w-5 h-0.5 bg-current"></span>
+<span class="w-5 h-0.5 bg-current"></span>
+</button>
+</div>
+</div>
+<!-- Sub-barra técnica de navegación y estado -->
+<div class="border-t border-outline-variant/20 bg-[#12100e]/80 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-3 text-xs font-tech-micro">
+<div class="flex items-center gap-2 text-on-surface-variant tracking-wider uppercase">
+<span class="text-on-surface font-semibold">ADMINISTRACIÓN</span>
+<span class="text-primary-container">//</span>
+<span class="text-primary-container font-bold">DASHBOARD DE VENTAS, CLIENTES Y RENDIMIENTO</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant font-tech-micro">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="text-on-surface tracking-wider font-semibold uppercase">CIERRE CONTABLE: AL DÍA</span>
+</div>
+<span class="text-outline-variant">•</span>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[13px] text-amber-tech">verified</span>
+<span>ATV HACIENDA V4.3 CONECTADO</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- CONTENIDO PRINCIPAL -->
+<main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+<div class="flex flex-col w-full space-y-8">
+<!-- CABECERA DE PÁGINA & ACCIONES -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-2 border-b border-outline-variant/20">
+<div class="space-y-2.5 max-w-3xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-high/90 border border-primary-container/30 text-primary font-tech-micro text-[11px] uppercase tracking-wider shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span class="font-bold tracking-widest text-primary-container">PANEL ANALÍTICO EJECUTIVO</span>
+<span class="text-outline-variant">//</span>
+<span class="text-on-surface-variant">MÉTRICAS B2B &amp; E-COMMERCE</span>
+</div>
+<h1 class="font-headline-xl text-3xl sm:text-4xl text-on-surface uppercase font-bold tracking-tight">
+              Ventas, Clientes &amp; Rendimiento
+            </h1>
+<p class="font-body-md text-sm sm:text-base text-on-surface-variant leading-relaxed">
+              Consolidado de facturación, comportamiento de compradores recurrentes, conversión de cotizaciones industriales DFM y rentabilidad por línea de negocio en Costa Rica.
+            </p>
+</div>
+<!-- Acciones Rápidas -->
+<div class="flex flex-wrap items-center gap-3 shrink-0">
+<button class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary-container text-white font-tech-label-sm text-xs uppercase font-bold tracking-wider hover:bg-orange-600 shadow-[0_0_15px_rgba(255,90,31,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span>Exportar Balance Ventas (CSV)</span>
+</button>
+<button class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#1a1715] hover:bg-surface-container-high border border-outline-variant/50 hover:border-outline text-on-surface font-tech-label-sm text-xs uppercase font-semibold tracking-wider transition-all" type="button">
+<span class="material-symbols-outlined text-[17px] text-amber-tech">receipt_long</span>
+<span>Reporte Mensual Hacienda</span>
+</button>
+</div>
+</div>
+<!-- SECCIÓN 1: 4 KPI CARDS - RESUMEN EJECUTIVO DE COMPRAS & VENTAS -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- KPI 1: Facturación Total Mes -->
+<div class="p-5 rounded-xl bg-[#141210]/80 backdrop-blur-md border border-white/5 hover:border-primary-container/30 transition-all duration-300 shadow-lg flex flex-col justify-between space-y-3 group">
+<div class="flex items-center justify-between">
+<span class="font-tech-label-sm text-[11px] text-on-surface-variant uppercase tracking-wider">Facturación Total Mes</span>
+<div class="w-8 h-8 rounded-lg bg-[#1f1b18] border border-outline-variant/30 flex items-center justify-center text-amber-tech">
+<span class="material-symbols-outlined text-[18px]">payments</span>
+</div>
+</div>
+<div>
+<div class="font-tech-data-lg text-2xl text-on-surface font-bold tracking-tight">₡18,450,200 <span class="text-xs font-normal text-on-surface-variant font-tech-micro">CRC</span></div>
+<div class="font-tech-micro text-[11px] text-on-surface-variant mt-0.5">~$35,480 USD · Facturado con IVA DGT</div>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-white/5">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-primary-container/15 text-primary-container font-tech-micro text-[11px] font-bold">
+<span class="material-symbols-outlined text-[13px]">trending_up</span> +18.4% vs mes ant.
+</span>
+<svg class="w-20 h-6 overflow-visible" viewbox="0 0 80 24">
+<path d="M0,20 Q15,18 28,12 T52,9 T80,3" fill="none" stroke="#ff5a1f" stroke-linecap="round" stroke-width="2"></path>
+<circle cx="80" cy="3" fill="#ff5a1f" r="2.5"></circle>
+</svg>
+</div>
+</div>
+<!-- KPI 2: Ticket Promedio (AOV) -->
+<div class="p-5 rounded-xl bg-[#141210]/80 backdrop-blur-md border border-white/5 hover:border-primary-container/30 transition-all duration-300 shadow-lg flex flex-col justify-between space-y-3 group">
+<div class="flex items-center justify-between">
+<span class="font-tech-label-sm text-[11px] text-on-surface-variant uppercase tracking-wider">Ticket Promedio (AOV)</span>
+<div class="w-8 h-8 rounded-lg bg-[#1f1b18] border border-outline-variant/30 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
+</div>
+</div>
+<div>
+<div class="font-tech-data-lg text-2xl text-on-surface font-bold tracking-tight">₡42,800 <span class="text-xs font-normal text-on-surface-variant font-tech-micro">CRC</span></div>
+<div class="font-tech-micro text-[11px] text-on-surface-variant mt-0.5">~$82.30 USD por pedido promedio</div>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-white/5 font-tech-micro text-[11px]">
+<span class="text-on-surface-variant">Lotes B2B: <span class="text-on-surface font-semibold">₡165k avg</span></span>
+<span class="text-primary-container font-semibold">+9.2% YoY</span>
+</div>
+</div>
+<!-- KPI 3: Total Órdenes Procesadas -->
+<div class="p-5 rounded-xl bg-[#141210]/80 backdrop-blur-md border border-white/5 hover:border-primary-container/30 transition-all duration-300 shadow-lg flex flex-col justify-between space-y-3 group">
+<div class="flex items-center justify-between">
+<span class="font-tech-label-sm text-[11px] text-on-surface-variant uppercase tracking-wider">Total Órdenes Procesadas</span>
+<div class="w-8 h-8 rounded-lg bg-[#1f1b18] border border-outline-variant/30 flex items-center justify-center text-amber-tech">
+<span class="material-symbols-outlined text-[18px]">inventory_2</span>
+</div>
+</div>
+<div>
+<div class="font-tech-data-lg text-2xl text-on-surface font-bold tracking-tight">431 Pedidos</div>
+<div class="font-tech-micro text-[11px] text-on-surface-variant mt-0.5">82% Catálogo · 18% On-Demand STL</div>
+</div>
+<div class="space-y-1.5 pt-2 border-t border-white/5">
+<div class="w-full h-1.5 bg-[#201d1a] rounded-full overflow-hidden flex">
+<div class="h-full bg-primary-container" style="width: 82%;"></div>
+<div class="h-full bg-amber-tech" style="width: 18%;"></div>
+</div>
+</div>
+</div>
+<!-- KPI 4: Tasa de Retención / Recompra -->
+<div class="p-5 rounded-xl bg-[#141210]/80 backdrop-blur-md border border-white/5 hover:border-primary-container/30 transition-all duration-300 shadow-lg flex flex-col justify-between space-y-3 group">
+<div class="flex items-center justify-between">
+<span class="font-tech-label-sm text-[11px] text-on-surface-variant uppercase tracking-wider">Tasa de Recompra (Retención)</span>
+<div class="w-8 h-8 rounded-lg bg-[#1f1b18] border border-outline-variant/30 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[18px]">repeat</span>
+</div>
+</div>
+<div>
+<div class="font-tech-data-lg text-2xl text-primary font-bold tracking-tight">68.4%</div>
+<div class="font-tech-micro text-[11px] text-on-surface-variant mt-0.5">Empresas de ingeniería &amp; ortodoncia</div>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-white/5 font-tech-micro text-[11px]">
+<span class="text-amber-tech font-semibold">Alto Engagement B2B</span>
+<span class="text-on-surface-variant">LTV Saludable</span>
+</div>
+</div>
+</div>
+<!-- GRID PRINCIPAL (8 COLS + 4 COLS) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- ================= COLUMNA IZQUIERDA (8 COLS) ================= -->
+<div class="lg:col-span-8 space-y-8">
+<!-- MÓDULO 1: Segmentación de Compradores, CAC & LTV -->
+<div class="p-6 rounded-xl bg-[#141210]/90 backdrop-blur-md border border-white/5 shadow-xl space-y-6">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline-variant/20 pb-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-lg bg-[#1f1b18] border border-primary-container/30 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[20px]">groups</span>
+</div>
+<div>
+<h2 class="font-headline-md text-base sm:text-lg text-on-surface uppercase font-bold tracking-tight">Segmentación de Compradores &amp; Dinámica de Cohortes</h2>
+<p class="font-tech-micro text-xs text-on-surface-variant uppercase tracking-wider">Nuevos compradores vs recurrentes · CAC &amp; Valor de Vida (LTV)</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-tech-micro text-[11px] px-2.5 py-1 rounded bg-[#1f1b18] border border-outline-variant/40 text-on-surface-variant uppercase">
+Mes en Curso
+</span>
+</div>
+</div>
+<!-- 4 Métricas Unit Economics (CAC, LTV, Ratio LTV/CAC, Payback) -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+<div class="p-3.5 rounded-lg bg-[#1b1816]/70 border border-white/5">
+<span class="font-tech-micro text-[10px] text-on-surface-variant uppercase tracking-wider">CAC (Costo Adquisición)</span>
+<div class="font-tech-data-lg text-lg text-on-surface font-bold mt-1">₡14,200 <span class="text-xs font-normal text-on-surface-variant">CRC</span></div>
+<span class="font-tech-micro text-[10px] text-primary-container font-semibold mt-0.5 block">~$27.30 USD por cuenta</span>
+</div>
+<div class="p-3.5 rounded-lg bg-[#1b1816]/70 border border-white/5">
+<span class="font-tech-micro text-[10px] text-on-surface-variant uppercase tracking-wider">LTV Estimado (12M)</span>
+<div class="font-tech-data-lg text-lg text-on-surface font-bold mt-1">₡285,000 <span class="text-xs font-normal text-on-surface-variant">CRC</span></div>
+<span class="font-tech-micro text-[10px] text-amber-tech font-semibold mt-0.5 block">~$548 USD por cliente</span>
+</div>
+<div class="p-3.5 rounded-lg bg-[#1b1816]/70 border border-white/5">
+<span class="font-tech-micro text-[10px] text-on-surface-variant uppercase tracking-wider">Ratio LTV / CAC</span>
+<div class="font-tech-data-lg text-lg text-primary font-bold mt-1">20.1x</div>
+<span class="font-tech-micro text-[10px] text-on-surface-variant mt-0.5 block">Benchmark industria &gt; 3x</span>
+</div>
+<div class="p-3.5 rounded-lg bg-[#1b1816]/70 border border-white/5">
+<span class="font-tech-micro text-[10px] text-on-surface-variant uppercase tracking-wider">Recuperación Payback</span>
+<div class="font-tech-data-lg text-lg text-on-surface font-bold mt-1">21 Días</div>
+<span class="font-tech-micro text-[10px] text-on-surface-variant mt-0.5 block">Primer pedido cubre CAC</span>
+</div>
+</div>
+<!-- Desglose Gráfico: Nuevos vs Recurrentes -->
+<div class="space-y-3 p-4 rounded-xl bg-[#171412] border border-white/5">
+<div class="flex items-center justify-between text-xs">
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1.5 font-tech-micro text-xs text-on-surface">
+<span class="w-3 h-3 rounded-sm bg-primary-container"></span>
+Clientes Recurrentes (295) · <span class="text-primary-container font-bold">68.4%</span>
+</span>
+<span class="flex items-center gap-1.5 font-tech-micro text-xs text-on-surface-variant">
+<span class="w-3 h-3 rounded-sm bg-amber-tech"></span>
+Nuevos Compradores (136) · <span class="text-amber-tech font-bold">31.6%</span>
+</span>
+</div>
+<span class="font-tech-micro text-xs text-on-surface-variant">Base Activa: 431</span>
+</div>
+<div class="w-full h-3 bg-[#26221f] rounded-full overflow-hidden flex">
+<div class="h-full bg-primary-container" style="width: 68.4%;"></div>
+<div class="h-full bg-amber-tech" style="width: 31.6%;"></div>
+</div>
+<div class="flex justify-between items-center text-[11px] font-tech-micro text-on-surface-variant pt-1">
+<span>Generan ₡15.1M (82% de ingresos)</span>
+<span>Generan ₡3.3M (18% de ingresos)</span>
+</div>
+</div>
+<!-- Top Clientes por Facturación Acumulada -->
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<span class="font-tech-label-sm text-xs text-on-surface-variant uppercase tracking-wider">Top Compradores Corporativos (Facturación YTD)</span>
+<span class="font-tech-micro text-[11px] text-primary-container">Facturación acumulada auditada</span>
+</div>
+<div class="divide-y divide-white/5 rounded-lg border border-white/5 overflow-hidden">
+<!-- Cliente 1 -->
+<div class="p-3 bg-[#191614] flex items-center justify-between hover:bg-[#201c19] transition-colors">
+<div class="flex items-center gap-3">
+<span class="w-7 h-7 rounded bg-primary-container/20 border border-primary-container/40 text-primary font-tech-micro font-bold flex items-center justify-center text-xs">01</span>
+<div>
+<div class="font-body-md text-sm font-bold text-on-surface">Aerospace Devices CR S.A.</div>
+<div class="font-tech-micro text-[11px] text-on-surface-variant">Zona Franca Coyol · Piezas en Nylon CF15 &amp; PEEK</div>
+</div>
+</div>
+<div class="text-right">
+<div class="font-tech-data-md text-sm font-bold text-primary-container">₡7,840,000 <span class="text-[10px] text-on-surface-variant">CRC</span></div>
+<div class="font-tech-micro text-[10px] text-on-surface-variant">19 órdenes · Factura Electrónica</div>
+</div>
+</div>
+<!-- Cliente 2 -->
+<div class="p-3 bg-[#191614] flex items-center justify-between hover:bg-[#201c19] transition-colors">
+<div class="flex items-center gap-3">
+<span class="w-7 h-7 rounded bg-[#24201c] border border-outline-variant/40 text-on-surface font-tech-micro font-bold flex items-center justify-center text-xs">02</span>
+<div>
+<div class="font-body-md text-sm font-bold text-on-surface">Orthotech Dental Labs</div>
+<div class="font-tech-micro text-[11px] text-on-surface-variant">Escazú · Resinas Quirúrgicas SLA 8K &amp; Modelos</div>
+</div>
+</div>
+<div class="text-right">
+<div class="font-tech-data-md text-sm font-bold text-amber-tech">₡3,210,500 <span class="text-[10px] text-on-surface-variant">CRC</span></div>
+<div class="font-tech-micro text-[10px] text-on-surface-variant">34 órdenes · Pago recurrente BAC</div>
+</div>
+</div>
+<!-- Cliente 3 -->
+<div class="p-3 bg-[#191614] flex items-center justify-between hover:bg-[#201c19] transition-colors">
+<div class="flex items-center gap-3">
+<span class="w-7 h-7 rounded bg-[#24201c] border border-outline-variant/40 text-on-surface font-tech-micro font-bold flex items-center justify-center text-xs">03</span>
+<div>
+<div class="font-body-md text-sm font-bold text-on-surface">Mecatrónica TEC Lab</div>
+<div class="font-tech-micro text-[11px] text-on-surface-variant">Cartago · Prototipado Robótica &amp; Sensores TPU</div>
+</div>
+</div>
+<div class="text-right">
+<div class="font-tech-data-md text-sm font-bold text-on-surface">₡1,420,000 <span class="text-[10px] text-on-surface-variant">CRC</span></div>
+<div class="font-tech-micro text-[10px] text-on-surface-variant">8 órdenes institucionales</div>
+</div>
+</div>
+<!-- Cliente 4 -->
+<div class="p-3 bg-[#191614] flex items-center justify-between hover:bg-[#201c19] transition-colors">
+<div class="flex items-center gap-3">
+<span class="w-7 h-7 rounded bg-[#24201c] border border-outline-variant/40 text-on-surface font-tech-micro font-bold flex items-center justify-center text-xs">04</span>
+<div>
+<div class="font-body-md text-sm font-bold text-on-surface">AgroTech Automatización</div>
+<div class="font-tech-micro text-[11px] text-on-surface-variant">Alajuela · Boquillas de aspersión y carcasas IP67</div>
+</div>
+</div>
+<div class="text-right">
+<div class="font-tech-data-md text-sm font-bold text-on-surface">₡980,400 <span class="text-[10px] text-on-surface-variant">CRC</span></div>
+<div class="font-tech-micro text-[10px] text-on-surface-variant">6 órdenes SINPE Móvil</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- MÓDULO 2: Productos y Materiales Más Vendidos & Rentabilidad -->
+<div class="p-6 rounded-xl bg-[#141210]/90 backdrop-blur-md border border-white/5 shadow-xl space-y-6">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-outline-variant/20 pb-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-lg bg-[#1f1b18] border border-amber-tech/30 flex items-center justify-center text-amber-tech">
+<span class="material-symbols-outlined text-[20px]">table_chart</span>
+</div>
+<div>
+<h2 class="font-headline-md text-base sm:text-lg text-on-surface uppercase font-bold tracking-tight">Piezas y Materiales de Mayor Demanda</h2>
+<p class="font-tech-micro text-xs text-on-surface-variant uppercase tracking-wider">Ingresos generados, volumen facturado y margen bruto comercial</p>
+</div>
+</div>
+<span class="font-tech-micro text-[11px] text-on-surface-variant">Actualizado Cierre ATV</span>
+</div>
+<!-- Tabla Detallada de Rentabilidad de Productos -->
+<div class="overflow-x-auto">
+<table class="w-full text-left text-xs font-body-sm">
+<thead>
+<tr class="border-b border-outline-variant/30 text-on-surface-variant font-tech-micro text-[10px] uppercase tracking-wider">
+<th class="py-2.5 px-3">Producto / Servicio</th>
+<th class="py-2.5 px-3">Categoría</th>
+<th class="py-2.5 px-3 text-right">Unidades / kg</th>
+<th class="py-2.5 px-3 text-right">Ingresos (CRC)</th>
+<th class="py-2.5 px-3 text-right">Margen Bruto</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5 font-tech-micro">
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-3">
+<div class="font-body-md font-bold text-sm text-on-surface">Chasis Dron Industrial Nylon-CF</div>
+<div class="text-[10px] text-on-surface-variant">Resistencia mecánica alta temperatura</div>
+</td>
+<td class="py-3 px-3 text-on-surface-variant">Catálogo B2B</td>
+<td class="py-3 px-3 text-right text-on-surface font-semibold">142 uds</td>
+<td class="py-3 px-3 text-right font-tech-data-md text-primary-container font-bold">₡4,118,000</td>
+<td class="py-3 px-3 text-right">
+<span class="px-2 py-0.5 rounded bg-primary-container/15 text-primary-container font-bold">64.5%</span>
+</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-3">
+<div class="font-body-md font-bold text-sm text-on-surface">Guías Quirúrgicas &amp; Modelos Dentales</div>
+<div class="text-[10px] text-on-surface-variant">Resina SLA bio-compatible 8K</div>
+</td>
+<td class="py-3 px-3 text-on-surface-variant">SLA Médico</td>
+<td class="py-3 px-3 text-right text-on-surface font-semibold">320 uds</td>
+<td class="py-3 px-3 text-right font-tech-data-md text-amber-tech font-bold">₡3,520,000</td>
+<td class="py-3 px-3 text-right">
+<span class="px-2 py-0.5 rounded bg-amber-tech/15 text-amber-tech font-bold">71.2%</span>
+</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-3">
+<div class="font-body-md font-bold text-sm text-on-surface">Manufactura Bajo Demanda STL / CAD</div>
+<div class="text-[10px] text-on-surface-variant">Servicio cotizado personalizado DFM</div>
+</td>
+<td class="py-3 px-3 text-on-surface-variant">On-Demand</td>
+<td class="py-3 px-3 text-right text-on-surface font-semibold">89 lotes</td>
+<td class="py-3 px-3 text-right font-tech-data-md text-on-surface font-bold">₡5,280,000</td>
+<td class="py-3 px-3 text-right">
+<span class="px-2 py-0.5 rounded bg-white/10 text-on-surface font-bold">58.0%</span>
+</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-3">
+<div class="font-body-md font-bold text-sm text-on-surface">Juntas Flexibles TPU &amp; Amortiguadores</div>
+<div class="text-[10px] text-on-surface-variant">Elastómero 95A absorción de impacto</div>
+</td>
+<td class="py-3 px-3 text-on-surface-variant">Catálogo FDM</td>
+<td class="py-3 px-3 text-right text-on-surface font-semibold">210 uds</td>
+<td class="py-3 px-3 text-right font-tech-data-md text-on-surface font-bold">₡1,840,200</td>
+<td class="py-3 px-3 text-right">
+<span class="px-2 py-0.5 rounded bg-white/10 text-on-surface font-bold">52.4%</span>
+</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-3">
+<div class="font-body-md font-bold text-sm text-on-surface">Bobinas PETG &amp; PLA Pro (Suministros)</div>
+<div class="text-[10px] text-on-surface-variant">Venta directa filamento e insumos</div>
+</td>
+<td class="py-3 px-3 text-on-surface-variant">Insumos Hub</td>
+<td class="py-3 px-3 text-right text-on-surface font-semibold">185 kg</td>
+<td class="py-3 px-3 text-right font-tech-data-md text-on-surface font-bold">₡3,692,000</td>
+<td class="py-3 px-3 text-right">
+<span class="px-2 py-0.5 rounded bg-white/10 text-on-surface font-bold">38.5%</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Comparación de Rentabilidad por Línea de Negocio -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+<div class="p-4 rounded-xl bg-[#191614] border border-white/5 space-y-2">
+<div class="flex justify-between items-center">
+<span class="font-headline-md text-xs font-bold text-on-surface uppercase">Piezas Funcionales de Catálogo</span>
+<span class="font-tech-micro text-[11px] text-primary font-bold">₡9,650,200 CRC</span>
+</div>
+<p class="font-tech-micro text-[11px] text-on-surface-variant">Productos serializados, stock inmediato en Rohrmoser.</p>
+<div class="w-full h-1.5 bg-[#26221f] rounded-full overflow-hidden">
+<div class="h-full bg-primary-container rounded-full" style="width: 52.3%;"></div>
+</div>
+<div class="flex justify-between font-tech-micro text-[10px] text-on-surface-variant">
+<span>52.3% de la facturación total</span>
+<span class="text-primary-container font-semibold">Margen: 59.8%</span>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-[#191614] border border-white/5 space-y-2">
+<div class="flex justify-between items-center">
+<span class="font-headline-md text-xs font-bold text-on-surface uppercase">Prototipos STL &amp; Proyectos CAD</span>
+<span class="font-tech-micro text-[11px] text-amber-tech font-bold">₡8,800,000 CRC</span>
+</div>
+<p class="font-tech-micro text-[11px] text-on-surface-variant">Ingeniería a la medida para dispositivos médicos y mecatrónica.</p>
+<div class="w-full h-1.5 bg-[#26221f] rounded-full overflow-hidden">
+<div class="h-full bg-amber-tech rounded-full" style="width: 47.7%;"></div>
+</div>
+<div class="flex justify-between font-tech-micro text-[10px] text-on-surface-variant">
+<span>47.7% de la facturación total</span>
+<span class="text-amber-tech font-semibold">Margen: 67.2%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ================= COLUMNA DERECHA (4 COLS) ================= -->
+<div class="lg:col-span-4 space-y-8">
+<!-- MÓDULO 3: Conversión de Cotizaciones DFM a Compra Pagada -->
+<div class="p-6 rounded-xl bg-[#141210]/90 backdrop-blur-md border border-white/5 shadow-xl space-y-5">
+<div class="flex items-center justify-between border-b border-outline-variant/20 pb-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-lg bg-[#1f1b18] border border-primary-container/30 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[20px]">filter_alt</span>
+</div>
+<div>
+<h2 class="font-headline-md text-base text-on-surface uppercase font-bold tracking-tight">Embudo de Cotización</h2>
+<p class="font-tech-micro text-xs text-on-surface-variant uppercase tracking-wider">Conversión STL a Venta Pagada</p>
+</div>
+</div>
+</div>
+<!-- Métrica Central de Conversión -->
+<div class="p-4 rounded-xl bg-[#1a1715] border border-primary-container/30 text-center space-y-1">
+<span class="font-tech-micro text-[11px] text-on-surface-variant uppercase tracking-wider">Ratio de Conversión General</span>
+<div class="font-tech-data-lg text-3xl text-primary font-bold">74.2%</div>
+<span class="font-tech-micro text-[11px] text-primary-container font-semibold block">+6.1% vs trimestre anterior</span>
+</div>
+<!-- Pasos del Funnel de Cotización CAD -->
+<div class="space-y-3 font-tech-micro text-xs">
+<div class="p-3 rounded-lg bg-[#181513] border border-white/5 space-y-1.5">
+<div class="flex justify-between">
+<span class="text-on-surface font-semibold">1. Archivos CAD/STL Subidos</span>
+<span class="text-on-surface font-bold">148 archivos</span>
+</div>
+<div class="w-full h-1.5 bg-[#26221f] rounded-full overflow-hidden">
+<div class="h-full bg-outline rounded-full" style="width: 100%;"></div>
+</div>
+</div>
+<div class="p-3 rounded-lg bg-[#181513] border border-white/5 space-y-1.5">
+<div class="flex justify-between">
+<span class="text-on-surface font-semibold">2. Análisis DFM &amp; Cotización Aprobada</span>
+<span class="text-amber-tech font-bold">126 cotizaciones (85.1%)</span>
+</div>
+<div class="w-full h-1.5 bg-[#26221f] rounded-full overflow-hidden">
+<div class="h-full bg-amber-tech rounded-full" style="width: 85.1%;"></div>
+</div>
+</div>
+<div class="p-3 rounded-lg bg-[#181513] border border-white/5 space-y-1.5">
+<div class="flex justify-between">
+<span class="text-on-surface font-semibold">3. Orden Pagada &amp; Facturada</span>
+<span class="text-primary-container font-bold">110 órdenes (74.2%)</span>
+</div>
+<div class="w-full h-1.5 bg-[#26221f] rounded-full overflow-hidden">
+<div class="h-full bg-primary-container rounded-full" style="width: 74.2%;"></div>
+</div>
+</div>
+</div>
+<div class="p-3 rounded-lg bg-surface-container-high/60 border border-outline-variant/30 text-on-surface-variant font-tech-micro text-[11px]">
+<span class="text-amber-tech font-bold">Tiempo promedio de decisión:</span> 4.8 horas desde el envío del presupuesto interactivo.
+</div>
+</div>
+<!-- MÓDULO 4: Métodos de Pago más Utilizados en Costa Rica -->
+<div class="p-6 rounded-xl bg-[#141210]/90 backdrop-blur-md border border-white/5 shadow-xl space-y-5">
+<div class="flex items-center justify-between border-b border-outline-variant/20 pb-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-lg bg-[#1f1b18] border border-amber-tech/30 flex items-center justify-center text-amber-tech">
+<span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+</div>
+<div>
+<h2 class="font-headline-md text-base text-on-surface uppercase font-bold tracking-tight">Métodos de Pago</h2>
+<p class="font-tech-micro text-xs text-on-surface-variant uppercase tracking-wider">Desglose Pasarelas Locales CR</p>
+</div>
+</div>
+</div>
+<div class="space-y-3.5">
+<!-- SINPE Móvil -->
+<div class="p-3.5 rounded-xl bg-[#1a1715] border border-primary-container/30 space-y-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container text-lg">smartphone</span>
+<span class="font-body-md text-sm font-bold text-on-surface">SINPE Móvil</span>
+</div>
+<span class="font-tech-data-md text-sm font-bold text-primary-container">64.0%</span>
+</div>
+<div class="w-full h-1.5 bg-[#26221f] rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 64%;"></div>
+</div>
+<div class="flex justify-between font-tech-micro text-[10px] text-on-surface-variant">
+<span>276 transacciones</span>
+<span>₡11,808,128 CRC</span>
+</div>
+</div>
+<!-- Transferencias BAC San José -->
+<div class="p-3.5 rounded-xl bg-[#1a1715] border border-white/5 space-y-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-tech text-lg">account_balance</span>
+<span class="font-body-md text-sm font-bold text-on-surface">Transferencia BAC (IBAN)</span>
+</div>
+<span class="font-tech-data-md text-sm font-bold text-amber-tech">24.0%</span>
+</div>
+<div class="w-full h-1.5 bg-[#26221f] rounded-full overflow-hidden">
+<div class="h-full bg-amber-tech" style="width: 24%;"></div>
+</div>
+<div class="flex justify-between font-tech-micro text-[10px] text-on-surface-variant">
+<span>103 transacciones corporativas</span>
+<span>₡4,428,048 CRC</span>
+</div>
+</div>
+<!-- Tarjetas / PayPal -->
+<div class="p-3.5 rounded-xl bg-[#1a1715] border border-white/5 space-y-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-lg">credit_card</span>
+<span class="font-body-md text-sm font-bold text-on-surface">Tarjetas / PayPal USD</span>
+</div>
+<span class="font-tech-data-md text-sm font-bold text-on-surface-variant">12.0%</span>
+</div>
+<div class="w-full h-1.5 bg-[#26221f] rounded-full overflow-hidden">
+<div class="h-full bg-outline" style="width: 12%;"></div>
+</div>
+<div class="flex justify-between font-tech-micro text-[10px] text-on-surface-variant">
+<span>52 transacciones e-commerce</span>
+<span>₡2,214,024 CRC</span>
+</div>
+</div>
+</div>
+</div>
+<!-- MÓDULO 5: Acciones Administrativas & Facturación -->
+<div class="p-6 rounded-xl bg-[#141210]/90 backdrop-blur-md border border-white/5 shadow-xl space-y-4">
+<div class="flex items-center gap-3 border-b border-outline-variant/20 pb-4">
+<div class="w-8 h-8 rounded-lg bg-[#1f1b18] border border-primary-container/30 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+</div>
+<h2 class="font-headline-md text-base text-on-surface uppercase font-bold tracking-tight">Acciones Administrativas</h2>
+</div>
+<div class="grid grid-cols-2 gap-3 font-tech-label-sm text-xs">
+<button class="p-3.5 rounded-xl bg-[#191614] hover:bg-[#231f1c] border border-white/5 hover:border-amber-tech/40 text-on-surface flex flex-col items-center justify-center gap-1.5 text-center transition-all group" type="button">
+<span class="material-symbols-outlined text-[22px] text-amber-tech group-hover:scale-110 transition-transform">receipt_long</span>
+<span class="font-bold uppercase tracking-wider text-[11px]">Facturar XML ATV</span>
+<span class="font-tech-micro text-[9px] text-on-surface-variant">Lote Hacienda v4.3</span>
+</button>
+<button class="p-3.5 rounded-xl bg-[#191614] hover:bg-[#231f1c] border border-white/5 hover:border-primary-container/40 text-on-surface flex flex-col items-center justify-center gap-1.5 text-center transition-all group" type="button">
+<span class="material-symbols-outlined text-[22px] text-primary-container group-hover:scale-110 transition-transform">analytics</span>
+<span class="font-bold uppercase tracking-wider text-[11px]">Reporte de Clientes</span>
+<span class="font-tech-micro text-[9px] text-on-surface-variant">LTV &amp; Churn mensual</span>
+</button>
+<button class="p-3.5 rounded-xl bg-[#191614] hover:bg-[#231f1c] border border-white/5 hover:border-amber-tech/40 text-on-surface flex flex-col items-center justify-center gap-1.5 text-center transition-all group" type="button">
+<span class="material-symbols-outlined text-[22px] text-amber-tech group-hover:scale-110 transition-transform">price_change</span>
+<span class="font-bold uppercase tracking-wider text-[11px]">Ajustar Tarifas DFM</span>
+<span class="font-tech-micro text-[9px] text-on-surface-variant">Costos por cm³</span>
+</button>
+<button class="p-3.5 rounded-xl bg-[#191614] hover:bg-[#231f1c] border border-white/5 hover:border-primary-container/40 text-on-surface flex flex-col items-center justify-center gap-1.5 text-center transition-all group" type="button">
+<span class="material-symbols-outlined text-[22px] text-primary-container group-hover:scale-110 transition-transform">sync_alt</span>
+<span class="font-bold uppercase tracking-wider text-[11px]">Conciliar SINPE</span>
+<span class="font-tech-micro text-[9px] text-on-surface-variant">Auto-match con pedidos</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FOOTER INSTITUCIONAL CANÓNICO DE 4 COLUMNAS -->
+<footer class="mt-20 border-t border-outline-variant/30 bg-[#0a0908] relative z-10 text-on-surface">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+<!-- Columna 1: Identidad con logo nítido y badge naranja -->
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3.5 group">
+<img alt="Vértice CR Logo" class="h-9 w-auto drop-shadow-[0_0_12px_rgba(255,90,31,0.35)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtmkHjk_xXMGDcS1o5xsOzo7SaKCZNmmuxfAI-4IIjnxPRpGmiFpn8QT3GW9JiY4-LlOCC5488DSBg6UiUfud_R74U-SmtSj2bdpzg9Uopt0D7xqN6bPdDyyikztlE78z8PaiMTi1dtuCn07Mwx_J0kT8ENm5WTJp444qHhAjKiX6aUO6Alpjkn1hrJfORpMpuFNS3ZSkiwNs6KJFWMZNZ8cOmqFdvzuLjWYLQdiF5aH_dtwzn85_kcZa1MkJO9ih-xg"/>
+<div class="flex flex-col">
+<span class="font-headline-md text-xl font-bold uppercase tracking-tight text-on-surface">VÉRTICE <span class="text-primary-container">CR</span></span>
+<span class="font-tech-micro text-[10px] text-on-surface-variant uppercase tracking-widest">Tecnología de Manufactura 3D</span>
+</div>
+</div>
+<!-- Badge naranja canónico -->
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container/20 border border-primary-container/50 w-fit">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+<span class="font-tech-micro text-[11px] uppercase tracking-wider text-primary-container font-bold">CORE FABRICATION DECK ACTIVE</span>
+</div>
+<p class="font-body-sm text-xs text-on-surface-variant leading-relaxed">
+              Infraestructura técnica de impresión 3D industrial, ingeniería inversa y prototipado rápido en Costa Rica.
+            </p>
+</div>
+<!-- Columna 2: Navegación -->
+<div class="flex flex-col gap-3 font-tech-label-sm text-xs uppercase tracking-wider">
+<span class="font-headline-md text-sm font-bold text-on-surface normal-case mb-1 tracking-normal">Navegación</span>
+<a class="text-on-surface-variant hover:text-primary-container transition-colors" href="#">Catálogo de Materiales</a>
+<a class="text-on-surface-variant hover:text-primary-container transition-colors" href="#">Cotizador CAD Instantáneo</a>
+<a class="text-on-surface-variant hover:text-primary-container transition-colors" href="#">Biblioteca de Modelos &amp; STL</a>
+<a class="text-on-surface-variant hover:text-primary-container transition-colors" href="#">Tolerancias &amp; Especificaciones</a>
+<a class="text-on-surface-variant hover:text-primary-container transition-colors" href="#">Documentación &amp; FAQ</a>
+</div>
+<!-- Columna 3: Sede Costa Rica & Logística -->
+<div class="flex flex-col gap-3 font-tech-label-sm text-xs">
+<span class="font-headline-md text-sm font-bold text-on-surface mb-1">Sede Costa Rica &amp; Logística</span>
+<div class="flex items-start gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary-container shrink-0 mt-0.5">location_on</span>
+<span class="font-body-sm text-xs">Rohrmoser &amp; Curridabat, San José, Costa Rica.</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary-container shrink-0">local_shipping</span>
+<span class="font-body-sm text-xs">Envíos a todo el país vía Correos de Costa Rica (EMS)</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary-container shrink-0">schedule</span>
+<span class="font-body-sm text-xs">Atención Taller: Lun–Sáb 08:00 – 18:00 CR</span>
+</div>
+</div>
+<!-- Columna 4: Pagos & Facturación SINPE/IBAN/Hacienda -->
+<div class="flex flex-col gap-3 font-tech-label-sm text-xs">
+<span class="font-headline-md text-sm font-bold text-on-surface mb-1">Pagos &amp; Facturación Hacienda</span>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary-container">point_of_sale</span>
+<span>SINPE Móvil: +(506) 8800-8378</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-amber-tech">receipt_long</span>
+<span>Factura Electrónica ATV v4.3</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-amber-tech">account_balance</span>
+<span>Transferencias BAC San José (IBAN)</span>
+</div>
+<p class="font-tech-micro text-[11px] text-on-surface-variant mt-1">
+              Cédula Jurídica: 3-102-849102 S.R.L.
+            </p>
+</div>
+</div>
+<div class="mt-12 pt-6 border-t border-outline-variant/20 flex flex-col sm:flex-row items-center justify-between gap-4 font-tech-micro text-[11px] text-on-surface-variant uppercase tracking-wider">
+<span>© 2025 VÉRTICE CR // TODOS LOS DERECHOS RESERVADOS</span>
+<span>SISTEMA DE MANUFACTURA &amp; INGENIERÍA 4.0</span>
+</div>
+</div>
+</footer>
+</div>
+</body></html>
