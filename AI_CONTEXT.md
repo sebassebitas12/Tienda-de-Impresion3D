@@ -20,7 +20,7 @@ No es un side project libre. Tiene una **rúbrica académica** que exige: React 
 
 ## Estado actual del proyecto
 
-**Última actualización:** 2026-09-19
+**Última actualización:** 2026-09-24
 
 ### Deadlines académicos
 
@@ -72,23 +72,24 @@ Para el detalle exacto del recorrido visual utilizar `docs/IDENTITY-ROADMAP.md`.
 
 ---
 
-## Documentos clave y dónde están
+## Documentos activos y dónde están
 
-| Documento | Ubicación | Para qué sirve |
-|-----------|-----------|----------------|
-| Roadmap de identidad | `docs/IDENTITY-ROADMAP.md` | Recorrido completo desde Base V0 hasta identidad cerrada |
-| Identidad visual en construcción | `docs/VISUAL-IDENTITY-WORKING.md` | Criterios visuales vigentes, auditoría y reglas |
-| Mockups HF | `docs/fase3_mockups_hf.md` | Registro y estado de cada mockup |
-| Sesión HF-01 2026-09-19 | `docs/HF-01-HOME-WORKSESSION-2026-09-19.md` | Decisiones, estructura y pendientes del primer HF-01 propio |
-| Documento vivo del proyecto | `docs/PROYECTO_VIVO.md` | Historia completa del proyecto, fases, decisiones |
-| Requisitos funcionales | `docs/REQUIREMENTS.md` | 34 RF priorizados con MoSCoW |
-| Arquitectura | `docs/ARCHITECTURE.md` | Estructura de carpetas, responsabilidades, flujo de datos |
-| Lógica de negocio | `docs/BUSINESS-LOGIC.md` | Reglas del negocio |
-| Métricas | `docs/METRICS.md` | Fórmulas puras para el dashboard |
-| Dirección visual | `docs/fase2_investigacion_direccion_visual.md` | Investigación visual histórica |
-| UX y wireframes | `docs/fase3_ux_user_flows_mockup.md` | Flujos de usuario, navegación y criterios UX |
-| Testing | `docs/TESTING.md` | Guía de pruebas |
-| Base de datos | `db.json` | Datos simulados |
+| Documento | Propósito |
+|---|---|
+| `AI_CONTEXT.md` | Fuente principal de estado y decisiones |
+| `docs/DECISIONES-HF-POST-AUDITORIA-2026-09-24.md` | Decisiones cerradas de la auditoría HF y siguiente secuencia |
+| `docs/fase3_mockups_hf.md` | Registro maestro de mockups HF |
+| `docs/IDENTITY-ROADMAP.md` | Proceso de cierre de identidad |
+| `docs/VISUAL-IDENTITY-WORKING.md` | Lenguaje visual vigente |
+| `docs/fase3_ux_user_flows_mockup.md` | UX, rutas y flujos |
+| `docs/REQUIREMENTS.md` | Requisitos funcionales |
+| `docs/BUSINESS-LOGIC.md` | Reglas de negocio |
+| `docs/METRICS.md` | Métricas y fórmulas |
+| `docs/ARCHITECTURE.md` | Arquitectura objetivo |
+| `docs/TESTING.md` | Estrategia de pruebas |
+| `docs/PROYECTO_VIVO.md` | Historial del proyecto |
+
+Los demás documentos de exploración que no sean fuente activa fueron retirados para evitar contradicciones y duplicación.
 
 ---
 
@@ -131,24 +132,21 @@ color + materialidad + geometría + tipografía + profundidad + iluminación + i
 
 ---
 
-## Tareas actuales
+## Estado de reorganización — 2026-09-24
 
-### Prioridad 1 — Deadline 21 de septiembre
+La auditoría global de mockups ya fue realizada. La documentación histórica redundante fue depurada. La referencia vigente está consolidada en este archivo y en `docs/DECISIONES-HF-POST-AUDITORIA-2026-09-24.md`.
 
-1. Refinar **HF-01 Home Desktop** sobre la base HTML propia.
-2. Crear **HF-01 Home Mobile**.
-3. Crear **HF-02 Catálogo**.
-4. Crear **HF-13 Admin Dashboard**.
-5. Actualizar `ANTEPROYECTO.md` para sustituir la referencia histórica al cian por la dirección visual actual, sin presentarla como identidad final.
-6. Adjuntar/registrar mockups HF requeridos.
+### Orden actual
+1. Corregir los HF según la auditoría global.
+2. Validar dashboards con métricas realmente derivables de `db.json`.
+3. Cerrar estados, responsive y accesibilidad.
+4. Aprobar visualmente Fase 3.
+5. Crear Design System.
+6. Definir arquitectura y contrato de datos.
+7. Implementar React.
 
-### No hacer todavía
-
-- implementar la tienda;
-- migrar el código de v0 directamente;
-- instalar dependencias solo porque aparezcan en un mockup;
-- cerrar prematuramente la identidad final;
-- crear funciones fuera del MVP.
+### Documentación
+Los documentos históricos eliminados ya no forman parte del flujo de trabajo. No crear nuevos Markdown para decisiones que puedan mantenerse en `AI_CONTEXT.md` o en el documento de decisiones de la auditoría.
 
 ---
 
