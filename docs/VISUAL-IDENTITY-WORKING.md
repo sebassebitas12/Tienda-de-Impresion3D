@@ -1,4 +1,6 @@
-# Identidad visual — vigente
+# Vértice CR — Identidad visual vigente
+
+> Fuente visual de trabajo: dirección, principios, tokens experimentales y evolución hacia el Design System.
 
 **Fecha:** 2026-09-19  \
 **Rama:** `Pruebas`  \
@@ -157,7 +159,15 @@ El objetivo es aumentar intención visual, no cantidad de efectos.
 
 ---
 
-## 8. Estado
+## 8. Roadmap de cierre
+
+```text
+Auditoría HF → validación visual → tokens definitivos → Design System → implementación
+```
+
+La identidad no se considera cerrada hasta validar Home, catálogo, producto, cotización, carrito, checkout, cuenta y administración en desktop/mobile, estados y accesibilidad.
+
+## 9. Estado
 
 **Identidad visual definitiva:** pendiente.  
 **Ruta 02 Lava Orgánica:** base de trabajo actual.  
