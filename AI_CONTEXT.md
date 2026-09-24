@@ -87,3 +87,22 @@ HF-07 fue revisado nuevamente con Gemini después de una iteración de UXMagic. 
 - Alternativa: definir API externa + JWT.
 
 Cuando el usuario pregunte "¿qué hacemos ahora?", responder primero con el estado actual y luego ofrecer los siguientes pasos posibles. Si existe una opción claramente recomendada por el roadmap, señalarla de forma explícita.
+
+
+## Estado de HF-07 — 2026-09-24
+
+**HF-07 Carrito Híbrido: APROBADO Y CONGELADO.**
+
+Gemini validó la segunda iteración de UXMagic:
+- `PENDING_QUOTE` correcto.
+- `QUOTED` correcto.
+- `APPROVED` correcto.
+- productos de catálogo separados del flujo de cotizaciones.
+- identidad visual consistente.
+- navbar de Stitch conservado.
+
+No se requieren más iteraciones de HF-07 antes de implementación.
+
+### Siguiente pantalla
+
+El foco pasa a **HF-08 Checkout**, que debe resolver el pago de productos y el pago independiente de cotizaciones aprobadas, además de estados, SINPE, facturación, entrega y excepciones.
