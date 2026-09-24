@@ -29,3 +29,14 @@ Una solicitud pendiente nunca se comporta como producto con precio × cantidad.
 
 ## Regla documental
 No crear un Markdown nuevo si la información pertenece a uno de los 11 documentos numerados. Si una decisión transversal cambia, actualizar AI_CONTEXT y el documento de dominio. El índice debe seguir siendo corto y navegable.
+
+## Regla de acompañamiento del usuario
+
+El usuario necesita saber **dónde estamos y hacia dónde vamos**. Al cerrar cualquier bloque de trabajo relevante, indicar explícitamente:
+- estado actual del proyecto;
+- qué se terminó o cambió realmente;
+- qué sigue;
+- 2–4 siguientes pasos posibles, cuando existan;
+- cuál recomendamos y por qué, sin ejecutar un camino distinto al esperado sin avisarlo.
+
+Las instrucciones deben ser prácticas y comprensibles para alguien que no necesita conocer el roadmap completo de memoria.
