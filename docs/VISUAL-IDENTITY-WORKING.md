@@ -1,4 +1,4 @@
-# Vértice CR — Identidad visual en construcción
+# Identidad visual — vigente
 
 **Fecha:** 2026-09-19  \
 **Rama:** `Pruebas`  \
@@ -36,7 +36,7 @@ Una salida generada por IA no es una decisión aprobada hasta documentar qué se
 
 ## 2. Dirección actual de trabajo
 
-### Ruta 02 — Lava Orgánica
+### Ruta Obsidian Precision Forge + Lava Orgánica
 
 **Estado:** 🔄 Base de trabajo para HF-01; identidad final pendiente.
 
