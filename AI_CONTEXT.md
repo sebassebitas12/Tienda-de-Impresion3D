@@ -111,10 +111,10 @@ Estas decisiones ya fueron discutidas y aprobadas. No se reabren salvo que el de
 | 2026-09-17 | La identidad final se construye mediante auditoría, refinamiento, interacción, movimiento, validación y documentación |
 | 2026-09-17 | Cada decisión, duda, descarte o experimento que afecte diseño o implementación debe documentarse |
 | 2026-09-19 | **HF-01 adopta 02 Lava Orgánica como base de trabajo visual; no es identidad final aprobada** |
-| 2026-09-19 | **HF-01 Home no incluye sección "Productos destacados"; los productos se muestran únicamente en el showcase del hero** |
-| 2026-09-19 | **El showcase oval/orgánico es el único display de productos de la Home** |
-| 2026-09-19 | **HF-01 Desktop tiene una base HTML+CSS propia funcional; queda en refinamiento visual y luego debe trabajarse Mobile** |
-| 2026-09-19 | **La paleta experimental vigente para HF-01 usa carbón/obsidiana y lava naranja; continúa siendo hipótesis de identidad** |
+| 2026-09-19 | **HF-01 adopta una base visual experimental que luego fue supersedida por la consolidación Obsidian Precision Forge + Lava Orgánica** |
+| 2026-09-24 | **La dirección visual vigente es Obsidian Precision Forge + Lava Orgánica como sistema combinado** |
+| 2026-09-24 | **HF-01 Home no muestra precios y no tiene una sección independiente de productos destacados** |
+| 2026-09-24 | **Las solicitudes personalizadas siguen un ciclo económico separado del catálogo** |
 
 ---
 
@@ -122,7 +122,7 @@ Estas decisiones ya fueron discutidas y aprobadas. No se reabren salvo que el de
 
 Vértice CR busca una identidad elegante, futurista, técnica, industrial y creativa, con sensación premium y lenguaje accesible.
 
-La dirección actualmente explorada es **02 Lava Orgánica**: estética oscura cálida, carbón/obsidiana, naranja/lava como acento y materialidad volcánica/fluida. **La identidad final y los tokens definitivos todavía no están cerrados.**
+La dirección vigente es **Obsidian Precision Forge + Lava Orgánica**: Obsidian define estructura, precisión, superficies y lenguaje industrial; Lava Orgánica aporta materialidad, iluminación térmica, profundidad y formas fluidas selectivas. **Los tokens definitivos se formalizarán después de la validación HF.**
 
 La identidad no dependerá únicamente de color. Debe construirse con:
 
@@ -191,7 +191,7 @@ La implementación React continúa bloqueada.
 
 ### Incidencia del repositorio
 
-`db.json` en `Pruebas` contiene marcadores de conflicto Git y debe repararse antes de utilizarlo como JSON Server.
+`db.json` en `Pruebas` fue verificado después de la reorganización y actualmente es JSON válido. No hay marcadores de conflicto Git pendientes.
 
 ### Siguiente trabajo
 
