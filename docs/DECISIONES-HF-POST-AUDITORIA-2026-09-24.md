@@ -271,3 +271,74 @@ Cualquier IA que continúe el proyecto debe leer:
 y debe asumir que:
 
 **React continúa bloqueado hasta la aprobación visual y de negocio.**
+
+
+---
+
+## 16. Revisión global de dashboards y datos — 2026-09-24
+
+### Principio
+
+Los dashboards no deben intentar demostrar que el sistema es sofisticado mostrando métricas que el MVP no puede calcular. El criterio será **utilidad operativa diaria + datos realmente disponibles**.
+
+### Admin: tablero diario
+
+El dashboard administrativo queda reducido a:
+
+**KPIs principales**
+- Ventas cobradas en el período.
+- Pedidos activos.
+- Solicitudes personalizadas pendientes de revisión/cotización.
+- Productos con stock bajo.
+
+**Gráficas útiles**
+- Ventas por día/semana del período seleccionado.
+- Pedidos por estado.
+- Solicitudes personalizadas por estado.
+- Productos más vendidos por unidades o ingresos.
+
+**Panel operativo**
+- Pedidos que requieren atención.
+- Solicitudes que requieren cotización/revisión.
+- Productos bajo mínimo.
+- Actividad reciente cuando exista `activityLog`.
+
+**Filtros**
+- período global;
+- opcionalmente estado/categoría según la gráfica.
+
+Se eliminan del dashboard MVP métricas que requieren fuentes no modeladas actualmente, como CAC, LTV, Payback, churn, benchmarks externos, conexión ficticia con Hacienda, “rentabilidad” si no existe costo real, y cualquier porcentaje presentado como dato operativo sin fórmula y fuente.
+
+### Usuario: información diaria
+
+El portal del usuario prioriza:
+- pedidos activos y su estado;
+- cotizaciones pendientes de aprobación;
+- solicitudes en revisión;
+- acceso a archivos/modelos guardados;
+- historial de pedidos;
+- datos de facturación/contacto.
+
+Los KPI personales deben derivarse de datos existentes. No se crearán “saldo SINPE”, LTV u otros indicadores que no tengan significado operativo para un cliente.
+
+### Regla para gráficas
+
+Cada gráfica debe responder una pregunta concreta:
+
+| Pregunta diaria | Visualización |
+|---|---|
+| ¿Cómo van las ventas? | línea/barras por período |
+| ¿Qué pedidos requieren atención? | distribución por estado + lista accionable |
+| ¿Cuántas solicitudes están trabadas en cada etapa? | barras por estado |
+| ¿Qué productos se venden más? | barras horizontales |
+| ¿Qué productos necesitan reposición? | lista priorizada / barras de stock |
+
+Si una gráfica no ayuda a tomar una acción o detectar un problema, no entra al MVP.
+
+### Fuente de datos
+
+Las métricas se calculan desde `db.json` mediante funciones puras. No se permiten números decorativos hardcodeados en la UI.
+
+### Estado del mockup
+
+Los mockups de dashboard se consideran **referencia visual, no contrato de métricas**. La siguiente iteración debe simplificar la densidad y sustituir datos ficticios por métricas derivables del modelo real.
