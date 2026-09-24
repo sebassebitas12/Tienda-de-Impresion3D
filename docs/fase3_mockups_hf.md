@@ -1,6 +1,6 @@
 # Fase 3 — Registro maestro de mockups de alta fidelidad
 
-**Fecha:** 2026-09-19  \
+**Fecha:** 2026-09-24  \
 **Rama:** `Pruebas`  \
 **Estado:** 🔄 En progreso — deadline urgente 21 de septiembre de 2026
 
@@ -49,7 +49,7 @@ La base fue construida directamente con HTML + CSS, sin Gemini, v0 ni generació
 
 ### Dirección visual
 
-**02 — Lava Orgánica** como base de trabajo.
+**Obsidian Precision Forge + Lava Orgánica** como base de trabajo.
 
 Esto significa:
 
