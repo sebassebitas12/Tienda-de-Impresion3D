@@ -57,3 +57,12 @@ Vértice CR es una tienda costarricense de impresión 3D con dos líneas: produc
 
 ## Regla
 Si un documento contradice una decisión posterior, prevalece la decisión posterior registrada aquí y en el documento de dominio. No crear nuevos Markdown si el tema ya tiene un hogar.
+
+## Decisión adicional — navegación y N8N (2026-09-24)
+
+- El navbar público de Stitch se conserva como base visual; solo tendrá ajustes pequeños y funcionales.
+- El footer completo pertenece principalmente al área pública. Los dashboards no están obligados a mostrar el footer comercial; pueden usar uno técnico compacto o ninguno si el foco operativo lo justifica.
+- Los mockups de Stitch/UXMagic son referencias visuales, no contratos literales de chrome para cada ruta.
+- React puede consumir un Webhook de N8N directamente para el chatbot y/o resumen IA sin añadir un backend intermedio para ese caso.
+- El frontend consume el endpoint del workflow; no se conecta directamente al nodo AI Agent.
+- Chatbot y resumen Admin pueden compartir infraestructura mediante un campo `mode`, manteniendo contratos y permisos separados.
