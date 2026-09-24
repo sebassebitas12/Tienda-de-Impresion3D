@@ -64,3 +64,26 @@ C. Definir primero Admin + resumen IA/N8N.
 D. Definir primero API externa + JWT.
 
 Criterio para elegir A: HF-07/HF-08 forman un único flujo de carrito/checkout y son los bloqueos funcionales más directos de UX antes de aprobar desktop.
+
+
+## Actualización 2026-09-24 — HF-07 cerrado
+
+**HF-07 Carrito Híbrido: APROBADO Y CONGELADO.**
+
+La validación final confirmó los estados `PENDING_QUOTE`, `QUOTED` y `APPROVED`, separación comercial entre catálogo y cotización, y consistencia visual con Vértice CR.
+
+### Próximo objetivo
+
+**HF-08 — Checkout**
+
+HF-08 es ahora el siguiente bloqueador. Debe cerrar:
+1. checkout de productos de catálogo;
+2. pago de cotización personalizada aprobada;
+3. estados de pago;
+4. SINPE;
+5. datos de facturación/Hacienda;
+6. entrega;
+7. errores y validaciones;
+8. responsive.
+
+Después de HF-08: revisión desktop global y cierre de Dark/Light + accesibilidad antes de pasar a mobile/tablet.
