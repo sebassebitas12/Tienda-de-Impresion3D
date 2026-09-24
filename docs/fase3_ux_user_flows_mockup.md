@@ -225,7 +225,7 @@ Cuenta / Actividad
 
 El usuario no entra directamente en una cuadrícula extensa como primera experiencia.
 
-La Home introduce los productos destacados y las categorías.
+La Home introduce los showcase de productos y las categorías.
 
 La misma ruta `/catalogo` representa descubrimiento y resultados.
 
@@ -965,13 +965,13 @@ Es el tema principal y la experiencia visual de referencia.
 Debe mantener:
 
 ```text
-#0A0E1A
-#111827
-#1F2937
+#0D0B09
+#141412
+#1E1C19
 #00D4FF
 #0EA5E9
-#F1F5F9
-#94A3B8
+#F5F5F5
+#8A8884
 ```
 
 ## Light Mode
