@@ -44,3 +44,23 @@ Fase 3: auditoría HF y cierre de UX/visual. React bloqueado.
 No empezar React hasta negocio + HF + Dark/Light + accesibilidad + API/JWT + modelo de datos estén suficientemente cerrados.
 
 No crear otro roadmap paralelo.
+
+
+## Actualización 2026-09-24 — después de auditoría Gemini de HF-07
+
+HF-07 ya no es un bloqueador estructural. UXMagic conservó la separación correcta entre productos y solicitudes pendientes. Queda una **iteración menor** para:
+- representar claramente `QUOTED` / `APPROVED`;
+- eliminar microcopy repetido;
+- refinar spacing, badges y acciones;
+- preparar el comportamiento responsive.
+
+Después de cerrar esa iteración, la siguiente prioridad es **HF-08**, porque sigue siendo bloqueador de flujo de pago/cotización.
+
+### Siguientes caminos posibles
+
+A. **Recomendado — cerrar HF-07 y pasar a HF-08**  
+B. Cerrar primero Dark/Light y accesibilidad transversal.  
+C. Definir primero Admin + resumen IA/N8N.  
+D. Definir primero API externa + JWT.
+
+Criterio para elegir A: HF-07/HF-08 forman un único flujo de carrito/checkout y son los bloqueos funcionales más directos de UX antes de aprobar desktop.
