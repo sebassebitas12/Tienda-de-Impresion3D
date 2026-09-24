@@ -106,3 +106,57 @@ No se requieren más iteraciones de HF-07 antes de implementación.
 ### Siguiente pantalla
 
 El foco pasa a **HF-08 Checkout**, que debe resolver el pago de productos y el pago independiente de cotizaciones aprobadas, además de estados, SINPE, facturación, entrega y excepciones.
+
+## Handoff de sesión — 2026-09-24
+
+### Estado al pausar
+La fase de mockups avanzó hasta cerrar **HF-07 Carrito Híbrido**. La validación final de Gemini sobre la segunda iteración de UXMagic fue **APROBADO**. HF-07 queda congelado y no debe seguir iterándose salvo que aparezca una contradicción de negocio o una dependencia descubierta posteriormente.
+
+### HF-07 aprobado
+La pantalla aprobada debe conservar:
+- productos de catálogo con cantidad, precio y subtotal;
+- solicitudes personalizadas separadas del catálogo;
+- `PENDING_QUOTE` sin precio final, cantidad ni subtotal;
+- `QUOTED` con monto presupuestado y acción para revisar la cotización;
+- `APPROVED` con monto aprobado y acción `Pagar cotización`;
+- solicitudes personalizadas sin lógica `quantity × unitPrice`;
+- total de productos separado del flujo de cotizaciones;
+- navbar basado en Stitch/Vértice;
+- identidad Obsidian Precision Forge + Lava Orgánica.
+
+### Punto exacto de reanudación
+**Siguiente pantalla: HF-08 Checkout.**
+
+Antes de generar HF-08:
+1. diseñar la separación entre checkout de productos y pago de cotización aprobada;
+2. definir estados y excepciones del checkout;
+3. preparar el prompt maestro para UXMagic tomando HF-07 como referencia aprobada;
+4. generar la primera propuesta HF-08;
+5. auditarla visualmente con Gemini;
+6. iterar hasta aprobación.
+
+### HF-08 debe resolver
+- checkout de productos de catálogo;
+- pago independiente de cotización personalizada aprobada;
+- SINPE;
+- facturación/Hacienda;
+- entrega;
+- revisión y confirmación;
+- loading/processing;
+- validación;
+- error;
+- pago pendiente;
+- comprobante SINPE;
+- cotización caducada;
+- cotización rechazada;
+- responsive 375/768 preparado, aunque los mockups responsive se harán después de cerrar desktop.
+
+### No hacer al retomar
+- No volver a rediseñar HF-07.
+- No empezar React todavía.
+- No crear un backend Node/Express solo para N8N.
+- No mezclar una cotización pendiente con productos de catálogo.
+- No crear documentación paralela fuera de la estructura existente.
+
+### Siguiente gran secuencia
+HF-08 → revisión desktop global → Dark/Light → accesibilidad/ayuda → mobile 375 → tablet 768 → aprobación HF → Design System → arquitectura/datos/API/JWT → React → testing/integraciones.
