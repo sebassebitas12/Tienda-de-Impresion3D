@@ -35,7 +35,7 @@ Diseñar e implementar el frontend interactivo, escalable y accesible de la plat
 1. **Arquitectura y navegación:** Estructurar una aplicación modular en React con rutas públicas y protegidas mediante React Router DOM, separando vistas (páginas), componentes reutilizables, hooks y una capa de servicios desacoplada (`src/services/`).
 2. **Backend simulado y consumo de APIs:** Configurar JSON Server (`db.json`) para persistir y ejecutar operaciones CRUD sobre usuarios, productos, categorías, pedidos y cotizaciones, integrando además un endpoint externo real para la búsqueda y exploración de modelos 3D comunitarios abiertos.
 3. **Diseño adaptativo y accesibilidad:** Construir una interfaz 100% responsive apta para móvil (~375px), tablet (~768px) y escritorio (~1280px+), cumpliendo con las 4 prácticas de accesibilidad: modo claro/oscuro, texto escalable en unidades relativas, soporte ARIA con semántica HTML, y diferenciación visual de estados independiente del color.
-4. **Autenticación y roles:** Implementar un sistema de autenticación (Login/Registro) con persistencia de sesión en cliente y control de acceso basado en roles (`admin` y `cliente`), protegiendo módulos administrativos de visualización y edición.
+4. **Autenticación y roles:** Implementar un sistema de autenticación (Login/Registro) con persistencia de sesión en cliente y control de acceso basado en roles (`admin` y `customer`), protegiendo módulos administrativos de visualización y edición.
 5. **Panel administrativo y analítica:** Desarrollar un dashboard de administración con indicadores clave de rendimiento (KPIs) calculados desde datos reales y visualización gráfica interactiva con Recharts.
 6. **Integración de Inteligencia Artificial:** Incorporar un asistente inteligente de cotización técnica que oriente al cliente en lenguaje natural respecto a la elección de materiales (PLA, PETG, Resina, Flex), dimensiones, resistencia mecánica y costo estimado.
 7. **Automatización con N8N:** Configurar dos flujos de trabajo automatizados para la gestión de nuevas cotizaciones y la notificación de aprobación a clientes.
@@ -76,7 +76,7 @@ src/
    * `/orders`: Pedidos confirmados y su trazabilidad de entrega.
 
 2. **Endpoint Externo Real (Servicio de Diseños 3D Comunitarios):**  
-   Consumido directamente desde `src/services/external3dService.js`. Conecta con la **API abierta de modelos 3D (Thingiverse / Sketchfab Data API / Free3D)**.  
+   Consumido directamente desde `src/services/external3dService.js`. La integración externa de modelos 3D queda **por definir durante la fase de arquitectura**. No se debe presentar un proveedor concreto como implementado hasta validar disponibilidad, licencia, autenticación y compatibilidad con el MVP.  
    * **Función en el sistema:** Permite al cliente que no dispone de un archivo STL/OBJ propio buscar e importar modelos 3D comunitarios certificados para cotizar su impresión con un solo clic, aumentando la tasa de conversión de la tienda.
 
 ### 4.3 Diseño Responsive y Prácticas de Accesibilidad
@@ -246,12 +246,12 @@ Los mockups desarrollados representan la guía visual y de interacción definiti
 | 5 | Backend simulado | JSON Server con `db.json` normalizado | Configurado y Planificado |
 | 6 | Rutas públicas y privadas | React Router DOM con `ProtectedRoute` y `AdminRoute` | Planificado |
 | 7 | Autenticación (Login y Register) | Módulo de autenticación con persistencia en `localStorage` | Planificado |
-| 8 | Autorización por roles | Roles `admin` y `client` almacenados en `db.json` | Planificado |
+| 8 | Autorización por roles | Roles `admin` y `customer` almacenados en `db.json` | Planificado |
 | 9 | Todos los CRUD del proyecto | Gestión en administración de Productos, Categorías, Solicitudes y Usuarios | Planificado |
 | 10 | Panel de administración con métricas y gráfico | Recharts (Ventas, Pedidos, Solicitudes, Stock crítico) | Planificado |
 | 11 | Pruebas unitarias de front end | Jest + React Testing Library (cobertura objetivo $\ge 70\%$) | Planificado |
 | 12 | Integración de IA (obligatorio) | Asistente de cotización y asesor de materiales 3D | Planificado en `aiService.js` |
 | 13 | Proyecto N8N con al menos 2 flujos | Flujo 1: Notificación al admin; Flujo 2: Aprobación al cliente | Planificado |
-| 14 | Anteproyecto escrito (21 de sept.) | Objetivos, Introducción, Desarrollo, Libro de Marca, Anexos | **COMPLETO** |
-| 15 | Mockups del sistema (escritorio y móvil) | 4 Vistas Desktop + 1 Vista Móvil registradas | **COMPLETO** |
-| 16 | Libro de marca | Paleta accesible WCAG, tipografías, logotipo e isotipo | **COMPLETO** |
+| 14 | Anteproyecto escrito (21 de sept.) | Objetivos, Introducción, Desarrollo, Libro de Marca, Anexos | **DOCUMENTADO** |
+| 15 | Mockups del sistema (escritorio y móvil) | Mockups HF en `mockups/HFcompletos/`, todavía en validación | **EN VALIDACIÓN** |
+| 16 | Libro de marca | Dirección visual consolidada; formalización final pendiente de validación HF | **EN CONSTRUCCIÓN** |
