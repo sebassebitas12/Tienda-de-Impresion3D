@@ -164,3 +164,37 @@ color + materialidad + geometría + tipografía + profundidad + iluminación + i
 8. No se asume una decisión que no esté documentada.
 
 **Regla:** si algo cambió en el proyecto y este archivo no lo refleja, el contexto está desactualizado.
+
+
+---
+
+# CHECKPOINT ACTUAL — 2026-09-24
+
+> Este bloque supersede cualquier estado anterior que contradiga estas decisiones.
+
+## Estado actual
+
+La auditoría HF realizada el 2026-09-24 identificó contradicciones entre documentación y PNG reales. La referencia visual vigente pasa a ser la familia actual de mockups, con **Obsidian Precision Forge como lenguaje principal y Lava Orgánica como capa de materialidad/energía**.
+
+La implementación React continúa bloqueada.
+
+### Decisiones cerradas
+
+- **Home:** no muestra precios.
+- **Identidad:** Obsidian Precision Forge + Lava Orgánica como sistema combinado.
+- **Moneda:** CRC principal; USD solo como equivalente secundario desde configuración/datos.
+- **Solicitudes personalizadas:** `PENDING_QUOTE → IN_REVIEW → QUOTED → AWAITING_APPROVAL → APPROVED → PAID`, con salidas REJECTED/EXPIRED/CANCELLED.
+- **Carrito:** catálogo y solicitudes personalizadas permanecen separados; `PENDING_QUOTE` nunca entra al total pagable.
+- **Checkout:** `/checkout/productos` y `/checkout/solicitud` son flujos conceptualmente separados.
+- **IA:** orienta, no fija precio final.
+- **Login cliente:** lenguaje e-commerce, no LDAP/GitHub Enterprise.
+- **Admin:** KPIs hero + módulos secundarios; Recharts real.
+- **Menú móvil:** debe rehacerse con identidad Vértice.
+
+### Incidencia del repositorio
+
+`db.json` en `Pruebas` contiene marcadores de conflicto Git y debe repararse antes de utilizarlo como JSON Server.
+
+### Siguiente trabajo
+
+Corrección de mockups HF → revisión global → aprobación visual → Design System → Arquitectura → consolidación de `db.json`/API → React.
