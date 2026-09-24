@@ -87,3 +87,23 @@ HF-08 es ahora el siguiente bloqueador. Debe cerrar:
 8. responsive.
 
 Después de HF-08: revisión desktop global y cierre de Dark/Light + accesibilidad antes de pasar a mobile/tablet.
+
+## Handoff de sesión — 2026-09-24
+
+### Pausa actual
+La sesión queda pausada con **HF-07 aprobado y congelado**.
+
+### Retomar exactamente aquí
+El siguiente trabajo es **HF-08 Checkout**. No requiere volver a revisar HF-07 salvo que HF-08 revele una contradicción funcional.
+
+### Checklist de reanudación
+- usar HF-07 aprobado como referencia visual y de negocio;
+- definir dos recorridos: productos y cotización aprobada;
+- cubrir estados de pago y excepciones;
+- generar mockup desktop en UXMagic;
+- validar con Gemini;
+- iterar hasta aprobación;
+- después avanzar al cierre transversal de desktop.
+
+### Estado de trabajo
+No hay React implementado todavía. La fase sigue siendo preproducción/mockups.
