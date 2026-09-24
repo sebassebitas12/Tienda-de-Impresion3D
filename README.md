@@ -1,133 +1,53 @@
 # Vértice CR — Tienda de Impresión 3D
 
-Frontend escalable para una tienda real de impresión 3D costarricense. El proyecto combina catálogo de productos terminados con un servicio de impresión personalizada y está diseñado para evolucionar después del curso.
+Frontend escalable para una tienda costarricense de impresión 3D. Combina productos terminados con impresión personalizada y cotización técnica.
 
-> **Lee `AI_CONTEXT.md` antes de trabajar en este repo.** Ese archivo dice exactamente en qué fase está el proyecto y cuál es el siguiente paso.
+> Antes de trabajar: lee `AI_CONTEXT.md`. Si buscas un tema concreto, abre `docs/00-INDICE-Y-MAPA.md`.
 
-**Stack base:** React 19 + Vite 8 + JavaScript/JSX + React Router DOM + JSON Server.
+**Stack:** React 19 + Vite 8 + JavaScript/JSX + React Router DOM + JSON Server + Jest + Testing Library + Recharts.
 
-**Rama de trabajo actual:** `Pruebas`.
+**Rama de trabajo:** `Pruebas`.
 
-**Estado:** Fase 3 — auditoría HF y consolidación visual; React aún bloqueado.
+**Estado:** Fase 3 — auditoría HF y cierre visual/UX. React bloqueado.
 
-## Identidad
+## Documentación
 
-**Nombre comercial:** Vértice CR
-**Valores:** confianza, seguridad, calidad, "encontrarás lo que necesitás"
-**Personalidad:** taller creativo de alta tecnología con identidad costarricense
-**Tema:** Dark mode por defecto con toggle a light
-**Dirección visual:** Obsidian Precision Forge + Lava Orgánica; carbón/obsidiana, naranja térmico y lenguaje técnico
-**Tipografías:** Space Grotesk (interfaz) + JetBrains Mono (datos técnicos)
+Los documentos están organizados por dominio para evitar buscar la misma información en varios Markdown:
 
-## Modelo de negocio
-
-### Productos terminados
-
-Catálogo de gadgets, figuras, juguetes, decoración y piezas funcionales con variantes, disponibilidad e inventario.
-
-### Impresión personalizada
-
-El cliente puede cargar un archivo `.stl` / `.obj` o solicitar ayuda para definir una pieza. La solicitud pasa por revisión y cotización antes de convertirse en una operación de producción.
-
-Una solicitud personalizada no se trata como una venta de ₡0: mientras no exista una cotización, su estado económico es `PENDING_QUOTE`.
-
-## Integración de IA
-
-**Asistente de cotización** integrado en la página de solicitud personalizada. El cliente describe en lenguaje natural lo que quiere imprimir y el asistente recomienda material, dimensiones aproximadas, tiempo estimado y rango de precio orientativo — aclarando siempre que el precio final lo confirma el administrador. Implementado en `src/services/aiService.js`.
-
-## Arquitectura
-
-```text
-UI
- ↓
-Pages / Features
- ↓
-Hooks + Services + Utils
- ↓
-JSON Server / APIs externas / API de IA
- ↓
-db.json
-```
-
-Las métricas siguen el mismo principio:
-
-```text
-db.json → services → funciones puras de métricas → dashboard
-```
-
-No se escriben manualmente las ventas, pedidos, clientes, stock ni tendencias que presenta el panel.
-
-## Dashboard administrativo
-
-Organizado por familias de métricas calculadas desde `db.json` con funciones puras. Librería de gráficos: **Recharts**.
-
-- ventas y resultados
-- inventario y eficiencia
-- operación de pedidos
-- impresión personalizada
-- alertas y deficiencias operativas
-
-Las fórmulas están documentadas en [`docs/METRICS.md`](docs/METRICS.md).
-
-## Documentación activa
-
-| Documento | Propósito |
+| Documento | Para qué sirve |
 |---|---|
-| [`AI_CONTEXT.md`](AI_CONTEXT.md) | Fuente principal de contexto y decisiones |
-| [`docs/DECISIONES-HF-POST-AUDITORIA-2026-09-24.md`](docs/DECISIONES-HF-POST-AUDITORIA-2026-09-24.md) | Auditoría y decisiones cerradas |
-| [`docs/fase3_mockups_hf.md`](docs/fase3_mockups_hf.md) | Registro de mockups HF |
-| [`docs/IDENTITY-ROADMAP.md`](docs/IDENTITY-ROADMAP.md) | Cierre de identidad |
-| [`docs/VISUAL-IDENTITY-WORKING.md`](docs/VISUAL-IDENTITY-WORKING.md) | Dirección visual |
-| [`docs/fase3_ux_user_flows_mockup.md`](docs/fase3_ux_user_flows_mockup.md) | UX y flujos |
-| [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md) | Requisitos |
-| [`docs/BUSINESS-LOGIC.md`](docs/BUSINESS-LOGIC.md) | Reglas de negocio |
-| [`docs/METRICS.md`](docs/METRICS.md) | Métricas |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Arquitectura |
-| [`docs/TESTING.md`](docs/TESTING.md) | Testing |
+| `AI_CONTEXT.md` | Estado y decisiones globales |
+| `AGENTS.md` | Reglas para agentes |
+| `docs/00-INDICE-Y-MAPA.md` | Dónde encontrar cada cosa |
+| `docs/01-PRODUCTO-Y-ALCANCE.md` | Producto, roles, alcance y rúbrica |
+| `docs/02-NEGOCIO-Y-ESTADOS.md` | Entidades, cotizaciones, pedidos y reglas |
+| `docs/03-UX-Y-FLUJOS.md` | Rutas, flujos, estados UX y responsive |
+| `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md` | Identidad, Dark/Light, ayuda y accesibilidad |
+| `docs/05-AUDITORIA-HF-Y-MOCKUPS.md` | Auditoría, bloqueadores y mockups |
+| `docs/06-ARQUITECTURA.md` | Estructura técnica y capas |
+| `docs/07-DATOS-API-AUTH.md` | db.json, API externa, JWT y N8N |
+| `docs/08-METRICAS-ADMIN-E-IA.md` | KPIs, gráficos y resumen IA |
+| `docs/09-TESTING-Y-CALIDAD.md` | Tests y cobertura |
+| `docs/10-ROADMAP.md` | Orden de trabajo |
 
-## Rúbrica integrada
-
-- React + React Router DOM
-- Componentes y páginas separados
-- `services/` para API local, externa y IA
-- JSON Server con `db.json`
-- Login, registro, sesión y rutas privadas
-- Roles: cliente y administrador
-- CRUDs: productos, categorías, clientes, pedidos, solicitudes
-- Dashboard con métricas derivadas y gráficos (Recharts)
-- Jest + Testing Library (cobertura mínima 70%)
-- Integración de IA: asistente de cotización
-- Dos flujos N8N
-- Responsive: 375px, 768px, 1280px+
-- Accesibilidad: tema claro/oscuro, texto ajustable, ARIA, estados sin depender solo del color
+## Principios
+- JavaScript/JSX; no TypeScript.
+- Solicitud personalizada sin cotizar = `PENDING_QUOTE`, nunca ₡0.
+- Métricas derivadas de datos reales.
+- Servicios centralizan APIs.
+- Sin secretos en Git.
+- React empieza después de aprobar negocio, HF, accesibilidad, temas y contratos técnicos.
 
 ## Desarrollo
-
-```bash
+~~~bash
 npm install
 npm run dev
 npx json-server --watch db.json --port 3001
-```
+~~~
 
 ## Testing
-
-```bash
+~~~bash
 npm run test
 npm run test:watch
 npm run test:coverage
-```
-
-Los tests nunca realizan peticiones HTTP reales.
-
-## Principios permanentes
-
-1. JavaScript/JSX; no TypeScript.
-2. La UI no contiene reglas de negocio complejas.
-3. Los servicios centralizan las peticiones.
-4. Los cálculos importantes son funciones puras y testeables.
-5. Ninguna métrica operativa se hardcodea.
-6. Una solicitud personalizada sin cotizar siempre es `PENDING_QUOTE`, nunca ₡0.
-7. Los errores, cargas y estados vacíos forman parte del producto.
-8. No se suben secretos al repositorio.
-9. El código generado con IA se revisa, prueba y justifica.
-10. La rama estable no se rompe; el trabajo nuevo se valida antes de mergear.
+~~~
