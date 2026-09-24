@@ -77,3 +77,45 @@ Negocio + jerarquía + CTA + estados + accesibilidad + responsive + identidad + 
 ## Secuencia
 
 HF-01/05/06 → HF-07 → HF-08 → Login → menú → HF-17 → revisión global → desktop aprobado → mobile/tablet → Design System → arquitectura → código.
+
+
+## HF-07 — Auditoría comparativa UXMagic + Gemini (2026-09-24)
+
+La segunda revisión comparó la referencia aprobada de Vértice CR contra la propuesta generada en UXMagic. La conclusión de Gemini fue **ajustes menores**: la estructura general y la separación entre productos de catálogo y solicitudes personalizadas se conservaron correctamente.
+
+### Cambios correctos confirmados
+
+- Layout de doble columna: contenido a la izquierda y resumen de pago a la derecha.
+- Separación visual entre **Productos de catálogo** y **Solicitudes de Impresión personalizada**.
+- Las solicitudes personalizadas mantienen el estado `PENDIENTE DE COTIZACIÓN`.
+- El total a pagar actual corresponde solamente a productos de catálogo.
+- No se detectó una regresión que vuelva a tratar la solicitud pendiente como producto con precio fijo.
+
+### Ajustes visuales
+
+- Mejorar nitidez de labels técnicos y exportación de assets.
+- Dar mayor jerarquía visual al badge `PENDIENTE DE COTIZACIÓN`.
+- Aumentar el aire del resumen lateral, especialmente alrededor de la nota previa al CTA.
+- Separar aproximadamente 24px entre cards de solicitudes.
+- Usar metadata técnica en 12px monoespaciada cuando corresponda.
+- Definir hover con borde/acento Lava sutil, sin glow excesivo.
+
+### Ajustes UX
+
+- `Ver especificación` debe parecer una acción secundaria clara.
+- Separar mejor controles de cantidad y precios en productos de catálogo.
+- No repetir microcopy idéntico de "sin precio/cantidad/subtotal" bajo cada solicitud; sustituirlo por información o acción útil.
+
+### Estado cotizado/aprobado
+
+HF-07 todavía debe representar el ciclo completo de la solicitud:
+- `PENDING_QUOTE`: sin precio final, cantidad ni subtotal.
+- `QUOTED`: existe monto presupuestado definido por administración/ingeniería.
+- `APPROVED`: el cliente acepta la cotización y puede incorporarla al pago según el flujo definido.
+- Una solicitud cotizada/aprobada no debe transformarse visualmente en un producto de catálogo ni usar la lógica de `quantity × unitPrice`.
+
+### Responsive a cerrar posteriormente
+
+- 375px: productos de catálogo pasan de tabla a cards verticales; resumen se convierte en bloque inferior o barra sticky de pago.
+- 768px: layout de dos columnas colapsa a una columna; resumen debajo o colapsable.
+- Estos mockups se producirán después de aprobar desktop.
