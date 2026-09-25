@@ -6,7 +6,7 @@
 Vértice CR es una tienda costarricense de impresión 3D con dos líneas: productos terminados e impresión personalizada con revisión y cotización.
 
 ## Estado
-Última actualización: 2026-09-24. Rama: `Pruebas`. Fase: auditoría HF + cierre visual/UX. **React permanece bloqueado.**
+Última actualización: 2026-09-25. Rama: `Pruebas`. Fase: auditoría HF + cierre visual/UX. **React permanece bloqueado.**
 
 ## Fuente de verdad documental
 - `AI_CONTEXT.md`: estado global y decisiones de alto nivel.
@@ -64,6 +64,24 @@ Si un documento contradice una decisión posterior, prevalece la decisión poste
 - El footer completo pertenece principalmente al área pública. Los dashboards no están obligados a mostrar el footer comercial; pueden usar uno técnico compacto o ninguno si el foco operativo lo justifica.
 - Los mockups de Stitch/UXMagic son referencias visuales, no contratos literales de chrome para cada ruta.
 - React puede consumir un Webhook de N8N directamente para el chatbot y/o resumen IA sin añadir un backend intermedio para ese caso.
+## Estado HF-01 — cierre del Hero Workbench — 2026-09-25
+
+**HF-01 Home: referencia visual del Hero completada y verificada en navegador.**
+
+El archivo mockups/hf-01-home.html consolida:
+- eliminación completa de la capa CAD triangular ficticia y sus cotas/gráficos superpuestos;
+- fotografía real como protagonista del Hero, con fundido perimetral;
+- Leader Line Callout dinámico para las cuatro piezas, con texto técnico y punto de llamada contextual;
+- cambio suave entre Soporte, Engranaje, Dragón y Drone mediante miniaturas;
+- escáner láser metrológico visual sutil y estado decorativo ESCANEANDO;
+- efecto Tilt/Parallax ligero, sin WebGL/Three.js;
+- ficha técnica inferior con referencia, tolerancia y datos de la pieza;
+- soporte de Dark/Light y prefers-reduced-motion.
+
+### Verificación reportada por Antigravity
+Se probó el archivo local en navegador: carga inicial del soporte, cambio a las piezas 02/03/04, actualización del Leader Line y ausencia del overlay triangular. La revisión actual del repositorio confirma que esas implementaciones existen en el HTML.
+
+**Decisión:** HF-01 queda congelado como referencia visual. El visor 3D WebGL/Three.js continúa reservado exclusivamente para HF-03 y HF-05.
 - El frontend consume el endpoint del workflow; no se conecta directamente al nodo AI Agent.
 - Chatbot y resumen Admin pueden compartir infraestructura mediante un campo `mode`, manteniendo contratos y permisos separados.
 - **Visor 3D real vs Hero (2026-09-25):** El Hero utiliza fotografía de estudio de alta fidelidad con interactividad ligera (Parallax 3D / Tilt, línea de llamada técnica contextual y escáner láser metrológico) para garantizar conversión y máximo rendimiento de carga (LCP/FCP). El visor 3D interactivo WebGL/Three.js se reserva exclusivamente para HF-03 (Detalle de Producto) y HF-05 (Solicitud con Archivo 3D), donde la inspección orbital 360° y validación geométrica aportan valor funcional real.
@@ -72,19 +90,17 @@ Si un documento contradice una decisión posterior, prevalece la decisión poste
 ## Navegación de trabajo para esta fase — 2026-09-24
 
 ### Dónde estamos
-HF-07 fue revisado nuevamente con Gemini después de una iteración de UXMagic. La estructura de negocio está correcta y el resultado quedó en **ajustes menores**, no reconstrucción.
+HF-07 y HF-08 están aprobados y congelados. HF-01 Home quedó consolidado como referencia visual del Hero después de la implementación y verificación en navegador del 2026-09-25.
 
-### Qué falta para cerrar este bloque
-1. Una iteración final de HF-07 en UXMagic.
-2. Resolver explícitamente los estados `QUOTED` / `APPROVED`.
-3. Eliminar microcopy redundante y aplicar refinamientos visuales.
-4. Verificar HF-07 desktop.
-5. Pasar a HF-08, que continúa siendo bloqueador.
+### Qué falta ahora
+1. Iterar HF-02 Catálogo.
+2. Iterar HF-05 Solicitud con archivo, incluyendo el tratamiento del visor 3D real que corresponde a ese flujo.
+3. Completar las pantallas restantes de desktop según la auditoría vigente.
+4. Mantener la documentación sincronizada con cada cierre.
 
 ### Próximos caminos posibles
-- Recomendado: **HF-07 → HF-08** y cerrar primero el flujo de compra/cotización.
-- Alternativa: cerrar Dark/Light + accesibilidad transversal antes de seguir mockups.
-- Alternativa: cerrar Admin + resumen IA/N8N.
+- Recomendado: **HF-02 → HF-05**.
+- Alternativa: cerrar primero la auditoría transversal de Admin + IA.
 - Alternativa: definir API externa + JWT.
 
 Cuando el usuario pregunte "¿qué hacemos ahora?", responder primero con el estado actual y luego ofrecer los siguientes pasos posibles. Si existe una opción claramente recomendada por el roadmap, señalarla de forma explícita.
@@ -126,7 +142,7 @@ La pantalla aprobada debe conservar:
 - identidad Obsidian Precision Forge + Lava Orgánica.
 
 ### Punto exacto de reanudación
-**Siguiente pantalla: HF-08 Checkout.**
+**HF-08 ya está congelado y HF-01 también quedó consolidado. El siguiente trabajo de mockups es HF-02/HF-05.**
 
 Antes de generar HF-08:
 1. diseñar la separación entre checkout de productos y pago de cotización aprobada;
