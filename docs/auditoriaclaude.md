@@ -1,333 +1,226 @@
-Vértice CR — Auditoría HF / Decisiones para implementación React
-Fecha: 2026-09-24
-Rama: Pruebas
-Estado: 🟢 Listo para iniciar implementación React
+# Auditoría Completa del Repositorio — Vértice CR
 
-0. Resolución de contradicción crítica
-fase3_componentes_ui.md menciona Tailwind + shadcn/ui.
-El AI_CONTEXT.md y el handoff dicen explícitamente: CSS propio, sin librería de componentes externa.
+> **Fecha:** 2026-09-25 · **Rama:** `Pruebas` · **Commit HEAD:** `968839e`
+> **Fase declarada:** 3 — auditoría HF + cierre visual/UX · **React: BLOQUEADO**
 
-Decisión tomada: CSS propio. Space Grotesk + JetBrains Mono. Variables CSS como design tokens.
-shadcn/ui queda descartado. El sistema visual es parte del diferencial del proyecto.
+---
 
-1. Resolución del db.json
-El db.json tiene un conflicto de merge sin resolver (marcadores <<<<<<< HEAD / ======= / >>>>>>>).
-Antes de npm run dev o json-server, hay que resolverlo.
+## 1. Resumen ejecutivo: ¿Dónde estamos?
 
-Decisión: conservar la versión extendida (users, products completos, orders, etc.) y descartar la versión simple de 5 productos. El db.json completo es el que corresponde a la arquitectura.
+```mermaid
+graph LR
+    A["Fase 1\nProducto\ny alcance"] --> B["Fase 2\nIdentidad\ny mockups"]
+    B --> C["Fase 3\nAuditoría HF\n+ cierre visual"]
+    C --> D["Fase 4\nDesign System"]
+    D --> E["Fase 5\nArquitectura\ny datos"]
+    E --> F["Fase 6\nReact"]
+    F --> G["Fase 7\nTesting\ny calidad"]
+    style C fill:#FF5A1F,stroke:#E03D00,color:#fff
+    style D fill:#25221E,stroke:#2A2723,color:#8A8884
+    style E fill:#25221E,stroke:#2A2723,color:#8A8884
+    style F fill:#25221E,stroke:#2A2723,color:#8A8884
+    style G fill:#25221E,stroke:#2A2723,color:#8A8884
+```
 
-2. Design system — tokens definitivos
-/* Superficies */
---color-bg:         #0D0B09;
---color-surface:    #141412;
---color-surface-2:  #1E1C19;
---color-surface-3:  #25221E;
---color-border:     #2A2723;
+**Estamos a mitad de la Fase 3.** El proyecto tiene una base documental sólida, identidad visual definida, y tres pantallas HF congeladas. Pero todavía quedan ~12 pantallas HF por cerrar, el cierre transversal de desktop, y todo el trabajo de código por delante.
 
-/* Acento térmico */
---color-accent:     #FF5A1F;
---color-accent-dim: #E03D00;
---color-accent-lit: #FF7A45;
+---
 
-/* Texto */
---color-text:       #EDE8E0;
---color-muted:      #8A8884;
+## 2. Estado por capa
 
-/* Estado */
---color-success:    #2ECC71;
---color-error:      #FF4444;
---color-warning:    #F5A623;
---color-pending:    #8A8884;   /* PENDING_QUOTE — nunca color de acción */
+### 📐 Documentación (11 docs numerados + extras)
 
-/* Tipografía */
---font-display:     'Space Grotesk', system-ui, sans-serif;
---font-mono:        'JetBrains Mono', 'Courier New', monospace;
+| Documento | Estado | Observación |
+|---|---|---|
+| AI_CONTEXT.md | ✅ Actualizado | Fuente de verdad global, sincronizado al 25-sep |
+| AGENTS.md | ✅ Correcto | Reglas claras y funcionales |
+| 00-INDICE-Y-MAPA.md | ✅ Correcto | Mapa limpio y navegable |
+| 01-PRODUCTO-Y-ALCANCE.md | ✅ Correcto | Roles, MoSCoW y principios claros |
+| 02-NEGOCIO-Y-ESTADOS.md | ✅ Correcto | Ciclo de solicitudes bien documentado |
+| 03-UX-Y-FLUJOS.md | ✅ Correcto | Rutas, flujos y estados completos |
+| 04-DISENO-VISUAL-Y-ACCESIBILIDAD.md | ✅ Completo | Dark/Light tokens, accesibilidad WCAG, ayuda inline |
+| 05-AUDITORIA-HF-Y-MOCKUPS.md | ✅ Detallado | 17 HF listados con estado individual |
+| 06-ARQUITECTURA.md | ⚠️ Esqueleto | Estructura objetivo pero sin detalle de contratos |
+| 07-DATOS-API-AUTH.md | ⚠️ Pendiente | API externa sin proveedor; JWT sin implementación |
+| 08-METRICAS-ADMIN-E-IA.md | ✅ Definido | KPIs, fórmulas y regla de IA documentados |
+| 09-TESTING-Y-CALIDAD.md | ⚠️ Declarativo | Orden y casos listados, 0 tests implementados |
+| 10-ROADMAP.md | ✅ Actualizado | Secuencia clara, gate de React explícito |
 
-/* Motion */
---motion-micro:     150ms ease;
---motion-ui:        220ms cubic-bezier(0.4, 0, 0.2, 1);
---motion-reveal:    400ms cubic-bezier(0.4, 0, 0.2, 1);
-Regla de color: el naranja se usa en CTA, focus ring, hover de elementos interactivos, y detalles técnicos. No en backgrounds de sección, no en texto de cuerpo, no en iconografía decorativa.
+> **Nota:** Existe un documento extra fuera de la numeración: `DECISIONES-HF-POST-AUDITORIA-2026-09-24.md`. Su contenido ya fue absorbido por los documentos numerados, pero referencia archivos que ya no existen (`docs/IDENTITY-ROADMAP.md`, `docs/VISUAL-IDENTITY-WORKING.md`, `docs/fase3_mockups_hf.md`). No es un problema funcional, pero es deuda documental.
 
-Regla de geometría: border-radius: 2px para elementos técnicos (inputs, badges de datos, tags de código). border-radius: 6px para cards de producto. border-radius: 12px solo para el showcase oval del hero. Sin border-radius universal.
+---
 
-3. Estructura de rutas React Router DOM
-/                        → HomePage
-/catalogo                → CatalogPage
-/producto/:id            → ProductDetailPage
-/solicitud               → CustomPrintSelectionPage
-/solicitud/archivo       → CustomPrintFilePage
-/solicitud/asistencia    → CustomPrintAssistancePage
-/carrito                 → CartPage
-/checkout/productos      → CheckoutProductsPage
-/checkout/solicitud      → CheckoutRequestPage
-/cuenta                  → AccountPage  (privada: role=customer)
-/pedido/:id              → OrderDetailPage  (privada)
-/login                   → LoginPage
-/registro                → RegisterPage
-/admin                   → AdminDashboardPage  (privada: role=admin)
-/admin/pedidos           → AdminOrdersPage
-/admin/pedidos/:id       → AdminOrderDetailPage
-/admin/solicitudes       → AdminRequestsPage
-/admin/solicitudes/:id   → AdminRequestDetailPage
-/admin/catalogo          → AdminCatalogPage
-/admin/catalogo/nuevo    → AdminProductNewPage
-/admin/catalogo/:id/editar → AdminProductEditPage
-/admin/clientes          → AdminClientsPage
-/admin/clientes/:id      → AdminClientDetailPage
-Rutas privadas por rol con ProtectedRoute. Redirect a /login si no hay sesión.
+### 🎨 Mockups / HF (Happy Flows)
 
-HF-01 — Home / Landing
-✅ Qué conservar del mockup Stitch
-Badge "Fabricación digital · Costa Rica" — conciso y real
-División hero: copy izquierda / showcase derecha
-Sección Precision con 4 bloques técnicos
-Flujo Process con 4 pasos
-Print CTA con badge "Pendiente de cotización"
-Ausencia de sección "Productos destacados" — correcto
-❌ Qué es demasiado básico
-El showcase actual (App.jsx) son dos rectángulos con glow genérico
-La tipografía no está aplicada (usa system-ui implícita)
-No hay motion real — solo CSS estático
-"3.6k piezas entregadas" y "24/7 soporte técnico" son datos inventados — sacar
-La sección catalog en Home (productos hardcodeados) no debe existir
-🔄 Qué cambiaremos
-Showcase: 5 tarjetas de productos con scroll infinito pausado al hover. Cada card tiene código técnico (PRT-01), nombre y un placeholder geométrico que representa la categoría del producto (forma SVG simple, no imagen genérica de AI).
-Hero H1: "De una idea, a algo real." — más directo que la versión actual
-Precision: valores conceptuales como especificaciones de referencia, nunca como claims de marketing definitivos. Aplicar JetBrains Mono en los valores.
-Process: los 4 pasos son correctos. Conectar con una línea SVG fina, no con iconos decorativos.
-Print CTA: mostrar el flujo Subís archivo → 3D → Cotización visualmente. El badge debe ser visible y decir "Pendiente de cotización".
-⚡ Interacción
-Navbar: sticky, backdrop-filter: blur(12px), opacidad 90% en scroll
-Showcase: animation: scroll-horizontal con pausa en hover y focus-within. @media (prefers-reduced-motion) desactiva la animación y muestra las cards estáticas.
-CTA primario ("Explorar catálogo"): hover con shift de 1px + naranja más intenso. Focus ring naranja visible.
-Cards del showcase: hover eleva la card 4px, aparece el nombre del producto en overlay.
-Precision values: revelan su label con un delay escalonado de 100ms en carga inicial.
-📐 Responsive
-Mobile (375px): showcase apila en columna única, scroll horizontal táctil. H1 a 36px (Space Grotesk 700). Los 4 bloques Precision van en 2×2.
-Tablet (768px): hero en columna única, showcase horizontal pero más pequeño.
-Desktop (1280px+): layout split 50/50.
-🧩 Componentes que salen de aquí
-<Navbar>, <ShowcaseOval>, <ShowcaseCard>, <PrecisionGrid>, <ProcessStepper>, <PrintCTAPanel>, <Footer>
+| HF | Pantalla | Estado | Archivo/Referencia |
+|---|---|---|---|
+| 01 | Home | ✅ **CONGELADO** | `mockups/hf-01-home.html` (79 KB, funcional) |
+| 02 | Catálogo | ❌ **Pendiente iteración** | Correcciones doc. en 05-AUDITORIA |
+| 03 | Detalle producto | 🟡 Mantener + refinar | PNG en HFcompletos |
+| 04 | Selección solicitud | 🟢 Mantener | PNG en HFcompletos |
+| 05 | Solicitud con archivo | ❌ **Pendiente iteración** | Correcciones doc. en 05-AUDITORIA |
+| 06 | Asistencia IA | 🟡 Mantener + refinar | PNG en HFcompletos |
+| 07 | Carrito híbrido | ✅ **CONGELADO** | Aprobado 24-sep |
+| 08 | Checkout | ✅ **CONGELADO** | Aprobado 25-sep |
+| 09 | Seguimiento | 🟢 Mantener | PNG en HFcompletos |
+| 10 | Admin Dashboard | ❌ **Simplificar** | Reducir a KPIs reales |
+| 11 | Admin productos | ❌ **Ajustar** | — |
+| 12 | Login/Registro | ❌ **Ajustar tono** | Eliminar LDAP/GitHub Enterprise |
+| 13 | Portal usuario | 🟢 Referencia fuerte | Fuente para QuoteApprovalCard |
+| 14 | Menú móvil | ❌ **Rehacer** | Con identidad Vértice |
+| 15 | FAQ | 🟡 Refinar | — |
+| 16 | About/Contact | 🟡 Revisar | — |
+| 17 | Biblioteca CAD | ⚠️ Depende del modelo | — |
 
-🚫 No hacer
-No agregar más secciones (testimonios, blog, logos de clientes)
-No poner glow naranja en cada elemento
-No animar todo el hero simultáneamente — solo el showcase tiene movimiento continuo
-HF-02 — Catálogo
-✅ Conservar
-Filtros visibles en sidebar izquierdo (desktop)
-Grid de productos — densidad correcta
-Badge de material y disponibilidad por producto
-❌ Mejorar
-Las cards son cards genéricas con imagen placeholder gris
-No hay estados de filtro activo claramente diferenciados
-El sorting está enterrado
-🔄 Cambios
-Cards de producto con: imagen/placeholder geométrico, código de producto (JetBrains Mono), nombre, precio, material badge, disponibilidad badge
-Filtros por: categoría, material, precio (rango), disponibilidad
-Sorting visible en toolbar: "Más recientes", "Precio: menor", "Precio: mayor", "Más vendidos"
-Búsqueda con debounce de 300ms
-Estado vacío específico: "No hay productos con estos filtros" + "Limpiar filtros"
-Skeleton loading: 6–8 cards con shimmer mientras carga
-⚡ Interacción
-Filtro activo: chip naranja con X para eliminar filtro individual
-"Agregar al carrito" en hover de card (desktop) — en mobile, botón visible siempre
-Disponibilidad "Sin stock": card visualmente atenuada, CTA "Notificar disponibilidad" (estado futuro)
-📐 Responsive
-Mobile: sidebar de filtros como Sheet (bottom drawer). Cards en 1 columna.
-Tablet: 2 columnas, filtros colapsables en top bar.
-Desktop: sidebar fijo de 240px + grid de 3 columnas.
-🧩 Componentes
-<CatalogSidebar>, <FilterGroup>, <ActiveFilters>, <CatalogGrid>, <ProductCard>, <SortingBar>, <SearchInput>
+**Resumen HF:** 3 congelados / 5 mantener-refinar / 6 requieren trabajo / 3 pendientes de iteración fuerte
 
-HF-03 — Detalle de Producto
-✅ Conservar
-Imagen grande / galería a la izquierda
-Especificaciones técnicas en la derecha
-CTA prominente
-❌ Mejorar
-Sin variantes de color/material diferenciadas visualmente
-Sin indicador de disponibilidad claro
-Sin dimensiones en JetBrains Mono
-Sin breadcrumb
-🔄 Cambios
-Layout: galería 55% / info 45% en desktop
-Dimensiones y especificaciones con JetBrains Mono (esto distingue visualmente la data técnica)
-Selector de material/color: pills con borde naranja cuando seleccionado
-Disponibilidad: badge con texto + icono (nunca solo color)
-Tiempo estimado de entrega junto al CTA
-Tabs para "Descripción" / "Especificaciones" / "Material" si el contenido es extenso
-Imagen ausente: placeholder SVG con rejilla tipo CAD sutil, en colores de superficie
-⚡ Interacción
-Galería: click en thumbnail → zoom/swap de imagen principal con crossfade 200ms
-Selector de variante: highlight inmediato sin recarga de página
-"Agregar al carrito": cambia a "✓ Agregado" por 1.5s, luego vuelve a estado normal
-Cantidad: input +/- con validación de mínimo 1
-🧩 Componentes
-<ProductGallery>, <VariantSelector>, <SpecTable>, <AvailabilityBadge>, <AddToCartButton>
+---
 
-HF-04/05/06 — Solicitud Personalizada
-Pantalla de selección (HF-04)
-Dos caminos claros:
+### 💻 Código fuente (`src/`)
 
-[ Tengo un archivo 3D ]     [ Necesito ayuda de diseño ]
-   .stl / .obj                 Descripción + referencia
-No es un formulario. Es una decisión visual clara. Cards grandes, icono representativo de cada camino.
+| Aspecto | Estado | Detalle |
+|---|---|---|
+| Estructura | ⚠️ Scaffold Vite | Solo 4 archivos: `main.jsx`, `App.jsx`, `App.css`, `index.css` |
+| Componentes | ❌ Ninguno | No existen componentes, features, pages, hooks ni services |
+| Router | ❌ No instalado | `react-router-dom` no está en `package.json` |
+| JSON Server | ❌ No instalado | No está en dependencias (aunque `db.json` existe) |
+| Recharts | ❌ No instalado | — |
+| Jest/Testing Library | ❌ No instalado | — |
+| Dependencias | Solo React 19 + Vite 8 | `package.json` tiene lo mínimo del scaffold |
 
-Upload de archivo (HF-05)
-No debe parecer un formulario aburrido.
+> **Nota:** El código actual en `App.jsx` es un **landing page estático** con datos hardcodeados. **No es una implementación de producción**; es un experimento visual temprano que:
+> - Muestra precios en Home (viola la regla de negocio)
+> - Usa datos inventados (`3.6k piezas entregadas`, `24/7 soporte técnico`)
+> - No tiene Dark/Light, routing, estados ni accesibilidad
+> - Los tokens CSS en `index.css` no coinciden con los tokens oficiales de `04-DISENO`
 
-Estados del dropzone:
+---
 
-idle: área punteada con icono, texto "Arrastrá tu .STL o .OBJ aquí"
-drag-over: border naranja, fondo ligeramente iluminado
-processing: spinner, "Analizando archivo..."
-success: muestra nombre, extensión, tamaño, dimensiones estimadas
-error-format: "Este formato no es compatible. Usá .STL o .OBJ."
-error-size: "El archivo supera el límite de 50MB."
-remove: botón X visible en el estado success
-Después del upload exitoso: formulario de especificaciones (material, calidad, notas) con progreso visible de pasos.
+### 🗃️ Datos (`db.json`)
 
-Asistencia de IA (HF-06)
-Chat-style interface: el usuario describe su pieza, la IA recomienda material y da rango indicativo
-La IA NUNCA confirma precio. Siempre termina con "El administrador revisará tu solicitud."
-Estado visual del resultado: card con las recomendaciones + badge "PENDING_QUOTE" prominente
-⚡ Interacción
-Progreso visible entre pasos (no solo steps numerados — progress bar real)
-Cada paso conserva los datos si el usuario retrocede
-Submit final: "Enviando solicitud..." → confirmación con número de referencia
-🧩 Componentes
-<RequestPathSelector>, <FileDropzone>, <FilePreview>, <RequestSpecsForm>, <AIAssistantPanel>, <PendingQuoteBadge>
+| Aspecto | Estado |
+|---|---|
+| Estructura general | ✅ Consistente con doc 07 |
+| Conflictos de merge | ✅ **Resuelto** (ya no hay marcadores `<<<<<<`) |
+| Users | ✅ 5 usuarios (1 admin, 4 customers) |
+| Products | ✅ 6 productos con campos completos |
+| Categories | ✅ 5 categorías |
+| Orders | ✅ 8 pedidos en distintos estados |
+| OrderItems | ✅ 8 items vinculados correctamente |
+| CustomPrintRequests | ✅ 5 solicitudes en distintos estados |
+| Reviews, coupons, notifications, activityLog | ⚠️ Arrays vacíos |
 
-HF-07 — Carrito Híbrido
-Separación visual obligatoria
-PRODUCTOS (pueden pagarse ahora)
-───────────────────────────────
-  [imagen] Nombre del producto
-           Material · Color
-           ₡ precio     [cantidad] [eliminar]
+> **Importante:** El `db.json` tiene un estado de ciclo parcialmente inconsistente: usa `SUBMITTED` e `IN_REVIEW` en `customPrintRequests`, pero el ciclo documentado en `02-NEGOCIO` empieza con `PENDING_QUOTE`. El campo `settings.customPrintQuoteStatus` dice `"PENDING_QUOTE"` pero ningún registro real usa ese valor. Esto se deberá normalizar antes de React.
 
-SOLICITUDES PERSONALIZADAS
-───────────────────────────────
-  [icono] archivo.stl
-           Material solicitado: PETG
-           ┌──────────────────────────────┐
-           │  ⏳ PENDIENTE DE COTIZACIÓN  │
-           │  El administrador revisará   │
-           │  tu solicitud antes de       │
-           │  confirmar el precio.        │
-           └──────────────────────────────┘
-El total nunca mezcla solicitudes sin cotización con precios reales. Si hay solicitudes pendientes, el total muestra "₡X.XXX (+ solicitudes por cotizar)".
+---
 
-Carrito vacío: ilustración sutil + "Tu carrito está vacío" + "Explorar catálogo".
+### 🖼️ Assets
 
-🧩 Componentes
-<CartProductSection>, <CartRequestSection>, <CartItem>, <PendingQuoteNotice>, <CartTotal>, <EmptyCart>
+| Tipo | Cantidad | Ubicación |
+|---|---|---|
+| Favicons | 10 archivos (SVG, PNG multi-size, squircle) | `public/` |
+| Logo SVG | 1 (182 KB) | `public/` + `src/assets/` (duplicado) |
+| Mockup PNGs (HF originales) | 18 figuras | `mockups/HFcompletos/` |
+| Mockup images generadas | 8 carpetas (UXMagic/IA) | `mockups/HFcompletos/` |
+| Hero photos | 5 imágenes JPG | `mockups/images/` |
+| HF-01 implementado | 1 HTML (80 KB) | `mockups/hf-01-home.html` |
+| Referencias | 0 archivos | `referencias/` (vacío) |
 
-HF-08/09 — Checkout
-Checkout de Productos
-Progreso: Datos → Pago → Confirmación (3 pasos)
-SINPE Móvil: número + banco + monto = ₡X.XXX + instrucciones claras
-Confirmación: número de pedido en JetBrains Mono, resumen, "Tu pedido está siendo procesado"
-Checkout de Solicitud
-No hay pago inmediato
-Resumen de la solicitud + archivo + especificaciones
-Estado: "PENDIENTE DE COTIZACIÓN — recibirás un correo con el precio y podrás aceptar o rechazar"
-Número de referencia de la solicitud
-HF-10 — Login / Registro
-Decisión de layout
-Modal o página dedicada — página dedicada (modal es más complejo de hacer bien, y el rubric exige rutas).
+---
 
-/login y /registro son páginas, no modals
-Layout centrado, superficie elevada (--color-surface-2)
-Tabs "Iniciar sesión" / "Registrarse" en la misma página
-Campos login: email + contraseña + "Recordarme"
-Campos registro: nombre, email, contraseña, confirmar contraseña
-Validación en tiempo real con mensajes junto al campo, no en toast genérico.
+### 🔀 Git
 
-HF-11/12/13 — Cuenta del Cliente
-Portal de usuario (/cuenta)
-Tabs: "Mis pedidos" / "Mis solicitudes" / "Perfil"
-Pedidos: tabla con número, fecha, estado (con texto + icono), total
-Solicitudes: tabla con referencia, archivo, estado, acciones
-Detalle de pedido (/pedido/:id)
-Timeline visual del estado del pedido (Processing → Produced → Shipped → Delivered)
-Cada estado tiene fecha/hora
-El timeline usa texto + color, nunca solo color
-Biblioteca de archivos (/cuenta tab "Mis archivos" o sub-ruta)
-Lista de .stl y .obj subidos por el usuario
-Nombre, tamaño, fecha de subida, pedido/solicitud asociado
-Opción de reutilizar en nueva solicitud
-HF-13+ — Admin
-Dashboard Admin (/admin)
-Regla absoluta: ningún número hardcodeado.
+| Aspecto | Valor |
+|---|---|
+| Rama activa | `Pruebas` (up to date con origin) |
+| Ramas | `Master`, `Pruebas` (activa), `sebas` (remote) |
+| Working tree | Limpio |
+| Últimos commits | Documentales (cierre HF-01, HF-08) |
 
-Familias de KPIs (en orden visual):
+---
 
-Ventas hoy / semana / mes con sparkline (Recharts LineChart)
-Pedidos por estado (BarChart)
-Solicitudes pendientes de cotización (número grande + acción directa "Ver solicitudes")
-Top 5 productos más vendidos (tabla)
-Alertas: productos con stock < 3
-Gestión de Productos (/admin/catalogo)
-Tabla con: imagen thumb, nombre, categoría, precio, stock, estado
-Acciones por fila: editar, desactivar
-Botón "Nuevo producto" prominente
-CRUD completo: crear, leer, actualizar, archivar (soft delete, no hard delete)
-Gestión de Clientes (/admin/clientes)
-Tabla: nombre, email, fecha de registro, pedidos totales, estado
-Detalle de cliente: historial de pedidos y solicitudes
-Gestión de Solicitudes (/admin/solicitudes)
-Tabla: referencia, cliente, archivo, estado, fecha
-Acción key: "Cotizar" → input de precio → confirmar → notificación al cliente (vía N8N)
-4. Componentes globales reutilizables
-<Navbar>              sticky, blur, con carrito badge y cuenta
-<Footer>              simple, brand + copyright
-<ProtectedRoute>      redirección por rol
-<PageShell>           max-width 1280px, padding horizontal
-<Button>              variantes: primary, secondary, ghost, danger
-<Badge>               variantes: material, status, pending, success, error
-<StatusBadge>         texto + icono, nunca solo color
-<Skeleton>            loading placeholder con shimmer
-<EmptyState>          ilustración + texto + acción
-<ErrorState>          texto de error + reintentar
-<Modal>               para confirmaciones y detalles breves
-<Toast>               feedback breve post-acción
-<ProgressBar>         para flows multi-paso
-<DataTable>           tabla reutilizable admin con sort y filtros
-5. Lo que NO necesitamos documentar más
-La arquitectura en docs/ARCHITECTURE.md está bien definida.
-El db.json completo (rama correcta, sin conflicto) está bien estructurado.
-Los estados e interacción en docs/fase3_estados_interaccion.md son correctos y aplicables directamente.
+## 3. Hallazgos e inconsistencias
 
-No hay que producir más documentos antes de React.
+### 🔴 Problemas
 
-6. Orden de implementación
-1. Resolver conflicto db.json
-2. Instalar deps: react-router-dom, recharts, json-server
-3. Estructura de carpetas (arquitectura ya definida)
-4. Design tokens en src/styles/tokens.css
-5. Componentes globales: Navbar, Footer, Button, Badge, PageShell
-6. Rutas en App.jsx con React Router DOM
-7. AuthContext (login/logout/roles)
-8. LoginPage + RegisterPage
-9. HomePage (HF-01) — primera pantalla real, establece el lenguaje visual
-10. CatalogPage + ProductCard (HF-02)
-11. ProductDetailPage (HF-03)
-12. CustomPrint flow (HF-04/05/06)
-13. CartPage (HF-07)
-14. CheckoutPages (HF-08/09)
-15. AccountPages (HF-11/12/13)
-16. Admin pages (HF-13+)
-17. Jest + React Testing Library
-18. N8N flows
-19. Polish, accesibilidad, reduced-motion, dark/light toggle
-7. Decisión final: ¿Empezamos React?
-Sí.
+1. **`App.jsx` contradice reglas de negocio**: muestra precios en Home, usa métricas inventadas (`3.6k`, `320+`, `90%`, `24/7`). Esto viola AGENTS.md ("No inventar precios, métricas, endpoints").
 
-La identidad está definida. Los componentes están identificados. Las rutas están mapeadas. Los estados están documentados. El design system tiene tokens concretos.
+2. **Tokens CSS no coinciden con diseño oficial**: `index.css` usa `#0b0d12`, `#ff6a1a`, etc. mientras que `04-DISENO` define `#0D0B09`, `#FF5A1F`. Son paletas distintas. Cuando se empiece React, debe usarse la paleta oficial de doc 04.
 
-El siguiente paso es el código.
+3. **`db.json` usa `SUBMITTED` en lugar de `PENDING_QUOTE`**: la solicitud `r5` tiene `status: "SUBMITTED"`, que no existe en el ciclo documentado.
 
-Documento generado: 2026-09-24 | Claude Sonnet 4.6 | Repositorio: Pruebas @ ee144ce
+4. **Documento huérfano**: `DECISIONES-HF-POST-AUDITORIA-2026-09-24.md` referencia 3 archivos inexistentes en la sección 15.
+
+5. **`package.json` con `@types/react`**: tiene dependencias de TypeScript (`@types/react`, `@types/react-dom`) a pesar de la regla explícita "JavaScript/JSX; no TypeScript".
+
+### 🟡 Deuda técnica prevista
+
+6. **12 pantallas HF sin congelar**: solo 3/17 están aprobadas.
+7. **0 dependencias de producción** más allá de React core: falta router, Recharts, JSON Server, Jest, Testing Library.
+8. **0 componentes, 0 tests, 0 services**: todo el código funcional está por escribirse.
+9. **API externa sin definir**: no hay proveedor, endpoint ni contrato.
+10. **JWT sin definir**: el flujo está descrito conceptualmente pero sin ningún detalle de implementación.
+
+---
+
+## 4. Mapa de progreso global
+
+```mermaid
+pie title Progreso del proyecto
+    "Documentación" : 85
+    "Mockups congelados" : 18
+    "Diseño/tokens" : 80
+    "Código" : 2
+    "Testing" : 0
+    "Integración API/JWT/N8N" : 0
+```
+
+| Área | Progreso | Nota |
+|---|---|---|
+| Documentación | ~85% | Sólida; falta cerrar arquitectura detallada y contratos |
+| Identidad visual | ~80% | Dark/Light definidos; aplicación pendiente |
+| Mockups HF | ~35% | 3/17 congelados; el resto requiere trabajo |
+| Código React | ~2% | Solo scaffold de Vite; landing estática descartable |
+| Testing | 0% | Ni siquiera Jest está instalado |
+| API/JWT/N8N | 0% | Conceptual; sin implementación |
+
+---
+
+## 5. Estado actual y qué sigue
+
+### Dónde estamos
+- **Fase 3 en curso**: auditoría HF + cierre visual/UX.
+- HF-01, HF-07 y HF-08 están congelados.
+- Dark/Light tokens y accesibilidad WCAG están definidos en documentación.
+- El código en `src/` es un prototipo temprano que **no debe considerarse base para implementación**.
+- React sigue bloqueado por el gate de la documentación.
+
+### Qué se terminó realmente
+- ✅ Identidad Obsidian Precision Forge + Lava Orgánica
+- ✅ HF-01 Home (HTML verificado en navegador)
+- ✅ HF-07 Carrito Híbrido (congelado tras 2 iteraciones)
+- ✅ HF-08 Checkout (congelado tras 2 iteraciones)
+- ✅ Tokens Dark/Light, reglas de accesibilidad, mecanismo de ayuda
+- ✅ Modelo de negocio de solicitudes personalizadas
+- ✅ 11 documentos numerados sincronizados
+
+### Qué falta ahora (bloque inmediato)
+1. **Iterar HF-02 Catálogo** — correcciones documentadas en 05-AUDITORIA
+2. **Iterar HF-05 Solicitud con archivo** — eliminar precios, visor 3D real
+3. **Refinar HF-03, HF-06, HF-09, HF-15, HF-16** — ajustes menores
+4. **Ajustar HF-10, HF-11, HF-12** — dashboard, productos admin, login
+5. **Rehacer HF-14** — menú móvil con identidad Vértice
+6. **Resolver HF-17** — depende del modelo de datos final
+
+---
+
+## 6. Siguientes pasos posibles
+
+| # | Opción | Razón |
+|---|---|---|
+| **A** | **(Recomendado)** Iterar HF-02 + HF-05 en UXMagic y auditar | Son los dos HF pendientes con más correcciones documentadas y son bloqueadores de flujo |
+| **B** | Limpiar `App.jsx`/tokens CSS para alinear con doc 04 | Reduce confusión, pero no desbloquea nada mientras React siga bloqueado |
+| **C** | Normalizar `db.json` (estados de solicitudes) | Preparación útil para cuando se empiece a consumir datos |
+| **D** | Definir API externa + JWT concretamente | Adelanta un bloque que eventualmente es gate de React |
+
+**Recomiendo A** porque es lo que el roadmap marca como siguiente trabajo y es requisito para cerrar desktop y avanzar hacia mobile/tablet → Design System → React.
