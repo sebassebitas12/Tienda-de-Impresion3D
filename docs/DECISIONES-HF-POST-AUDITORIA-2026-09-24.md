@@ -252,11 +252,13 @@ Esto no autoriza todavía su implementación.
 11. Después, corregir/consolidar `db.json` y contrato de API conforme al modelo aprobado.
 12. Solo después comienza React.
 
-## 14. Incidencia técnica detectada
+## 14. Incidencia técnica detectada — estado actualizado 2026-09-25
 
-`db.json` en la rama `Pruebas` contiene actualmente marcadores de conflicto Git (`<<<<<<< HEAD`, `=======`, `>>>>>>> ...`).
+El conflicto Git que existía anteriormente en `db.json` fue resuelto en la rama `Pruebas`. El archivo actual es JSON válido y ya no contiene los marcadores `<<<<<<<`, `=======` ni `>>>>>>>`.
 
-Por tanto, el archivo **no debe consumirse como JSON válido** hasta resolver el conflicto. La resolución se hará después de cerrar el modelo de solicitudes personalizado definido arriba.
+La siguiente incidencia de datos pendiente es de **normalización del ciclo de solicitudes personalizadas**: el registro `r5` utiliza `status: "SUBMITTED"`, mientras que el ciclo oficial comienza en `PENDING_QUOTE`.
+
+No corregir silenciosamente este dato en los mocks sin documentar primero la decisión. Antes de React, normalizar `r5` y verificar que todos los registros de `customPrintRequests` utilicen únicamente estados definidos en `docs/02-NEGOCIO-Y-ESTADOS.md`.
 
 ## 15. Regla de continuidad
 
