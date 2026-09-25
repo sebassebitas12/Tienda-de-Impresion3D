@@ -106,3 +106,40 @@ El usuario debe sentir que público, cuenta y admin pertenecen a Vértice CR med
 - navegación específica por contexto.
 
 La consistencia no significa que todas las áreas tengan exactamente la misma densidad ni el mismo chrome.
+
+
+## HF-08 Checkout — diseño de flujo (2026-09-24)
+
+### Checkout de productos
+
+`/carrito → /checkout/productos → Datos → Entrega → Pago → Revisión → Confirmación → /pedidos/:id`
+
+### Checkout de cotización
+
+`/carrito → /checkout/solicitud → Resumen técnico → Datos → Entrega → Pago → Revisión → Confirmación → /pedidos/:id`
+
+### Regla visual
+
+Los dos recorridos pueden compartir componentes de checkout (stepper, datos de facturación, entrega, SINPE, revisión), pero deben mantener **contexto visual explícito** sobre qué se está pagando.
+
+### Navbar/footer
+
+Mantener el navbar público de Stitch/Vértice con ajustes mínimos. En checkout puede simplificarse únicamente si mejora el foco sin perder navegación, identidad o accesibilidad. Footer comercial completo no es necesario; puede usarse uno técnico compacto.
+
+### Estados de pago
+
+- idle;
+- form invalid;
+- processing;
+- esperando comprobante;
+- comprobante recibido;
+- validando;
+- pago confirmado;
+- error;
+- cotización caducada/no disponible.
+
+### Mobile posterior
+
+375px: bloques del checkout en secuencia vertical, resumen colapsable/sticky y CTA accesible.
+
+768px: una columna principal con resumen debajo o panel colapsable.
