@@ -148,3 +148,41 @@ HF-07 no requiere otra iteración de diseño antes de pasar a la siguiente panta
 - Pago de una cotización aprobada.
 - Excepciones: cotización rechazada, caducada o no disponible.
 - Definir claramente si el flujo de pago de cotización es independiente del checkout de productos.
+
+
+## HF-08 — Auditoría visual de primera propuesta (2026-09-24)
+
+La primera propuesta de HF-08 generada en UXMagic fue revisada como un flujo compuesto por:
+1. checkout de productos;
+2. checkout de cotización aprobada;
+3. confirmación.
+
+Gemini clasificó el flujo como **AJUSTES IMPORTANTES**. La estructura y la identidad visual son consistentes, pero existen correcciones necesarias antes de congelar.
+
+### Correcciones prioritarias
+
+1. **Destino SINPE visible:** el bloque de pago debe indicar de forma explícita el número/cuenta y titular de destino. En mockup puede usarse un valor claramente marcado como demostrativo/configurable; no inventar el dato real de producción.
+2. **Separar logística y pago:** SINPE debe vivir en una sección propia, no dentro del bloque de despacho.
+3. **Unificar formularios:** en checkout de cotización separar `Contacto` y `Facturación electrónica`, manteniendo coherencia con el checkout de productos.
+4. **Vigencia visible:** el checkout de cotización debe mostrar claramente la fecha de vencimiento de la cotización.
+5. **Stepper contextual:** evitar `01 Items` en el flujo de cotización; usar `01 Cotización` o `01 Resumen`.
+
+### Correcciones secundarias
+
+- Mejorar contraste de placeholders.
+- Dar mayor jerarquía al estado `PAGO PENDIENTE DE VALIDACIÓN`.
+- Indicar formatos/tamaño para el comprobante de SINPE.
+- Contemplar cotización caducada y comprobante rechazado/inválido.
+- Mantener preparada la adaptación a 375px y 768px.
+
+### Nota sobre entrega
+
+Gemini señaló que el costo de entrega podría mostrarse si ya es calculable con la dirección. Esto queda condicionado a que exista una regla/fuente de cálculo definida. Mientras no exista, `Por confirmar` es válido si la interfaz explica cuándo se conocerá el monto. No introducir un costo inventado.
+
+### Estado por pantalla
+
+- HF-08 Productos: **Ajustes**
+- HF-08 Cotización: **Ajustes**
+- HF-08 Confirmación: **Aprobado con refinamiento visual**
+
+HF-08 completo sigue **NO APROBADO / PENDIENTE DE ITERACIÓN**.
