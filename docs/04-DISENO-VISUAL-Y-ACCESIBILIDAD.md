@@ -255,5 +255,5 @@ La reutilización visual se logra mediante tokens y componentes compartidos, no 
 | Reduced motion | ✅ Regla CSS definida |
 | Movimiento/animación | ✅ Reglas cerradas |
 
-Siguiente paso: revisar HF-01, HF-02, HF-05 con estas reglas aplicadas.
+Siguiente paso: HF-01 ya fue consolidado y verificado. El siguiente foco es revisar HF-02 y HF-05 con estas reglas aplicadas.
 
