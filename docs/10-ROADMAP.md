@@ -107,3 +107,12 @@ El siguiente trabajo es **HF-08 Checkout**. No requiere volver a revisar HF-07 s
 
 ### Estado de trabajo
 No hay React implementado todavía. La fase sigue siendo preproducción/mockups.
+
+
+## Actualización 2026-09-24 — HF-08 requiere segunda iteración
+
+La primera propuesta HF-08 fue auditada con Gemini y quedó en **AJUSTES IMPORTANTES**.
+
+Siguiente acción única: aplicar las 5 correcciones prioritarias en UXMagic y volver a validar las tres pantallas como un flujo único.
+
+HF-08 solo se congela después de validación final.
