@@ -30,6 +30,16 @@ Fase 3: auditoría HF y cierre de UX/visual. React bloqueado.
 16. Contratos API.
 17. Implementación React.
 
+## Actualización 2026-09-25 — cierre HF-01 Hero
+
+**HF-01 Home: APROBADO Y CONGELADO como referencia visual del Hero.**
+
+La sesión de Antigravity implementó y verificó el Hero Workbench con fotografías reales, Leader Line Callout dinámico, eliminación del overlay CAD triangular, escáner láser sutil, Tilt/Parallax ligero y ficha técnica. La revisión actual del HTML en GitHub confirma que estos elementos están implementados en mockups/hf-01-home.html.
+
+No se utilizará Three.js/WebGL en Home. El visor 3D real queda reservado para HF-03 y HF-05.
+
+**Siguiente foco de mockups:** HF-02 Catálogo y HF-05 Solicitud con archivo.
+
 ## Calidad
 
 18. Jest/Testing Library.
