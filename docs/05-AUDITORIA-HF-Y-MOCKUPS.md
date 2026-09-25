@@ -188,6 +188,41 @@ Gemini señaló que el costo de entrega podría mostrarse si ya es calculable co
 HF-08 completo sigue **NO APROBADO / PENDIENTE DE ITERACIÓN**.
 
 
+## HF-08 — Auditoría visual de segunda propuesta (2026-09-25)
+
+La segunda iteración de UXMagic fue auditada visualmente con zoom en secciones críticas.
+Resultado: **APROBADO CON OBSERVACIÓN MENOR**.
+
+### Criterios verificados
+
+| # | Criterio | Veredicto |
+|---|---|---|
+| 1 | SINPE tiene sección propia `04 / Método de Pago` con bloque `DESTINO DEL PAGO`, titular `Vértice CR`, número demostrativo `+506 XXXX-XXXX`, monto dinámico, referencia, formatos `PDF / JPG / PNG · MÁXIMO X MB` y botón `Adjuntar comprobante` | ✅ |
+| 2 | Entrega y Método de Pago son tarjetas separadas en ambos checkouts | ✅ |
+| 3 | Checkout de cotización tiene `02 / Contacto` (nombre, correo, teléfono) y `Facturación Electrónica` (tipo ID, número, nombre/razón social, correo) como secciones independientes | ✅ |
+| 4 | Sidebar del checkout de cotización muestra monto aprobado `¢112,000` y vigencia `30/09/2026` de forma visible | ✅ |
+| 5 | Stepper del checkout de cotización usa `01 Cotización`; checkout de productos conserva `01 Items` | ✅ |
+
+### Elementos adicionales verificados
+
+- Bloque SINPE incluye nota: *"Dato demostrativo configurable. No corresponde a la coordinación de entrega."* — separa conceptualmente pago de logística.
+- Estado `Archivo no válido` preparado visualmente en sección comprobante.
+- Badge de confirmación `PAGO PENDIENTE DE VALIDACIÓN` con fondo sutil.
+- Checkout de cotización incluye sección de entrega (`Preparación posterior al pago`) con opciones `Entrega a domicilio` / `Retiro`, provincia, cantón, distrito y dirección.
+
+### Observación menor pendiente
+
+En el checkout de cotización, las secciones Contacto, Facturación y Entrega podrían compartir el mismo número de paso (`02`) en lugar de avanzar de forma progresiva (`02 / Contacto`, `03 / Facturación`, `04 / Entrega`). Verificar numeración antes de congelar.
+
+### Estado
+
+- HF-08 Checkout de productos: **Aprobado pendiente de congelar**
+- HF-08 Checkout de cotización: **Aprobado — verificar numeración de pasos**
+- HF-08 Confirmación: **Aprobado**
+
+HF-08 **NO CONGELADO** hasta resolver observación de numeración.
+
+
 ## HF-08 — Iteración 2: correcciones no verificadas (2026-09-25)
 
 UXMagic volvió a describir la generación de las tres pantallas, pero la auditoría textual aportada por Gemini mantiene exactamente los cinco problemas prioritarios de la primera versión:

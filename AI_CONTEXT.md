@@ -176,11 +176,16 @@ No avanzar todavía a aprobación HF-08. Hacer una iteración de UXMagic con est
 
 ## HF-08 — estado 2026-09-25
 
-La segunda salida de UXMagic todavía no está aprobada. Gemini sigue detectando los cinco problemas prioritarios originales. La siguiente iteración debe ser **edición dirigida**, no rediseño:
-1. bloque SINPE independiente con destino demostrativo/configurable;
-2. Entrega separada de Método de Pago;
-3. Contacto y Facturación separados en checkout de cotización;
-4. fecha exacta de vencimiento visible;
-5. stepper contextual sin "Items" en cotización.
+La segunda iteración de UXMagic fue auditada visualmente con zoom en secciones críticas.
+Resultado: **APROBADO CON OBSERVACIÓN MENOR**.
 
-No congelar HF-08 hasta que esos cinco puntos queden resueltos.
+Los cinco criterios obligatorios están verificados:
+1. SINPE con sección propia `04 / Método de Pago`, destino `Vértice CR + XXXX-XXXX`, monto dinámico, comprobante y formatos. ✅
+2. Entrega y Método de Pago son tarjetas separadas en ambos checkouts. ✅
+3. Checkout de cotización tiene Contacto y Facturación Electrónica como secciones independientes. ✅
+4. Sidebar muestra monto aprobado `¢112,000` y vigencia `30/09/2026` visible. ✅
+5. Stepper de cotización usa `01 Cotización`; productos conserva `01 Items`. ✅
+
+**Observación menor pendiente:** verificar que la numeración de pasos en el checkout de cotización sea progresiva (`02 / Contacto`, `03 / Facturación`, `04 / Entrega`) y no repetida.
+
+HF-08 **NO CONGELADO** hasta resolver esa observación. Una vez confirmada la numeración, se congela.
