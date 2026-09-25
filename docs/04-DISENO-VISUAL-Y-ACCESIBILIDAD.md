@@ -53,7 +53,7 @@ Fuentes cargadas desde Google Fonts. No reemplazar por system-ui en producción.
 /* Geometría */
 --radius-sharp:     2px;   /* inputs, badges técnicos, tags */
 --radius-card:      6px;   /* cards de producto */
---radius-hero:      12px;  /* showcase hero oval */
+--radius-hero:      24px;  /* showcase hero con volumen organico */
 ~~~
 
 
@@ -107,7 +107,7 @@ Reglas de aplicación Light:
 
 - `border-radius: 2px` — inputs, badges de datos, etiquetas técnicas.
 - `border-radius: 6px` — cards de producto y secciones.
-- `border-radius: 12px` — showcase oval del hero únicamente.
+- `border-radius: 24px` — showcase del hero con volumen organico.
 - Sin `border-radius` universal aplicado a todo.
 
 
@@ -145,6 +145,7 @@ Objetivo: WCAG 2.2 AA como mínimo. AAA en texto de cuerpo cuando sea posible.
 
 ### Resize de texto
 - La UI debe funcionar correctamente con texto al 200% sin pérdida de funcionalidad ni truncamiento de información crítica.
+- La rúbrica considera el tamaño de texto ajustable como una de las 4 prácticas evaluables. Se recomienda exponer un control de aumento/reducción o una estrategia equivalente documentada; el zoom del navegador por sí solo no contará como funcionalidad propia.
 
 ### Reduced motion
 ~~~css
@@ -255,5 +256,18 @@ La reutilización visual se logra mediante tokens y componentes compartidos, no 
 | Reduced motion | ✅ Regla CSS definida |
 | Movimiento/animación | ✅ Reglas cerradas |
 
-Siguiente paso: HF-01 ya fue consolidado y verificado. El siguiente foco es revisar HF-02 y HF-05 con estas reglas aplicadas.
+Siguiente paso: extraer estas reglas a tokens y componentes del Design System. HF-02 y HF-05 se implementarán después usando esta misma línea base, sin rediseñar el lenguaje visual desde cero.
+
+## HF-01 como línea base y backlog de accesibilidad técnica — 2026-09-25
+
+HF-01 queda como referencia visual para el Design System y la implementación React. Sus controles de tamaño de texto, contraste, reduced-motion, idioma y ayuda establecen la dirección de interacción, pero el mockup no sustituye la validación con tecnología asistiva.
+
+Antes de cerrar la accesibilidad en producción se debe implementar y probar:
+
+- `skip link`, landmarks y orden de lectura correcto;
+- foco atrapado dentro de los paneles flotantes, retorno al botón que los abrió y cierre con Escape;
+- `aria-live` para cambios de idioma, estados de accesibilidad y respuestas del chatbot;
+- labels explícitos para inputs y mensajes de error/éxito anunciables;
+- iconografía no dependiente de emoji, con nombre accesible y alternativa textual;
+- pruebas de teclado, lector de pantalla y texto al 200% en 375/768/1280+.
 

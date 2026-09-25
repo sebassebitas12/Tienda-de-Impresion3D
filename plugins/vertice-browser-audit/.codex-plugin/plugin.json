@@ -1,0 +1,25 @@
+{
+  "name": "vertice-browser-audit",
+  "version": "0.1.0",
+  "description": "Audita los mockups y la interfaz Vértice CR en navegador con foco visual, responsive y accesibilidad.",
+  "author": {
+    "name": "Vértice CR"
+  },
+  "license": "MIT",
+  "keywords": ["browser", "accessibility", "responsive", "ux", "vertice-cr"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Vértice Browser Audit",
+    "shortDescription": "Auditoría visual y accesible para Vértice CR",
+    "longDescription": "Revisa mockups y páginas Vértice en navegador cuando existe una pestaña conectada; además ofrece una auditoría estática reproducible para detectar gaps de responsive, accesibilidad y coherencia visual.",
+    "developerName": "Vértice CR",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Read"],
+    "defaultPrompt": [
+      "Audita HF-01 en desktop, tablet y móvil.",
+      "Revisa accesibilidad de esta página con foco en lector de pantalla.",
+      "Compara la interfaz contra la rúbrica y documenta los gaps."
+    ],
+    "brandColor": "#FF5A1F"
+  }
+}

@@ -4,6 +4,10 @@
 
 Jest + Testing Library.
 
+## Brecha actual frente a la rúbrica
+
+La rúbrica exige pruebas unitarias de front end con Jest. En la revisión del repositorio actual, `package.json` todavía no contiene dependencias de Jest/Testing Library, scripts `test`/`test:coverage` ni una carpeta de pruebas implementada. Antes del gate de React se debe agregar la configuración, definir el entorno DOM y crear evidencia ejecutable; no basta con mantener este objetivo escrito.
+
 Cobertura mínima objetivo:
 - branches >= 70%;
 - functions >= 70%;

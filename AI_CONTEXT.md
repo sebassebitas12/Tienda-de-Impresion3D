@@ -41,6 +41,10 @@ Vértice CR es una tienda costarricense de impresión 3D con dos líneas: produc
 - Mobile 375 y tablet 768 se mockupean después de cerrar desktop.
 - No inventar datos, endpoints, capacidades ni métricas.
 
+## Rúbrica académica revisada — 2026-09-25
+
+La rúbrica de `Proyecto_Final_FrontEnd_Actualizado.pdf` fue cruzada con la documentación. `docs/01-PRODUCTO-Y-ALCANCE.md` contiene la matriz vigente: HF-01 es la base visual desktop, pero la entrega completa sigue bloqueada por implementación de Router/servicios, auth y roles, CRUD, API externa real, Jest/Testing Library, IA, dos flujos N8N, evidencias móvil/tablet y demostración de accesibilidad con texto ajustable.
+
 ## Orden de trabajo
 1. Corregir HF según auditoría.
 2. Cerrar Dark/Light, ayuda y accesibilidad.
@@ -64,9 +68,11 @@ Si un documento contradice una decisión posterior, prevalece la decisión poste
 - El footer completo pertenece principalmente al área pública. Los dashboards no están obligados a mostrar el footer comercial; pueden usar uno técnico compacto o ninguno si el foco operativo lo justifica.
 - Los mockups de Stitch/UXMagic son referencias visuales, no contratos literales de chrome para cada ruta.
 - React puede consumir un Webhook de N8N directamente para el chatbot y/o resumen IA sin añadir un backend intermedio para ese caso.
-## Estado HF-01 — cierre del Hero Workbench — 2026-09-25
+## Estado HF-01 — rediseño del Hero Workbench reabierto — 2026-09-25
 
-**HF-01 Home: referencia visual del Hero completada y verificada en navegador.**
+**Auditoria ChatGPT 2026-09-25:** HF-01 conserva la exploracion aprobada como referencia visual, pero el congelado tecnico queda pendiente de resolver responsive 375/768, targets tactiles, contraste, carga de imagenes y jerarquia de motion. La solicitud de rehacer el Home reabre la iteracion visual controlada. Ver el detalle en `docs/05-AUDITORIA-HF-Y-MOCKUPS.md`.
+
+**HF-01 Home: reconstrucción visual desde cero completada en el mockup; pendiente validación manual en navegador.**
 
 El archivo mockups/hf-01-home.html consolida:
 - eliminación completa de la capa CAD triangular ficticia y sus cotas/gráficos superpuestos;
@@ -78,10 +84,12 @@ El archivo mockups/hf-01-home.html consolida:
 - ficha técnica inferior con referencia, tolerancia y datos de la pieza;
 - soporte de Dark/Light y prefers-reduced-motion.
 
-### Verificación reportada por Antigravity
-Se probó el archivo local en navegador: carga inicial del soporte, cambio a las piezas 02/03/04, actualización del Leader Line y ausencia del overlay triangular. La revisión actual del repositorio confirma que esas implementaciones existen en el HTML.
+### Verificación actual
+La revisión estática confirma carga local de assets, cambio de las piezas 01/02/03/04, actualización del Leader Line, ausencia del overlay CAD ficticio, responsive base, reduced-motion, separación de badges, controles de accesibilidad e idioma ES/EN. La validación manual en navegador a 375px, 768px y desktop queda como evidencia pendiente; en el entorno actual no hay una superficie de navegador automatizable.
 
-**Decisión:** HF-01 queda congelado como referencia visual. El visor 3D WebGL/Three.js continúa reservado exclusivamente para HF-03 y HF-05.
+**Decisión vigente:** HF-01 queda adoptado como referencia visual del sistema y fuente de verdad para el Design System. Los hallazgos de accesibilidad técnica, responsive y evidencia de rúbrica se resolverán en la implementación React; no se abrirá otra ronda de rediseño del mockup. El visor 3D WebGL/Three.js continúa reservado exclusivamente para HF-03 y HF-05.
+
+**Interacciones HF-01:** el Hero admite parallax/tilt/foco radial controlado con mouse y el navbar incluye menú de cuenta plegable para login, registro, cuenta, carrito y nueva solicitud; ambos respetan accesibilidad y reduced-motion. Home también incorpora controles flotantes de accesibilidad (tamaño de texto efectivo, contraste, movimiento y restaurar), una superficie visual de asistencia técnica con microcopy para personas expertas y principiantes, y cambio persistente ES/EN; la IA real queda reservada para HF-06.
 - El frontend consume el endpoint del workflow; no se conecta directamente al nodo AI Agent.
 - Chatbot y resumen Admin pueden compartir infraestructura mediante un campo `mode`, manteniendo contratos y permisos separados.
 - **Visor 3D real vs Hero (2026-09-25):** El Hero utiliza fotografía de estudio de alta fidelidad con interactividad ligera (Parallax 3D / Tilt, línea de llamada técnica contextual y escáner láser metrológico) para garantizar conversión y máximo rendimiento de carga (LCP/FCP). El visor 3D interactivo WebGL/Three.js se reserva exclusivamente para HF-03 (Detalle de Producto) y HF-05 (Solicitud con Archivo 3D), donde la inspección orbital 360° y validación geométrica aportan valor funcional real.
@@ -93,8 +101,9 @@ Se probó el archivo local en navegador: carga inicial del soporte, cambio a las
 HF-07 y HF-08 están aprobados y congelados. HF-01 Home quedó consolidado como referencia visual del Hero después de la implementación y verificación en navegador del 2026-09-25.
 
 ### Qué falta ahora
-1. Iterar HF-02 Catálogo.
-2. Iterar HF-05 Solicitud con archivo, incluyendo el tratamiento del visor 3D real que corresponde a ese flujo.
+1. Extraer tokens y componentes del Design System desde HF-01.
+2. Construir el shell/Home en React con accesibilidad, idioma, tema y navegación reales.
+3. Preparar Router, servicios, auth/roles y contratos antes de expandir HF-02/HF-05.
 3. Completar las pantallas restantes de desktop según la auditoría vigente.
 4. Mantener la documentación sincronizada con cada cierre.
 
@@ -142,7 +151,7 @@ La pantalla aprobada debe conservar:
 - identidad Obsidian Precision Forge + Lava Orgánica.
 
 ### Punto exacto de reanudación
-**HF-08 ya está congelado y HF-01 también quedó consolidado. El siguiente trabajo de mockups es HF-02/HF-05.**
+**HF-08 ya está congelado y HF-01 quedó adoptado como guía visual del sistema. El siguiente trabajo ya no es abrir mockups: es Design System, arquitectura y primera implementación React del Home.**
 
 Antes de generar HF-08:
 1. diseñar la separación entre checkout de productos y pago de cotización aprobada;
@@ -170,13 +179,13 @@ Antes de generar HF-08:
 
 ### No hacer al retomar
 - No volver a rediseñar HF-07.
-- No empezar React todavía.
+- No abrir otra ronda de rediseño de HF-01.
 - No crear un backend Node/Express solo para N8N.
 - No mezclar una cotización pendiente con productos de catálogo.
 - No crear documentación paralela fuera de la estructura existente.
 
 ### Siguiente gran secuencia
-HF-08 → revisión desktop global → Dark/Light → accesibilidad/ayuda → mobile 375 → tablet 768 → aprobación HF → Design System → arquitectura/datos/API/JWT → React → testing/integraciones.
+HF-01 como guía → Design System → shell/Home en React → Router y servicios → auth/roles → JSON Server/API externa → HF-02/HF-05 en React → IA/N8N → testing y evidencia responsive/accessibility.
 
 
 ## Estado HF-08 — auditoría 2026-09-24

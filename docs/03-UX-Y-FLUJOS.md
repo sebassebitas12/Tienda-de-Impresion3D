@@ -2,7 +2,9 @@
 
 ## Rutas públicas
 
-/, /catalogo, /producto/:id, /solicitud, /solicitud/archivo, /solicitud/ayuda-diseno, /carrito, /checkout/productos, /checkout/solicitud, /registro, /pedidos/:id, /cuenta.
+/, /catalogo, /producto/:id, /solicitud, /solicitud/archivo, /solicitud/ayuda-diseno, /carrito, /checkout/productos, /checkout/solicitud, /login, /registro, /faq, /about, /contacto, /pedidos/:id, /cuenta.
+
+La rúbrica también exige Login/Register, persistencia de sesión y rutas privadas. Estas rutas deben existir como contratos UX aunque su implementación React permanezca pendiente.
 
 ## Rutas administrativas
 

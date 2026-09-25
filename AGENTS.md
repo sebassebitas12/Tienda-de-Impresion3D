@@ -40,3 +40,14 @@ El usuario necesita saber **dónde estamos y hacia dónde vamos**. Al cerrar cua
 - cuál recomendamos y por qué, sin ejecutar un camino distinto al esperado sin avisarlo.
 
 Las instrucciones deben ser prácticas y comprensibles para alguien que no necesita conocer el roadmap completo de memoria.
+
+## Fuentes externas de diseño y desarrollo
+
+Los agentes pueden consultar la biblioteca de referencias registrada en `docs/05-AUDITORIA-HF-Y-MOCKUPS.md` cuando una tarea necesite mejorar diseño, UX, motion, componentes o revisión de código.
+
+- Buscar primero patrones, decisiones y herramientas relevantes en esas fuentes; no asumir que todas aplican al proyecto.
+- Usar los repositorios como investigación y material de trabajo, no como permiso para copiar una página completa o introducir una dependencia sin revisión.
+- Antes de instalar una skill, librería o CLI, informar qué aporta, revisar licencia, impacto en el stack y necesidad real. No instalar automáticamente.
+- Traducir las ideas al sistema existente: JavaScript/JSX, tokens oficiales, Dark/Light, WCAG 2.2 AA, `prefers-reduced-motion` y estados del producto.
+- No usar una referencia externa para contradecir las reglas de negocio, el gate de React, la reserva de WebGL para HF-03/HF-05 o la prohibición de inventar datos.
+- Si una decisión visual se inspira claramente en una fuente, documentar la adaptación y validar que siga perteneciendo a Vértice CR.

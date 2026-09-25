@@ -2,43 +2,45 @@
 
 ## Estado
 
-Fase 3: auditoría HF y cierre de UX/visual. React bloqueado.
+Fase 4: Design System y arquitectura pre-React. HF-01 es la guía visual base; no se abren más rondas de mockup para Home.
 
-## Ahora
+### Estado frente a la rúbrica académica — 2026-09-25
 
-1. Incorporar auditoría.
-2. Cerrar Dark/Light.
-3. Definir ayuda accesible.
-4. Cerrar HF-07/HF-08.
-5. Ajustar Admin + resumen IA.
-6. Definir API externa y contrato.
-7. Definir JWT/auth.
-8. Cerrar desktop.
+HF-01 ya funciona como base visual desktop reconstruida y fue adoptado como referencia del sistema. Para afirmar que la entrega completa cumple la rúbrica todavía faltan: validar HF-01 a 375/768/1280+, crear evidencia móvil/tablet del sistema, cerrar accesibilidad con teclado/lector de pantalla/texto ajustable, y aprobar los contratos de auth, API externa, IA, N8N y testing antes del gate de React. La matriz completa vive en `docs/01-PRODUCTO-Y-ALCANCE.md`.
+
+## Ahora — siguiente bloque, fuera de mockups
+
+1. Extraer tokens de HF-01 a un Design System documentado.
+2. Definir shell React: navbar, footer, tema, idioma, ayuda y accesibilidad.
+3. Crear React Router, páginas públicas/privadas y guards.
+4. Crear `services/`, contratos de JSON Server y modelo de sesión/roles.
+5. Implementar primero Home React conservando HF-01 como referencia visual.
+6. Definir proveedor y contrato real de API externa e IA.
+7. Preparar Jest/Testing Library y pruebas de accesibilidad.
+8. Exportar y probar los dos flujos N8N.
 
 ## Después
 
-9. Mockups mobile 375.
-10. Mockups tablet 768.
-11. Revisión de estados/accesibilidad.
-12. Aprobación HF.
+9. Validar Home React a 375/768/1280+.
+10. Auditoría con teclado, lector de pantalla y texto al 200%.
+11. Completar HF-02/HF-05 en React usando el mismo sistema.
+12. Cerrar evidencia de rúbrica.
 
 ## Luego
 
-13. Design System.
-14. Arquitectura final.
-15. Modelo db.json.
-16. Contratos API.
-17. Implementación React.
+13. CRUD y operaciones de cliente/admin.
+14. Dashboard, IA y automatizaciones.
+15. Cobertura, build y entrega final.
 
-## Actualización 2026-09-25 — cierre HF-01 Hero
+## Actualización 2026-09-25 — HF-01 adoptado como guía del sistema
 
-**HF-01 Home: APROBADO Y CONGELADO como referencia visual del Hero.**
+**HF-01 Home: base visual desktop reconstruida y adoptada como referencia visual; pendiente validación responsive y cierre técnico en la implementación.**
 
 La sesión de Antigravity implementó y verificó el Hero Workbench con fotografías reales, Leader Line Callout dinámico, eliminación del overlay CAD triangular, escáner láser sutil, Tilt/Parallax ligero y ficha técnica. La revisión actual del HTML en GitHub confirma que estos elementos están implementados en mockups/hf-01-home.html.
 
 No se utilizará Three.js/WebGL en Home. El visor 3D real queda reservado para HF-03 y HF-05.
 
-**Siguiente foco de mockups:** HF-02 Catálogo y HF-05 Solicitud con archivo.
+**Siguiente foco recomendado:** extraer el Design System y construir el shell/Home en React conservando HF-01 como referencia. La validación 375/768/1280+, accesibilidad y rúbrica se hará sobre esa implementación; después se continúa con HF-02 Catálogo y HF-05 Solicitud con archivo.
 
 ## Calidad
 
