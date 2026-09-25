@@ -172,3 +172,15 @@ La primera propuesta de HF-08 existe pero todavía no está congelada. Gemini de
 - corregir stepper contextual.
 
 No avanzar todavía a aprobación HF-08. Hacer una iteración de UXMagic con estas correcciones y luego validar nuevamente.
+
+
+## HF-08 — estado 2026-09-25
+
+La segunda salida de UXMagic todavía no está aprobada. Gemini sigue detectando los cinco problemas prioritarios originales. La siguiente iteración debe ser **edición dirigida**, no rediseño:
+1. bloque SINPE independiente con destino demostrativo/configurable;
+2. Entrega separada de Método de Pago;
+3. Contacto y Facturación separados en checkout de cotización;
+4. fecha exacta de vencimiento visible;
+5. stepper contextual sin "Items" en cotización.
+
+No congelar HF-08 hasta que esos cinco puntos queden resueltos.
