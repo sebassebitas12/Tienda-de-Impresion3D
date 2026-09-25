@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 320" width="100%" height="100%">
+  <defs>
+    <!-- Fondo y retícula -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#161412" />
+      <stop offset="100%" stop-color="#0E0D0B" />
+    </linearGradient>
+    <linearGradient id="accentLava" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A45" />
+      <stop offset="50%" stop-color="#FF5A1F" />
+      <stop offset="100%" stop-color="#D94400" />
+    </linearGradient>
+    <radialGradient id="glowCenter" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(255, 90, 31, 0.16)" />
+      <stop offset="100%" stop-color="transparent" />
+    </radialGradient>
+    <pattern id="cadGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255, 255, 255, 0.03)" stroke-width="1" />
+    </pattern>
+  </defs>
+
+  <!-- Fondo base -->
+  <rect width="100%" height="100%" fill="url(#bgGrad)" />
+  <rect width="100%" height="100%" fill="url(#cadGrid)" />
+  <circle cx="200" cy="140" r="100" fill="url(#glowCenter)" />
+
+  <!-- Marco técnico con esquinas acentuadas -->
+  <rect x="12" y="12" width="376" height="296" rx="6" fill="none" stroke="#26231F" stroke-width="1" />
+  <!-- Esquinas técnicas -->
+  <path d="M 12 28 L 12 12 L 28 12" fill="none" stroke="#FF5A1F" stroke-width="2" />
+  <path d="M 388 28 L 388 12 L 372 12" fill="none" stroke="#FF5A1F" stroke-width="2" />
+  <path d="M 12 292 L 12 308 L 28 308" fill="none" stroke="#FF5A1F" stroke-width="2" />
+  <path d="M 388 292 L 388 308 L 372 308" fill="none" stroke="#FF5A1F" stroke-width="2" />
+
+  <!-- Isometría 3D de Cubo de Calibración / Modelo en proceso -->
+  <g transform="translate(200, 135)">
+    <!-- Base de sombra -->
+    <ellipse cx="0" cy="55" rx="55" ry="14" fill="rgba(0,0,0,0.5)" filter="blur(4px)" />
+
+    <!-- Caras isométricas del cubo de calibración 3D -->
+    <!-- Cara superior -->
+    <polygon points="0,-45 42,-21 0,3 -42,-21" fill="#24211D" stroke="url(#accentLava)" stroke-width="1.8" />
+    <!-- Cara derecha -->
+    <polygon points="42,-21 42,28 0,52 0,3" fill="#1C1A17" stroke="url(#accentLava)" stroke-width="1.8" />
+    <!-- Cara izquierda -->
+    <polygon points="-42,-21 -42,28 0,52 0,3" fill="#151412" stroke="url(#accentLava)" stroke-width="1.8" />
+
+    <!-- Líneas de extrusión de filamento (Layer lines) -->
+    <line x1="-42" y1="-8" x2="0" y2="16" stroke="rgba(255, 90, 31, 0.4)" stroke-width="1" stroke-dasharray="2 2" />
+    <line x1="0" y1="16" x2="42" y2="-8" stroke="rgba(255, 90, 31, 0.4)" stroke-width="1" stroke-dasharray="2 2" />
+    <line x1="-42" y1="5" x2="0" y2="29" stroke="rgba(255, 90, 31, 0.4)" stroke-width="1" stroke-dasharray="2 2" />
+    <line x1="0" y1="29" x2="42" y2="5" stroke="rgba(255, 90, 31, 0.4)" stroke-width="1" stroke-dasharray="2 2" />
+    <line x1="-42" y1="18" x2="0" y2="42" stroke="rgba(255, 90, 31, 0.4)" stroke-width="1" stroke-dasharray="2 2" />
+    <line x1="0" y1="42" x2="42" y2="18" stroke="rgba(255, 90, 31, 0.4)" stroke-width="1" stroke-dasharray="2 2" />
+
+    <!-- Vértices con micro-nodos térmicos -->
+    <circle cx="0" cy="-45" r="3.5" fill="#FF5A1F" />
+    <circle cx="42" cy="-21" r="3.5" fill="#FF5A1F" />
+    <circle cx="-42" cy="-21" r="3.5" fill="#FF5A1F" />
+    <circle cx="0" cy="3" r="3.5" fill="#EDE8E0" />
+    <circle cx="0" cy="52" r="3.5" fill="#FF5A1F" />
+    <circle cx="42" cy="28" r="3.5" fill="#FF5A1F" />
+    <circle cx="-42" cy="28" r="3.5" fill="#FF5A1F" />
+
+    <!-- Retícula de cota en X, Y, Z -->
+    <path d="M 52 -21 L 65 -14 L 65 35" fill="none" stroke="#5C5852" stroke-width="1" stroke-dasharray="2 2" />
+    <text x="70" y="10" fill="#8A8884" font-family="'JetBrains Mono', monospace" font-size="9">Z: 40mm</text>
+  </g>
+
+  <!-- Tipografía y Metadatos Técnicos -->
+  <text x="200" y="235" text-anchor="middle" fill="#EDE8E0" font-family="'Space Grotesk', sans-serif" font-size="13" font-weight="700" letter-spacing="0.06em">
+    VÉRTICE CR // MODELO EN PREPARACIÓN
+  </text>
+  
+  <text x="200" y="255" text-anchor="middle" fill="#8A8884" font-family="'JetBrains Mono', monospace" font-size="10" letter-spacing="0.04em">
+    RENDER 3D NO DISPONIBLE · CONSULTAR FICHA TÉCNICA
+  </text>
+
+  <!-- Badges técnicos inferiores -->
+  <g transform="translate(110, 275)">
+    <rect width="80" height="18" rx="2" fill="#1E1C19" stroke="#2E2B26" stroke-width="1" />
+    <text x="40" y="12" text-anchor="middle" fill="#FF5A1F" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700">FDM / SLA</text>
+  </g>
+  <g transform="translate(205, 275)">
+    <rect width="85" height="18" rx="2" fill="#1E1C19" stroke="#2E2B26" stroke-width="1" />
+    <text x="42" y="12" text-anchor="middle" fill="#8A8884" font-family="'JetBrains Mono', monospace" font-size="9">±0.05 MM</text>
+  </g>
+</svg>

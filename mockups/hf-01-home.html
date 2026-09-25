@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VÉRTICE CR — Impresión 3D de Alta Precisión en Costa Rica</title>
+  <meta name="description" content="Laboratorio de manufactura aditiva y desarrollo 3D de alta precisión en Costa Rica. Piezas funcionales, prototipos de ingeniería y producción a medida." />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ==========================================================================
+       TOKENS OFICIALES DEL SISTEMA VÉRTICE CR
+       Obsidian Precision Forge + Lava Orgánica (docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md)
+       ========================================================================== */
+    :root {
+      /* Tema Dark (Obsidian + Lava) */
+      --color-bg:              #0D0B09;
+      --color-surface:         #141412;
+      --color-surface-2:       #1E1C19;
+      --color-surface-3:       #25221E;
+      --color-border:          #2A2723;
+      --color-border-subtle:   #1A1816;
+      --color-border-bright:   #3D372F;
+
+      /* Acento térmico Lava */
+      --color-accent:          #FF5A1F;
+      --color-accent-lit:      #FF7A45;
+      --color-accent-dim:      #E03D00;
+      --color-accent-glow:     rgba(255, 90, 31, 0.28);
+      --color-accent-subtle:   rgba(255, 90, 31, 0.08);
+
+      /* Texto */
+      --color-text:            #EDE8E0;
+      --color-text-muted:      #8A8884;
+      --color-text-dim:        #5C5852;
+
+      /* Semánticos */
+      --color-success:         #2ECC71;
+      --color-error:           #FF4444;
+      --color-warning:         #F5A623;
+      --color-pending:         #8A8884;
+
+      /* Tipografía */
+      --font-display:          'Space Grotesk', system-ui, -apple-system, sans-serif;
+      --font-mono:             'JetBrains Mono', 'Courier New', monospace;
+
+      /* Geometría */
+      --radius-sharp:          2px;   /* inputs, badges técnicos, cotas */
+      --radius-card:           6px;   /* cards de producto y secciones */
+      --radius-hero:           12px;  /* panel visor hero */
+      --radius-pill:           9999px;
+
+      /* Motion */
+      --motion-micro:          150ms ease;
+      --motion-ui:             220ms cubic-bezier(0.4, 0, 0.2, 1);
+      --motion-reveal:         400ms cubic-bezier(0.4, 0, 0.2, 1);
+      --motion-smooth:         600ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="light"] {
+      --color-bg:              #F5F3F0;
+      --color-surface:         #FFFFFF;
+      --color-surface-2:       #EDEAE6;
+      --color-surface-3:       #E4E0DB;
+      --color-border:          #CEC9C2;
+      --color-border-subtle:   #DDD7CE;
+      --color-border-bright:   #B0A89C;
+
+      --color-accent:          #D94400;
+      --color-accent-lit:      #FF5A1F;
+      --color-accent-dim:      #B83900;
+      --color-accent-glow:     rgba(217, 68, 0, 0.20);
+      --color-accent-subtle:   rgba(217, 68, 0, 0.06);
+
+      --color-text:            #1A1816;
+      --color-text-muted:      #6B6560;
+      --color-text-dim:        #948D84;
+
+      --color-success:         #1A8C4E;
+      --color-error:           #CC2200;
+      --color-warning:         #C07B00;
+      --color-pending:         #6B6560;
+    }
+
+    /* Reset & Base */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      transition: background-color var(--motion-ui), color var(--motion-ui);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { border: none; background: none; cursor: pointer; font-family: inherit; color: inherit; }
+
+    /* Accesibilidad WCAG: foco visible */
+    :focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+
+    /* Accesibilidad: Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* ==========================================================================
+       NAVBAR OFICIAL DE STITCH (docs/03-UX-Y-FLUJOS.md)
+       ========================================================================== */
+    .stitch-navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: 72px;
+      background: rgba(13, 11, 9, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--color-border);
+      transition: background-color var(--motion-ui), border-color var(--motion-ui);
+    }
+    [data-theme="light"] .stitch-navbar {
+      background: rgba(245, 243, 240, 0.90);
+    }
+
+    .navbar-inner {
+      max-width: 1360px; height: 100%; margin: 0 auto;
+      padding: 0 36px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .brand-group {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .brand-logo-img {
+      width: 32px; height: 32px; object-fit: contain;
+      filter: drop-shadow(0 2px 8px rgba(255, 90, 31, 0.35));
+      transition: transform var(--motion-micro);
+    }
+    .brand-group:hover .brand-logo-img {
+      transform: scale(1.06) rotate(-2deg);
+    }
+    .brand-text-name {
+      font-size: 17px; font-weight: 700; letter-spacing: 0.16em;
+      color: var(--color-text); text-transform: uppercase;
+    }
+
+    .nav-menu {
+      display: flex; align-items: center; gap: 32px;
+      list-style: none;
+    }
+    .nav-item-link {
+      font-size: 13px; font-weight: 500; letter-spacing: 0.02em;
+      color: var(--color-text-muted);
+      position: relative; padding: 6px 0;
+      transition: color var(--motion-micro);
+    }
+    .nav-item-link:hover { color: var(--color-text); }
+    .nav-item-link.active {
+      color: var(--color-text);
+      font-weight: 600;
+    }
+    .nav-item-link.active::after {
+      content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px;
+      background: var(--color-accent);
+      box-shadow: 0 0 10px var(--color-accent);
+      border-radius: var(--radius-pill);
+    }
+
+    .nav-actions {
+      display: flex; align-items: center; gap: 14px;
+      position: relative;
+    }
+
+    .btn-stitch-quote {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 18px;
+      background: rgba(255, 90, 31, 0.12);
+      border: 1px solid rgba(255, 90, 31, 0.40);
+      color: var(--color-accent);
+      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      border-radius: var(--radius-sharp);
+      transition: all var(--motion-micro);
+    }
+    .btn-stitch-quote:hover {
+      background: var(--color-accent);
+      color: #0D0B09;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 20px var(--color-accent-glow);
+      transform: translateY(-1px);
+    }
+
+    .theme-switch-btn {
+      width: 38px; height: 38px;
+      border-radius: var(--radius-sharp);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-muted);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      transition: all var(--motion-micro);
+    }
+    .theme-switch-btn:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+
+    .hamburger-btn {
+      width: 38px; height: 38px;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      gap: 5px; cursor: pointer;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sharp);
+      background: var(--color-surface);
+      transition: all var(--motion-micro);
+    }
+    .hamburger-btn:hover {
+      border-color: var(--color-border-bright);
+      background: var(--color-surface-2);
+    }
+    .hamburger-line {
+      width: 18px; height: 2px; background: var(--color-text);
+      transition: transform var(--motion-micro), opacity var(--motion-micro);
+    }
+    .hamburger-line.short { width: 12px; margin-left: -6px; }
+
+    /* Menú Desplegable Oficial Stitch (mockups/lista plegable.jpg) */
+    .dropdown-menu-stitch {
+      position: absolute; top: 52px; right: 0;
+      width: 250px;
+      background: rgba(22, 20, 17, 0.96);
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.65);
+      backdrop-filter: blur(20px);
+      padding: 10px 8px;
+      display: none; flex-direction: column; gap: 4px;
+      z-index: 200;
+      animation: menuPop 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    [data-theme="light"] .dropdown-menu-stitch {
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.14);
+    }
+    .dropdown-menu-stitch.open { display: flex; }
+    @keyframes menuPop {
+      from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .dropdown-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 12px;
+      border-radius: 4px;
+      font-size: 13px; color: var(--color-text);
+      transition: background var(--motion-micro);
+    }
+    .dropdown-item:hover { background: var(--color-surface-2); }
+    .dropdown-item-left { display: flex; align-items: center; gap: 10px; }
+    .dropdown-badge-count {
+      background: var(--color-accent); color: #fff; font-size: 10px; font-weight: 700;
+      padding: 1px 6px; border-radius: var(--radius-pill);
+    }
+    .dropdown-divider { height: 1px; background: var(--color-border); margin: 6px 4px; }
+
+    /* ==========================================================================
+       HERO PRINCIPAL DE STITCH (Visor Fotográfico Fiel + Cotas CAD)
+       ========================================================================== */
+    .stitch-hero {
+      position: relative;
+      min-height: 100vh;
+      padding-top: 100px;
+      padding-bottom: 60px;
+      display: flex; align-items: center;
+      background: 
+        radial-gradient(circle at 65% 45%, rgba(255, 90, 31, 0.12) 0%, transparent 60%),
+        radial-gradient(circle at 20% 80%, rgba(255, 90, 31, 0.04) 0%, transparent 50%),
+        var(--color-bg);
+      overflow: hidden;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .hero-grid-bg {
+      position: absolute; inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .hero-container {
+      max-width: 1360px; width: 100%; margin: 0 auto;
+      padding: 0 36px;
+      display: grid; grid-template-columns: 1.05fr 1fr;
+      align-items: center; gap: 48px;
+      position: relative; z-index: 2;
+    }
+
+    .hero-left-content { max-width: 580px; }
+    .hero-eyebrow-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-pill);
+      font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+      letter-spacing: 0.12em; color: var(--color-accent);
+      text-transform: uppercase; margin-bottom: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
+    .eyebrow-pulse-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--color-accent);
+      box-shadow: 0 0 8px var(--color-accent);
+      animation: pulseThermal 2s infinite ease-in-out;
+    }
+    @keyframes pulseThermal {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.8); }
+    }
+
+    .hero-main-title {
+      font-size: clamp(42px, 4.8vw, 64px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 22px;
+      color: var(--color-text);
+    }
+    .hero-main-title .orange-lit {
+      color: var(--color-accent);
+      text-shadow: 0 0 28px rgba(255, 90, 31, 0.40);
+    }
+
+    .hero-subtitle-p {
+      font-size: 16px;
+      color: var(--color-text-muted);
+      line-height: 1.7;
+      margin-bottom: 34px;
+    }
+
+    .hero-cta-row {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 48px;
+    }
+    .btn-stitch-hero-action {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 28px;
+      background: var(--color-accent);
+      color: #0D0B09;
+      font-size: 14px; font-weight: 700;
+      letter-spacing: 0.04em;
+      border-radius: var(--radius-card);
+      box-shadow: 0 8px 25px var(--color-accent-glow);
+      transition: all var(--motion-micro);
+    }
+    .btn-stitch-hero-action:hover {
+      background: var(--color-accent-lit);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(255, 90, 31, 0.45);
+    }
+    .btn-stitch-hero-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 22px;
+      background: transparent;
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+      font-size: 14px; font-weight: 600;
+      border-radius: var(--radius-card);
+      transition: all var(--motion-micro);
+    }
+    .btn-stitch-hero-secondary:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      background: var(--color-accent-subtle);
+    }
+
+    .hero-pillars-row {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; padding-top: 24px;
+      border-top: 1px solid var(--color-border);
+    }
+    .pillar-box { display: flex; flex-direction: column; gap: 4px; }
+    .pillar-top {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 13px; font-weight: 700; color: var(--color-text);
+    }
+    .pillar-icon-circle {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 1px solid var(--color-accent);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-accent); font-size: 10px; flex-shrink: 0;
+    }
+    .pillar-desc {
+      font-size: 11px; color: var(--color-text-muted);
+      padding-left: 25px;
+    }
+
+    /* ==========================================================================
+       VISOR DE PRODUCTO DEL HERO (Imágenes Reales 3D + Riel Stitch)
+       ========================================================================== */
+    .hero-workbench-layout {
+      display: flex; align-items: stretch; gap: 18px;
+      position: relative;
+    }
+
+    .stage-main-frame {
+      flex: 1; height: 500px;
+      background: #110F0D;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-hero);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.75);
+      display: flex; align-items: center; justify-content: center;
+    }
+    [data-theme="light"] .stage-main-frame {
+      background: #EDEAE6;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+    }
+
+    .stage-thermal-glow {
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 90, 31, 0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Rayo láser sutil de escaneo 3D */
+    .scan-laser-line {
+      position: absolute; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, #FF5A1F 30%, #FFA066 50%, #FF5A1F 70%, transparent);
+      box-shadow: 0 0 16px #FF5A1F;
+      opacity: 0.70;
+      animation: laserSweep 5.5s ease-in-out infinite alternate;
+      pointer-events: none; z-index: 5;
+    }
+    @keyframes laserSweep {
+      0% { top: 15%; opacity: 0.25; }
+      50% { opacity: 0.80; }
+      100% { top: 85%; opacity: 0.25; }
+    }
+
+    /* Badge de estado de escaneo decorativo */
+    .stage-scan-status-badge {
+      position: absolute; top: 16px; right: 20px; z-index: 15;
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(13, 11, 9, 0.85);
+      padding: 5px 10px; border-radius: var(--radius-sharp);
+      border: 1px solid var(--color-border);
+      backdrop-filter: blur(8px);
+      font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+      color: var(--color-text-muted); letter-spacing: 0.08em;
+      pointer-events: none; user-select: none;
+    }
+    .scan-dot-pulse {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--color-accent);
+      animation: pulseDot 1.8s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.7); }
+    }
+
+    /* Anotación técnica Stitch con línea de llamada dinámica (Leader Line Callout) */
+    .stitch-callout-wrap {
+      position: absolute; top: 28px; left: 28px; z-index: 10;
+      pointer-events: none;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .callout-text-group {
+      display: flex; flex-direction: column; gap: 2px;
+      font-family: var(--font-mono); font-size: 11px;
+    }
+    .callout-tag-primary {
+      font-weight: 700; color: var(--color-accent); letter-spacing: 0.12em;
+    }
+    .callout-tag-sub {
+      color: var(--color-text-muted); font-size: 10px; font-weight: 500;
+    }
+    .callout-leader-svg {
+      width: 220px; height: 140px;
+      overflow: visible; pointer-events: none;
+      margin-top: 4px;
+    }
+    .leader-line-path {
+      stroke: var(--color-accent);
+      stroke-width: 1.5px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: d 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .leader-target-dot {
+      fill: var(--color-accent);
+      transition: cx 280ms cubic-bezier(0.16, 1, 0.3, 1), cy 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .leader-target-pulse {
+      stroke: var(--color-accent);
+      stroke-width: 1px;
+      animation: pulseLeaderRing 2.2s infinite ease-in-out;
+      transition: cx 280ms cubic-bezier(0.16, 1, 0.3, 1), cy 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes pulseLeaderRing {
+      0% { r: 3px; opacity: 0.9; }
+      100% { r: 11px; opacity: 0; }
+    }
+
+    /* Retícula técnica '+' de Stitch */
+    .crosshair-target {
+      position: absolute; top: 130px; right: 55px;
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-accent); font-family: var(--font-mono); font-size: 14px;
+      opacity: 0.75; pointer-events: none;
+      animation: crossRotate 20s linear infinite;
+    }
+    @keyframes crossRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Contenedor de la Pieza con Fotografía Real de Alta Calidad */
+    .piece-render-canvas {
+      width: 400px; height: 380px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; z-index: 4;
+      transition: transform var(--motion-smooth), opacity var(--motion-ui);
+    }
+    
+    .hero-photo-img {
+      max-width: 95%; max-height: 95%;
+      object-fit: contain;
+      filter: drop-shadow(0 20px 35px rgba(0,0,0,0.85));
+      /* Fundido perimetral suave para eliminar cualquier borde rectangular */
+      -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 68%, rgba(0,0,0,0) 98%);
+      mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 68%, rgba(0,0,0,0) 98%);
+      transition: opacity var(--motion-ui), transform var(--motion-ui);
+    }
+
+    /* Ficha inferior de la pieza activa */
+    .stage-bottom-info {
+      position: absolute; bottom: 20px; left: 24px; right: 24px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      z-index: 10;
+    }
+    .piece-title-h3 {
+      font-size: 16px; font-weight: 700; color: var(--color-text);
+      line-height: 1.2; margin-bottom: 3px;
+    }
+    .piece-sub-desc {
+      font-size: 12px; color: var(--color-text-muted);
+    }
+    .piece-spec-badge {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+      color: var(--color-accent);
+      background: rgba(255, 90, 31, 0.12);
+      border: 1px solid rgba(255, 90, 31, 0.35);
+      padding: 4px 10px; border-radius: var(--radius-sharp);
+    }
+
+    /* Riel Vertical de Miniaturas (4 piezas oficiales Stitch) */
+    .vertical-thumbnails-rail {
+      width: 78px;
+      display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+      gap: 8px;
+    }
+    .rail-arrow-btn {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-muted);
+      border-radius: var(--radius-sharp);
+      transition: color var(--motion-micro);
+    }
+    .rail-arrow-btn:hover { color: var(--color-text); }
+
+    .thumb-card-item {
+      width: 72px; height: 72px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative; cursor: pointer;
+      transition: all var(--motion-micro);
+      overflow: hidden; padding: 6px;
+    }
+    .thumb-card-item:hover {
+      border-color: var(--color-border-bright);
+      background: var(--color-surface-2);
+    }
+    .thumb-card-item.active {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 16px var(--color-accent-glow);
+    }
+    .thumb-card-item.active::after {
+      content: ''; position: absolute; right: -1px; top: 14px; bottom: 14px; width: 3px;
+      background: var(--color-accent);
+      border-radius: var(--radius-sharp);
+      box-shadow: 0 0 8px var(--color-accent);
+    }
+    .thumb-num-label {
+      position: absolute; top: 3px; left: 5px;
+      font-family: var(--font-mono); font-size: 8px; font-weight: 700;
+      color: var(--color-text-dim); z-index: 2;
+    }
+    .thumb-card-item.active .thumb-num-label { color: var(--color-accent); }
+    .thumb-photo-crop {
+      width: 50px; height: 50px; object-fit: contain;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+    }
+
+    /* ==========================================================================
+       SECCIÓN: PRODUCTOS DESTACADOS DEL CATÁLOGO (Estilo Stitch Limpio)
+       Regla crítica: HOME NO MUESTRA PRECIOS (AI_CONTEXT.md)
+       ========================================================================== */
+    .section-popular-products {
+      padding: 96px 0;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .popular-container {
+      max-width: 1360px; margin: 0 auto; padding: 0 36px;
+    }
+    .popular-header-row {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 48px;
+    }
+    .section-eyebrow-red {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.16em; color: var(--color-accent);
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .section-h2-title {
+      font-size: clamp(28px, 3vw, 40px); font-weight: 700;
+      letter-spacing: -0.02em; line-height: 1.15; color: var(--color-text);
+    }
+    .btn-view-all-catalog {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+      color: var(--color-accent); padding: 9px 16px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sharp);
+      transition: all var(--motion-micro);
+    }
+    .btn-view-all-catalog:hover {
+      border-color: var(--color-accent);
+      background: rgba(255, 90, 31, 0.08);
+      transform: translateX(2px);
+    }
+
+    /* Grid de Productos */
+    .popular-products-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    @media (max-width: 1024px) {
+      .popular-products-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .popular-products-grid { grid-template-columns: 1fr; }
+    }
+
+    .product-catalog-card {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      transition: transform var(--motion-micro), border-color var(--motion-micro), box-shadow var(--motion-micro);
+      position: relative;
+    }
+    .product-catalog-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--color-accent);
+      box-shadow: 0 16px 36px rgba(0,0,0,0.55);
+    }
+
+    /* Marco de imagen del producto */
+    .product-image-box {
+      height: 220px;
+      background: #110F0D;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    [data-theme="light"] .product-image-box { background: #EDEAE6; }
+    
+    .product-img-element {
+      max-width: 100%; max-height: 100%; object-fit: contain;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.65));
+      transition: transform var(--motion-ui);
+    }
+    .product-catalog-card:hover .product-img-element {
+      transform: scale(1.06);
+    }
+
+    .product-material-pill {
+      position: absolute; top: 12px; left: 12px;
+      font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+      color: var(--color-accent); letter-spacing: 0.08em;
+      padding: 3px 8px; background: rgba(13, 11, 9, 0.85);
+      border: 1px solid var(--color-border); border-radius: var(--radius-sharp);
+      backdrop-filter: blur(6px);
+    }
+    .product-stock-tag {
+      position: absolute; top: 12px; right: 12px;
+      font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+      padding: 3px 8px; border-radius: var(--radius-sharp);
+      background: rgba(46, 204, 113, 0.14); color: var(--color-success);
+      border: 1px solid rgba(46, 204, 113, 0.30);
+    }
+    .product-stock-tag.on-demand {
+      background: rgba(245, 166, 35, 0.14); color: #F5A623;
+      border-color: rgba(245, 166, 35, 0.30);
+    }
+    .product-stock-tag.fallback-demo {
+      background: rgba(255, 90, 31, 0.14); color: var(--color-accent);
+      border-color: rgba(255, 90, 31, 0.35);
+    }
+
+    .product-card-body {
+      padding: 22px;
+      display: flex; flex-direction: column; flex-grow: 1;
+    }
+    .product-card-ref-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .product-card-ref {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      color: var(--color-text-dim);
+    }
+    .product-card-spec-meta {
+      font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+      color: var(--color-accent);
+    }
+    .product-card-title {
+      font-size: 16px; font-weight: 700; color: var(--color-text);
+      line-height: 1.3; margin-bottom: 8px;
+    }
+    .product-card-desc {
+      font-size: 13px; color: var(--color-text-muted);
+      line-height: 1.55; margin-bottom: 20px; flex-grow: 1;
+    }
+    .product-card-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 16px; border-top: 1px solid var(--color-border);
+    }
+    .product-badge-category {
+      font-family: var(--font-mono); font-size: 11px;
+      color: var(--color-text-muted);
+    }
+    .btn-product-buy {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px;
+      background: var(--color-accent);
+      color: #0D0B09;
+      font-size: 11px; font-weight: 700;
+      border-radius: var(--radius-sharp);
+      transition: all var(--motion-micro);
+    }
+    .btn-product-buy:hover {
+      background: var(--color-accent-lit);
+      transform: translateY(-1px);
+    }
+
+    /* ==========================================================================
+       SECCIÓN: TECNOLOGÍA Y PRECISIÓN (Figura_1_Home_Landing Page.png)
+       ========================================================================== */
+    .section-tech-precision {
+      padding: 96px 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .tech-container {
+      max-width: 1360px; margin: 0 auto; padding: 0 36px;
+    }
+    .section-subtext {
+      font-size: 15px; color: var(--color-text-muted);
+      max-width: 620px; line-height: 1.6; margin-bottom: 48px;
+    }
+
+    .precision-cards-3-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    @media (max-width: 900px) {
+      .precision-cards-3-grid { grid-template-columns: 1fr; }
+    }
+
+    .precision-hero-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 36px 30px;
+      position: relative;
+      display: flex; flex-direction: column;
+      transition: transform var(--motion-micro), border-color var(--motion-micro), box-shadow var(--motion-micro);
+    }
+    .precision-hero-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--color-accent);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.45);
+    }
+    .precision-metric-row {
+      display: flex; align-items: baseline; gap: 8px;
+      margin-bottom: 16px;
+    }
+    .precision-big-num {
+      font-family: var(--font-mono); font-size: 44px; font-weight: 700;
+      color: var(--color-text); line-height: 1; letter-spacing: -0.03em;
+    }
+    .precision-metric-unit {
+      font-family: var(--font-mono); font-size: 18px; font-weight: 700;
+      color: var(--color-accent);
+    }
+    .precision-card-h4 {
+      font-size: 17px; font-weight: 700; color: var(--color-text);
+      margin-bottom: 10px;
+    }
+    .precision-card-desc {
+      font-size: 13px; color: var(--color-text-muted);
+      line-height: 1.6; margin-bottom: 24px; flex-grow: 1;
+    }
+    .precision-card-footer-tag {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      color: var(--color-accent);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .precision-card-footer-tag::before {
+      content: '⌖'; font-size: 12px;
+    }
+
+    /* ==========================================================================
+       SECCIÓN: CÓMO TRABAJAMOS / FLUJO DE TRABAJO (Figura_1_Home_Landing Page.png)
+       ========================================================================== */
+    .section-workflow-stitch {
+      padding: 96px 0;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .workflow-header-center {
+      text-align: center; max-width: 640px; margin: 0 auto 56px;
+    }
+
+    .workflow-cards-4-grid {
+      max-width: 1360px; margin: 0 auto; padding: 0 36px;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 1024px) {
+      .workflow-cards-4-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .workflow-cards-4-grid { grid-template-columns: 1fr; }
+    }
+
+    .workflow-step-card {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 30px 24px;
+      position: relative;
+      display: flex; flex-direction: column;
+      transition: transform var(--motion-micro), border-color var(--motion-micro);
+    }
+    .workflow-step-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--color-accent);
+    }
+    .workflow-step-num {
+      font-family: var(--font-mono); font-size: 26px; font-weight: 700;
+      color: var(--color-accent); margin-bottom: 16px; line-height: 1;
+    }
+    .workflow-step-title {
+      font-size: 16px; font-weight: 700; color: var(--color-text);
+      margin-bottom: 10px;
+    }
+    .workflow-step-text {
+      font-size: 12px; color: var(--color-text-muted);
+      line-height: 1.6; margin-bottom: 20px; flex-grow: 1;
+    }
+    .workflow-step-tag {
+      font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+      color: var(--color-text-dim);
+      padding-top: 12px; border-top: 1px solid var(--color-border);
+    }
+
+    /* ==========================================================================
+       SECCIÓN: COTIZACIÓN DIRECTA (PRINT CTA)
+       Regla crítica: PENDING_QUOTE / SIN COBRO PREVIO
+       ========================================================================== */
+    .section-quote-banner {
+      padding: 80px 0;
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .quote-banner-box {
+      max-width: 1360px; margin: 0 auto; padding: 0 36px;
+      background: radial-gradient(circle at 80% 50%, rgba(255, 90, 31, 0.14) 0%, transparent 60%), var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-hero);
+      padding: 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 36px;
+    }
+    @media (max-width: 850px) {
+      .quote-banner-box { flex-direction: column; align-items: flex-start; }
+    }
+
+    .quote-banner-left { max-width: 700px; }
+    .quote-rule-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px;
+      background: rgba(138, 136, 132, 0.12);
+      border: 1px solid var(--color-pending);
+      border-radius: var(--radius-sharp);
+      font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+      color: var(--color-text);
+      letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .quote-banner-h2 {
+      font-size: clamp(24px, 2.5vw, 34px); font-weight: 700;
+      line-height: 1.2; margin-bottom: 12px; color: var(--color-text);
+    }
+    .quote-banner-p {
+      font-size: 14px; color: var(--color-text-muted); line-height: 1.6;
+    }
+
+    .btn-quote-banner-cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 16px 32px;
+      background: var(--color-accent);
+      color: #0D0B09;
+      font-size: 14px; font-weight: 700;
+      letter-spacing: 0.04em;
+      border-radius: var(--radius-card);
+      box-shadow: 0 8px 25px var(--color-accent-glow);
+      transition: all var(--motion-micro);
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .btn-quote-banner-cta:hover {
+      background: var(--color-accent-lit);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(255, 90, 31, 0.45);
+    }
+
+    /* ==========================================================================
+       FOOTER OFICIAL DE STITCH (Figura_1_Home_Landing Page.png)
+       ========================================================================== */
+    .stitch-official-footer {
+      background: var(--color-bg);
+      padding: 72px 0 36px;
+      border-top: 1px solid var(--color-border);
+    }
+    .footer-inner-wrap {
+      max-width: 1360px; margin: 0 auto; padding: 0 36px;
+    }
+    .footer-top-columns {
+      display: grid; grid-template-columns: 1.4fr 1fr 1.2fr 1.2fr;
+      gap: 48px; margin-bottom: 56px;
+    }
+    @media (max-width: 960px) {
+      .footer-top-columns { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 540px) {
+      .footer-top-columns { grid-template-columns: 1fr; }
+    }
+
+    .footer-col-1 p {
+      font-size: 13px; color: var(--color-text-muted);
+      line-height: 1.7; margin-top: 16px; margin-bottom: 16px; max-width: 320px;
+    }
+    .footer-spec-tag {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      color: var(--color-accent);
+    }
+
+    .footer-heading-col {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.14em; color: var(--color-text);
+      text-transform: uppercase; margin-bottom: 18px;
+    }
+    .footer-menu-links {
+      list-style: none; display: flex; flex-direction: column; gap: 10px;
+    }
+    .footer-menu-links a {
+      font-size: 13px; color: var(--color-text-muted);
+      transition: color var(--motion-micro);
+    }
+    .footer-menu-links a:hover { color: var(--color-accent); }
+
+    .footer-location-text, .footer-payment-text {
+      font-size: 13px; color: var(--color-text-muted); line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    .footer-contact-item {
+      display: block; font-size: 13px; color: var(--color-text);
+      margin-bottom: 6px; transition: color var(--motion-micro);
+    }
+    .footer-contact-item:hover { color: var(--color-accent); }
+
+    .footer-bottom-bar {
+      padding-top: 28px;
+      border-top: 1px solid var(--color-border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--font-mono); font-size: 11px; color: var(--color-text-dim);
+    }
+    @media (max-width: 600px) {
+      .footer-bottom-bar { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       NAVBAR OFICIAL DE STITCH
+       ========================================================================== -->
+  <header class="stitch-navbar" role="banner">
+    <div class="navbar-inner">
+      
+      <!-- Marca Oficial Vértice CR -->
+      <a href="/" class="brand-group" aria-label="Vértice CR Inicio">
+        <img src="favicon.png" alt="Vértice CR Logo Monograma" class="brand-logo-img" />
+        <span class="brand-text-name">VÉRTICE CR</span>
+      </a>
+
+      <!-- Navegación Primaria -->
+      <nav aria-label="Navegación principal">
+        <ul class="nav-menu" role="list">
+          <li><a href="/" class="nav-item-link active" aria-current="page">Inicio</a></li>
+          <li><a href="/catalogo" class="nav-item-link">Tienda</a></li>
+          <li><a href="/nosotros" class="nav-item-link">Sobre nosotros</a></li>
+          <li><a href="/contacto" class="nav-item-link">Contáctenos</a></li>
+          <li><a href="/faq" class="nav-item-link">Preguntas frecuentes</a></li>
+        </ul>
+      </nav>
+
+      <!-- Acciones de Navegación -->
+      <div class="nav-actions">
+        <!-- CTA Cotización Técnica -->
+        <a href="/solicitud" class="btn-stitch-quote">
+          <span>Cotizar STL</span>
+        </a>
+
+        <!-- Switch de Tema Dark/Light -->
+        <button class="theme-switch-btn" id="theme-btn" aria-label="Cambiar tema de color" title="Alternar modo Claro / Oscuro">
+          <svg id="theme-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg id="theme-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+
+        <!-- Botón Menú Hamburger (Stitch) -->
+        <button class="hamburger-btn" id="menu-toggle-btn" aria-label="Abrir menú de usuario" aria-expanded="false">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line short"></span>
+          <span class="hamburger-line"></span>
+        </button>
+
+        <!-- Menú Desplegable (lista plegable.jpg) -->
+        <div class="dropdown-menu-stitch" id="user-dropdown-panel" role="menu">
+          <a href="/perfil" class="dropdown-item" role="menuitem">
+            <div class="dropdown-item-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+              <span>Javier A. (Admin)</span>
+            </div>
+          </a>
+          <a href="/notificaciones" class="dropdown-item" role="menuitem">
+            <div class="dropdown-item-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span>Notificaciones</span>
+            </div>
+            <span class="dropdown-badge-count">3</span>
+          </a>
+          <a href="/configuracion" class="dropdown-item" role="menuitem">
+            <div class="dropdown-item-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Configuración</span>
+            </div>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="/facturacion" class="dropdown-item" role="menuitem">
+            <div class="dropdown-item-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              <span>Facturación</span>
+            </div>
+          </a>
+          <a href="/ayuda" class="dropdown-item" role="menuitem">
+            <div class="dropdown-item-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Ayuda y Soporte</span>
+            </div>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="/logout" class="dropdown-item" role="menuitem">
+            <div class="dropdown-item-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <span>Cerrar sesión</span>
+            </div>
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       HERO PRINCIPAL DE STITCH (Visor Fotográfico Fiel + Riel Vertical)
+       ========================================================================== -->
+  <main id="main-content">
+    <section class="stitch-hero" aria-label="Hero principal">
+      <div class="hero-grid-bg" aria-hidden="true"></div>
+
+      <div class="hero-container">
+        
+        <!-- Contenido Izquierdo -->
+        <div class="hero-left-content">
+          <div class="hero-eyebrow-chip">
+            <span class="eyebrow-pulse-dot" aria-hidden="true"></span>
+            <span>IDEAS QUE SE CONVIERTEN EN OBJETOS</span>
+          </div>
+
+          <h1 class="hero-main-title">
+            De una idea,<br />
+            a <span class="orange-lit">algo real.</span>
+          </h1>
+
+          <p class="hero-subtitle-p">
+            Diseñamos, imprimimos y fabricamos piezas funcionales y de colección 
+            con tecnología de última generación. Desde prototipos hasta soluciones 
+            personalizadas en Costa Rica.
+          </p>
+
+          <div class="hero-cta-row">
+            <a href="#productos-populares" class="btn-stitch-hero-action" id="hero-store-btn">
+              <span>Ver catálogo</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+            <a href="/solicitud" class="btn-stitch-hero-secondary">
+              <span>Cotizar a medida</span>
+            </a>
+          </div>
+
+          <div class="hero-pillars-row" aria-label="Ventajas principales de manufactura">
+            <div class="pillar-box">
+              <div class="pillar-top">
+                <div class="pillar-icon-circle">⌖</div>
+                <span>Alta precisión</span>
+              </div>
+              <div class="pillar-desc">Tolerancia ±0.05 mm</div>
+            </div>
+            <div class="pillar-box">
+              <div class="pillar-top">
+                <div class="pillar-icon-circle">🛡</div>
+                <span>Materiales técnicos</span>
+              </div>
+              <div class="pillar-desc">PETG, Nylon CF y ASA</div>
+            </div>
+            <div class="pillar-box">
+              <div class="pillar-top">
+                <div class="pillar-icon-circle">⚙</div>
+                <span>Diseño a medida</span>
+              </div>
+              <div class="pillar-desc">Revisión y cotización</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lado Derecho: Visor de Alta Fidelidad de la Pieza 3D (Stitch Workbench) -->
+        <div class="hero-workbench-layout" id="workbench-zone">
+          
+          <div class="stage-main-frame" id="stage-frame">
+            <div class="stage-thermal-glow" aria-hidden="true"></div>
+            <div class="scan-laser-line" aria-hidden="true"></div>
+
+            <!-- Badge decorativo de estado de escaneo -->
+            <div class="stage-scan-status-badge" aria-hidden="true">
+              <span class="scan-dot-pulse"></span>
+              <span>ESCANEANDO</span>
+            </div>
+
+            <!-- Anotación Técnica Stitch con Línea Guía Dinámica -->
+            <div class="stitch-callout-wrap" aria-hidden="true">
+              <div class="callout-text-group">
+                <span class="callout-tag-primary" id="callout-material">PETG PRO</span>
+                <span class="callout-tag-sub" id="callout-process">/ ESTRUCTURA LATTICE</span>
+              </div>
+              <svg class="callout-leader-svg" viewBox="0 0 220 140" fill="none">
+                <path id="callout-line-path" class="leader-line-path" d="M 0 6 L 55 6 L 130 75" />
+                <circle id="callout-dot-pulse" class="leader-target-pulse" cx="130" cy="75" r="3" />
+                <circle id="callout-dot" class="leader-target-dot" cx="130" cy="75" r="3" />
+              </svg>
+            </div>
+
+            <!-- Retícula técnica '+' de precisión -->
+            <div class="crosshair-target" aria-hidden="true">
+              <svg viewBox="0 0 30 30" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="15" cy="15" r="9" stroke-dasharray="3 3"/>
+                <line x1="3" y1="15" x2="27" y2="15"/>
+                <line x1="15" y1="3" x2="15" y2="27"/>
+              </svg>
+            </div>
+
+            <!-- Visor con Imagen Fotográfica Real y Textura de Impresión 3D -->
+            <div class="piece-render-canvas" id="active-piece-container" aria-hidden="true">
+              <!-- Imagen Fotográfica Real de Alta Resolución -->
+              <img id="hero-main-photo" 
+                   src="images/hero-soporte.jpg" 
+                   alt="Soporte Modular de Carga Lattice PETG" 
+                   class="hero-photo-img" 
+                   onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
+            </div>
+
+            <!-- Ficha inferior de la pieza activa -->
+            <div class="stage-bottom-info">
+              <div>
+                <h2 class="piece-title-h3" id="piece-name-display">Soporte Modular de Carga</h2>
+                <div class="piece-sub-desc" id="piece-desc-display">Estructura mecánica con alivios lattice de alta rigidez</div>
+              </div>
+              <div class="piece-spec-badge" id="piece-spec-tag">REF: PRT-001 · ±0.05 mm</div>
+            </div>
+
+          </div>
+
+          <!-- Riel Vertical de Miniaturas (Las 4 piezas con imágenes reales) -->
+          <div class="vertical-thumbnails-rail" role="tablist" aria-label="Selector de piezas destacadas">
+            <button class="rail-arrow-btn" id="thumb-prev-btn" aria-label="Pieza anterior">↑</button>
+
+            <!-- Card 01: Soporte Modular -->
+            <button class="thumb-card-item active" data-idx="0" role="tab" aria-selected="true" aria-label="Pieza 01: Soporte Modular">
+              <span class="thumb-num-label">01</span>
+              <img src="images/hero-soporte.jpg" alt="Miniatura Soporte Modular" class="thumb-photo-crop" onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
+            </button>
+
+            <!-- Card 02: Engranaje Nylon -->
+            <button class="thumb-card-item" data-idx="1" role="tab" aria-selected="false" aria-label="Pieza 02: Engranaje Helicoidal">
+              <span class="thumb-num-label">02</span>
+              <img src="images/producto-engranaje.jpg" alt="Miniatura Engranaje" class="thumb-photo-crop" onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
+            </button>
+
+            <!-- Card 03: Dragón de Colección -->
+            <button class="thumb-card-item" data-idx="2" role="tab" aria-selected="false" aria-label="Pieza 03: Dragón Geométrico">
+              <span class="thumb-num-label">03</span>
+              <img src="images/producto-dragon.jpg" alt="Miniatura Dragón" class="thumb-photo-crop" onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
+            </button>
+
+            <!-- Card 04: Brazo Chasis Drone -->
+            <button class="thumb-card-item" data-idx="3" role="tab" aria-selected="false" aria-label="Pieza 04: Chasis Drone">
+              <span class="thumb-num-label">04</span>
+              <img src="images/producto-drone.jpg" alt="Miniatura Chasis Drone" class="thumb-photo-crop" onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
+            </button>
+
+            <button class="rail-arrow-btn" id="thumb-next-btn" aria-label="Siguiente pieza">↓</button>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+       SECCIÓN: PRODUCTOS DESTACADOS DEL CATÁLOGO
+       Regla Crítica: HOME NO MUESTRA PRECIOS (docs/04 y AI_CONTEXT.md)
+       Se presentan las 5 imágenes reales + 1 card demostrativa de fallback oficial
+       ========================================================================== -->
+    <section class="section-popular-products" id="productos-populares" aria-label="Productos destacados del catálogo">
+      <div class="popular-container">
+        
+        <div class="popular-header-row">
+          <div>
+            <div class="section-eyebrow-red">CATÁLOGO DESTACADO // MANUFACTURA ADITIVA</div>
+            <h2 class="section-h2-title">Piezas y Modelos Más Solicitados</h2>
+          </div>
+          <a href="/catalogo" class="btn-view-all-catalog">
+            <span>Explorar catálogo completo (18 piezas)</span>
+            <span>→</span>
+          </a>
+        </div>
+
+        <div class="popular-products-grid" role="list">
+          
+          <!-- Producto 1: Soporte Modular -->
+          <article class="product-catalog-card" role="listitem">
+            <div class="product-image-box">
+              <span class="product-material-pill">PETG PRO</span>
+              <span class="product-stock-tag">EN STOCK (14)</span>
+              <img src="images/hero-soporte.jpg" 
+                   alt="Soporte de Alta Precisión Modular" 
+                   class="product-img-element"
+                   onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
+            </div>
+            <div class="product-card-body">
+              <div class="product-card-ref-row">
+                <span class="product-card-ref">REF: PRT-001</span>
+                <span class="product-card-spec-meta">TOLERANCIA ±0.05 mm</span>
+              </div>
+              <h3 class="product-card-title">Soporte de Alta Precisión Modular</h3>
+              <p class="product-card-desc">Geometría lattice optimizada con alivios de peso Voronoi para montajes mecánicos y rigidez estructural.</p>
+              <div class="product-card-bottom">
+                <span class="product-badge-category">Piezas funcionales</span>
+                <a href="/catalogo/p1" class="btn-product-buy">Ver detalles →</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Producto 2: Engranaje Nylon 60T -->
+          <article class="product-catalog-card" role="listitem">
+            <div class="product-image-box">
+              <span class="product-material-pill">NYLON PA12</span>
+              <span class="product-stock-tag">EN STOCK (21)</span>
+              <img src="images/producto-engranaje.jpg" 
+                   alt="Engranaje Helicoidal de Precisión 60T" 
+                   class="product-img-element" 
+                   onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
+            </div>
+            <div class="product-card-body">
+              <div class="product-card-ref-row">
+                <span class="product-card-ref">REF: PRT-002</span>
+                <span class="product-card-spec-meta">MÓDULO 2.0</span>
+              </div>
+              <h3 class="product-card-title">Engranaje de Nylon de Precisión 60T</h3>
+              <p class="product-card-desc">Dientes helicoidales sinterizados para transmisión de bajo nivel sonoro y resistencia continua al desgaste.</p>
+              <div class="product-card-bottom">
+                <span class="product-badge-category">Mecánica / Robótica</span>
+                <a href="/catalogo/p5" class="btn-product-buy">Ver detalles →</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Producto 3: Dragón de Colección -->
+          <article class="product-catalog-card" role="listitem">
+            <div class="product-image-box">
+              <span class="product-material-pill">PLA SILK</span>
+              <span class="product-stock-tag on-demand">BAJO PEDIDO</span>
+              <img src="images/producto-dragon.jpg" 
+                   alt="Dragón Articulado Geométrico Low-Poly" 
+                   class="product-img-element" 
+                   onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
+            </div>
+            <div class="product-card-body">
+              <div class="product-card-ref-row">
+                <span class="product-card-ref">REF: PRT-003</span>
+                <span class="product-card-spec-meta">ACABADO IRIDISCENTE</span>
+              </div>
+              <h3 class="product-card-title">Dragón de Colección Geométrico</h3>
+              <p class="product-card-desc">Escultura de facetas low-poly con articulaciones internas continuas impresas en una sola pieza móvil.</p>
+              <div class="product-card-bottom">
+                <span class="product-badge-category">Colección / Arte</span>
+                <a href="/catalogo/p3" class="btn-product-buy">Ver detalles →</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Producto 4: Brazo de Chasis Drone -->
+          <article class="product-catalog-card" role="listitem">
+            <div class="product-image-box">
+              <span class="product-material-pill">ASA CARBON</span>
+              <span class="product-stock-tag">EN STOCK (8)</span>
+              <img src="images/producto-drone.jpg" 
+                   alt="Brazo de Chasis de Drone Pro" 
+                   class="product-img-element"
+                   onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
+            </div>
+            <div class="product-card-body">
+              <div class="product-card-ref-row">
+                <span class="product-card-ref">REF: PRT-004</span>
+                <span class="product-card-spec-meta">RESISTENCIA UV</span>
+              </div>
+              <h3 class="product-card-title">Brazo de Chasis de Drone Pro</h3>
+              <p class="product-card-desc">Estructura tubular con montura para motor brushless de alta potencia y amortiguación elástica de impacto.</p>
+              <div class="product-card-bottom">
+                <span class="product-badge-category">Aeroespacial / Drones</span>
+                <a href="/catalogo/p2" class="btn-product-buy">Ver detalles →</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Producto 5: Maqueta de Edificio Rascacielos -->
+          <article class="product-catalog-card" role="listitem">
+            <div class="product-image-box">
+              <span class="product-material-pill">PLA HIGH DETAIL</span>
+              <span class="product-stock-tag on-demand">BAJO PEDIDO</span>
+              <img src="images/producto-maqueta.jpg" 
+                   alt="Maqueta de Rascacielos Cúbico" 
+                   class="product-img-element"
+                   onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
+            </div>
+            <div class="product-card-body">
+              <div class="product-card-ref-row">
+                <span class="product-card-ref">REF: PRT-005</span>
+                <span class="product-card-spec-meta">CAPA 0.08 mm</span>
+              </div>
+              <h3 class="product-card-title">Maqueta de Rascacielos Cúbico</h3>
+              <p class="product-card-desc">Modelo arquitectónico de precisión con vanos de ventanas definidos, terrazas y textura de fachada limpia.</p>
+              <div class="product-card-bottom">
+                <span class="product-badge-category">Arquitectura</span>
+                <a href="/catalogo/p4" class="btn-product-buy">Ver detalles →</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Producto 6: Demostración de Fallback Oficial (placeholder-product.jpg) -->
+          <article class="product-catalog-card" role="listitem">
+            <div class="product-image-box">
+              <span class="product-material-pill">RESINA 8K</span>
+              <span class="product-stock-tag fallback-demo">NUEVO LOTE</span>
+              <!-- Utiliza la imagen de reemplazo oficial generada para cuando no hay imagen disponible -->
+              <img src="placeholder-product.jpg" 
+                   alt="Busto de Precisión Demostrativo (Fallback)" 
+                   class="product-img-element"
+                   onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
+            </div>
+            <div class="product-card-body">
+              <div class="product-card-ref-row">
+                <span class="product-card-ref">REF: PRT-006</span>
+                <span class="product-card-spec-meta">FALLBACK DEMO</span>
+              </div>
+              <h3 class="product-card-title">Busto de Precisión Cibernético</h3>
+              <p class="product-card-desc">Muestra el fallback oficial en wireframe isométrico cuando la imagen técnica se encuentra en fase de procesado.</p>
+              <div class="product-card-bottom">
+                <span class="product-badge-category">Prototipo</span>
+                <a href="/catalogo" class="btn-product-buy">Ver detalles →</a>
+              </div>
+            </div>
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SECCIÓN: ESTÁNDARES DE CALIDAD / TECNOLOGÍA Y PRECISIÓN
+         ========================================================================== -->
+    <section class="section-tech-precision" aria-label="Tecnología y Precisión">
+      <div class="tech-container">
+        
+        <div class="section-eyebrow-red">ESTÁNDARES DE CALIDAD</div>
+        <h2 class="section-h2-title">Tecnología y Precisión</h2>
+        <p class="section-subtext">
+          Equipamiento industrial calibrado para ofrecer la máxima exactitud dimensional 
+          y acabados superficiales limpios en polímeros de ingeniería.
+        </p>
+
+        <div class="precision-cards-3-grid" role="list">
+          
+          <div class="precision-hero-card" role="listitem">
+            <div class="precision-metric-row">
+              <div class="precision-big-num">±0.05</div>
+              <div class="precision-metric-unit">mm</div>
+            </div>
+            <h3 class="precision-card-h4">Tolerancia Dimensional</h3>
+            <p class="precision-card-desc">
+              Tolerancia garantizada para ensambles mecánicos precisos, acoples sin juego 
+              y especificaciones industriales exigentes.
+            </p>
+            <div class="precision-card-footer-tag">Ajustes H7/g6 verificados</div>
+          </div>
+
+          <div class="precision-hero-card" role="listitem">
+            <div class="precision-metric-row">
+              <div class="precision-big-num">8K</div>
+              <div class="precision-metric-unit">Resina & FDM</div>
+            </div>
+            <h3 class="precision-card-h4">Grado Industrial</h3>
+            <p class="precision-card-desc">
+              Detalle microscópico para piezas estéticas y polímeros técnicos como PETG, 
+              Nylon con Fibra de Carbono, ASA resistente a UV y TPU flexible.
+            </p>
+            <div class="precision-card-footer-tag">FDM & SLA de alta densidad</div>
+          </div>
+
+          <div class="precision-hero-card" role="listitem">
+            <div class="precision-metric-row">
+              <div class="precision-big-num">24-48</div>
+              <div class="precision-metric-unit">h</div>
+            </div>
+            <h3 class="precision-card-h4">Despacho Ágil</h3>
+            <p class="precision-card-desc">
+              Prototipado rápido con envíos express en el GAM y cobertura garantizada 
+              a las 7 provincias de Costa Rica mediante Correos de Costa Rica.
+            </p>
+            <div class="precision-card-footer-tag">Entregas GAM & 7 Provincias</div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SECCIÓN: CÓMO TRABAJAMOS / FLUJO DE TRABAJO
+         ========================================================================== -->
+    <section class="section-workflow-stitch" aria-label="Flujo de trabajo">
+      <div class="workflow-header-center">
+        <div class="section-eyebrow-red">CÓMO TRABAJAMOS</div>
+        <h2 class="section-h2-title">Flujo de Trabajo</h2>
+        <p class="section-subtext" style="margin-bottom: 0;">
+          Un proceso directo y transparente desde el archivo digital hasta la pieza final verificada.
+        </p>
+      </div>
+
+      <div class="workflow-cards-4-grid" role="list">
+        
+        <div class="workflow-step-card" role="listitem">
+          <div class="workflow-step-num">01</div>
+          <h3 class="workflow-step-title">Carga de Archivo</h3>
+          <p class="workflow-step-text">Envíanos tu modelo en formato .STL, .STEP o .OBJ para revisión técnica de malla y orientación de capas.</p>
+          <div class="workflow-step-tag">Validación técnica previa</div>
+        </div>
+
+        <div class="workflow-step-card" role="listitem">
+          <div class="workflow-step-num">02</div>
+          <h3 class="workflow-step-title">Selección de Polímero</h3>
+          <p class="workflow-step-text">Definimos el material óptimo según esfuerzo mecánico, temperatura y acabado estético.</p>
+          <div class="workflow-step-tag">PETG, Nylon CF, Resina, ASA</div>
+        </div>
+
+        <div class="workflow-step-card" role="listitem">
+          <div class="workflow-step-num">03</div>
+          <h3 class="workflow-step-title">Fabricación Aditiva</h3>
+          <p class="workflow-step-text">Impresión de alta precisión con control térmico de cámara cerrada y supervisión continua.</p>
+          <div class="workflow-step-tag">Monitoreo dimensional</div>
+        </div>
+
+        <div class="workflow-step-card" role="listitem">
+          <div class="workflow-step-num">04</div>
+          <h3 class="workflow-step-title">Inspección y Despacho</h3>
+          <p class="workflow-step-text">Curado, verificación metrológica con calibrador digital y entrega segura hasta tu puerta.</p>
+          <div class="workflow-step-tag">Embalaje reforzado</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+       SECCIÓN: COTIZACIÓN DIRECTA (PRINT CTA)
+       Regla Crítica: PENDING_QUOTE / SIN COBRO PREVIO
+       ========================================================================== -->
+    <section class="section-quote-banner" aria-label="Cotización de proyectos personalizados">
+      <div class="quote-banner-box">
+        <div class="quote-banner-left">
+          <div class="quote-rule-pill">
+            <span>⏳ ESTADO: PENDIENTE DE COTIZACIÓN · SIN COBRO PREVIO</span>
+          </div>
+          <div class="section-eyebrow-red" style="margin-bottom: 6px;">COTIZACIÓN DIRECTA</div>
+          <h2 class="quote-banner-h2">¿Tenés un proyecto a medida o archivo propio?</h2>
+          <p class="quote-banner-p">
+            Subí tus especificaciones técnicas para recibir una cotización detallada con tiempos de entrega en menos de 2 horas.
+          </p>
+        </div>
+
+        <a href="/solicitud" class="btn-quote-banner-cta" id="banner-quote-btn">
+          <span>Cotizar archivo STL / STEP →</span>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       FOOTER OFICIAL DE STITCH
+       ========================================================================== -->
+  <footer class="stitch-official-footer" role="contentinfo">
+    <div class="footer-inner-wrap">
+      
+      <div class="footer-top-columns">
+        
+        <div class="footer-col-1">
+          <a href="/" class="brand-group">
+            <img src="favicon.png" alt="Vértice CR Logo Oficial" class="brand-logo-img" />
+            <span class="brand-text-name">VÉRTICE CR</span>
+          </a>
+          <p>
+            Manufactura aditiva de precisión y desarrollo de soluciones 3D en San José, Costa Rica. 
+            Tolerancia dimensional verificada de ±0.05 mm.
+          </p>
+          <div class="footer-spec-tag">● FDM / SLA Grado Industrial</div>
+        </div>
+
+        <div>
+          <div class="footer-heading-col">NAVEGACIÓN</div>
+          <ul class="footer-menu-links" role="list">
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/catalogo">Tienda & Catálogo</a></li>
+            <li><a href="/nosotros">Sobre nosotros</a></li>
+            <li><a href="/contacto">Contáctenos</a></li>
+            <li><a href="/faq">Preguntas frecuentes</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="footer-heading-col">UBICACIÓN</div>
+          <div class="footer-location-text">
+            San José, Costa Rica.<br />
+            Envíos diarios al GAM y a las 7 provincias mediante Correos de Costa Rica.
+          </div>
+          <a href="mailto:info@verticecr.com" class="footer-contact-item">info@verticecr.com</a>
+          <a href="tel:+50600000000" class="footer-contact-item">WhatsApp: +506 0000-0000</a>
+        </div>
+
+        <div>
+          <div class="footer-heading-col">MÉTODOS DE PAGO</div>
+          <div class="footer-payment-text">
+            SINPE Móvil, transferencias bancarias locales y tarjetas de crédito o débito (Visa / Mastercard). Factura electrónica de Hacienda disponible.
+          </div>
+          <div class="footer-contact-item" style="color: var(--color-accent); margin-top: 12px;">
+            🧾 Factura electrónica oficial CR
+          </div>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom-bar">
+        <div>© 2026 VÉRTICE CR - TODOS LOS DERECHOS RESERVADOS</div>
+        <div>PRECISIÓN ±0.05 MM · SAN JOSÉ, COSTA RICA</div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       SCRIPT INTERACTIVO CON FOTOGRAFÍAS REALES Y CONTROL CAD
+       ========================================================================== -->
+  <script>
+    (function() {
+      // 1. Datos de las 4 Piezas con Imágenes Reales y Coordenadas de Llamada Técnica Stitch
+      const piecesData = [
+        {
+          code: 'REF: PRT-001 · ±0.05 mm',
+          title: 'Soporte Modular de Carga',
+          sub: 'Estructura mecánica con alivios lattice de alta rigidez',
+          mat: 'PETG PRO',
+          proc: '/ ESTRUCTURA LATTICE',
+          imgSrc: 'images/hero-soporte.jpg',
+          alt: 'Soporte Modular de Carga Lattice PETG',
+          pathD: 'M 0 6 L 55 6 L 130 75',
+          dotX: 130,
+          dotY: 75
+        },
+        {
+          code: 'REF: PRT-002 · MOD 2.0',
+          title: 'Engranaje Helicoidal 60T M2',
+          sub: 'Nylon técnico de alta resistencia al desgaste mecánico',
+          mat: 'NYLON PA12',
+          proc: '/ MÓDULO 2.0 HELICOIDAL',
+          imgSrc: 'images/producto-engranaje.jpg',
+          alt: 'Engranaje Helicoidal 60T de Nylon de Alta Precisión',
+          pathD: 'M 0 6 L 50 6 L 115 95',
+          dotX: 115,
+          dotY: 95
+        },
+        {
+          code: 'REF: PRT-003 · 22µm SLA',
+          title: 'Dragón de Colección Geométrico',
+          sub: 'Escultura facetada low-poly con acabado iridiscente continuo',
+          mat: 'PLA SILK',
+          proc: '/ ARTICULACIÓN PRINT-IN-PLACE',
+          imgSrc: 'images/producto-dragon.jpg',
+          alt: 'Dragón Articulado Geométrico Low-Poly',
+          pathD: 'M 0 6 L 48 6 L 108 78',
+          dotX: 108,
+          dotY: 78
+        },
+        {
+          code: 'REF: PRT-004 · REINFORCED',
+          title: 'Brazo de Chasis de Drone Pro',
+          sub: 'Polímero técnico ASA reforzado para absorción de impactos y rayos UV',
+          mat: 'ASA CARBON',
+          proc: '/ ESTRUCTURA AEROESPACIAL',
+          imgSrc: 'images/producto-drone.jpg',
+          alt: 'Brazo de Chasis de Drone Pro de ASA Carbon',
+          pathD: 'M 0 6 L 60 6 L 140 85',
+          dotX: 140,
+          dotY: 85
+        }
+      ];
+
+      const heroImg = document.getElementById('hero-main-photo');
+      const pieceName = document.getElementById('piece-name-display');
+      const pieceDesc = document.getElementById('piece-desc-display');
+      const pieceSpec = document.getElementById('piece-spec-tag');
+      const calloutMat = document.getElementById('callout-material');
+      const calloutProc = document.getElementById('callout-process');
+      const calloutLinePath = document.getElementById('callout-line-path');
+      const calloutDot = document.getElementById('callout-dot');
+      const calloutDotPulse = document.getElementById('callout-dot-pulse');
+      const thumbBtns = document.querySelectorAll('.thumb-card-item');
+      let currentIdx = 0;
+      let autoTimer = null;
+
+      function displayPiece(idx) {
+        const item = piecesData[idx];
+        if (!item) return;
+
+        heroImg.style.opacity = '0';
+        heroImg.style.transform = 'scale(0.96)';
+
+        setTimeout(() => {
+          heroImg.src = item.imgSrc;
+          heroImg.alt = item.alt;
+          pieceName.textContent = item.title;
+          pieceDesc.textContent = item.sub;
+          pieceSpec.textContent = item.code;
+          calloutMat.textContent = item.mat;
+          calloutProc.textContent = item.proc;
+
+          // Actualizar posición de la línea guía técnica Stitch
+          if (calloutLinePath && calloutDot && calloutDotPulse) {
+            calloutLinePath.setAttribute('d', item.pathD);
+            calloutDot.setAttribute('cx', item.dotX);
+            calloutDot.setAttribute('cy', item.dotY);
+            calloutDotPulse.setAttribute('cx', item.dotX);
+            calloutDotPulse.setAttribute('cy', item.dotY);
+          }
+
+          thumbBtns.forEach((btn, i) => {
+            const isActive = i === idx;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          });
+
+          heroImg.style.opacity = '1';
+          heroImg.style.transform = 'scale(1)';
+        }, 120);
+
+        currentIdx = idx;
+      }
+
+      thumbBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const idx = parseInt(this.getAttribute('data-idx'), 10);
+          displayPiece(idx);
+          resetAutoCycle();
+        });
+      });
+
+      document.getElementById('thumb-prev-btn').addEventListener('click', () => {
+        const next = (currentIdx - 1 + piecesData.length) % piecesData.length;
+        displayPiece(next);
+        resetAutoCycle();
+      });
+
+      document.getElementById('thumb-next-btn').addEventListener('click', () => {
+        const next = (currentIdx + 1) % piecesData.length;
+        displayPiece(next);
+        resetAutoCycle();
+      });
+
+      function startAutoCycle() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        autoTimer = setInterval(() => {
+          const next = (currentIdx + 1) % piecesData.length;
+          displayPiece(next);
+        }, 6500);
+      }
+
+      function resetAutoCycle() {
+        clearInterval(autoTimer);
+        startAutoCycle();
+      }
+
+      startAutoCycle();
+
+      // Pausar auto-ciclo al interactuar con el visor
+      const stageFrame = document.getElementById('stage-frame');
+      const pieceContainer = document.getElementById('active-piece-container');
+      if (stageFrame) {
+        stageFrame.addEventListener('mouseenter', () => clearInterval(autoTimer));
+        stageFrame.addEventListener('mouseleave', () => resetAutoCycle());
+      }
+
+      // 2. Efecto Parallax 3D suave al mover el mouse en el Visor
+      if (stageFrame && pieceContainer && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        stageFrame.addEventListener('mousemove', (e) => {
+          const rect = stageFrame.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width - 0.5;
+          const y = (e.clientY - rect.top) / rect.height - 0.5;
+          pieceContainer.style.transform = `perspective(800px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg) scale(1.02)`;
+        });
+
+        stageFrame.addEventListener('mouseleave', () => {
+          pieceContainer.style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg) scale(1)';
+        });
+      }
+
+      // 3. Menú Desplegable Hamburger
+      const menuBtn = document.getElementById('menu-toggle-btn');
+      const dropdown = document.getElementById('user-dropdown-panel');
+
+      menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = dropdown.classList.toggle('open');
+        menuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target) && e.target !== menuBtn) {
+          dropdown.classList.remove('open');
+          menuBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      // 4. Toggle Dark/Light Mode
+      const themeBtn = document.getElementById('theme-btn');
+      const themeSun = document.getElementById('theme-sun');
+      const themeMoon = document.getElementById('theme-moon');
+      const root = document.documentElement;
+
+      function applyTheme(th) {
+        root.setAttribute('data-theme', th);
+        if (th === 'light') {
+          themeSun.style.display = 'block';
+          themeMoon.style.display = 'none';
+        } else {
+          themeSun.style.display = 'none';
+          themeMoon.style.display = 'block';
+        }
+        try { localStorage.setItem('vertice_theme_pref', th); } catch(e) {}
+      }
+
+      // Recuperar preferencia guardada
+      try {
+        const saved = localStorage.getItem('vertice_theme_pref');
+        if (saved) applyTheme(saved);
+      } catch(e) {}
+
+      themeBtn.addEventListener('click', () => {
+        const current = root.getAttribute('data-theme') || 'dark';
+        applyTheme(current === 'dark' ? 'light' : 'dark');
+      });
+
+    })();
+  </script>
+</body>
+</html>

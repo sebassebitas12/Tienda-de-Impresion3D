@@ -236,24 +236,46 @@ Observación de numeración resuelta: Contacto y Facturación son sub-secciones 
 
 Pendientes de iteración en UXMagic aplicando las reglas del cierre transversal de desktop.
 
-### HF-01 — Home
+### HF-01 — Home (Estado: Se ve bien pero NO terminado / En iteración)
 
-Correcciones obligatorias:
-- **Eliminar precio visible** en el showcase/cards del hero. Home no muestra precios — decisión de negocio cerrada.
-- **Datos inventados**: eliminar "3.6k piezas entregadas", "24/7 soporte técnico" y cualquier cifra operativa no derivada de datos reales.
-- **Catálogo en Home**: si existe una sección de productos hardcodeados en Home, eliminarla. Home presenta producto y rutas de acción, no catálogo.
+Iteración implementada en `mockups/hf-01-home.html` con base oficial en Stitch (`mockups/mainpage.jpg` y `mockups/HFcompletos/Figura_1_Home_Landing Page.png`).
 
-Refinamientos visuales:
-- Showcase: 5 cards de producto con código técnico (`PRT-01`), nombre y placeholder geométrico SVG representativo de categoría.
-- Hero H1 más directo.
-- Valores de Precision con JetBrains Mono — no claims de marketing.
-- Proceso de 4 pasos conectado con línea SVG fina, no iconografía decorativa.
-- Badge `PENDIENTE DE COTIZACIÓN` visible y legible en el CTA de impresión personalizada.
+**Puntos aprobados y consolidados:**
+- **Navbar oficial de Stitch:** Monograma `V` oficial (`favicon.png`), nombre `VÉRTICE CR`, navegación horizontal (*Inicio*, *Tienda*, *Sobre nosotros*, *Contáctenos*, *Preguntas frecuentes*), botón de cotización técnica y menú de usuario desplegable (`mockups/lista plegable.jpg`).
+- **Hero de Stitch:** Título *"De una idea, a algo real."*, badge *IDEAS QUE SE CONVIERTEN EN OBJETOS*, pilares de ingeniería (*Alta precisión*, *Materiales resistentes*, *Diseño a medida*) y botón *Ver catálogo*.
+- **Pie de página oficial de Stitch:** 4 columnas (marca con tolerancia $\pm 0.05\text{ mm}$, navegación, ubicación en San José con envíos a las 7 provincias, y métodos de pago con factura electrónica oficial).
+- **Regla de negocio crítica respetada:** En la sección de solicitud a medida, badge `PENDIENTE DE COTIZACIÓN · SIN COBRO PREVIO` claramente visible y sin inventar `precio × cantidad`.
 
-Accesibilidad aplicada:
-- Focus ring naranja en todos los CTAs.
-- Showcase con pausa en `hover` y `focus-within`; `prefers-reduced-motion` desactiva scroll infinito.
-- Imágenes de cards: `alt` con nombre del producto.
+**Cambios aplicados — 2026-09-25 (iteración 2):**
+1. **Toggle "CAD RAYOS-X" eliminado:** Reemplazado por un badge decorativo animado `● ESCANEANDO` en la esquina superior derecha del visor. No es interactivo (no confunde). La capa de anotaciones CAD ahora siempre está visible con opacidad 18%, sube al 32% en hover del frame — puramente decorativa.
+2. **Imagen fallback oficial generada:** `mockups/placeholder-product.jpg` — cubo isométrico wireframe naranja (Lava) sobre fondo oscuro (#0D0B09), con texto "SIN IMAGEN" en monospace.
+3. **Todos los `onerror`** actualizados de `placeholder-product.svg` → `placeholder-product.jpg` en hero, thumbnails y product cards.
+
+**Cambios aplicados — 2026-09-25 (iteración 3 — Reconstrucción con imágenes reales auditadas):**
+1. **Eliminación total de screenshots de software de diseño (`mainpage.jpg` y `tienda.jpg`):** Se reemplazaron todos los recortes con las 5 imágenes fotorrealistas de alta resolución auditadas en `mockups/images/`:
+   - `images/hero-soporte.jpg`: Soporte modular lattice PETG negro (Hero principal + Miniatura 01 + Card 01).
+   - `images/producto-engranaje.jpg`: Engranaje helicoidal Nylon PA12 gris oscuro (Miniatura 02 + Card 02).
+   - `images/producto-dragon.jpg`: Dragón low-poly PLA SILK iridiscente (Miniatura 03 + Card 03).
+   - `images/producto-drone.jpg`: Brazo de chasis drone ASA negro carbono (Miniatura 04 + Card 04).
+   - `images/producto-maqueta.jpg`: Maqueta arquitectónica de rascacielos PLA High Detail (Card 05).
+   - `placeholder-product.jpg`: Card 06 demostrativa con el fallback oficial wireframe en acción.
+2. **Eliminación estricta de precios en Home (`AI_CONTEXT.md` / Regla crítica #33):**
+   - Se removieron los precios (`₡8.500`, etc.) que estaban indebidamente presentes en la propuesta anterior.
+   - Cada tarjeta ahora muestra metadatos de ingeniería: código en JetBrains Mono (`REF: PRT-001`), tolerancias dimensionales (`±0.05 mm`), material, stock y acción `Ver detalles →`.
+3. **Hero Workbench interactivo fiel a Stitch (Corrección de diseño crítica):**
+   - **Eliminación total del SVG triangular hardcodeado:** Se eliminó la capa artificial que dibujaba un triángulo con cotas y círculos fijos sobre piezas no triangulares (como el engranaje helicoidal circular).
+   - **Línea de llamada técnica auténtica (*Leader Line Callout*):** Fiel a Stitch (`mainpage.jpg`), una línea fina naranja con punto térmico pulsante apunta con precisión al detalle técnico característico de cada pieza (`PETG PRO / ESTRUCTURA LATTICE`, `NYLON PA12 / MÓDULO 2.0 HELICOIDAL`, `PLA SILK / ARTICULACIÓN PRINT-IN-PLACE`, `ASA CARBON / ESTRUCTURA AEROESPACIAL`), actualizando sus coordenadas SVG suavemente al alternar de pieza.
+   - **Fusión perimetral de fotografías:** Aplicación de viñeta radial suave (`mask-image`) para eliminar cualquier corte rectangular visible de la imagen contra el fondo Obsidian.
+   - **Interactividad física táctil:** Parallax 3D suave (`perspective` / `rotateX` / `rotateY`) sensible al movimiento del mouse a 60 FPS, pausa automática en `hover` o `prefers-reduced-motion`, y rayo láser de escaneo metrológico sutil ($\pm 0.05\text{ mm}$).
+4. **Decisión arquitectónica — Ubicación del Visor 3D real:**
+   - **En el Hero:** No se utiliza motor 3D pesado (Three.js/WebGL) para no degradar la velocidad de carga (LCP/FCP), optimizar el rendimiento y maximizar el gancho visual y la conversión inicial con fotografía de estudio de alta definición.
+   - **Visor 3D interactivo real (WebGL / Three.js con rotación 360°, órbita y vista de capas):** Se reserva exclusivamente para:
+     1. **HF-03 Detalle de Producto (`/producto/:id`):** Inspección geométrica, verificación de texturas y selección de variantes.
+     2. **HF-05 Solicitud con Archivo 3D (`/solicitud/archivo`):** Validación de mallas STL/STEP/OBJ, dimensiones y orientación antes de cotizar.
+5. **Verificación visual en navegador completada:** Auditoría con subagente de navegador confirmando carga limpia, alternancia suave en las 4 piezas con reubicación dinámica de la línea técnica, cero errores 404 y renderizado perfecto de las 6 tarjetas y footer.
+
+**Estado actual:**
+- Mockup `mockups/hf-01-home.html` completado con estructura fiel a Stitch, imágenes reales, tokens Obsidian/Lava y sin gráficos falsos. Queda como referencia visual aprobada del Hero y Home.
 
 ### HF-02 — Catálogo
 

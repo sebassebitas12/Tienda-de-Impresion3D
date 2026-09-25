@@ -66,6 +66,7 @@ Si un documento contradice una decisión posterior, prevalece la decisión poste
 - React puede consumir un Webhook de N8N directamente para el chatbot y/o resumen IA sin añadir un backend intermedio para ese caso.
 - El frontend consume el endpoint del workflow; no se conecta directamente al nodo AI Agent.
 - Chatbot y resumen Admin pueden compartir infraestructura mediante un campo `mode`, manteniendo contratos y permisos separados.
+- **Visor 3D real vs Hero (2026-09-25):** El Hero utiliza fotografía de estudio de alta fidelidad con interactividad ligera (Parallax 3D / Tilt, línea de llamada técnica contextual y escáner láser metrológico) para garantizar conversión y máximo rendimiento de carga (LCP/FCP). El visor 3D interactivo WebGL/Three.js se reserva exclusivamente para HF-03 (Detalle de Producto) y HF-05 (Solicitud con Archivo 3D), donde la inspección orbital 360° y validación geométrica aportan valor funcional real.
 
 
 ## Navegación de trabajo para esta fase — 2026-09-24
