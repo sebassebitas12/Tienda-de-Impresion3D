@@ -16,8 +16,8 @@ React continúa bloqueado hasta cerrar los bloqueos.
 | 04 | Selección solicitud | Mantener |
 | 05 | Solicitud con archivo | Ajustar |
 | 06 | Asistencia IA | Mantener + refinar |
-| 07 | Carrito híbrido | **BLOQUEADOR** |
-| 08 | Checkout | **BLOQUEADOR** |
+| 07 | Carrito híbrido | ✅ CONGELADO |
+| 08 | Checkout | ✅ CONGELADO |
 | 09 | Seguimiento | Mantener |
 | 10 | Admin Dashboard | Simplificar |
 | 11 | Admin productos | Ajustar |
@@ -216,22 +216,81 @@ En el checkout de cotización, las secciones Contacto, Facturación y Entrega po
 
 ### Estado
 
-- HF-08 Checkout de productos: **Aprobado pendiente de congelar**
-- HF-08 Checkout de cotización: **Aprobado — verificar numeración de pasos**
-- HF-08 Confirmación: **Aprobado**
+- HF-08 Checkout de productos: **APROBADO Y CONGELADO**
+- HF-08 Checkout de cotización: **APROBADO Y CONGELADO**
+- HF-08 Confirmación: **APROBADO Y CONGELADO**
 
-HF-08 **NO CONGELADO** hasta resolver observación de numeración.
+Observación de numeración resuelta: Contacto y Facturación son sub-secciones del paso `02 Datos`; `03 Entrega` y `04 Método de Pago` son pasos propios. Numeración correcta.
+
+**HF-08: CONGELADO — 2026-09-25.**
 
 
-## HF-08 — Iteración 2: correcciones no verificadas (2026-09-25)
 
-UXMagic volvió a describir la generación de las tres pantallas, pero la auditoría textual aportada por Gemini mantiene exactamente los cinco problemas prioritarios de la primera versión:
-- destino SINPE no visible;
-- SINPE mezclado con logística;
-- Contacto + Facturación agrupados en checkout de cotización;
-- vigencia exacta no visible;
-- stepper `01 Items` en cotización.
 
-Por tanto, esta iteración **no puede considerarse corregida ni aprobada**. No se debe interpretar el mensaje "Designed" de UXMagic como aprobación.
+## HF-08 — Iteración 2: registro histórico (2026-09-25)
 
-La siguiente instrucción debe ser una edición dirigida de las pantallas existentes, no una regeneración libre. Cada uno de los cinco cambios debe quedar explícitamente representado.
+> Esta sección documenta el estado intermedio antes de la auditoría visual con zoom. La auditoría visual posterior confirmó que los cinco puntos estaban resueltos en el mockup real. HF-08 quedó congelado.
+
+
+## HF-01, HF-02, HF-05 — Ajustes pendientes (2026-09-25)
+
+Pendientes de iteración en UXMagic aplicando las reglas del cierre transversal de desktop.
+
+### HF-01 — Home
+
+Correcciones obligatorias:
+- **Eliminar precio visible** en el showcase/cards del hero. Home no muestra precios — decisión de negocio cerrada.
+- **Datos inventados**: eliminar "3.6k piezas entregadas", "24/7 soporte técnico" y cualquier cifra operativa no derivada de datos reales.
+- **Catálogo en Home**: si existe una sección de productos hardcodeados en Home, eliminarla. Home presenta producto y rutas de acción, no catálogo.
+
+Refinamientos visuales:
+- Showcase: 5 cards de producto con código técnico (`PRT-01`), nombre y placeholder geométrico SVG representativo de categoría.
+- Hero H1 más directo.
+- Valores de Precision con JetBrains Mono — no claims de marketing.
+- Proceso de 4 pasos conectado con línea SVG fina, no iconografía decorativa.
+- Badge `PENDIENTE DE COTIZACIÓN` visible y legible en el CTA de impresión personalizada.
+
+Accesibilidad aplicada:
+- Focus ring naranja en todos los CTAs.
+- Showcase con pausa en `hover` y `focus-within`; `prefers-reduced-motion` desactiva scroll infinito.
+- Imágenes de cards: `alt` con nombre del producto.
+
+### HF-02 — Catálogo
+
+Correcciones obligatorias:
+- Moneda principal en CRC, no USD. Si aparece equivalente USD debe tener fuente definida.
+- Filtros con estado activo claramente diferenciado (chip naranja con X para eliminar filtro individual).
+- Sorting visible en toolbar, no enterrado.
+
+Refinamientos visuales:
+- Cards de producto: imagen/placeholder geométrico + código en JetBrains Mono + nombre + precio en CRC + badge de material + badge de disponibilidad.
+- Filtros por: categoría, material, precio (rango), disponibilidad.
+- Búsqueda con indicación de debounce visual.
+- Estado vacío específico: "No hay productos con estos filtros" + "Limpiar filtros".
+- Skeleton loading en 6–8 cards mientras carga.
+
+Accesibilidad aplicada:
+- Disponibilidad comunicada con texto + badge, nunca solo color.
+- "Sin stock": card visualmente atenuada + texto "Sin stock" visible.
+- Filtros accesibles por teclado. Checkboxes con label explícito.
+
+### HF-05 — Solicitud con archivo
+
+Correcciones obligatorias:
+- Eliminar cualquier precio o rango de precio en pantalla de upload — la pantalla es pre-cotización.
+- Si aparece un estimado de IA, debe llevar badge `ORIENTATIVO · SUJETO A VALIDACIÓN` prominente, nunca como texto secundario.
+
+Refinamientos visuales:
+- Dropzone con estados claros: idle, drag-over (borde naranja), processing (spinner + texto), success (nombre + extensión + tamaño), error-format, error-size.
+- Progreso visible entre pasos del formulario de especificaciones.
+- Datos técnicos del archivo en JetBrains Mono.
+
+Accesibilidad aplicada:
+- Todos los estados del dropzone comunicados textualmente (no solo visualmente).
+- Botón de remove/replace accesible con `aria-label`.
+- `HelpDisclosure` junto al dropzone explicando formatos aceptados y cómo preparar el archivo.
+- Formulario de especificaciones: cada campo con `<label>` explícito, no solo placeholder.
+
+### Siguiente acción
+
+Generar iteración en UXMagic para HF-01, HF-02 y HF-05 con estas correcciones. Auditar con zoom en los puntos críticos antes de congelar.

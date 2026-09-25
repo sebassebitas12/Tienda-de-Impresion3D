@@ -186,6 +186,9 @@ Los cinco criterios obligatorios están verificados:
 4. Sidebar muestra monto aprobado `¢112,000` y vigencia `30/09/2026` visible. ✅
 5. Stepper de cotización usa `01 Cotización`; productos conserva `01 Items`. ✅
 
-**Observación menor pendiente:** verificar que la numeración de pasos en el checkout de cotización sea progresiva (`02 / Contacto`, `03 / Facturación`, `04 / Entrega`) y no repetida.
+**Observación menor resuelta:** el número de paso que las secciones muestran es el del stepper compartido (`02 Datos` contiene Contacto + Facturación; `03 Entrega`; `04 Método de Pago`). No es una duplicación de numeración.
 
-HF-08 **NO CONGELADO** hasta resolver esa observación. Una vez confirmada la numeración, se congela.
+**HF-08: APROBADO Y CONGELADO — 2026-09-25.**
+
+No requiere otra iteración de diseño antes de implementación.
+Siguiente bloque: cierre transversal de desktop (Dark/Light, accesibilidad y ayuda).
