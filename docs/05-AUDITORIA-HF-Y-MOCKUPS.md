@@ -186,3 +186,17 @@ Gemini señaló que el costo de entrega podría mostrarse si ya es calculable co
 - HF-08 Confirmación: **Aprobado con refinamiento visual**
 
 HF-08 completo sigue **NO APROBADO / PENDIENTE DE ITERACIÓN**.
+
+
+## HF-08 — Iteración 2: correcciones no verificadas (2026-09-25)
+
+UXMagic volvió a describir la generación de las tres pantallas, pero la auditoría textual aportada por Gemini mantiene exactamente los cinco problemas prioritarios de la primera versión:
+- destino SINPE no visible;
+- SINPE mezclado con logística;
+- Contacto + Facturación agrupados en checkout de cotización;
+- vigencia exacta no visible;
+- stepper `01 Items` en cotización.
+
+Por tanto, esta iteración **no puede considerarse corregida ni aprobada**. No se debe interpretar el mensaje "Designed" de UXMagic como aprobación.
+
+La siguiente instrucción debe ser una edición dirigida de las pantallas existentes, no una regeneración libre. Cada uno de los cinco cambios debe quedar explícitamente representado.
