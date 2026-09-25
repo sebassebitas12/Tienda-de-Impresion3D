@@ -160,3 +160,15 @@ Antes de generar HF-08:
 
 ### Siguiente gran secuencia
 HF-08 → revisión desktop global → Dark/Light → accesibilidad/ayuda → mobile 375 → tablet 768 → aprobación HF → Design System → arquitectura/datos/API/JWT → React → testing/integraciones.
+
+
+## Estado HF-08 — auditoría 2026-09-24
+
+La primera propuesta de HF-08 existe pero todavía no está congelada. Gemini detectó ajustes importantes, principalmente:
+- destino SINPE visible;
+- separar pago de logística;
+- separar Contacto y Facturación en checkout de cotización;
+- mostrar vigencia exacta;
+- corregir stepper contextual.
+
+No avanzar todavía a aprobación HF-08. Hacer una iteración de UXMagic con estas correcciones y luego validar nuevamente.
