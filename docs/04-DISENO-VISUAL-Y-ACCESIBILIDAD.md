@@ -1,5 +1,7 @@
 # Vértice CR — Diseño visual, temas y accesibilidad
 
+> Última actualización: **2026-09-25**.
+
 ## Dirección vigente
 
 **Obsidian Precision Forge + Lava Orgánica**.

@@ -1,5 +1,7 @@
 # Vértice CR — Auditoría HF y mockups
 
+> Última actualización: **2026-09-26**.
+
 ## Referencia
 
 Auditoría global del 2026-09-24 sobre mockups de mockups/HFcompletos. Commit de referencia: ee144ce.
@@ -10,14 +12,14 @@ React continúa bloqueado hasta cerrar los bloqueos.
 
 | HF | Pantalla | Estado |
 |---|---|---|
-| 01 | Home | ✅ CONGELADO / APROBADO |
+| 01 | Home | ✅ CONGELADO / APROBADO — mockup HTML funcional (`mockups/hf-01-home.html`) |
 | 02 | Catálogo | Ajustar |
 | 03 | Detalle producto | Mantener + refinar |
 | 04 | Selección solicitud | Mantener |
 | 05 | Solicitud con archivo | Ajustar |
 | 06 | Asistencia IA | Mantener + refinar |
-| 07 | Carrito híbrido | ✅ CONGELADO |
-| 08 | Checkout | ✅ CONGELADO |
+| 07 | Carrito híbrido | ✅ Aprobado documental (UXMagic + validación Gemini, sin HTML propio) |
+| 08 | Checkout | ✅ Aprobado documental (UXMagic + validación Gemini, sin HTML propio) |
 | 09 | Seguimiento | Mantener |
 | 10 | Admin Dashboard | Simplificar |
 | 11 | Admin productos | Ajustar |

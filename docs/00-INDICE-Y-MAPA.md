@@ -1,6 +1,8 @@
 # Vértice CR — Índice de documentación
 
-**Fuente rápida para humanos y agentes. Si no sabes dónde buscar algo, empieza aquí.**
+> Última actualización: **2026-09-26**.
+
+**Fuente rápida para humanos y agentes. Si no sabes dónde buscar algo, empieza aquí. Si eres una IA, lee primero `AI_CONTEXT.md` y `AGENTS.md`.**
 
 | Si te preguntan... | Busca en |
 |---|---|

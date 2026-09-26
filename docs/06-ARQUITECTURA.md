@@ -1,5 +1,7 @@
 # Vértice CR — Arquitectura
 
+> Última actualización: **2026-09-24**.
+
 ## Principio
 
 UI → Pages/Features → Hooks/Services/Utils → APIs → datos.

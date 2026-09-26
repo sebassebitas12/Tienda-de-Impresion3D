@@ -1,5 +1,7 @@
 # Vértice CR — Negocio, entidades y estados
 
+> Última actualización: **2026-09-24**.
+
 ## Entidades
 
 users, products, categories, orders, orderItems, customPrintRequests, reviews, coupons, notifications, activityLog, settings.

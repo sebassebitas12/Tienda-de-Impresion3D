@@ -1,5 +1,7 @@
 # Vértice CR — Métricas, Admin e IA operativa
 
+> Última actualización: **2026-09-24**.
+
 ## Principio
 
 Admin debe ayudar a decidir y actuar diariamente, no demostrar cantidad de widgets.

@@ -1,5 +1,7 @@
 # Vértice CR — Testing y calidad
 
+> Última actualización: **2026-09-24**.
+
 ## Objetivo
 
 Jest + Testing Library.

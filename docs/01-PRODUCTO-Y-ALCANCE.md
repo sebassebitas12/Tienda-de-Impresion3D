@@ -1,5 +1,7 @@
 # Vértice CR — Producto y alcance
 
+> Última actualización: **2026-09-24**.
+
 ## Producto
 
 Tienda costarricense de impresión 3D con dos líneas:

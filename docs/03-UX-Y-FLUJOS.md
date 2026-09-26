@@ -1,5 +1,7 @@
 # Vértice CR — UX, navegación y estados
 
+> Última actualización: **2026-09-24**.
+
 ## Rutas públicas
 
 /, /catalogo, /producto/:id, /solicitud, /solicitud/archivo, /solicitud/ayuda-diseno, /carrito, /checkout/productos, /checkout/solicitud, /registro, /pedidos/:id, /cuenta.

@@ -1,5 +1,7 @@
 # Vértice CR — Datos, API externa, JWT y N8N
 
+> Última actualización: **2026-09-24**.
+
 ## Propósito
 
 Este es el documento para responder: **¿de dónde salen los datos y cómo se conectan los servicios?**
