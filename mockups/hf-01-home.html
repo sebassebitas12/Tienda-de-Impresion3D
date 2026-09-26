@@ -430,23 +430,29 @@
 
     .stage-thermal-glow {
       position: absolute; inset: 0;
-      background: radial-gradient(circle at 50% 50%, rgba(255, 90, 31, 0.18) 0%, transparent 70%);
+      background: radial-gradient(circle at 50% 50%, rgba(255, 90, 31, 0.22) 0%, rgba(255, 90, 31, 0.08) 45%, transparent 72%);
       pointer-events: none;
+      animation: thermalPulse 4s ease-in-out infinite alternate;
+      will-change: transform, opacity;
+    }
+    @keyframes thermalPulse {
+      0% { opacity: 0.60; transform: scale(0.92); }
+      100% { opacity: 1; transform: scale(1.10); }
     }
 
-    /* Rayo láser sutil de escaneo 3D */
+    /* Rayo láser dinámico de escaneo 3D */
     .scan-laser-line {
-      position: absolute; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, #FF5A1F 30%, #FFA066 50%, #FF5A1F 70%, transparent);
-      box-shadow: 0 0 16px #FF5A1F;
-      opacity: 0.70;
-      animation: laserSweep 5.5s ease-in-out infinite alternate;
-      pointer-events: none; z-index: 5;
+      position: absolute; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 90, 31, 0.25) 15%, #FF5A1F 40%, #FFA066 50%, #FF5A1F 60%, rgba(255, 90, 31, 0.25) 85%, transparent 100%);
+      box-shadow: 0 0 14px #FF5A1F, 0 0 32px rgba(255, 90, 31, 0.8), 0 0 55px rgba(255, 90, 31, 0.35);
+      animation: laserSweep 4.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+      pointer-events: none; z-index: 6;
+      will-change: top, opacity;
     }
     @keyframes laserSweep {
-      0% { top: 15%; opacity: 0.25; }
-      50% { opacity: 0.80; }
-      100% { top: 85%; opacity: 0.25; }
+      0% { top: 12%; opacity: 0.40; }
+      50% { opacity: 1; }
+      100% { top: 88%; opacity: 0.40; }
     }
 
     /* Badge de estado de escaneo decorativo */
@@ -544,7 +550,23 @@
       /* Fundido perimetral suave para eliminar cualquier borde rectangular */
       -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 68%, rgba(0,0,0,0) 98%);
       mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 68%, rgba(0,0,0,0) 98%);
-      transition: opacity var(--motion-ui), transform var(--motion-ui);
+      animation: heroFloatIdle 4.8s ease-in-out infinite alternate;
+      will-change: transform, filter;
+      transition: opacity var(--motion-ui);
+    }
+    @keyframes heroFloatIdle {
+      0% {
+        transform: translateY(0px) rotate(0deg);
+        filter: drop-shadow(0 18px 30px rgba(0,0,0,0.85));
+      }
+      50% {
+        transform: translateY(-12px) rotate(1.2deg);
+        filter: drop-shadow(0 32px 48px rgba(0,0,0,0.95)) drop-shadow(0 0 25px rgba(255, 90, 31, 0.18));
+      }
+      100% {
+        transform: translateY(0px) rotate(0deg);
+        filter: drop-shadow(0 18px 30px rgba(0,0,0,0.85));
+      }
     }
 
     /* Ficha inferior de la pieza activa */
@@ -677,58 +699,79 @@
       border-radius: var(--radius-card);
       overflow: hidden;
       display: flex; flex-direction: column;
-      transition: transform var(--motion-micro), border-color var(--motion-micro), box-shadow var(--motion-micro);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.25s ease;
       position: relative;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+    .product-catalog-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 90, 31, 0.08), transparent 45%);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 3;
+    }
+    .product-catalog-card:hover::before {
+      opacity: 1;
     }
     .product-catalog-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-5px);
       border-color: var(--color-accent);
-      box-shadow: 0 16px 36px rgba(0,0,0,0.55);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6), 0 0 20px rgba(255, 90, 31, 0.12);
     }
 
-    /* Marco de imagen del producto */
+    /* Marco de imagen del producto con máscara perimetral suave */
     .product-image-box {
       height: 220px;
-      background: #110F0D;
+      background: radial-gradient(circle at center, #1c1815 0%, #0d0b09 100%);
       position: relative;
       display: flex; align-items: center; justify-content: center;
-      padding: 20px;
+      padding: 24px 18px 12px 18px;
       overflow: hidden;
       border-bottom: 1px solid var(--color-border-subtle);
     }
-    [data-theme="light"] .product-image-box { background: #EDEAE6; }
+    [data-theme="light"] .product-image-box {
+      background: radial-gradient(circle at center, #F4F1ED 0%, #E6E1DC 100%);
+    }
     
     .product-img-element {
-      max-width: 100%; max-height: 100%; object-fit: contain;
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.65));
-      transition: transform var(--motion-ui);
+      max-width: 86%; max-height: 86%; object-fit: contain;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,0.75));
+      -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 68%, rgba(0,0,0,0) 98%);
+      mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 68%, rgba(0,0,0,0) 98%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1;
     }
     .product-catalog-card:hover .product-img-element {
-      transform: scale(1.06);
+      transform: scale(1.08) translateY(-2px);
     }
 
     .product-material-pill {
       position: absolute; top: 12px; left: 12px;
       font-family: var(--font-mono); font-size: 9px; font-weight: 700;
       color: var(--color-accent); letter-spacing: 0.08em;
-      padding: 3px 8px; background: rgba(13, 11, 9, 0.85);
+      padding: 3px 8px; background: rgba(13, 11, 9, 0.90);
       border: 1px solid var(--color-border); border-radius: var(--radius-sharp);
-      backdrop-filter: blur(6px);
+      backdrop-filter: blur(8px);
+      z-index: 10; pointer-events: none;
     }
     .product-stock-tag {
       position: absolute; top: 12px; right: 12px;
       font-family: var(--font-mono); font-size: 9px; font-weight: 700;
       padding: 3px 8px; border-radius: var(--radius-sharp);
-      background: rgba(46, 204, 113, 0.14); color: var(--color-success);
-      border: 1px solid rgba(46, 204, 113, 0.30);
+      background: rgba(46, 204, 113, 0.16); color: var(--color-success);
+      border: 1px solid rgba(46, 204, 113, 0.35);
+      z-index: 10; pointer-events: none;
+      backdrop-filter: blur(8px);
     }
     .product-stock-tag.on-demand {
-      background: rgba(245, 166, 35, 0.14); color: #F5A623;
-      border-color: rgba(245, 166, 35, 0.30);
+      background: rgba(245, 166, 35, 0.16); color: #F5A623;
+      border-color: rgba(245, 166, 35, 0.35);
     }
     .product-stock-tag.fallback-demo {
-      background: rgba(255, 90, 31, 0.14); color: var(--color-accent);
-      border-color: rgba(255, 90, 31, 0.35);
+      background: rgba(255, 90, 31, 0.16); color: var(--color-accent);
+      border-color: rgba(255, 90, 31, 0.40);
     }
 
     .product-card-body {
@@ -1022,9 +1065,547 @@
     @media (max-width: 600px) {
       .footer-bottom-bar { flex-direction: column; gap: 8px; text-align: center; }
     }
+
+    /* ==========================================================================
+       MEJORAS DE NARRATIVA CODEX, ACCESIBILIDAD Y MOVIMIENTO
+       ========================================================================== */
+    .skip-to-content {
+      position: absolute; top: -80px; left: 24px; z-index: 9999;
+      background: var(--color-accent); color: #FFFFFF;
+      padding: 10px 16px; font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+      border-radius: var(--radius-sharp); transition: top var(--motion-micro);
+    }
+    .skip-to-content:focus { top: 16px; }
+
+    /* Botones de navegación adicionales */
+    .search-nav-btn {
+      width: 40px; height: 40px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      border-radius: var(--radius-sharp);
+      color: var(--color-text-muted);
+      cursor: pointer; transition: all var(--motion-micro);
+    }
+    .search-nav-btn:hover {
+      border-color: var(--color-accent); color: var(--color-accent);
+    }
+
+    .lang-toggle-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 6px 14px; min-height: 40px;
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      border-radius: var(--radius-pill);
+      font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+      color: var(--color-text-muted);
+      cursor: pointer; transition: all var(--motion-micro);
+    }
+    .lang-toggle-btn:hover, .lang-toggle-btn.active {
+      border-color: var(--color-border-bright); color: var(--color-accent);
+      background: var(--color-surface-2);
+    }
+
+    /* Hero: Coordenadas y Etiqueta Vertical */
+    .hero-vertical-object-tag {
+      position: absolute; left: calc(50% - 24px); top: 50%; transform: translateY(-50%) rotate(-90deg);
+      font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.22em;
+      color: var(--color-text-dim); pointer-events: none; z-index: 5;
+    }
+    @media (max-width: 1100px) { .hero-vertical-object-tag { display: none; } }
+
+    .hero-coords-tag {
+      position: absolute; top: -28px; right: 0;
+      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      color: var(--color-text-dim); letter-spacing: 0.12em;
+    }
+
+    .pillar-metric-bold {
+      font-family: var(--font-mono); font-size: 16px; font-weight: 700;
+      color: var(--color-text); line-height: 1;
+    }
+
+    .popular-desc-right {
+      max-width: 500px; font-size: 14px; color: var(--color-text-muted); line-height: 1.6;
+    }
+
+    /* Sección 02: El Método (Split Layout Codex) */
+    .section-metodo-split {
+      padding: 96px 0;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      position: relative;
+    }
+    .metodo-split-container {
+      max-width: 1360px; margin: 0 auto; padding: 0 36px;
+      display: grid; grid-template-columns: 1fr 1.2fr; gap: 64px; align-items: center;
+    }
+    @media (max-width: 960px) {
+      .metodo-split-container { grid-template-columns: 1fr; gap: 40px; }
+    }
+    .metodo-left-statement {
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .metodo-h2-split {
+      font-size: clamp(32px, 3.8vw, 52px); font-weight: 700;
+      letter-spacing: -0.03em; line-height: 1.1; color: var(--color-text);
+    }
+    .metodo-subtext-split {
+      font-size: 15px; color: var(--color-text-muted); line-height: 1.6; max-width: 480px;
+    }
+    .metodo-right-steps {
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .metodo-step-row {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 22px 28px;
+      display: flex; align-items: center; gap: 24px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none; color: inherit;
+      position: relative; overflow: hidden;
+    }
+    .metodo-step-row::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      background: var(--color-accent);
+      transform: scaleY(0);
+      transform-origin: bottom;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .metodo-step-row:hover::before {
+      transform: scaleY(1);
+    }
+    .metodo-step-row:hover {
+      border-color: var(--color-accent);
+      transform: translateX(6px);
+      background: var(--color-surface-2);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    }
+    .metodo-step-index {
+      font-family: var(--font-mono); font-size: 22px; font-weight: 700;
+      color: var(--color-accent); line-height: 1; flex-shrink: 0;
+      transition: transform 0.2s ease, text-shadow 0.2s ease;
+    }
+    .metodo-step-row:hover .metodo-step-index {
+      transform: scale(1.15);
+      text-shadow: 0 0 12px var(--color-accent-glow);
+    }
+    @keyframes stepIndexPulse {
+      0%, 100% { opacity: 0.75; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.08); text-shadow: 0 0 10px rgba(255,90,31,0.6); }
+    }
+    .metodo-step-row:nth-child(1) .metodo-step-index { animation: stepIndexPulse 4s ease-in-out infinite 0s; }
+    .metodo-step-row:nth-child(2) .metodo-step-index { animation: stepIndexPulse 4s ease-in-out infinite 1s; }
+    .metodo-step-row:nth-child(3) .metodo-step-index { animation: stepIndexPulse 4s ease-in-out infinite 2s; }
+    .metodo-step-row:nth-child(4) .metodo-step-index { animation: stepIndexPulse 4s ease-in-out infinite 3s; }
+    .metodo-step-info {
+      flex-grow: 1; display: flex; flex-direction: column; gap: 4px;
+    }
+    .metodo-step-name {
+      font-size: 16px; font-weight: 700; color: var(--color-text);
+    }
+    .metodo-step-desc {
+      font-size: 13px; color: var(--color-text-muted); line-height: 1.5;
+    }
+    .metodo-step-arrow {
+      color: var(--color-text-dim); font-size: 18px; transition: all 0.2s ease;
+    }
+    .metodo-step-row:hover .metodo-step-arrow {
+      color: var(--color-accent);
+      transform: translate(3px, -3px);
+    }
+
+    /* Header editorial de Sección 01 */
+    .section-editorial-note {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 8px; text-align: right;
+    }
+    .section-editorial-note p {
+      font-size: 13.5px; color: var(--color-text-muted); max-width: 380px; line-height: 1.5; margin: 0;
+    }
+    .link-editorial-arrow {
+      font-size: 13px; font-weight: 600; color: var(--color-accent); text-decoration: none;
+      display: inline-flex; align-items: center; gap: 4px; transition: color var(--motion-micro);
+    }
+    .link-editorial-arrow:hover { color: var(--color-accent-lit); text-decoration: underline; }
+    @media (max-width: 768px) {
+      .section-editorial-note { align-items: flex-start; text-align: left; margin-top: 10px; }
+    }
+
+    /* Modal de Búsqueda Rápida */
+    .search-modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px);
+      z-index: 200; display: none; align-items: flex-start; justify-content: center;
+      padding-top: 10vh; animation: fadeInModal 0.2s ease;
+    }
+    .search-modal-backdrop.open { display: flex; }
+    .search-modal-panel {
+      width: min(640px, 92vw); background: var(--color-surface);
+      border: 1px solid var(--color-border); border-radius: var(--radius-card);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    .search-modal-header {
+      display: flex; align-items: center; gap: 12px; padding: 18px 24px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .search-modal-input {
+      flex-grow: 1; background: transparent; border: none; outline: none;
+      font-size: 16px; color: var(--color-text); font-family: var(--font-body);
+    }
+    .search-modal-close {
+      background: var(--color-surface-2); border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm); color: var(--color-text-muted);
+      font-size: 11px; padding: 4px 8px; cursor: pointer; font-family: var(--font-mono);
+    }
+    .search-modal-results {
+      max-height: 360px; overflow-y: auto; padding: 16px 24px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .search-result-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px; border-radius: var(--radius-sm);
+      text-decoration: none; color: inherit; transition: background var(--motion-micro);
+      border: 1px solid transparent;
+    }
+    .search-result-item:hover, .search-result-item:focus {
+      background: var(--color-surface-2); border-color: var(--color-border);
+    }
+    .search-result-title { font-weight: 600; font-size: 14px; }
+    .search-result-tag { font-family: var(--font-mono); font-size: 11px; color: var(--color-accent); }
+    @keyframes fadeInModal { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ==========================================================================
+       ACCESIBILIDAD UNIVERSAL (TP - TODO PÚBLICO / WCAG 2.2)
+       ========================================================================== */
+    :root {
+      --a11y-font-scale: 1;
+    }
+    body {
+      font-size: calc(15px * var(--a11y-font-scale));
+    }
+
+    /* Modo Alto Contraste */
+    html.a11y-contrast {
+      --color-bg: #000000 !important;
+      --color-surface: #0a0a0a !important;
+      --color-surface-2: #141414 !important;
+      --color-border: #FFD700 !important;
+      --color-border-bright: #FFFF00 !important;
+      --color-border-subtle: #806b00 !important;
+      --color-text: #FFFFFF !important;
+      --color-text-muted: #F2F2F2 !important;
+      --color-text-dim: #DCDCDC !important;
+      --color-accent: #FFFF00 !important;
+      --color-accent-lit: #FFF500 !important;
+      --color-accent-glow: rgba(255, 255, 0, 0.45) !important;
+    }
+    html.a11y-contrast img {
+      filter: contrast(1.2) brightness(1.05) !important;
+    }
+
+    /* Tipografía Alta Legibilidad / Dislexia */
+    html.a11y-dyslexia, html.a11y-dyslexia * {
+      font-family: 'Verdana', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+      letter-spacing: 0.04em !important;
+      word-spacing: 0.08em !important;
+      line-height: 1.65 !important;
+    }
+
+    /* Pausar Movimiento / Animaciones */
+    html.a11y-reduce-motion *, 
+    html.a11y-reduce-motion *::before, 
+    html.a11y-reduce-motion *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+
+    /* Resaltar Enlaces y Foco */
+    html.a11y-highlights a, 
+    html.a11y-highlights button {
+      text-decoration: underline !important;
+      outline: 2.5px solid var(--color-accent) !important;
+      outline-offset: 3px !important;
+    }
+
+    /* ==========================================================================
+       ONDAS CONCÉNTRICAS DE SEÑAL DE PRECISIÓN (Versión Codex - Pulso Activo)
+       ========================================================================== */
+    .radar-wave-bg {
+      position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0;
+    }
+    .radar-circle-1, .radar-circle-2, .radar-circle-3 {
+      position: absolute; border-radius: 50%;
+      top: 50%; left: 50%;
+      will-change: transform, opacity;
+    }
+    .radar-circle-1 {
+      width: 420px; height: 420px;
+      border: 1.5px solid rgba(255, 90, 31, 0.28);
+      box-shadow: 0 0 35px rgba(255, 90, 31, 0.09);
+      animation: radarPulseMotion 5.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    .radar-circle-2 {
+      width: 740px; height: 740px;
+      border: 1px solid rgba(255, 90, 31, 0.20);
+      box-shadow: 0 0 50px rgba(255, 90, 31, 0.06);
+      animation: radarPulseMotion 5.5s cubic-bezier(0.4, 0, 0.2, 1) infinite 1.8s;
+    }
+    .radar-circle-3 {
+      width: 1080px; height: 1080px;
+      border: 1px dashed rgba(255, 90, 31, 0.15);
+      animation: radarPulseMotion 5.5s cubic-bezier(0.4, 0, 0.2, 1) infinite 3.6s;
+    }
+    @keyframes radarPulseMotion {
+      0% {
+        transform: translate(-50%, -50%) scale(0.92);
+        opacity: 0.35;
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.08);
+        opacity: 0.95;
+        border-color: rgba(255, 90, 31, 0.45);
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(0.92);
+        opacity: 0.35;
+      }
+    }
+
+    /* Animaciones de Entrada Reveal on Scroll */
+    .reveal-item {
+      opacity: 0; transform: translateY(22px);
+      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-item.visible {
+      opacity: 1; transform: translateY(0);
+    }
+
+    /* Cinta Ticker Telemetría Técnica AM (Movimiento Continuo 60fps) */
+    .tech-marquee-bar {
+      width: 100%; overflow: hidden;
+      background: #0B0A08; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+      padding: 11px 0; white-space: nowrap; position: relative; user-select: none;
+    }
+    .tech-marquee-bar::before, .tech-marquee-bar::after {
+      content: ''; position: absolute; top: 0; bottom: 0; width: 70px; z-index: 2; pointer-events: none;
+    }
+    .tech-marquee-bar::before { left: 0; background: linear-gradient(90deg, #0B0A08, transparent); }
+    .tech-marquee-bar::after { right: 0; background: linear-gradient(270deg, #0B0A08, transparent); }
+    .marquee-track {
+      display: inline-flex; align-items: center; gap: 24px;
+      animation: marqueeScroll 26s linear infinite; will-change: transform;
+    }
+    .marquee-track:hover { animation-play-state: paused; }
+    @keyframes marqueeScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .marquee-item {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      letter-spacing: 0.12em; color: var(--color-text-muted);
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .marquee-sep {
+      color: var(--color-accent); font-family: var(--font-mono); font-size: 11px; font-weight: 700; opacity: 0.7;
+    }
+
+    /* ==========================================================================
+       DOCK FLOTANTE: BOLITAS REDONDAS VERTICALES (CHATBOT + ACCESIBILIDAD TP)
+       ========================================================================== */
+    .floating-actions-dock {
+      position: fixed; bottom: 28px; right: 28px; z-index: 150;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
+    }
+    .floating-buttons-column {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .fab-bolita {
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; position: relative;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+      outline: none;
+    }
+    .fab-bolita:hover {
+      transform: scale(1.12);
+    }
+    .fab-bolita:active {
+      transform: scale(0.95);
+    }
+    .fab-a11y-btn {
+      width: 46px; height: 46px;
+      background: var(--color-surface);
+      color: var(--color-text);
+      border: 1.5px solid var(--color-border);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    }
+    .fab-a11y-btn:hover {
+      border-color: #38BDF8;
+      color: #38BDF8;
+      box-shadow: 0 8px 24px rgba(56, 189, 248, 0.4);
+    }
+    .fab-chat-btn {
+      width: 54px; height: 54px;
+      background: var(--color-accent);
+      color: #FFFFFF;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 28px var(--color-accent-glow);
+      animation: fabChatPulse 3.5s ease-in-out infinite;
+    }
+    @keyframes fabChatPulse {
+      0%, 100% {
+        box-shadow: 0 8px 26px var(--color-accent-glow), 0 0 0 0 rgba(255, 90, 31, 0.4);
+      }
+      50% {
+        box-shadow: 0 10px 32px rgba(255, 90, 31, 0.6), 0 0 0 10px rgba(255, 90, 31, 0);
+      }
+    }
+    .fab-chat-btn:hover {
+      box-shadow: 0 12px 36px var(--color-accent-glow);
+      background: var(--color-accent-lit);
+    }
+    .fab-status-dot {
+      position: absolute; top: 1px; right: 1px;
+      width: 13px; height: 13px; border-radius: 50%;
+      background: #10B981; border: 2.5px solid var(--color-bg);
+      box-shadow: 0 0 8px #10B981;
+      animation: beaconBlink 2s ease-in-out infinite;
+    }
+    @keyframes beaconBlink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Panel de Accesibilidad Universal */
+    .a11y-panel-card {
+      width: min(390px, 92vw); background: var(--color-surface);
+      border: 1px solid var(--color-border); border-radius: var(--radius-card);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.65); display: none; flex-direction: column;
+      overflow: hidden; animation: slideUpDock 0.25s ease;
+    }
+    .a11y-panel-card.open { display: flex; }
+    .a11y-header {
+      padding: 16px; background: var(--color-surface-2); border-bottom: 1px solid var(--color-border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .a11y-header-left { display: flex; align-items: center; gap: 10px; }
+    .a11y-avatar {
+      width: 32px; height: 32px; border-radius: var(--radius-sm);
+      background: #0284C7; color: #FFF; display: flex;
+      align-items: center; justify-content: center; font-size: 17px;
+    }
+    .a11y-name { font-size: 13.5px; font-weight: 700; color: var(--color-text); }
+    .a11y-status-sub { font-size: 10.5px; color: #38BDF8; font-family: var(--font-mono); }
+    .a11y-content-body {
+      padding: 18px; display: flex; flex-direction: column; gap: 14px;
+      max-height: 440px; overflow-y: auto;
+    }
+    .a11y-item-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .a11y-item-info { display: flex; flex-direction: column; gap: 2px; }
+    .a11y-item-title { font-size: 13px; font-weight: 600; color: var(--color-text); }
+    .a11y-item-sub { font-size: 11px; color: var(--color-text-muted); }
+    .a11y-ctrl-group { display: flex; align-items: center; gap: 6px; }
+    .a11y-btn-scale {
+      width: 32px; height: 32px; border-radius: var(--radius-sm);
+      background: var(--color-surface-2); border: 1px solid var(--color-border);
+      color: var(--color-text); font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--motion-micro);
+    }
+    .a11y-btn-scale:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .a11y-scale-badge {
+      font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+      color: var(--color-accent); min-width: 44px; text-align: center;
+    }
+    .a11y-switch-btn {
+      padding: 6px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600;
+      background: var(--color-surface-2); border: 1px solid var(--color-border);
+      color: var(--color-text-muted); cursor: pointer; transition: all var(--motion-micro);
+    }
+    .a11y-switch-btn.active {
+      background: var(--color-accent); border-color: var(--color-accent); color: #FFFFFF;
+    }
+    .a11y-reset-all {
+      background: transparent; border: none; color: var(--color-text-dim);
+      font-size: 12px; text-decoration: underline; cursor: pointer;
+      padding: 6px; text-align: center; margin-top: 4px;
+    }
+    .a11y-reset-all:hover { color: var(--color-accent); }
+
+    /* Drawer del Chatbot */
+    .chatbot-drawer-card {
+      width: min(380px, 92vw); height: 500px; background: var(--color-surface);
+      border: 1px solid var(--color-border); border-radius: var(--radius-card);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.65); display: none; flex-direction: column;
+      overflow: hidden; animation: slideUpDock 0.25s ease;
+    }
+    .chatbot-drawer-card.open { display: flex; }
+    .chatbot-header {
+      padding: 16px; background: var(--color-surface-2); border-bottom: 1px solid var(--color-border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .chatbot-header-left { display: flex; align-items: center; gap: 10px; }
+    .chatbot-avatar {
+      width: 32px; height: 32px; border-radius: var(--radius-sm);
+      background: var(--color-accent); color: #FFF; display: flex;
+      align-items: center; justify-content: center; font-size: 13px; font-weight: 700;
+    }
+    .chatbot-name { font-size: 13px; font-weight: 700; color: var(--color-text); }
+    .chatbot-status-sub { font-size: 11px; color: #10B981; font-family: var(--font-mono); }
+    .chatbot-close-btn {
+      background: transparent; border: none; color: var(--color-text-dim);
+      font-size: 18px; cursor: pointer; padding: 4px;
+    }
+    .chatbot-messages-box {
+      flex-grow: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+      font-size: 13px; line-height: 1.5;
+    }
+    .chat-bubble {
+      max-width: 85%; padding: 10px 14px; border-radius: var(--radius-sm);
+    }
+    .chat-bubble.bot {
+      background: var(--color-surface-2); color: var(--color-text); border: 1px solid var(--color-border);
+      align-self: flex-start;
+    }
+    .chat-bubble.user {
+      background: var(--color-accent); color: #FFFFFF; align-self: flex-end;
+    }
+    .chat-quick-actions {
+      display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 14px;
+      background: var(--color-bg); border-top: 1px solid var(--color-border);
+    }
+    .quick-chip {
+      background: var(--color-surface-2); border: 1px solid var(--color-border);
+      color: var(--color-text-muted); border-radius: 12px; padding: 4px 10px;
+      font-size: 11px; cursor: pointer; transition: all var(--motion-micro);
+    }
+    .quick-chip:hover { border-color: var(--color-accent); color: var(--color-text); }
+    .chatbot-input-row {
+      display: flex; align-items: center; padding: 10px 12px;
+      border-top: 1px solid var(--color-border); background: var(--color-surface);
+      gap: 8px;
+    }
+    .chatbot-input {
+      flex-grow: 1; background: var(--color-surface-2); border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm); padding: 8px 12px; color: var(--color-text);
+      font-size: 12.5px; outline: none;
+    }
+    .chatbot-send-btn {
+      background: var(--color-accent); border: none; border-radius: var(--radius-sm);
+      color: #FFF; padding: 8px 12px; cursor: pointer; font-size: 12px; font-weight: 600;
+    }
+    @keyframes slideUpDock { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
+
+  <!-- Accesibilidad WCAG 2.2: Salto directo al contenido -->
+  <a href="#main-content" class="skip-to-content">Saltar al contenido principal</a>
 
   <!-- ==========================================================================
        NAVBAR OFICIAL DE STITCH
@@ -1035,7 +1616,7 @@
       <!-- Marca Oficial Vértice CR -->
       <a href="/" class="brand-group" aria-label="Vértice CR Inicio">
         <img src="favicon.png" alt="Vértice CR Logo Monograma" class="brand-logo-img" />
-        <span class="brand-text-name">VÉRTICE CR</span>
+        <span class="brand-text-name">VÉRTICE <span style="color:var(--color-text-dim); font-size:12px; font-weight:400;">CR / AM</span></span>
       </a>
 
       <!-- Navegación Primaria -->
@@ -1051,10 +1632,24 @@
 
       <!-- Acciones de Navegación -->
       <div class="nav-actions">
+        <!-- Búsqueda -->
+        <button class="search-nav-btn" id="search-btn" aria-label="Buscar en catálogo y tolerancias" title="Buscar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+
         <!-- CTA Cotización Técnica -->
         <a href="/solicitud" class="btn-stitch-quote">
           <span>Cotizar STL</span>
+          <span style="font-size:12px;">↗</span>
         </a>
+
+        <!-- Selector Bilingüe ES / EN -->
+        <button class="lang-toggle-btn" id="lang-btn" aria-label="Alternar idioma ES / EN" title="Cambiar idioma">
+          <span id="lang-label">ES / EN</span>
+        </button>
 
         <!-- Switch de Tema Dark/Light -->
         <button class="theme-switch-btn" id="theme-btn" aria-label="Cambiar tema de color" title="Alternar modo Claro / Oscuro">
@@ -1142,30 +1737,26 @@
         <div class="hero-left-content">
           <div class="hero-eyebrow-chip">
             <span class="eyebrow-pulse-dot" aria-hidden="true"></span>
-            <span>IDEAS QUE SE CONVIERTEN EN OBJETOS</span>
+            <span>:: MANUFACTURA ADITIVA / SAN JOSÉ, CR</span>
           </div>
 
           <h1 class="hero-main-title">
-            De una idea,<br />
-            a <span class="orange-lit">algo real.</span>
+            Lo que imaginas.<br />
+            <span class="orange-lit">Hecho preciso.</span>
           </h1>
 
           <p class="hero-subtitle-p">
-            Diseñamos, imprimimos y fabricamos piezas funcionales y de colección 
-            con tecnología de última generación. Desde prototipos hasta soluciones 
-            personalizadas en Costa Rica.
+            Ingeniería aditiva, prototipado funcional y piezas finales con precisión industrial desde San José, Costa Rica. Tu modelo cobra vida capa por capa.
           </p>
 
           <div class="hero-cta-row">
-            <a href="#productos-populares" class="btn-stitch-hero-action" id="hero-store-btn">
-              <span>Ver catálogo</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
+            <a href="#catalogo-taller" class="btn-stitch-hero-action" id="hero-store-btn">
+              <span>Nuestro trabajo</span>
+              <span style="font-size:13px;" aria-hidden="true">↓</span>
             </a>
             <a href="/solicitud" class="btn-stitch-hero-secondary">
-              <span>Cotizar a medida</span>
+              <span>Tengo un archivo</span>
+              <span style="font-size:13px;" aria-hidden="true">↗</span>
             </a>
           </div>
 
@@ -1173,23 +1764,23 @@
             <div class="pillar-box">
               <div class="pillar-top">
                 <div class="pillar-icon-circle">⌖</div>
-                <span>Alta precisión</span>
+                <span>±0.05 mm</span>
               </div>
-              <div class="pillar-desc">Tolerancia ±0.05 mm</div>
-            </div>
-            <div class="pillar-box">
-              <div class="pillar-top">
-                <div class="pillar-icon-circle">🛡</div>
-                <span>Materiales técnicos</span>
-              </div>
-              <div class="pillar-desc">PETG, Nylon CF y ASA</div>
+              <div class="pillar-desc">Tolerancia dimensional</div>
             </div>
             <div class="pillar-box">
               <div class="pillar-top">
                 <div class="pillar-icon-circle">⚙</div>
-                <span>Diseño a medida</span>
+                <span>FDM / SLA</span>
               </div>
-              <div class="pillar-desc">Revisión y cotización</div>
+              <div class="pillar-desc">Tecnología multieje</div>
+            </div>
+            <div class="pillar-box">
+              <div class="pillar-top">
+                <div class="pillar-icon-circle">🛡</div>
+                <span>01 — 04</span>
+              </div>
+              <div class="pillar-desc">Proceso trazable</div>
             </div>
           </div>
         </div>
@@ -1200,6 +1791,12 @@
           <div class="stage-main-frame" id="stage-frame">
             <div class="stage-thermal-glow" aria-hidden="true"></div>
             <div class="scan-laser-line" aria-hidden="true"></div>
+
+            <!-- Tag Vertical Superior Izquierdo del Stage: OBJECT 01 / 04 -->
+            <div class="hero-vertical-object-tag" id="hero-object-num" aria-hidden="true">OBJECT 01 / 04</div>
+
+            <!-- Coordenadas Geográficas / Técnicas Superiores Derechas -->
+            <div class="hero-coords-tag" aria-hidden="true">01° 53' N / 70° 30' W</div>
 
             <!-- Badge decorativo de estado de escaneo -->
             <div class="stage-scan-status-badge" aria-hidden="true">
@@ -1242,7 +1839,7 @@
             <!-- Ficha inferior de la pieza activa -->
             <div class="stage-bottom-info">
               <div>
-                <h2 class="piece-title-h3" id="piece-name-display">Soporte Modular de Carga</h2>
+                <div class="piece-title-h3" id="piece-name-display" role="heading" aria-level="3">Soporte Modular de Carga</div>
                 <div class="piece-sub-desc" id="piece-desc-display">Estructura mecánica con alivios lattice de alta rigidez</div>
               </div>
               <div class="piece-spec-badge" id="piece-spec-tag">REF: PRT-001 · ±0.05 mm</div>
@@ -1286,23 +1883,56 @@
       </div>
     </section>
 
+    <!-- Cinta Ticker Telemetría Técnica AM (Movimiento Continuo 60fps) -->
+    <div class="tech-marquee-bar" aria-hidden="true">
+      <div class="marquee-track">
+        <span class="marquee-item">⌖ TOLERANCIA VERIFICADA ±0.05 MM</span>
+        <span class="marquee-sep">/</span>
+        <span class="marquee-item">⚡ CAMA CALEFACTORA ACTIVA 110°C</span>
+        <span class="marquee-sep">/</span>
+        <span class="marquee-item">⚙ NYLON PA12-CF · PETG PRO · RESINA 8K</span>
+        <span class="marquee-sep">/</span>
+        <span class="marquee-item">🛡 CONTROL METROLÓGICO ISO 9001</span>
+        <span class="marquee-sep">/</span>
+        <span class="marquee-item">📦 DESPACHO SEGURO GAM Y 7 PROVINCIAS CR</span>
+        <span class="marquee-sep">/</span>
+        <span class="marquee-item">⏱ COTIZACIÓN FORMAL EN MENOS DE 2 HORAS</span>
+        <span class="marquee-sep">/</span>
+        <span class="marquee-item">⌖ TOLERANCIA VERIFICADA ±0.05 MM</span>
+        <span class="marquee-sep">/</span>
+        <span class="marquee-item">⚡ CAMA CALEFACTORA ACTIVA 110°C</span>
+        <span class="marquee-sep">/</span>
+        <span class="marquee-item">⚙ NYLON PA12-CF · PETG PRO · RESINA 8K</span>
+        <span class="marquee-sep">/</span>
+        <span class="marquee-item">🛡 CONTROL METROLÓGICO ISO 9001</span>
+        <span class="marquee-sep">/</span>
+        <span class="marquee-item">📦 DESPACHO SEGURO GAM Y 7 PROVINCIAS CR</span>
+        <span class="marquee-sep">/</span>
+        <span class="marquee-item">⏱ COTIZACIÓN FORMAL EN MENOS DE 2 HORAS</span>
+        <span class="marquee-sep">/</span>
+      </div>
+    </div>
+
     <!-- ==========================================================================
-       SECCIÓN: PRODUCTOS DESTACADOS DEL CATÁLOGO
+       01 / SELECCIÓN DE TALLER
        Regla Crítica: HOME NO MUESTRA PRECIOS (docs/04 y AI_CONTEXT.md)
        Se presentan las 5 imágenes reales + 1 card demostrativa de fallback oficial
        ========================================================================== -->
-    <section class="section-popular-products" id="productos-populares" aria-label="Productos destacados del catálogo">
+    <section class="section-popular-products" id="catalogo-taller" aria-label="Selección de piezas destacadas del taller">
       <div class="popular-container">
         
         <div class="popular-header-row">
           <div>
-            <div class="section-eyebrow-red">CATÁLOGO DESTACADO // MANUFACTURA ADITIVA</div>
-            <h2 class="section-h2-title">Piezas y Modelos Más Solicitados</h2>
+            <div class="section-eyebrow-red">01 / SELECCIÓN DE TALLER</div>
+            <h2 class="section-h2-title">Objetos que resuelven algo.</h2>
           </div>
-          <a href="/catalogo" class="btn-view-all-catalog">
-            <span>Explorar catálogo completo (18 piezas)</span>
-            <span>→</span>
-          </a>
+          <div class="section-editorial-note">
+            <p>No imprimimos por imprimir. Cada pieza del taller responde a una función mecánica, estética o de ingeniería verificada.</p>
+            <a href="/catalogo" class="link-editorial-arrow">
+              <span>Explorar catálogo completo (18 piezas)</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
         </div>
 
         <div class="popular-products-grid" role="list">
@@ -1314,7 +1944,7 @@
               <span class="product-stock-tag">EN STOCK (14)</span>
               <img src="images/hero-soporte.jpg" 
                    alt="Soporte de Alta Precisión Modular" 
-                   class="product-img-element"
+                   class="product-img-element" 
                    onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
             </div>
             <div class="product-card-body">
@@ -1326,7 +1956,7 @@
               <p class="product-card-desc">Geometría lattice optimizada con alivios de peso Voronoi para montajes mecánicos y rigidez estructural.</p>
               <div class="product-card-bottom">
                 <span class="product-badge-category">Piezas funcionales</span>
-                <a href="/catalogo/p1" class="btn-product-buy">Ver detalles →</a>
+                <a href="/catalogo/p1" class="btn-product-buy">Ver ficha ↗</a>
               </div>
             </div>
           </article>
@@ -1350,7 +1980,7 @@
               <p class="product-card-desc">Dientes helicoidales sinterizados para transmisión de bajo nivel sonoro y resistencia continua al desgaste.</p>
               <div class="product-card-bottom">
                 <span class="product-badge-category">Mecánica / Robótica</span>
-                <a href="/catalogo/p5" class="btn-product-buy">Ver detalles →</a>
+                <a href="/catalogo/p5" class="btn-product-buy">Ver ficha ↗</a>
               </div>
             </div>
           </article>
@@ -1374,7 +2004,7 @@
               <p class="product-card-desc">Escultura de facetas low-poly con articulaciones internas continuas impresas en una sola pieza móvil.</p>
               <div class="product-card-bottom">
                 <span class="product-badge-category">Colección / Arte</span>
-                <a href="/catalogo/p3" class="btn-product-buy">Ver detalles →</a>
+                <a href="/catalogo/p3" class="btn-product-buy">Ver ficha ↗</a>
               </div>
             </div>
           </article>
@@ -1386,7 +2016,7 @@
               <span class="product-stock-tag">EN STOCK (8)</span>
               <img src="images/producto-drone.jpg" 
                    alt="Brazo de Chasis de Drone Pro" 
-                   class="product-img-element"
+                   class="product-img-element" 
                    onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
             </div>
             <div class="product-card-body">
@@ -1398,7 +2028,7 @@
               <p class="product-card-desc">Estructura tubular con montura para motor brushless de alta potencia y amortiguación elástica de impacto.</p>
               <div class="product-card-bottom">
                 <span class="product-badge-category">Aeroespacial / Drones</span>
-                <a href="/catalogo/p2" class="btn-product-buy">Ver detalles →</a>
+                <a href="/catalogo/p2" class="btn-product-buy">Ver ficha ↗</a>
               </div>
             </div>
           </article>
@@ -1410,7 +2040,7 @@
               <span class="product-stock-tag on-demand">BAJO PEDIDO</span>
               <img src="images/producto-maqueta.jpg" 
                    alt="Maqueta de Rascacielos Cúbico" 
-                   class="product-img-element"
+                   class="product-img-element" 
                    onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
             </div>
             <div class="product-card-body">
@@ -1422,7 +2052,7 @@
               <p class="product-card-desc">Modelo arquitectónico de precisión con vanos de ventanas definidos, terrazas y textura de fachada limpia.</p>
               <div class="product-card-bottom">
                 <span class="product-badge-category">Arquitectura</span>
-                <a href="/catalogo/p4" class="btn-product-buy">Ver detalles →</a>
+                <a href="/catalogo/p4" class="btn-product-buy">Ver ficha ↗</a>
               </div>
             </div>
           </article>
@@ -1432,10 +2062,9 @@
             <div class="product-image-box">
               <span class="product-material-pill">RESINA 8K</span>
               <span class="product-stock-tag fallback-demo">NUEVO LOTE</span>
-              <!-- Utiliza la imagen de reemplazo oficial generada para cuando no hay imagen disponible -->
               <img src="placeholder-product.jpg" 
                    alt="Busto de Precisión Demostrativo (Fallback)" 
-                   class="product-img-element"
+                   class="product-img-element" 
                    onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
             </div>
             <div class="product-card-body">
@@ -1447,7 +2076,7 @@
               <p class="product-card-desc">Muestra el fallback oficial en wireframe isométrico cuando la imagen técnica se encuentra en fase de procesado.</p>
               <div class="product-card-bottom">
                 <span class="product-badge-category">Prototipo</span>
-                <a href="/catalogo" class="btn-product-buy">Ver detalles →</a>
+                <a href="/catalogo" class="btn-product-buy">Ver ficha ↗</a>
               </div>
             </div>
           </article>
@@ -1458,16 +2087,93 @@
     </section>
 
     <!-- ==========================================================================
-         SECCIÓN: ESTÁNDARES DE CALIDAD / TECNOLOGÍA Y PRECISIÓN
+         02 / EL MÉTODO (Layout Split Editorial)
          ========================================================================== -->
-    <section class="section-tech-precision" aria-label="Tecnología y Precisión">
-      <div class="tech-container">
+    <section class="section-metodo-split" id="el-metodo" aria-label="El Método Vértice CR">
+      <!-- Ondas concéntricas de señal de precisión (Versión Codex) -->
+      <div class="radar-wave-bg" aria-hidden="true">
+        <div class="radar-circle-1"></div>
+        <div class="radar-circle-2"></div>
+        <div class="radar-circle-3"></div>
+      </div>
+
+      <div class="metodo-split-container reveal-item">
         
-        <div class="section-eyebrow-red">ESTÁNDARES DE CALIDAD</div>
-        <h2 class="section-h2-title">Tecnología y Precisión</h2>
+        <div class="metodo-left-statement">
+          <div class="section-eyebrow-red">02 / EL MÉTODO</div>
+          <h2 class="metodo-h2-split">
+            No imprimimos por imprimir.<br />
+            <span class="orange-lit">Resolvemos.</span>
+          </h2>
+          <p class="metodo-subtext-split">
+            Cada solicitud pasa por un protocolo estricto de ingeniería aditiva, selección metrológica de materiales y control de calidad antes de salir del taller.
+          </p>
+          <a href="/solicitud" class="btn-stitch-hero-action" style="align-self: flex-start; margin-top: 12px;">
+            <span>Iniciar proyecto</span>
+            <span style="font-size: 13px;" aria-hidden="true">↗</span>
+          </a>
+        </div>
+
+        <div class="metodo-right-steps" role="list">
+          
+          <a href="/solicitud" class="metodo-step-row" role="listitem">
+            <span class="metodo-step-index">01</span>
+            <div class="metodo-step-info">
+              <span class="metodo-step-name">Análisis de Geometría</span>
+              <span class="metodo-step-desc">Revisión de malla .STL / .STEP, espesores de pared, alivios mecánicos y orientación óptima de capas.</span>
+            </div>
+            <span class="metodo-step-arrow" aria-hidden="true">↗</span>
+          </a>
+
+          <a href="/solicitud" class="metodo-step-row" role="listitem">
+            <span class="metodo-step-index">02</span>
+            <div class="metodo-step-info">
+              <span class="metodo-step-name">Selección de Material</span>
+              <span class="metodo-step-desc">Definición de polímero según fatiga térmica, esfuerzo a tracción, resistencia UV (ASA) o rigidez estructural.</span>
+            </div>
+            <span class="metodo-step-arrow" aria-hidden="true">↗</span>
+          </a>
+
+          <a href="/solicitud" class="metodo-step-row" role="listitem">
+            <span class="metodo-step-index">03</span>
+            <div class="metodo-step-info">
+              <span class="metodo-step-name">Fabricación Paramétrica</span>
+              <span class="metodo-step-desc">Impresión en cámaras cerradas industriales con control térmico activo y monitoreo continuo capa por capa.</span>
+            </div>
+            <span class="metodo-step-arrow" aria-hidden="true">↗</span>
+          </a>
+
+          <a href="/solicitud" class="metodo-step-row" role="listitem">
+            <span class="metodo-step-index">04</span>
+            <div class="metodo-step-info">
+              <span class="metodo-step-name">Metrología y Curado</span>
+              <span class="metodo-step-desc">Verificación con calibrador digital ±0.05 mm, post-procesado técnico y despacho seguro GAM / 7 Provincias.</span>
+            </div>
+            <span class="metodo-step-arrow" aria-hidden="true">↗</span>
+          </a>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         03 / SEÑALES DE PRECISIÓN (Estándares de Calidad)
+         ========================================================================== -->
+    <section class="section-tech-precision" id="senales-precision" aria-label="Señales de Precisión" style="position:relative; overflow:hidden;">
+      <!-- Ondas concéntricas de señal de precisión (Versión Codex) -->
+      <div class="radar-wave-bg" aria-hidden="true">
+        <div class="radar-circle-1"></div>
+        <div class="radar-circle-2"></div>
+        <div class="radar-circle-3"></div>
+      </div>
+
+      <div class="tech-container reveal-item" style="position:relative; z-index:2;">
+        
+        <div class="section-eyebrow-red">03 / SEÑALES DE PRECISIÓN</div>
+        <h2 class="section-h2-title">La técnica también se puede sentir.</h2>
         <p class="section-subtext">
-          Equipamiento industrial calibrado para ofrecer la máxima exactitud dimensional 
-          y acabados superficiales limpios en polímeros de ingeniería.
+          Estándares industriales y control de tolerancias para piezas que se integran en aplicaciones del mundo real sin holguras ni desajustes.
         </p>
 
         <div class="precision-cards-3-grid" role="list">
@@ -1477,12 +2183,11 @@
               <div class="precision-big-num">±0.05</div>
               <div class="precision-metric-unit">mm</div>
             </div>
-            <h3 class="precision-card-h4">Tolerancia Dimensional</h3>
+            <h3 class="precision-card-h4">1 / INGENIERÍA</h3>
             <p class="precision-card-desc">
-              Tolerancia garantizada para ensambles mecánicos precisos, acoples sin juego 
-              y especificaciones industriales exigentes.
+              Tolerancia dimensional garantizada para ensambles mecánicos precisos, acoples H7/g6 sin juego y piezas de ajuste milimétrico.
             </p>
-            <div class="precision-card-footer-tag">Ajustes H7/g6 verificados</div>
+            <div class="precision-card-footer-tag">Ajustes mecánicos verificados</div>
           </div>
 
           <div class="precision-hero-card" role="listitem">
@@ -1490,12 +2195,11 @@
               <div class="precision-big-num">8K</div>
               <div class="precision-metric-unit">Resina & FDM</div>
             </div>
-            <h3 class="precision-card-h4">Grado Industrial</h3>
+            <h3 class="precision-card-h4">2 / MATERIAL</h3>
             <p class="precision-card-desc">
-              Detalle microscópico para piezas estéticas y polímeros técnicos como PETG, 
-              Nylon con Fibra de Carbono, ASA resistente a UV y TPU flexible.
+              Polímeros certificados: PETG Pro, Nylon PA12 reforzado con Fibra de Carbono, ASA resistente a intemperie UV y resinas de ingeniería de alta densidad.
             </p>
-            <div class="precision-card-footer-tag">FDM & SLA de alta densidad</div>
+            <div class="precision-card-footer-tag">Polímeros certificados</div>
           </div>
 
           <div class="precision-hero-card" role="listitem">
@@ -1503,59 +2207,13 @@
               <div class="precision-big-num">24-48</div>
               <div class="precision-metric-unit">h</div>
             </div>
-            <h3 class="precision-card-h4">Despacho Ágil</h3>
+            <h3 class="precision-card-h4">3 / ENTORNO</h3>
             <p class="precision-card-desc">
-              Prototipado rápido con envíos express en el GAM y cobertura garantizada 
-              a las 7 provincias de Costa Rica mediante Correos de Costa Rica.
+              Despacho express en el GAM y cobertura garantizada a las 7 provincias de Costa Rica mediante Correos de Costa Rica con empaque técnico blindado.
             </p>
-            <div class="precision-card-footer-tag">Entregas GAM & 7 Provincias</div>
+            <div class="precision-card-footer-tag">Cobertura nacional garantizada</div>
           </div>
 
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ==========================================================================
-         SECCIÓN: CÓMO TRABAJAMOS / FLUJO DE TRABAJO
-         ========================================================================== -->
-    <section class="section-workflow-stitch" aria-label="Flujo de trabajo">
-      <div class="workflow-header-center">
-        <div class="section-eyebrow-red">CÓMO TRABAJAMOS</div>
-        <h2 class="section-h2-title">Flujo de Trabajo</h2>
-        <p class="section-subtext" style="margin-bottom: 0;">
-          Un proceso directo y transparente desde el archivo digital hasta la pieza final verificada.
-        </p>
-      </div>
-
-      <div class="workflow-cards-4-grid" role="list">
-        
-        <div class="workflow-step-card" role="listitem">
-          <div class="workflow-step-num">01</div>
-          <h3 class="workflow-step-title">Carga de Archivo</h3>
-          <p class="workflow-step-text">Envíanos tu modelo en formato .STL, .STEP o .OBJ para revisión técnica de malla y orientación de capas.</p>
-          <div class="workflow-step-tag">Validación técnica previa</div>
-        </div>
-
-        <div class="workflow-step-card" role="listitem">
-          <div class="workflow-step-num">02</div>
-          <h3 class="workflow-step-title">Selección de Polímero</h3>
-          <p class="workflow-step-text">Definimos el material óptimo según esfuerzo mecánico, temperatura y acabado estético.</p>
-          <div class="workflow-step-tag">PETG, Nylon CF, Resina, ASA</div>
-        </div>
-
-        <div class="workflow-step-card" role="listitem">
-          <div class="workflow-step-num">03</div>
-          <h3 class="workflow-step-title">Fabricación Aditiva</h3>
-          <p class="workflow-step-text">Impresión de alta precisión con control térmico de cámara cerrada y supervisión continua.</p>
-          <div class="workflow-step-tag">Monitoreo dimensional</div>
-        </div>
-
-        <div class="workflow-step-card" role="listitem">
-          <div class="workflow-step-num">04</div>
-          <h3 class="workflow-step-title">Inspección y Despacho</h3>
-          <p class="workflow-step-text">Curado, verificación metrológica con calibrador digital y entrega segura hasta tu puerta.</p>
-          <div class="workflow-step-tag">Embalaje reforzado</div>
         </div>
 
       </div>
@@ -1571,15 +2229,15 @@
           <div class="quote-rule-pill">
             <span>⏳ ESTADO: PENDIENTE DE COTIZACIÓN · SIN COBRO PREVIO</span>
           </div>
-          <div class="section-eyebrow-red" style="margin-bottom: 6px;">COTIZACIÓN DIRECTA</div>
-          <h2 class="quote-banner-h2">¿Tenés un proyecto a medida o archivo propio?</h2>
+          <div class="section-eyebrow-red" style="margin-bottom: 6px;">PROYECTOS A MEDIDA</div>
+          <h2 class="quote-banner-h2">¿Tenés un archivo que quiere existir?</h2>
           <p class="quote-banner-p">
-            Subí tus especificaciones técnicas para recibir una cotización detallada con tiempos de entrega en menos de 2 horas.
+            Subí tu modelo 3D o boceto. Analizamos geometría, sugerimos el material óptimo y emitimos cotización formal sin costo inicial.
           </p>
         </div>
 
         <a href="/solicitud" class="btn-quote-banner-cta" id="banner-quote-btn">
-          <span>Cotizar archivo STL / STEP →</span>
+          <span>Cotizar archivo ↗</span>
         </a>
       </div>
     </section>
@@ -1595,12 +2253,12 @@
       <div class="footer-top-columns">
         
         <div class="footer-col-1">
-          <a href="/" class="brand-group">
+          <a href="/" class="brand-group" aria-label="Vértice CR Inicio">
             <img src="favicon.png" alt="Vértice CR Logo Oficial" class="brand-logo-img" />
-            <span class="brand-text-name">VÉRTICE CR</span>
+            <span class="brand-text-name">VÉRTICE <span style="color:var(--color-text-dim); font-size:12px; font-weight:400;">CR / AM</span></span>
           </a>
           <p>
-            Manufactura aditiva de precisión y desarrollo de soluciones 3D en San José, Costa Rica. 
+            Manufactura aditiva de precisión y prototipado técnico en San José, Costa Rica. 
             Tolerancia dimensional verificada de ±0.05 mm.
           </p>
           <div class="footer-spec-tag">● FDM / SLA Grado Industrial</div>
@@ -1618,19 +2276,19 @@
         </div>
 
         <div>
-          <div class="footer-heading-col">UBICACIÓN</div>
+          <div class="footer-heading-col">COBERTURA & TALLER</div>
           <div class="footer-location-text">
             San José, Costa Rica.<br />
             Envíos diarios al GAM y a las 7 provincias mediante Correos de Costa Rica.
           </div>
           <a href="mailto:info@verticecr.com" class="footer-contact-item">info@verticecr.com</a>
-          <a href="tel:+50600000000" class="footer-contact-item">WhatsApp: +506 0000-0000</a>
+          <a href="https://wa.me/50600000000" class="footer-contact-item">WhatsApp Técnico: +506 0000-0000</a>
         </div>
 
         <div>
-          <div class="footer-heading-col">MÉTODOS DE PAGO</div>
+          <div class="footer-heading-col">PAGO & HACIENDA</div>
           <div class="footer-payment-text">
-            SINPE Móvil, transferencias bancarias locales y tarjetas de crédito o débito (Visa / Mastercard). Factura electrónica de Hacienda disponible.
+            SINPE Móvil, transferencias bancarias locales y tarjetas de crédito o débito Visa / Mastercard. Factura electrónica oficial autorizada por el Ministerio de Hacienda.
           </div>
           <div class="footer-contact-item" style="color: var(--color-accent); margin-top: 12px;">
             🧾 Factura electrónica oficial CR
@@ -1640,12 +2298,180 @@
       </div>
 
       <div class="footer-bottom-bar">
-        <div>© 2026 VÉRTICE CR - TODOS LOS DERECHOS RESERVADOS</div>
+        <div>© 2026 VÉRTICE CR - MANUFACTURA ADITIVA · TODOS LOS DERECHOS RESERVADOS</div>
         <div>PRECISIÓN ±0.05 MM · SAN JOSÉ, COSTA RICA</div>
       </div>
 
     </div>
   </footer>
+
+  <!-- ==========================================================================
+       MODAL DE BÚSQUEDA TÉCNICA Y ACCESIBLE
+       ========================================================================== -->
+  <div class="search-modal-backdrop" id="search-modal" role="dialog" aria-modal="true" aria-label="Búsqueda de piezas y especificaciones técnicas">
+    <div class="search-modal-panel">
+      <div class="search-modal-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="search" class="search-modal-input" id="search-input" placeholder="Buscar por pieza, material (PETG, Nylon) o tolerancia..." aria-label="Buscar en Vértice CR" />
+        <button class="search-modal-close" id="search-close-btn" aria-label="Cerrar búsqueda">ESC</button>
+      </div>
+      <div class="search-modal-results" id="search-results-list" role="list">
+        <a href="/catalogo" class="search-result-item" role="listitem">
+          <div>
+            <div class="search-result-title">Soporte Modular de Carga</div>
+            <div style="font-size:12px; color:var(--color-text-muted);">Alivios mecánicos lattice · Piezas funcionales</div>
+          </div>
+          <span class="search-result-tag">PETG PRO</span>
+        </a>
+        <a href="/catalogo" class="search-result-item" role="listitem">
+          <div>
+            <div class="search-result-title">Engranaje Helicoidal 60T</div>
+            <div style="font-size:12px; color:var(--color-text-muted);">Módulo 2.0 · Robótica & Mecánica</div>
+          </div>
+          <span class="search-result-tag">NYLON PA12</span>
+        </a>
+        <a href="/catalogo" class="search-result-item" role="listitem">
+          <div>
+            <div class="search-result-title">Brazo de Chasis de Drone Pro</div>
+            <div style="font-size:12px; color:var(--color-text-muted);">Estructura aeroespacial · Resistencia UV</div>
+          </div>
+          <span class="search-result-tag">ASA CARBON</span>
+        </a>
+        <a href="/catalogo" class="search-result-item" role="listitem">
+          <div>
+            <div class="search-result-title">Dragón de Colección Geométrico</div>
+            <div style="font-size:12px; color:var(--color-text-muted);">Escultura Low-Poly · Print-in-Place</div>
+          </div>
+          <span class="search-result-tag">PLA SILK</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       DOCK FLOTANTE: CHATBOT (BOLITA) + ACCESIBILIDAD UNIVERSAL TP (BOLITA)
+       ========================================================================== -->
+  <div class="floating-actions-dock" id="floating-dock">
+    
+    <!-- Panel de Accesibilidad Universal (TP) -->
+    <div class="a11y-panel-card" id="a11y-drawer" role="dialog" aria-modal="false" aria-label="Panel de Accesibilidad Universal">
+      <div class="a11y-header">
+        <div class="a11y-header-left">
+          <div class="a11y-avatar">♿</div>
+          <div>
+            <div class="a11y-name">Accesibilidad Universal</div>
+            <div class="a11y-status-sub">● ENTORNO INCLUSIVO (TP) · WCAG 2.2</div>
+          </div>
+        </div>
+        <button class="chatbot-close-btn" id="a11y-close-btn" aria-label="Cerrar panel de accesibilidad">✕</button>
+      </div>
+
+      <div class="a11y-content-body">
+        <!-- 1. Escala de Texto -->
+        <div class="a11y-item-row">
+          <div class="a11y-item-info">
+            <span class="a11y-item-title">Tamaño de Texto</span>
+            <span class="a11y-item-sub">Escala tipográfica relativa para baja visión</span>
+          </div>
+          <div class="a11y-ctrl-group">
+            <button class="a11y-btn-scale" id="btn-scale-down" aria-label="Reducir tamaño de texto">A-</button>
+            <span class="a11y-scale-badge" id="lbl-scale-val">100%</span>
+            <button class="a11y-btn-scale" id="btn-scale-up" aria-label="Aumentar tamaño de texto">A+</button>
+          </div>
+        </div>
+
+        <!-- 2. Alto Contraste -->
+        <div class="a11y-item-row">
+          <div class="a11y-item-info">
+            <span class="a11y-item-title">Alto Contraste</span>
+            <span class="a11y-item-sub">Máxima nitidez negro / amarillo reforzado</span>
+          </div>
+          <button class="a11y-switch-btn" id="btn-toggle-contrast" aria-pressed="false">Activar</button>
+        </div>
+
+        <!-- 3. Fuente para Dislexia / Alta Legibilidad -->
+        <div class="a11y-item-row">
+          <div class="a11y-item-info">
+            <span class="a11y-item-title">Fuente Alta Legibilidad</span>
+            <span class="a11y-item-sub">Espaciado y glifos para dislexia</span>
+          </div>
+          <button class="a11y-switch-btn" id="btn-toggle-dyslexia" aria-pressed="false">Activar</button>
+        </div>
+
+        <!-- 4. Pausar Movimiento -->
+        <div class="a11y-item-row">
+          <div class="a11y-item-info">
+            <span class="a11y-item-title">Pausar Movimiento</span>
+            <span class="a11y-item-sub">Detiene láseres, carrusel y animaciones</span>
+          </div>
+          <button class="a11y-switch-btn" id="btn-toggle-motion" aria-pressed="false">Pausar</button>
+        </div>
+
+        <!-- 5. Resaltar Enlaces y Foco -->
+        <div class="a11y-item-row">
+          <div class="a11y-item-info">
+            <span class="a11y-item-title">Resaltar Navegación</span>
+            <span class="a11y-item-sub">Subrayado y contornos accesibles</span>
+          </div>
+          <button class="a11y-switch-btn" id="btn-toggle-links" aria-pressed="false">Resaltar</button>
+        </div>
+
+        <button class="a11y-reset-all" id="btn-a11y-reset">Restablecer valores predeterminados</button>
+      </div>
+    </div>
+
+    <!-- Panel del Chatbot Técnico -->
+    <div class="chatbot-drawer-card" id="chatbot-drawer" role="dialog" aria-modal="false" aria-label="Asistente de Cotización y Manufactura">
+      <div class="chatbot-header">
+        <div class="chatbot-header-left">
+          <div class="chatbot-avatar">V</div>
+          <div>
+            <div class="chatbot-name">Asistente Técnico Vértice</div>
+            <div class="chatbot-status-sub">● EN LÍNEA · TALLER AM</div>
+          </div>
+        </div>
+        <button class="chatbot-close-btn" id="chatbot-close-btn" aria-label="Cerrar asistente">✕</button>
+      </div>
+
+      <div class="chatbot-messages-box" id="chatbot-messages" role="log" aria-live="polite">
+        <div class="chat-bubble bot">
+          ¡Hola! Soy el asistente técnico de Vértice CR. ¿En qué te puedo asesorar hoy sobre materiales, cotizaciones STL o tolerancias dimensionales?
+        </div>
+      </div>
+
+      <div class="chat-quick-actions" aria-label="Consultas frecuentes">
+        <button class="quick-chip" data-q="¿Cómo cotizo un archivo STL?">Cotizar STL</button>
+        <button class="quick-chip" data-q="¿Qué materiales técnicos usan?">Materiales</button>
+        <button class="quick-chip" data-q="¿Hacen envíos a todo Costa Rica?">Envíos CR</button>
+        <button class="quick-chip" data-q="¿Cuál es la tolerancia dimensional?">Tolerancias</button>
+      </div>
+
+      <div class="chatbot-input-row">
+        <input type="text" class="chatbot-input" id="chatbot-input" placeholder="Pregunta sobre materiales, envíos..." aria-label="Escribe tu consulta técnica" />
+        <button class="chatbot-send-btn" id="chatbot-send-btn" aria-label="Enviar pregunta">Enviar</button>
+      </div>
+    </div>
+
+    <!-- Columna de Botones Redondos Flotantes (Bolitas uno encima del otro) -->
+    <div class="floating-buttons-column" id="floating-btn-column">
+      <!-- Bolita Superior: Accesibilidad Universal TP -->
+      <button class="fab-bolita fab-a11y-btn" id="a11y-trigger-btn" aria-label="Opciones de accesibilidad para personas con discapacidad visual y de lectura" title="Accesibilidad Universal (TP)" aria-expanded="false">
+        <span style="font-size: 21px;" aria-hidden="true">♿</span>
+      </button>
+
+      <!-- Bolita Inferior: Chatbot Técnico (con pulso y baliza de estado en línea) -->
+      <button class="fab-bolita fab-chat-btn" id="chatbot-trigger-btn" aria-label="Abrir asistente técnico de manufactura" title="Asistente Técnico Vértice" aria-expanded="false">
+        <span class="fab-status-dot" aria-hidden="true"></span>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </button>
+    </div>
+
+  </div>
 
   <!-- ==========================================================================
        SCRIPT INTERACTIVO CON FOTOGRAFÍAS REALES Y CONTROL CAD
@@ -1708,6 +2534,7 @@
       const pieceName = document.getElementById('piece-name-display');
       const pieceDesc = document.getElementById('piece-desc-display');
       const pieceSpec = document.getElementById('piece-spec-tag');
+      const objectTag = document.getElementById('hero-object-num');
       const calloutMat = document.getElementById('callout-material');
       const calloutProc = document.getElementById('callout-process');
       const calloutLinePath = document.getElementById('callout-line-path');
@@ -1732,6 +2559,10 @@
           pieceSpec.textContent = item.code;
           calloutMat.textContent = item.mat;
           calloutProc.textContent = item.proc;
+
+          if (objectTag) {
+            objectTag.textContent = `OBJECT 0${idx + 1} / 04`;
+          }
 
           // Actualizar posición de la línea guía técnica Stitch
           if (calloutLinePath && calloutDot && calloutDotPulse) {
@@ -1763,17 +2594,23 @@
         });
       });
 
-      document.getElementById('thumb-prev-btn').addEventListener('click', () => {
-        const next = (currentIdx - 1 + piecesData.length) % piecesData.length;
-        displayPiece(next);
-        resetAutoCycle();
-      });
+      const prevBtn = document.getElementById('thumb-prev-btn');
+      const nextBtn = document.getElementById('thumb-next-btn');
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+          const next = (currentIdx - 1 + piecesData.length) % piecesData.length;
+          displayPiece(next);
+          resetAutoCycle();
+        });
+      }
 
-      document.getElementById('thumb-next-btn').addEventListener('click', () => {
-        const next = (currentIdx + 1) % piecesData.length;
-        displayPiece(next);
-        resetAutoCycle();
-      });
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          const next = (currentIdx + 1) % piecesData.length;
+          displayPiece(next);
+          resetAutoCycle();
+        });
+      }
 
       function startAutoCycle() {
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -1815,19 +2652,20 @@
       // 3. Menú Desplegable Hamburger
       const menuBtn = document.getElementById('menu-toggle-btn');
       const dropdown = document.getElementById('user-dropdown-panel');
+      if (menuBtn && dropdown) {
+        menuBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = dropdown.classList.toggle('open');
+          menuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
 
-      menuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isOpen = dropdown.classList.toggle('open');
-        menuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!dropdown.contains(e.target) && e.target !== menuBtn) {
-          dropdown.classList.remove('open');
-          menuBtn.setAttribute('aria-expanded', 'false');
-        }
-      });
+        document.addEventListener('click', (e) => {
+          if (!dropdown.contains(e.target) && e.target !== menuBtn) {
+            dropdown.classList.remove('open');
+            menuBtn.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
 
       // 4. Toggle Dark/Light Mode
       const themeBtn = document.getElementById('theme-btn');
@@ -1838,24 +2676,318 @@
       function applyTheme(th) {
         root.setAttribute('data-theme', th);
         if (th === 'light') {
-          themeSun.style.display = 'block';
-          themeMoon.style.display = 'none';
+          if (themeSun) themeSun.style.display = 'block';
+          if (themeMoon) themeMoon.style.display = 'none';
         } else {
-          themeSun.style.display = 'none';
-          themeMoon.style.display = 'block';
+          if (themeSun) themeSun.style.display = 'none';
+          if (themeMoon) themeMoon.style.display = 'block';
         }
         try { localStorage.setItem('vertice_theme_pref', th); } catch(e) {}
       }
 
-      // Recuperar preferencia guardada
       try {
         const saved = localStorage.getItem('vertice_theme_pref');
         if (saved) applyTheme(saved);
       } catch(e) {}
 
-      themeBtn.addEventListener('click', () => {
-        const current = root.getAttribute('data-theme') || 'dark';
-        applyTheme(current === 'dark' ? 'light' : 'dark');
+      if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+          const current = root.getAttribute('data-theme') || 'dark';
+          applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+      }
+
+      // 5. Modal de Búsqueda Rápida
+      const searchBtn = document.getElementById('search-btn');
+      const searchModal = document.getElementById('search-modal');
+      const searchClose = document.getElementById('search-close-btn');
+      const searchInput = document.getElementById('search-input');
+
+      function openSearch() {
+        if (!searchModal) return;
+        searchModal.classList.add('open');
+        if (searchInput) {
+          searchInput.value = '';
+          searchInput.focus();
+        }
+      }
+
+      function closeSearch() {
+        if (!searchModal) return;
+        searchModal.classList.remove('open');
+        if (searchBtn) searchBtn.focus();
+      }
+
+      if (searchBtn) searchBtn.addEventListener('click', openSearch);
+      if (searchClose) searchClose.addEventListener('click', closeSearch);
+
+      if (searchModal) {
+        searchModal.addEventListener('click', (e) => {
+          if (e.target === searchModal) closeSearch();
+        });
+      }
+
+      // 6. Selector Bilingüe ES / EN
+      const langBtn = document.getElementById('lang-btn');
+      const langLabel = document.getElementById('lang-label');
+      let currentLang = 'ES';
+
+      if (langBtn) {
+        langBtn.addEventListener('click', () => {
+          currentLang = currentLang === 'ES' ? 'EN' : 'ES';
+          if (langLabel) langLabel.textContent = currentLang === 'ES' ? 'ES / EN' : 'EN / ES';
+          root.setAttribute('lang', currentLang.toLowerCase());
+          try { localStorage.setItem('vertice_lang_pref', currentLang); } catch(e) {}
+        });
+      }
+
+      // 7. Chatbot Asistente Técnico
+      const chatTrigger = document.getElementById('chatbot-trigger-btn');
+      const chatDrawer = document.getElementById('chatbot-drawer');
+      const chatClose = document.getElementById('chatbot-close-btn');
+      const chatInput = document.getElementById('chatbot-input');
+      const chatSend = document.getElementById('chatbot-send-btn');
+      const chatMessages = document.getElementById('chatbot-messages');
+      const quickChips = document.querySelectorAll('.quick-chip');
+
+      function toggleChat() {
+        if (!chatDrawer) return;
+        const isOpen = chatDrawer.classList.toggle('open');
+        if (chatTrigger) chatTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        if (isOpen) {
+          if (a11yDrawer) {
+            a11yDrawer.classList.remove('open');
+            if (a11yTrigger) a11yTrigger.setAttribute('aria-expanded', 'false');
+          }
+          if (chatInput) chatInput.focus();
+        }
+      }
+
+      if (chatTrigger) chatTrigger.addEventListener('click', toggleChat);
+      if (chatClose) chatClose.addEventListener('click', toggleChat);
+
+      // 8. Panel de Accesibilidad Universal (TP)
+      const a11yTrigger = document.getElementById('a11y-trigger-btn');
+      const a11yDrawer = document.getElementById('a11y-drawer');
+      const a11yClose = document.getElementById('a11y-close-btn');
+
+      function toggleA11y() {
+        if (!a11yDrawer) return;
+        const isOpen = a11yDrawer.classList.toggle('open');
+        if (a11yTrigger) a11yTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        if (isOpen && chatDrawer) {
+          chatDrawer.classList.remove('open');
+          if (chatTrigger) chatTrigger.setAttribute('aria-expanded', 'false');
+        }
+      }
+
+      if (a11yTrigger) a11yTrigger.addEventListener('click', toggleA11y);
+      if (a11yClose) a11yClose.addEventListener('click', toggleA11y);
+
+      // Accesibilidad: Escala de texto
+      let fontScale = 1;
+      const lblScale = document.getElementById('lbl-scale-val');
+      const btnScaleDown = document.getElementById('btn-scale-down');
+      const btnScaleUp = document.getElementById('btn-scale-up');
+
+      function updateFontScale(val) {
+        fontScale = Math.min(1.3, Math.max(0.9, val));
+        root.style.setProperty('--a11y-font-scale', fontScale);
+        if (lblScale) lblScale.textContent = `${Math.round(fontScale * 100)}%`;
+        try { localStorage.setItem('vertice_a11y_scale', fontScale); } catch(e) {}
+      }
+
+      if (btnScaleDown) btnScaleDown.addEventListener('click', () => updateFontScale(fontScale - 0.1));
+      if (btnScaleUp) btnScaleUp.addEventListener('click', () => updateFontScale(fontScale + 0.1));
+
+      // Accesibilidad: Alto Contraste
+      const btnContrast = document.getElementById('btn-toggle-contrast');
+      function toggleContrast(force) {
+        const isNow = force !== undefined ? force : !root.classList.contains('a11y-contrast');
+        root.classList.toggle('a11y-contrast', isNow);
+        if (btnContrast) {
+          btnContrast.classList.toggle('active', isNow);
+          btnContrast.setAttribute('aria-pressed', isNow ? 'true' : 'false');
+          btnContrast.textContent = isNow ? 'Activo' : 'Activar';
+        }
+        try { localStorage.setItem('vertice_a11y_contrast', isNow ? '1' : '0'); } catch(e) {}
+      }
+      if (btnContrast) btnContrast.addEventListener('click', () => toggleContrast());
+
+      // Accesibilidad: Fuente Dislexia / Legibilidad
+      const btnDyslexia = document.getElementById('btn-toggle-dyslexia');
+      function toggleDyslexia(force) {
+        const isNow = force !== undefined ? force : !root.classList.contains('a11y-dyslexia');
+        root.classList.toggle('a11y-dyslexia', isNow);
+        if (btnDyslexia) {
+          btnDyslexia.classList.toggle('active', isNow);
+          btnDyslexia.setAttribute('aria-pressed', isNow ? 'true' : 'false');
+          btnDyslexia.textContent = isNow ? 'Activo' : 'Activar';
+        }
+        try { localStorage.setItem('vertice_a11y_dyslexia', isNow ? '1' : '0'); } catch(e) {}
+      }
+      if (btnDyslexia) btnDyslexia.addEventListener('click', () => toggleDyslexia());
+
+      // Accesibilidad: Pausar Movimiento
+      const btnMotion = document.getElementById('btn-toggle-motion');
+      function toggleMotion(force) {
+        const isNow = force !== undefined ? force : !root.classList.contains('a11y-reduce-motion');
+        root.classList.toggle('a11y-reduce-motion', isNow);
+        if (btnMotion) {
+          btnMotion.classList.toggle('active', isNow);
+          btnMotion.setAttribute('aria-pressed', isNow ? 'true' : 'false');
+          btnMotion.textContent = isNow ? 'Pausado' : 'Pausar';
+        }
+        if (isNow) {
+          clearInterval(autoTimer);
+        } else {
+          startAutoCycle();
+        }
+        try { localStorage.setItem('vertice_a11y_motion', isNow ? '1' : '0'); } catch(e) {}
+      }
+      if (btnMotion) btnMotion.addEventListener('click', () => toggleMotion());
+
+      // Accesibilidad: Resaltar Enlaces
+      const btnLinks = document.getElementById('btn-toggle-links');
+      function toggleLinks(force) {
+        const isNow = force !== undefined ? force : !root.classList.contains('a11y-highlights');
+        root.classList.toggle('a11y-highlights', isNow);
+        if (btnLinks) {
+          btnLinks.classList.toggle('active', isNow);
+          btnLinks.setAttribute('aria-pressed', isNow ? 'true' : 'false');
+          btnLinks.textContent = isNow ? 'Resaltado' : 'Resaltar';
+        }
+        try { localStorage.setItem('vertice_a11y_links', isNow ? '1' : '0'); } catch(e) {}
+      }
+      if (btnLinks) btnLinks.addEventListener('click', () => toggleLinks());
+
+      // Accesibilidad: Restablecer
+      const btnReset = document.getElementById('btn-a11y-reset');
+      if (btnReset) {
+        btnReset.addEventListener('click', () => {
+          updateFontScale(1);
+          toggleContrast(false);
+          toggleDyslexia(false);
+          toggleMotion(false);
+          toggleLinks(false);
+          try {
+            localStorage.removeItem('vertice_a11y_scale');
+            localStorage.removeItem('vertice_a11y_contrast');
+            localStorage.removeItem('vertice_a11y_dyslexia');
+            localStorage.removeItem('vertice_a11y_motion');
+            localStorage.removeItem('vertice_a11y_links');
+          } catch(e) {}
+        });
+      }
+
+      // Recuperar preferencias de accesibilidad guardadas
+      try {
+        const sScale = localStorage.getItem('vertice_a11y_scale');
+        if (sScale) updateFontScale(parseFloat(sScale));
+        if (localStorage.getItem('vertice_a11y_contrast') === '1') toggleContrast(true);
+        if (localStorage.getItem('vertice_a11y_dyslexia') === '1') toggleDyslexia(true);
+        if (localStorage.getItem('vertice_a11y_motion') === '1') toggleMotion(true);
+        if (localStorage.getItem('vertice_a11y_links') === '1') toggleLinks(true);
+      } catch(e) {}
+
+      // 9. Movimiento y Animación: 3D Tilt y Spotlight Táctil (Emil Kowalski)
+      const interactiveCards = document.querySelectorAll('.product-catalog-card, .precision-hero-card');
+      interactiveCards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          if (root.classList.contains('a11y-reduce-motion')) return;
+          const rect = card.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width - 0.5;
+          const y = (e.clientY - rect.top) / rect.height - 0.5;
+          card.style.transform = `perspective(1000px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateY(-5px)`;
+          card.style.setProperty('--mouse-x', `${(e.clientX - rect.left)}px`);
+          card.style.setProperty('--mouse-y', `${(e.clientY - rect.top)}px`);
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(0px)';
+        });
+      });
+
+      // 10. Scroll Reveal Animations (Entrada fluida editorial)
+      const revealElements = document.querySelectorAll('.reveal-item');
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+            }
+          });
+        }, { threshold: 0.1 });
+        revealElements.forEach(el => observer.observe(el));
+      } else {
+        revealElements.forEach(el => el.classList.add('visible'));
+      }
+
+      const botReplies = {
+        'stl': 'Podés subir tu archivo .STL, .STEP o .OBJ en nuestra sección de cotización. Analizamos la malla, volumen y requerimientos mecánicos para emitir una cotización formal sin costo previo en menos de 2 horas.',
+        'materiales': 'Trabajamos con polímeros certificados de ingeniería: PETG Pro para montajes mecánicos, Nylon PA12 reforzado con Fibra de Carbono, ASA resistente a intemperie UV, PLA de alta definición y resinas de ingeniería 8K.',
+        'envios': 'Despachamos de forma segura mediante Correos de Costa Rica a las 7 provincias del país (San José, Alajuela, Cartago, Heredia, Guanacaste, Puntarenas y Limón) y mensajería express en el GAM.',
+        'tolerancias': 'Nuestros equipos calibrados garantizan tolerancias dimensionales de ±0.05 mm para ensambles mecánicos precisos, acoples tipo H7/g6 y piezas técnicas sin holgura.',
+        'precio': 'En Vértice CR, las cotizaciones personalizadas dependen de la geometría exacta, el material técnico elegido y los parámetros de infill. Cada solicitud recibe un desglose técnico antes de cualquier pago.',
+        'default': 'Entendido. Para requerimientos especiales de manufactura aditiva o proyectos a medida, podés iniciar una solicitud con tu archivo 3D o contactar al equipo técnico a info@verticecr.com.'
+      };
+
+      function addChatMessage(text, sender) {
+        if (!chatMessages) return;
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble ${sender}`;
+        bubble.textContent = text;
+        chatMessages.appendChild(bubble);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function handleUserQuestion(q) {
+        if (!q.trim()) return;
+        addChatMessage(q, 'user');
+
+        const clean = q.toLowerCase();
+        let replyKey = 'default';
+        if (clean.includes('stl') || clean.includes('cotiz') || clean.includes('archivo')) replyKey = 'stl';
+        else if (clean.includes('material') || clean.includes('nylon') || clean.includes('petg') || clean.includes('asa')) replyKey = 'materiales';
+        else if (clean.includes('envi') || clean.includes('provincia') || clean.includes('gam') || clean.includes('correos')) replyKey = 'envios';
+        else if (clean.includes('toleran') || clean.includes('precis') || clean.includes('0.05')) replyKey = 'tolerancias';
+        else if (clean.includes('precio') || clean.includes('costo') || clean.includes('cuanto')) replyKey = 'precio';
+
+        setTimeout(() => {
+          addChatMessage(botReplies[replyKey], 'bot');
+        }, 400);
+      }
+
+      if (chatSend && chatInput) {
+        chatSend.addEventListener('click', () => {
+          handleUserQuestion(chatInput.value);
+          chatInput.value = '';
+        });
+        chatInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            handleUserQuestion(chatInput.value);
+            chatInput.value = '';
+          }
+        });
+      }
+
+      quickChips.forEach(chip => {
+        chip.addEventListener('click', function() {
+          const query = this.getAttribute('data-q') || this.textContent;
+          handleUserQuestion(query);
+        });
+      });
+
+      // Tecla ESC para cerrar modales
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (searchModal && searchModal.classList.contains('open')) closeSearch();
+          if (chatDrawer && chatDrawer.classList.contains('open')) toggleChat();
+          if (a11yDrawer && a11yDrawer.classList.contains('open')) toggleA11y();
+          if (dropdown && dropdown.classList.contains('open')) {
+            dropdown.classList.remove('open');
+            if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+          }
+        }
       });
 
     })();
