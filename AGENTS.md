@@ -32,7 +32,7 @@ No crear un Markdown nuevo si la información pertenece a uno de los 11 document
 
 ## Regla de acompañamiento del usuario
 
-El usuario necesita saber **dónde estamos y hacia dónde vamos**. Al cerrar cualquier bloque de trabajo relevante, indicar explícitamente:
+El usuario necesita saber **dónde estamos y hacia dónde vamos**. Al cerrar cualquier bloque de trabajo, indicar explícitamente:
 - estado actual del proyecto;
 - qué se terminó o cambió realmente;
 - qué sigue;
