@@ -108,7 +108,9 @@
 
     /* Accesibilidad: Reduced Motion */
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
+      html:not(.a11y-motion-preview) *,
+      html:not(.a11y-motion-preview) *::before,
+      html:not(.a11y-motion-preview) *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
@@ -201,7 +203,7 @@
     }
 
     .theme-switch-btn {
-      width: 38px; height: 38px;
+      width: 44px; height: 44px;
       border-radius: var(--radius-sharp);
       display: flex; align-items: center; justify-content: center;
       color: var(--color-text-muted);
@@ -215,7 +217,7 @@
     }
 
     .hamburger-btn {
-      width: 38px; height: 38px;
+      width: 44px; height: 44px;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       gap: 5px; cursor: pointer;
       border: 1px solid var(--color-border);
@@ -440,20 +442,38 @@
       100% { opacity: 1; transform: scale(1.10); }
     }
 
-    /* Rayo láser dinámico de escaneo 3D */
-    .scan-laser-line {
-      position: absolute; left: 0; right: 0; height: 3px;
-      background: linear-gradient(90deg, transparent 0%, rgba(255, 90, 31, 0.25) 15%, #FF5A1F 40%, #FFA066 50%, #FF5A1F 60%, rgba(255, 90, 31, 0.25) 85%, transparent 100%);
-      box-shadow: 0 0 14px #FF5A1F, 0 0 32px rgba(255, 90, 31, 0.8), 0 0 55px rgba(255, 90, 31, 0.35);
-      animation: laserSweep 4.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
-      pointer-events: none; z-index: 6;
-      will-change: top, opacity;
+    /* Barrido ambiental de volumen: movimiento amplio, no una línea decorativa */
+    .stage-signal-sweep {
+      position: absolute; inset: -28% -35%; z-index: 2; pointer-events: none;
+      background: linear-gradient(112deg, transparent 38%, rgba(255, 90, 31, 0.03) 43%, rgba(255, 159, 102, 0.20) 49%, rgba(255, 90, 31, 0.05) 55%, transparent 62%);
+      filter: blur(8px);
+      transform: translate3d(-34%, 0, 0) rotate(-8deg);
+      animation: volumeSweep 7.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+      will-change: transform, opacity;
     }
-    @keyframes laserSweep {
-      0% { top: 12%; opacity: 0.40; }
-      50% { opacity: 1; }
-      100% { top: 88%; opacity: 0.40; }
+    @keyframes volumeSweep {
+      0%, 12% { opacity: 0; transform: translate3d(-38%, 8%, 0) rotate(-8deg); }
+      26% { opacity: 0.9; }
+      58% { opacity: 0.45; }
+      84%, 100% { opacity: 0; transform: translate3d(38%, -8%, 0) rotate(-8deg); }
     }
+
+    .stage-motion-toggle {
+      position: absolute; top: 60px; right: 20px; left: auto; bottom: auto; z-index: 18;
+      display: inline-flex; align-items: center; gap: 8px; min-height: 40px;
+      padding: 8px 12px; border: 1px solid var(--color-border);
+      border-radius: var(--radius-sharp); background: rgba(13, 11, 9, 0.82);
+      color: var(--color-text-muted); font-family: var(--font-mono); font-size: 10px;
+      font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      backdrop-filter: blur(10px); transition: color var(--motion-micro), border-color var(--motion-micro), background var(--motion-micro);
+    }
+    .stage-motion-toggle::before {
+      content: ''; width: 7px; height: 7px; border-radius: 50%;
+      background: var(--color-text-dim); box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
+    }
+    .stage-motion-toggle[aria-pressed="true"] { color: var(--color-accent); border-color: var(--color-accent); background: rgba(255, 90, 31, 0.12); }
+    .stage-motion-toggle[aria-pressed="true"]::before { background: var(--color-accent); box-shadow: 0 0 0 3px rgba(255,90,31,0.16), 0 0 12px var(--color-accent); }
+    .stage-motion-toggle:hover { color: var(--color-text); border-color: var(--color-accent); }
 
     /* Badge de estado de escaneo decorativo */
     .stage-scan-status-badge {
@@ -551,21 +571,18 @@
       -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 68%, rgba(0,0,0,0) 98%);
       mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 68%, rgba(0,0,0,0) 98%);
       animation: heroFloatIdle 4.8s ease-in-out infinite alternate;
-      will-change: transform, filter;
+       will-change: transform;
       transition: opacity var(--motion-ui);
     }
     @keyframes heroFloatIdle {
       0% {
         transform: translateY(0px) rotate(0deg);
-        filter: drop-shadow(0 18px 30px rgba(0,0,0,0.85));
       }
       50% {
         transform: translateY(-12px) rotate(1.2deg);
-        filter: drop-shadow(0 32px 48px rgba(0,0,0,0.95)) drop-shadow(0 0 25px rgba(255, 90, 31, 0.18));
       }
       100% {
         transform: translateY(0px) rotate(0deg);
-        filter: drop-shadow(0 18px 30px rgba(0,0,0,0.85));
       }
     }
 
@@ -597,7 +614,7 @@
       gap: 8px;
     }
     .rail-arrow-btn {
-      width: 28px; height: 28px;
+      width: 44px; height: 44px;
       display: flex; align-items: center; justify-content: center;
       color: var(--color-text-muted);
       border-radius: var(--radius-sharp);
@@ -1077,9 +1094,147 @@
     }
     .skip-to-content:focus { top: 16px; }
 
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+
+    /* Navegación: jerarquía clara y controles homogéneos */
+    .stitch-navbar { height: 80px; background: rgba(13, 11, 9, 0.94); }
+    .navbar-inner { width: 100%; max-width: none; padding: 0 48px; gap: 28px; }
+    .brand-group { min-height: 48px; gap: 12px; padding: 4px 10px 4px 4px; border-radius: 8px; transition: background var(--motion-micro); }
+    .brand-group:hover { background: rgba(255,255,255,0.04); }
+    .nav-menu { flex: 1 1 auto; justify-content: center; gap: 8px; }
+    .nav-item-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border: 1px solid transparent; border-radius: 6px; }
+    .nav-item-link.active { background: rgba(255,90,31,0.09); border-color: rgba(255,90,31,0.32); }
+    .nav-item-link.active::after { bottom: 3px; left: 12px; right: 12px; height: 2px; }
+    .nav-item-link:hover { background: var(--color-surface-2); border-color: var(--color-border); }
+    .nav-actions { gap: 8px; }
+    .btn-stitch-quote { min-height: 44px; padding: 0 16px; }
+    .lang-toggle-btn { min-width: 76px; min-height: 44px; }
+    .search-nav-btn, .theme-switch-btn, .hamburger-btn { background: rgba(255,255,255,0.035); }
+    .search-nav-btn:hover, .theme-switch-btn:hover, .hamburger-btn:hover { background: rgba(255,90,31,0.10); box-shadow: 0 0 0 3px rgba(255,90,31,0.08); }
+
+    /* El panel se comporta como modal real: scrim, lectura y foco aislado */
+    .dialog-scrim { position: fixed; inset: 0; z-index: 140; display: none; background: rgba(5,4,3,0.76); backdrop-filter: blur(1px); }
+    .dialog-scrim.open { display: block; }
+    body.modal-open { overflow: hidden; }
+    .floating-actions-dock { z-index: 160; }
+    .a11y-panel-card, .chatbot-drawer-card { position: relative; z-index: 161; border-radius: 8px; background: #15120f; border-color: rgba(255,90,31,0.34); box-shadow: 0 28px 80px rgba(0,0,0,0.72), 0 0 0 1px rgba(255,255,255,0.04); }
+    .a11y-panel-card { width: min(438px, calc(100vw - 32px)); max-height: min(720px, calc(100vh - 32px)); }
+    .a11y-header, .chatbot-header { padding: 18px 20px; border-left: 3px solid var(--color-accent); }
+    .a11y-header { background: linear-gradient(135deg, #211914, #17130f); }
+    .a11y-content-body { padding: 18px 20px 20px; max-height: min(560px, calc(100vh - 150px)); gap: 0; background: #15120f; }
+    .a11y-intro { margin: 0 0 16px; color: var(--color-text-muted); font-size: 12px; line-height: 1.55; }
+    .a11y-group-label { margin: 14px 0 8px; color: var(--color-accent); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+    .a11y-item-row { min-height: 68px; margin: 0 0 8px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; background: rgba(255,255,255,0.025); }
+    .a11y-item-title { font-size: 13px; }
+    .a11y-item-sub { max-width: 250px; line-height: 1.4; }
+    .a11y-switch-btn { flex: 0 0 auto; }
+    .a11y-switch-btn:not(.active):hover { color: var(--color-text); border-color: var(--color-accent); }
+    .a11y-reset-all { min-height: 44px; margin-top: 12px; border: 1px solid var(--color-border); border-radius: 6px; color: var(--color-text-muted); }
+    .a11y-reset-all:hover { background: var(--color-surface-2); border-color: var(--color-accent); }
+
+    /* Chat técnico: conversación de demo, no falsa disponibilidad online */
+    .chatbot-drawer-card { width: min(430px, calc(100vw - 32px)); height: min(650px, calc(100vh - 32px)); }
+    .chatbot-header { background: linear-gradient(135deg, #211914, #17130f); }
+    .chatbot-avatar { width: 40px; height: 40px; border-radius: 10px; position: relative; box-shadow: 0 0 0 4px rgba(255,90,31,0.12); }
+    .chatbot-avatar::after { content: ''; position: absolute; right: -4px; bottom: -4px; width: 10px; height: 10px; border-radius: 50%; background: #22c55e; border: 2px solid var(--color-surface-2); }
+    .chatbot-name { font-size: 14px; letter-spacing: 0.01em; }
+    .chatbot-status-sub { color: #86efac; font-size: 10px; }
+    .chatbot-context { margin: 0; color: var(--color-text-dim); font-size: 11px; line-height: 1.45; }
+    .chatbot-header-tools { display: flex; align-items: center; gap: 4px; }
+    .chat-reset-btn { min-height: 40px; padding: 6px 10px; border: 1px solid var(--color-border); border-radius: 6px; color: var(--color-text-muted); font-family: var(--font-mono); font-size: 10px; }
+    .chat-reset-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .chatbot-messages-box { padding: 20px; gap: 14px; background: radial-gradient(circle at 85% 10%, rgba(255,90,31,0.08), transparent 40%), #15120f; }
+    .chat-intro-card { padding: 14px; border: 1px solid rgba(255,90,31,0.28); border-left: 3px solid var(--color-accent); background: rgba(255,90,31,0.06); }
+    .chat-intro-kicker { color: var(--color-accent); font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+    .chat-intro-copy { margin: 6px 0 0; color: var(--color-text-muted); font-size: 12px; line-height: 1.55; }
+    .chat-bubble { max-width: 88%; padding: 11px 13px; border-radius: 8px; }
+    .chat-bubble.bot { border-color: var(--color-border); }
+    .chat-bubble.user { border-bottom-right-radius: 3px; }
+    .chat-typing { color: var(--color-text-muted); font-family: var(--font-mono); font-size: 11px; }
+    .chat-quick-actions { gap: 7px; padding: 12px 16px 14px; background: #100e0c; }
+    .chat-quick-label { flex-basis: 100%; color: var(--color-text-dim); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+    .quick-chip { min-height: 40px; padding: 8px 12px; border-radius: 6px; font-size: 11px; }
+    .chatbot-input-row { padding: 12px 16px 16px; background: var(--color-surface); }
+    .chatbot-input { min-height: 44px; padding: 10px 12px; font-size: 13px; }
+    .chatbot-input:focus { border-color: var(--color-accent); box-shadow: 0 0 0 3px rgba(255,90,31,0.12); }
+    .chatbot-send-btn { min-width: 78px; }
+
+    /* El dock conserva su legibilidad aunque el contenido esté al 90% o 130%. */
+    .floating-actions-dock { zoom: calc(1 / var(--a11y-font-scale)); }
+    .a11y-panel-card {
+      width: min(470px, calc(100vw - 40px));
+      height: min(600px, calc(100vh - 80px));
+      max-height: none;
+      border-radius: 10px;
+      background: #171411;
+    }
+    .a11y-header {
+      min-height: 76px;
+      padding: 16px 20px;
+      background: linear-gradient(110deg, #261a14 0%, #1a1613 68%, #141210 100%);
+    }
+    .a11y-avatar {
+      width: 38px; height: 38px;
+      border-radius: 8px;
+      background: #1269a8;
+      box-shadow: 0 0 0 4px rgba(18,105,168,0.15);
+    }
+    .a11y-name { font-size: 15px; letter-spacing: 0.01em; }
+    .a11y-status-sub { margin-top: 3px; font-size: 10px; letter-spacing: 0.04em; }
+    .a11y-content-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      padding: 18px 20px 20px;
+      max-height: min(620px, calc(100vh - 138px));
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,90,31,0.72) rgba(255,255,255,0.06);
+    }
+    .a11y-content-body::-webkit-scrollbar { width: 8px; }
+    .a11y-content-body::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    .a11y-content-body::-webkit-scrollbar-thumb { background: rgba(255,90,31,0.72); border: 2px solid #171411; border-radius: 8px; }
+    .a11y-intro { padding: 12px 14px; border-left: 2px solid #38bdf8; background: rgba(56,189,248,0.06); border-radius: 4px; }
+    .a11y-group-label { margin: 18px 0 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,90,31,0.22); font-size: 10px; }
+    .a11y-item-row { min-height: 72px; margin-bottom: 8px; padding: 13px 14px; border: 1px solid rgba(255,255,255,0.09); border-radius: 7px; background: #1d1916; }
+    .a11y-item-row:last-of-type { margin-bottom: 0; }
+    .a11y-item-title { font-size: 14px; }
+    .a11y-item-sub { margin-top: 3px; font-size: 11px; }
+    .a11y-btn-scale { width: 46px; height: 46px; background: #27211d; border-color: rgba(255,255,255,0.14); }
+    .a11y-scale-badge { min-width: 50px; font-size: 13px; }
+    .a11y-switch-btn { min-width: 96px; min-height: 46px; background: #27211d; border-color: rgba(255,255,255,0.14); }
+    .a11y-switch-btn.active { box-shadow: 0 0 0 3px rgba(255,90,31,0.14); }
+    .a11y-reset-all { margin-top: 16px; background: transparent; }
+    .a11y-header .chatbot-close-btn { color: var(--color-text-muted); }
+    .a11y-header .chatbot-close-btn:hover { color: var(--color-accent); background: rgba(255,90,31,0.08); }
+
+    @media (max-width: 1120px) {
+      .navbar-inner { padding: 0 18px; gap: 12px; }
+      .nav-menu { gap: 0; }
+      .nav-item-link { padding: 0 8px; font-size: 12px; }
+      .brand-text-name { font-size: 15px; }
+      .btn-stitch-quote { padding: 0 12px; }
+    }
+    @media (max-width: 820px) {
+      .nav-menu { display: none; }
+      .navbar-inner { justify-content: space-between; }
+      .brand-text-name { display: none; }
+      .nav-actions { margin-left: auto; }
+    }
+    @media (max-width: 560px) {
+      .navbar-inner { padding: 0 12px; }
+      .btn-stitch-quote span:first-child { font-size: 0; }
+      .btn-stitch-quote span:first-child::after { content: 'STL'; font-size: 11px; }
+      .lang-toggle-btn { min-width: 62px; padding: 0 8px; }
+      .floating-actions-dock { right: 14px; bottom: 14px; }
+      .a11y-panel-card, .chatbot-drawer-card { width: calc(100vw - 28px); }
+      .chatbot-drawer-card { height: min(660px, calc(100vh - 28px)); }
+    }
+
     /* Botones de navegación adicionales */
     .search-nav-btn {
-      width: 40px; height: 40px;
+      width: 44px; height: 44px;
       display: inline-flex; align-items: center; justify-content: center;
       border: 1px solid var(--color-border);
       background: var(--color-surface);
@@ -1257,7 +1412,7 @@
     .search-modal-close {
       background: var(--color-surface-2); border: 1px solid var(--color-border);
       border-radius: var(--radius-sm); color: var(--color-text-muted);
-      font-size: 11px; padding: 4px 8px; cursor: pointer; font-family: var(--font-mono);
+      min-width: 44px; min-height: 44px; font-size: 11px; padding: 4px 8px; cursor: pointer; font-family: var(--font-mono);
     }
     .search-modal-results {
       max-height: 360px; overflow-y: auto; padding: 16px 24px; display: flex; flex-direction: column; gap: 8px;
@@ -1281,8 +1436,13 @@
     :root {
       --a11y-font-scale: 1;
     }
+    html {
+      font-size: calc(100% * var(--a11y-font-scale));
+    }
     body {
-      font-size: calc(15px * var(--a11y-font-scale));
+      font-size: 0.9375rem;
+      /* La maqueta usa tokens históricos en px; zoom hace que A+/A- escale de verdad. */
+      zoom: var(--a11y-font-scale);
     }
 
     /* Modo Alto Contraste */
@@ -1318,7 +1478,13 @@
     html.a11y-reduce-motion *::after {
       animation-duration: 0.001ms !important;
       animation-iteration-count: 1 !important;
+      animation-play-state: paused !important;
       transition-duration: 0.001ms !important;
+    }
+    html.a11y-reduce-motion .stage-main-frame,
+    html.a11y-reduce-motion .product-catalog-card,
+    html.a11y-reduce-motion .precision-hero-card {
+      transform: none !important;
     }
 
     /* Resaltar Enlaces y Foco */
@@ -1380,35 +1546,6 @@
     }
     .reveal-item.visible {
       opacity: 1; transform: translateY(0);
-    }
-
-    /* Cinta Ticker Telemetría Técnica AM (Movimiento Continuo 60fps) */
-    .tech-marquee-bar {
-      width: 100%; overflow: hidden;
-      background: #0B0A08; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
-      padding: 11px 0; white-space: nowrap; position: relative; user-select: none;
-    }
-    .tech-marquee-bar::before, .tech-marquee-bar::after {
-      content: ''; position: absolute; top: 0; bottom: 0; width: 70px; z-index: 2; pointer-events: none;
-    }
-    .tech-marquee-bar::before { left: 0; background: linear-gradient(90deg, #0B0A08, transparent); }
-    .tech-marquee-bar::after { right: 0; background: linear-gradient(270deg, #0B0A08, transparent); }
-    .marquee-track {
-      display: inline-flex; align-items: center; gap: 24px;
-      animation: marqueeScroll 26s linear infinite; will-change: transform;
-    }
-    .marquee-track:hover { animation-play-state: paused; }
-    @keyframes marqueeScroll {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-    .marquee-item {
-      font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-      letter-spacing: 0.12em; color: var(--color-text-muted);
-      display: inline-flex; align-items: center; gap: 8px;
-    }
-    .marquee-sep {
-      color: var(--color-accent); font-family: var(--font-mono); font-size: 11px; font-weight: 700; opacity: 0.7;
     }
 
     /* ==========================================================================
@@ -1511,7 +1648,7 @@
     .a11y-item-sub { font-size: 11px; color: var(--color-text-muted); }
     .a11y-ctrl-group { display: flex; align-items: center; gap: 6px; }
     .a11y-btn-scale {
-      width: 32px; height: 32px; border-radius: var(--radius-sm);
+      width: 44px; height: 44px; border-radius: var(--radius-sm);
       background: var(--color-surface-2); border: 1px solid var(--color-border);
       color: var(--color-text); font-weight: 700; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
@@ -1523,7 +1660,7 @@
       color: var(--color-accent); min-width: 44px; text-align: center;
     }
     .a11y-switch-btn {
-      padding: 6px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600;
+      min-width: 92px; min-height: 44px; padding: 8px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600;
       background: var(--color-surface-2); border: 1px solid var(--color-border);
       color: var(--color-text-muted); cursor: pointer; transition: all var(--motion-micro);
     }
@@ -1559,7 +1696,7 @@
     .chatbot-status-sub { font-size: 11px; color: #10B981; font-family: var(--font-mono); }
     .chatbot-close-btn {
       background: transparent; border: none; color: var(--color-text-dim);
-      font-size: 18px; cursor: pointer; padding: 4px;
+      min-width: 44px; min-height: 44px; font-size: 18px; cursor: pointer; padding: 4px;
     }
     .chatbot-messages-box {
       flex-grow: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
@@ -1581,7 +1718,7 @@
     }
     .quick-chip {
       background: var(--color-surface-2); border: 1px solid var(--color-border);
-      color: var(--color-text-muted); border-radius: 12px; padding: 4px 10px;
+      color: var(--color-text-muted); border-radius: 12px; min-height: 44px; padding: 8px 12px;
       font-size: 11px; cursor: pointer; transition: all var(--motion-micro);
     }
     .quick-chip:hover { border-color: var(--color-accent); color: var(--color-text); }
@@ -1597,9 +1734,177 @@
     }
     .chatbot-send-btn {
       background: var(--color-accent); border: none; border-radius: var(--radius-sm);
-      color: #FFF; padding: 8px 12px; cursor: pointer; font-size: 12px; font-weight: 600;
+      color: #FFF; min-height: 44px; padding: 8px 12px; cursor: pointer; font-size: 12px; font-weight: 600;
     }
     @keyframes slideUpDock { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Override final del panel de accesibilidad: legible, estable y sin scrollbar blanco. */
+    .floating-actions-dock { zoom: calc(1 / var(--a11y-font-scale)); }
+    .a11y-panel-card {
+      width: min(470px, calc(100vw - 40px));
+      height: min(600px, calc(100vh - 80px));
+      max-height: none;
+      border-radius: 10px;
+      background: #171411;
+      border-color: rgba(255,90,31,0.34);
+    }
+    .a11y-header {
+      min-height: 76px;
+      padding: 16px 20px;
+      border-left: 3px solid var(--color-accent);
+      background: linear-gradient(110deg, #261a14 0%, #1a1613 68%, #141210 100%);
+    }
+    .a11y-avatar { width: 38px; height: 38px; border-radius: 8px; background: #1269a8; box-shadow: 0 0 0 4px rgba(18,105,168,0.15); }
+    .a11y-name { font-size: 15px; letter-spacing: 0.01em; }
+    .a11y-status-sub { margin-top: 3px; font-size: 10px; letter-spacing: 0.04em; }
+    .a11y-content-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: none;
+      padding: 18px 20px 20px;
+      gap: 0;
+      background: #171411;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,90,31,0.72) rgba(255,255,255,0.06);
+    }
+    .a11y-content-body::-webkit-scrollbar { width: 8px; }
+    .a11y-content-body::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    .a11y-content-body::-webkit-scrollbar-thumb { background: rgba(255,90,31,0.72); border: 2px solid #171411; border-radius: 8px; }
+    .a11y-intro { padding: 12px 14px; border-left: 2px solid #38bdf8; background: rgba(56,189,248,0.06); border-radius: 4px; }
+    .a11y-group-label { margin: 18px 0 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,90,31,0.22); font-size: 10px; }
+    .a11y-item-row { min-height: 72px; margin: 0 0 8px; padding: 13px 14px; border: 1px solid rgba(255,255,255,0.09); border-radius: 7px; background: #1d1916; }
+    .a11y-item-row:last-of-type { margin-bottom: 0; }
+    .a11y-item-title { font-size: 14px; }
+    .a11y-item-sub { margin-top: 3px; font-size: 11px; }
+    .a11y-btn-scale { width: 46px; height: 46px; background: #27211d; border-color: rgba(255,255,255,0.14); }
+    .a11y-scale-badge { min-width: 50px; font-size: 13px; }
+    .a11y-switch-btn { min-width: 96px; min-height: 46px; background: #27211d; border-color: rgba(255,255,255,0.14); }
+    .a11y-switch-btn.active { box-shadow: 0 0 0 3px rgba(255,90,31,0.14); }
+    .a11y-reset-all { min-height: 44px; margin-top: 16px; background: transparent; }
+
+    /* Chatbot: consola de taller, con jerarquía de conversación y espacio útil. */
+    .chatbot-drawer-card {
+      width: min(470px, calc(100vw - 40px));
+      height: min(540px, calc(100vh - 40px));
+      max-height: none;
+      border-radius: 10px;
+      background: #171411;
+      border-color: rgba(255,90,31,0.38);
+    }
+    .chatbot-header {
+      min-height: 88px;
+      padding: 18px 20px;
+      border-left: 3px solid var(--color-accent);
+      background: linear-gradient(110deg, #261a14 0%, #1a1613 68%, #141210 100%);
+    }
+    .chatbot-header-left { min-width: 0; flex: 1 1 auto; align-items: flex-start; gap: 12px; }
+    .chatbot-avatar {
+      width: 44px; height: 44px; flex: 0 0 44px;
+      border-radius: 9px;
+      background: var(--color-accent);
+      color: #171411;
+      font-size: 16px;
+      box-shadow: 0 0 0 4px rgba(255,90,31,0.14), 0 8px 18px rgba(255,90,31,0.18);
+    }
+    .chatbot-avatar::after { width: 11px; height: 11px; right: -5px; bottom: -5px; border-color: #171411; }
+    .chatbot-name { font-size: 15px; line-height: 1.2; }
+    .chatbot-status-sub { margin-top: 5px; font-size: 10px; letter-spacing: 0.05em; }
+    .chatbot-context { max-width: 260px; margin-top: 5px; font-size: 11px; line-height: 1.4; }
+    .chatbot-header-tools { flex: 0 0 auto; align-items: flex-start; }
+    .chat-reset-btn { min-height: 40px; padding: 6px 11px; background: rgba(255,255,255,0.035); }
+    .chatbot-close-btn { border-radius: 6px; }
+    .chatbot-close-btn:hover { color: var(--color-accent); background: rgba(255,90,31,0.08); }
+    .chatbot-messages-box {
+      flex: 1 1 auto;
+      min-height: 0;
+      padding: 22px 20px;
+      gap: 16px;
+      background:
+        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        radial-gradient(circle at 85% 8%, rgba(255,90,31,0.09), transparent 42%),
+        #15120f;
+      background-size: 100% 28px, auto, auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,90,31,0.72) rgba(255,255,255,0.06);
+    }
+    .chatbot-messages-box::-webkit-scrollbar { width: 8px; }
+    .chatbot-messages-box::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    .chatbot-messages-box::-webkit-scrollbar-thumb { background: rgba(255,90,31,0.72); border: 2px solid #15120f; border-radius: 8px; }
+    .chat-intro-card { padding: 16px; border: 1px solid rgba(255,90,31,0.36); border-left: 3px solid var(--color-accent); border-radius: 7px; background: linear-gradient(135deg, rgba(255,90,31,0.12), rgba(255,90,31,0.035)); }
+    .chat-intro-kicker { font-size: 10px; letter-spacing: 0.14em; }
+    .chat-intro-copy { margin-top: 8px; font-size: 12px; line-height: 1.55; }
+    .chat-bubble { max-width: 86%; padding: 12px 14px; border-radius: 8px; font-size: 13px; line-height: 1.5; }
+    .chat-bubble.bot { background: #211c18; border-color: rgba(255,255,255,0.12); border-top-left-radius: 3px; }
+    .chat-bubble.user { background: var(--color-accent); color: #171411; border-bottom-right-radius: 3px; font-weight: 600; }
+    .chat-quick-actions { flex: 0 0 auto; gap: 8px; padding: 14px 16px 15px; background: #100e0c; border-top: 1px solid rgba(255,255,255,0.08); }
+    .chat-quick-label { margin-bottom: 2px; }
+    .quick-chip { min-height: 42px; padding: 8px 13px; border-radius: 7px; background: #211c18; border-color: rgba(255,255,255,0.12); color: var(--color-text-muted); }
+    .quick-chip:hover, .quick-chip:focus-visible { background: rgba(255,90,31,0.12); border-color: var(--color-accent); color: var(--color-text); }
+    .chatbot-input-row { flex: 0 0 auto; padding: 12px 16px 16px; background: #171411; border-top: 1px solid rgba(255,255,255,0.10); }
+    .chatbot-input { min-height: 46px; background: #211c18; border-color: rgba(255,255,255,0.14); }
+    .chatbot-send-btn { min-width: 82px; min-height: 46px; border-radius: 7px; color: #171411; font-weight: 800; box-shadow: 0 8px 18px rgba(255,90,31,0.16); }
+
+    @media (max-width: 560px) {
+      .chatbot-drawer-card { width: calc(100vw - 24px); height: calc(100vh - 24px); }
+      .chatbot-header { padding: 16px; }
+      .chatbot-context { max-width: 190px; }
+      .chatbot-messages-box { padding: 18px 14px; }
+      .chat-quick-actions, .chatbot-input-row { padding-left: 12px; padding-right: 12px; }
+      .quick-chip { flex: 1 1 auto; }
+    }
+
+    /* Iteración compacta del chatbot: menos marco, más conversación. */
+    .chatbot-drawer-card {
+      width: min(430px, calc(100vw - 32px));
+      height: min(480px, calc(100vh - 32px));
+      border: 1px solid rgba(255,255,255,0.14);
+      border-left: 2px solid var(--color-accent);
+      border-radius: 7px;
+      background: #11100e;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+    }
+    .chatbot-header {
+      min-height: 70px;
+      padding: 13px 15px;
+      border-left: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      background: #191613;
+    }
+    .chatbot-header-left { gap: 10px; }
+    .chatbot-avatar { width: 36px; height: 36px; flex-basis: 36px; border-radius: 7px; box-shadow: none; font-size: 14px; }
+    .chatbot-avatar::after { width: 9px; height: 9px; right: -4px; bottom: -4px; }
+    .chatbot-name { font-size: 14px; }
+    .chatbot-status-sub { margin-top: 3px; font-size: 9px; }
+    .chatbot-context { max-width: 230px; margin-top: 3px; font-size: 10px; line-height: 1.3; }
+    .chatbot-header-tools { gap: 2px; }
+    .chat-reset-btn { min-height: 34px; padding: 5px 9px; border-color: rgba(255,255,255,0.10); background: transparent; font-size: 9px; }
+    .chatbot-close-btn { min-width: 36px; min-height: 36px; font-size: 16px; }
+    .chatbot-messages-box {
+      min-height: 150px;
+      padding: 17px 15px;
+      gap: 12px;
+      background: #11100e;
+      background-image: radial-gradient(circle at 90% 0%, rgba(255,90,31,0.07), transparent 38%);
+    }
+    .chatbot-messages-box::-webkit-scrollbar { width: 6px; }
+    .chatbot-messages-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border: 1px solid #11100e; }
+    .chat-bubble { max-width: 94%; padding: 10px 12px; border-radius: 6px; font-size: 12px; line-height: 1.45; }
+    .chat-bubble.bot { background: #1b1916; border: 1px solid rgba(255,255,255,0.10); border-left: 2px solid rgba(255,90,31,0.7); }
+    .chat-bubble.user { color: #11100e; }
+    .chat-quick-actions { gap: 6px; padding: 9px 11px 10px; background: #151311; border-top: 1px solid rgba(255,255,255,0.08); }
+    .chat-quick-label { font-size: 9px; letter-spacing: 0.13em; }
+    .quick-chip { min-height: 38px; padding: 7px 10px; border-radius: 5px; background: #1b1916; font-size: 10px; }
+    .chatbot-input-row { padding: 9px 11px 11px; background: #191613; }
+    .chatbot-input { min-height: 42px; padding: 8px 10px; font-size: 12px; }
+    .chatbot-send-btn { min-width: 70px; min-height: 42px; border-radius: 5px; box-shadow: none; font-size: 11px; }
+    @media (max-width: 560px) {
+      .chatbot-drawer-card { width: calc(100vw - 24px); height: min(490px, calc(100vh - 24px)); }
+      .chatbot-context { max-width: 180px; }
+      .chatbot-messages-box { padding-left: 13px; padding-right: 13px; }
+      .chat-quick-actions { overflow-x: auto; }
+      .chat-quick-label { flex-basis: 100%; }
+      .quick-chip { flex: 0 0 auto; }
+    }
   </style>
 </head>
 <body>
@@ -1670,7 +1975,7 @@
         </button>
 
         <!-- Botón Menú Hamburger (Stitch) -->
-        <button class="hamburger-btn" id="menu-toggle-btn" aria-label="Abrir menú de usuario" aria-expanded="false">
+        <button class="hamburger-btn" id="menu-toggle-btn" aria-label="Abrir menú de usuario" aria-controls="user-dropdown-panel" aria-expanded="false">
           <span class="hamburger-line"></span>
           <span class="hamburger-line short"></span>
           <span class="hamburger-line"></span>
@@ -1764,9 +2069,9 @@
             <div class="pillar-box">
               <div class="pillar-top">
                 <div class="pillar-icon-circle">⌖</div>
-                <span>±0.05 mm</span>
+                <span>CONTROL TÉCNICO</span>
               </div>
-              <div class="pillar-desc">Tolerancia dimensional</div>
+                <div class="pillar-desc">Validación según pieza</div>
             </div>
             <div class="pillar-box">
               <div class="pillar-top">
@@ -1788,9 +2093,9 @@
         <!-- Lado Derecho: Visor de Alta Fidelidad de la Pieza 3D (Stitch Workbench) -->
         <div class="hero-workbench-layout" id="workbench-zone">
           
-          <div class="stage-main-frame" id="stage-frame">
+          <div class="stage-main-frame" id="stage-frame" role="tabpanel" aria-label="Vista de la pieza destacada">
             <div class="stage-thermal-glow" aria-hidden="true"></div>
-            <div class="scan-laser-line" aria-hidden="true"></div>
+            <div class="stage-signal-sweep" aria-hidden="true"></div>
 
             <!-- Tag Vertical Superior Izquierdo del Stage: OBJECT 01 / 04 -->
             <div class="hero-vertical-object-tag" id="hero-object-num" aria-hidden="true">OBJECT 01 / 04</div>
@@ -1801,8 +2106,13 @@
             <!-- Badge decorativo de estado de escaneo -->
             <div class="stage-scan-status-badge" aria-hidden="true">
               <span class="scan-dot-pulse"></span>
-              <span>ESCANEANDO</span>
+              <span>SECUENCIA ACTIVA</span>
             </div>
+
+            <button class="stage-motion-toggle" id="stage-motion-toggle" type="button" aria-pressed="false" aria-describedby="stage-motion-help">
+              <span id="stage-motion-toggle-label">Ver movimiento</span>
+            </button>
+            <span id="stage-motion-help" class="sr-only">Activa una vista demo de movimiento. Se puede apagar desde accesibilidad.</span>
 
             <!-- Anotación Técnica Stitch con Línea Guía Dinámica -->
             <div class="stitch-callout-wrap" aria-hidden="true">
@@ -1842,76 +2152,47 @@
                 <div class="piece-title-h3" id="piece-name-display" role="heading" aria-level="3">Soporte Modular de Carga</div>
                 <div class="piece-sub-desc" id="piece-desc-display">Estructura mecánica con alivios lattice de alta rigidez</div>
               </div>
-              <div class="piece-spec-badge" id="piece-spec-tag">REF: PRT-001 · ±0.05 mm</div>
+              <div class="piece-spec-badge" id="piece-spec-tag">REF: PRT-001 · PETG PRO</div>
             </div>
 
           </div>
 
           <!-- Riel Vertical de Miniaturas (Las 4 piezas con imágenes reales) -->
-          <div class="vertical-thumbnails-rail" role="tablist" aria-label="Selector de piezas destacadas">
+          <div class="vertical-thumbnails-rail" role="tablist" aria-label="Selector de piezas destacadas" aria-orientation="vertical">
             <button class="rail-arrow-btn" id="thumb-prev-btn" aria-label="Pieza anterior">↑</button>
 
             <!-- Card 01: Soporte Modular -->
-            <button class="thumb-card-item active" data-idx="0" role="tab" aria-selected="true" aria-label="Pieza 01: Soporte Modular">
+            <button class="thumb-card-item active" data-idx="0" role="tab" tabindex="0" aria-controls="stage-frame" aria-selected="true" aria-label="Pieza 01: Soporte Modular">
               <span class="thumb-num-label">01</span>
               <img src="images/hero-soporte.jpg" alt="Miniatura Soporte Modular" class="thumb-photo-crop" onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
             </button>
 
             <!-- Card 02: Engranaje Nylon -->
-            <button class="thumb-card-item" data-idx="1" role="tab" aria-selected="false" aria-label="Pieza 02: Engranaje Helicoidal">
+            <button class="thumb-card-item" data-idx="1" role="tab" tabindex="-1" aria-controls="stage-frame" aria-selected="false" aria-label="Pieza 02: Engranaje Helicoidal">
               <span class="thumb-num-label">02</span>
               <img src="images/producto-engranaje.jpg" alt="Miniatura Engranaje" class="thumb-photo-crop" onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
             </button>
 
             <!-- Card 03: Dragón de Colección -->
-            <button class="thumb-card-item" data-idx="2" role="tab" aria-selected="false" aria-label="Pieza 03: Dragón Geométrico">
+            <button class="thumb-card-item" data-idx="2" role="tab" tabindex="-1" aria-controls="stage-frame" aria-selected="false" aria-label="Pieza 03: Dragón Geométrico">
               <span class="thumb-num-label">03</span>
               <img src="images/producto-dragon.jpg" alt="Miniatura Dragón" class="thumb-photo-crop" onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
             </button>
 
             <!-- Card 04: Brazo Chasis Drone -->
-            <button class="thumb-card-item" data-idx="3" role="tab" aria-selected="false" aria-label="Pieza 04: Chasis Drone">
+            <button class="thumb-card-item" data-idx="3" role="tab" tabindex="-1" aria-controls="stage-frame" aria-selected="false" aria-label="Pieza 04: Chasis Drone">
               <span class="thumb-num-label">04</span>
               <img src="images/producto-drone.jpg" alt="Miniatura Chasis Drone" class="thumb-photo-crop" onerror="this.onerror=null; this.src='placeholder-product.jpg';" />
             </button>
 
             <button class="rail-arrow-btn" id="thumb-next-btn" aria-label="Siguiente pieza">↓</button>
           </div>
+          <div id="piece-announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
         </div>
 
       </div>
     </section>
-
-    <!-- Cinta Ticker Telemetría Técnica AM (Movimiento Continuo 60fps) -->
-    <div class="tech-marquee-bar" aria-hidden="true">
-      <div class="marquee-track">
-        <span class="marquee-item">⌖ TOLERANCIA VERIFICADA ±0.05 MM</span>
-        <span class="marquee-sep">/</span>
-        <span class="marquee-item">⚡ CAMA CALEFACTORA ACTIVA 110°C</span>
-        <span class="marquee-sep">/</span>
-        <span class="marquee-item">⚙ NYLON PA12-CF · PETG PRO · RESINA 8K</span>
-        <span class="marquee-sep">/</span>
-        <span class="marquee-item">🛡 CONTROL METROLÓGICO ISO 9001</span>
-        <span class="marquee-sep">/</span>
-        <span class="marquee-item">📦 DESPACHO SEGURO GAM Y 7 PROVINCIAS CR</span>
-        <span class="marquee-sep">/</span>
-        <span class="marquee-item">⏱ COTIZACIÓN FORMAL EN MENOS DE 2 HORAS</span>
-        <span class="marquee-sep">/</span>
-        <span class="marquee-item">⌖ TOLERANCIA VERIFICADA ±0.05 MM</span>
-        <span class="marquee-sep">/</span>
-        <span class="marquee-item">⚡ CAMA CALEFACTORA ACTIVA 110°C</span>
-        <span class="marquee-sep">/</span>
-        <span class="marquee-item">⚙ NYLON PA12-CF · PETG PRO · RESINA 8K</span>
-        <span class="marquee-sep">/</span>
-        <span class="marquee-item">🛡 CONTROL METROLÓGICO ISO 9001</span>
-        <span class="marquee-sep">/</span>
-        <span class="marquee-item">📦 DESPACHO SEGURO GAM Y 7 PROVINCIAS CR</span>
-        <span class="marquee-sep">/</span>
-        <span class="marquee-item">⏱ COTIZACIÓN FORMAL EN MENOS DE 2 HORAS</span>
-        <span class="marquee-sep">/</span>
-      </div>
-    </div>
 
     <!-- ==========================================================================
        01 / SELECCIÓN DE TALLER
@@ -1950,7 +2231,7 @@
             <div class="product-card-body">
               <div class="product-card-ref-row">
                 <span class="product-card-ref">REF: PRT-001</span>
-                <span class="product-card-spec-meta">TOLERANCIA ±0.05 mm</span>
+                <span class="product-card-spec-meta">MATERIAL PETG PRO</span>
               </div>
               <h3 class="product-card-title">Soporte de Alta Precisión Modular</h3>
               <p class="product-card-desc">Geometría lattice optimizada con alivios de peso Voronoi para montajes mecánicos y rigidez estructural.</p>
@@ -2147,7 +2428,7 @@
             <span class="metodo-step-index">04</span>
             <div class="metodo-step-info">
               <span class="metodo-step-name">Metrología y Curado</span>
-              <span class="metodo-step-desc">Verificación con calibrador digital ±0.05 mm, post-procesado técnico y despacho seguro GAM / 7 Provincias.</span>
+              <span class="metodo-step-desc">Revisión dimensional y post-procesado definidos según la pieza; la entrega se confirma en la cotización.</span>
             </div>
             <span class="metodo-step-arrow" aria-hidden="true">↗</span>
           </a>
@@ -2180,38 +2461,38 @@
           
           <div class="precision-hero-card" role="listitem">
             <div class="precision-metric-row">
-              <div class="precision-big-num">±0.05</div>
-              <div class="precision-metric-unit">mm</div>
+              <div class="precision-big-num">Según</div>
+              <div class="precision-metric-unit">pieza</div>
             </div>
             <h3 class="precision-card-h4">1 / INGENIERÍA</h3>
             <p class="precision-card-desc">
-              Tolerancia dimensional garantizada para ensambles mecánicos precisos, acoples H7/g6 sin juego y piezas de ajuste milimétrico.
+              La tolerancia se define y verifica según geometría, material y uso previsto de cada pieza.
             </p>
-            <div class="precision-card-footer-tag">Ajustes mecánicos verificados</div>
+            <div class="precision-card-footer-tag">Revisión dimensional</div>
           </div>
 
           <div class="precision-hero-card" role="listitem">
             <div class="precision-metric-row">
-              <div class="precision-big-num">8K</div>
-              <div class="precision-metric-unit">Resina & FDM</div>
+              <div class="precision-big-num">FDM / SLA</div>
+              <div class="precision-metric-unit">según proyecto</div>
             </div>
             <h3 class="precision-card-h4">2 / MATERIAL</h3>
             <p class="precision-card-desc">
-              Polímeros certificados: PETG Pro, Nylon PA12 reforzado con Fibra de Carbono, ASA resistente a intemperie UV y resinas de ingeniería de alta densidad.
+              La selección de material se revisa según el uso, acabado, resistencia y disponibilidad del proyecto.
             </p>
-            <div class="precision-card-footer-tag">Polímeros certificados</div>
+            <div class="precision-card-footer-tag">Selección técnica</div>
           </div>
 
           <div class="precision-hero-card" role="listitem">
             <div class="precision-metric-row">
-              <div class="precision-big-num">24-48</div>
-              <div class="precision-metric-unit">h</div>
+              <div class="precision-big-num">A medida</div>
+              <div class="precision-metric-unit">proceso</div>
             </div>
             <h3 class="precision-card-h4">3 / ENTORNO</h3>
             <p class="precision-card-desc">
-              Despacho express en el GAM y cobertura garantizada a las 7 provincias de Costa Rica mediante Correos de Costa Rica con empaque técnico blindado.
+              Plazos, entrega y disponibilidad se confirman después de revisar el proyecto y el destino.
             </p>
-            <div class="precision-card-footer-tag">Cobertura nacional garantizada</div>
+            <div class="precision-card-footer-tag">Datos por confirmar</div>
           </div>
 
         </div>
@@ -2259,7 +2540,7 @@
           </a>
           <p>
             Manufactura aditiva de precisión y prototipado técnico en San José, Costa Rica. 
-            Tolerancia dimensional verificada de ±0.05 mm.
+            Especificaciones verificadas según cada pieza.
           </p>
           <div class="footer-spec-tag">● FDM / SLA Grado Industrial</div>
         </div>
@@ -2279,19 +2560,19 @@
           <div class="footer-heading-col">COBERTURA & TALLER</div>
           <div class="footer-location-text">
             San José, Costa Rica.<br />
-            Envíos diarios al GAM y a las 7 provincias mediante Correos de Costa Rica.
+            Cobertura y método de entrega se confirman según destino.
           </div>
           <a href="mailto:info@verticecr.com" class="footer-contact-item">info@verticecr.com</a>
-          <a href="https://wa.me/50600000000" class="footer-contact-item">WhatsApp Técnico: +506 0000-0000</a>
+          <a href="mailto:info@verticecr.com" class="footer-contact-item">Contacto técnico por correo</a>
         </div>
 
         <div>
           <div class="footer-heading-col">PAGO & HACIENDA</div>
           <div class="footer-payment-text">
-            SINPE Móvil, transferencias bancarias locales y tarjetas de crédito o débito Visa / Mastercard. Factura electrónica oficial autorizada por el Ministerio de Hacienda.
+            Métodos de pago y facturación: configuración pendiente de confirmación.
           </div>
           <div class="footer-contact-item" style="color: var(--color-accent); margin-top: 12px;">
-            🧾 Factura electrónica oficial CR
+            🧾 Pago y facturación por confirmar
           </div>
         </div>
 
@@ -2299,7 +2580,7 @@
 
       <div class="footer-bottom-bar">
         <div>© 2026 VÉRTICE CR - MANUFACTURA ADITIVA · TODOS LOS DERECHOS RESERVADOS</div>
-        <div>PRECISIÓN ±0.05 MM · SAN JOSÉ, COSTA RICA</div>
+        <div>VÉRTICE CR · SAN JOSÉ, COSTA RICA</div>
       </div>
 
     </div>
@@ -2308,13 +2589,14 @@
   <!-- ==========================================================================
        MODAL DE BÚSQUEDA TÉCNICA Y ACCESIBLE
        ========================================================================== -->
-  <div class="search-modal-backdrop" id="search-modal" role="dialog" aria-modal="true" aria-label="Búsqueda de piezas y especificaciones técnicas">
+  <div class="search-modal-backdrop" id="search-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Búsqueda de piezas y especificaciones técnicas">
     <div class="search-modal-panel">
       <div class="search-modal-header">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
+        <label class="sr-only" for="search-input">Buscar en Vértice CR</label>
         <input type="search" class="search-modal-input" id="search-input" placeholder="Buscar por pieza, material (PETG, Nylon) o tolerancia..." aria-label="Buscar en Vértice CR" />
         <button class="search-modal-close" id="search-close-btn" aria-label="Cerrar búsqueda">ESC</button>
       </div>
@@ -2354,22 +2636,25 @@
   <!-- ==========================================================================
        DOCK FLOTANTE: CHATBOT (BOLITA) + ACCESIBILIDAD UNIVERSAL TP (BOLITA)
        ========================================================================== -->
+  <div class="dialog-scrim" id="dialog-scrim" aria-hidden="true"></div>
   <div class="floating-actions-dock" id="floating-dock">
     
     <!-- Panel de Accesibilidad Universal (TP) -->
-    <div class="a11y-panel-card" id="a11y-drawer" role="dialog" aria-modal="false" aria-label="Panel de Accesibilidad Universal">
+    <div class="a11y-panel-card" id="a11y-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="a11y-title" aria-describedby="a11y-intro" tabindex="-1">
       <div class="a11y-header">
         <div class="a11y-header-left">
-          <div class="a11y-avatar">♿</div>
+          <div class="a11y-avatar" aria-hidden="true">♿</div>
           <div>
-            <div class="a11y-name">Accesibilidad Universal</div>
-            <div class="a11y-status-sub">● ENTORNO INCLUSIVO (TP) · WCAG 2.2</div>
+            <div class="a11y-name" id="a11y-title">Accesibilidad para ti</div>
+            <div class="a11y-status-sub">● CONTROLES LOCALES · WCAG 2.2 AA</div>
           </div>
         </div>
-        <button class="chatbot-close-btn" id="a11y-close-btn" aria-label="Cerrar panel de accesibilidad">✕</button>
+        <button class="chatbot-close-btn" id="a11y-close-btn" type="button" aria-label="Cerrar panel de accesibilidad">✕</button>
       </div>
 
       <div class="a11y-content-body">
+        <p class="a11y-intro" id="a11y-intro">Estos controles cambian esta vista en tu dispositivo. El navegador y el lector de pantalla siguen teniendo prioridad.</p>
+        <div class="a11y-group-label">Lectura y contraste</div>
         <!-- 1. Escala de Texto -->
         <div class="a11y-item-row">
           <div class="a11y-item-info">
@@ -2401,15 +2686,26 @@
           <button class="a11y-switch-btn" id="btn-toggle-dyslexia" aria-pressed="false">Activar</button>
         </div>
 
+        <div class="a11y-group-label">Movimiento y orientación</div>
         <!-- 4. Pausar Movimiento -->
         <div class="a11y-item-row">
           <div class="a11y-item-info">
             <span class="a11y-item-title">Pausar Movimiento</span>
-            <span class="a11y-item-sub">Detiene láseres, carrusel y animaciones</span>
+            <span class="a11y-item-sub">Detiene barridos, carrusel y animaciones</span>
           </div>
           <button class="a11y-switch-btn" id="btn-toggle-motion" aria-pressed="false">Pausar</button>
         </div>
 
+        <!-- Vista previa explícita para revisar el mockup con reduced-motion activo -->
+        <div class="a11y-item-row">
+          <div class="a11y-item-info">
+            <span class="a11y-item-title">Vista previa de movimiento</span>
+            <span class="a11y-item-sub">Opt-in para este mockup; ignora la preferencia del sistema</span>
+          </div>
+          <button class="a11y-switch-btn" id="btn-toggle-motion-preview" aria-pressed="false">Mostrar</button>
+        </div>
+
+        <div class="a11y-group-label">Navegación</div>
         <!-- 5. Resaltar Enlaces y Foco -->
         <div class="a11y-item-row">
           <div class="a11y-item-info">
@@ -2424,25 +2720,28 @@
     </div>
 
     <!-- Panel del Chatbot Técnico -->
-    <div class="chatbot-drawer-card" id="chatbot-drawer" role="dialog" aria-modal="false" aria-label="Asistente de Cotización y Manufactura">
+    <div class="chatbot-drawer-card" id="chatbot-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="chatbot-title" aria-describedby="chatbot-context" tabindex="-1">
       <div class="chatbot-header">
         <div class="chatbot-header-left">
-          <div class="chatbot-avatar">V</div>
+          <div class="chatbot-avatar" aria-hidden="true">V</div>
           <div>
-            <div class="chatbot-name">Asistente Técnico Vértice</div>
-            <div class="chatbot-status-sub">● EN LÍNEA · TALLER AM</div>
+            <div class="chatbot-name" id="chatbot-title">Asistente de taller</div>
+            <div class="chatbot-status-sub">● MODO DEMO · RESPUESTAS LOCALES</div>
+            <p class="chatbot-context" id="chatbot-context">Orientación inicial; una cotización real requiere revisión técnica.</p>
           </div>
         </div>
-        <button class="chatbot-close-btn" id="chatbot-close-btn" aria-label="Cerrar asistente">✕</button>
+        <div class="chatbot-header-tools">
+          <button class="chat-reset-btn" id="chat-reset-btn" type="button">Nuevo</button>
+          <button class="chatbot-close-btn" id="chatbot-close-btn" type="button" aria-label="Cerrar asistente">✕</button>
+        </div>
       </div>
 
       <div class="chatbot-messages-box" id="chatbot-messages" role="log" aria-live="polite">
-        <div class="chat-bubble bot">
-          ¡Hola! Soy el asistente técnico de Vértice CR. ¿En qué te puedo asesorar hoy sobre materiales, cotizaciones STL o tolerancias dimensionales?
-        </div>
+        <div class="chat-bubble bot">Hola. Puedo orientarte sobre materiales, archivos 3D y el proceso de solicitud. ¿Qué estás preparando: una pieza funcional, un prototipo o una figura?</div>
       </div>
 
       <div class="chat-quick-actions" aria-label="Consultas frecuentes">
+        <span class="chat-quick-label">Preguntas frecuentes</span>
         <button class="quick-chip" data-q="¿Cómo cotizo un archivo STL?">Cotizar STL</button>
         <button class="quick-chip" data-q="¿Qué materiales técnicos usan?">Materiales</button>
         <button class="quick-chip" data-q="¿Hacen envíos a todo Costa Rica?">Envíos CR</button>
@@ -2450,6 +2749,7 @@
       </div>
 
       <div class="chatbot-input-row">
+        <label class="sr-only" for="chatbot-input">Escribe tu consulta técnica</label>
         <input type="text" class="chatbot-input" id="chatbot-input" placeholder="Pregunta sobre materiales, envíos..." aria-label="Escribe tu consulta técnica" />
         <button class="chatbot-send-btn" id="chatbot-send-btn" aria-label="Enviar pregunta">Enviar</button>
       </div>
@@ -2481,7 +2781,7 @@
       // 1. Datos de las 4 Piezas con Imágenes Reales y Coordenadas de Llamada Técnica Stitch
       const piecesData = [
         {
-          code: 'REF: PRT-001 · ±0.05 mm',
+          code: 'REF: PRT-001 · PETG PRO',
           title: 'Soporte Modular de Carga',
           sub: 'Estructura mecánica con alivios lattice de alta rigidez',
           mat: 'PETG PRO',
@@ -2540,6 +2840,9 @@
       const calloutLinePath = document.getElementById('callout-line-path');
       const calloutDot = document.getElementById('callout-dot');
       const calloutDotPulse = document.getElementById('callout-dot-pulse');
+      const pieceAnnouncement = document.getElementById('piece-announcement');
+      const stageMotionToggle = document.getElementById('stage-motion-toggle');
+      const stageMotionToggleLabel = document.getElementById('stage-motion-toggle-label');
       const thumbBtns = document.querySelectorAll('.thumb-card-item');
       let currentIdx = 0;
       let autoTimer = null;
@@ -2549,16 +2852,16 @@
         if (!item) return;
 
         heroImg.style.opacity = '0';
-        heroImg.style.transform = 'scale(0.96)';
 
         setTimeout(() => {
           heroImg.src = item.imgSrc;
           heroImg.alt = item.alt;
           pieceName.textContent = item.title;
           pieceDesc.textContent = item.sub;
-          pieceSpec.textContent = item.code;
-          calloutMat.textContent = item.mat;
-          calloutProc.textContent = item.proc;
+           pieceSpec.textContent = item.code;
+           calloutMat.textContent = item.mat;
+           calloutProc.textContent = item.proc;
+           if (pieceAnnouncement) pieceAnnouncement.textContent = `Pieza activa: ${item.title}. ${item.mat}. ${item.proc}.`;
 
           if (objectTag) {
             objectTag.textContent = `OBJECT 0${idx + 1} / 04`;
@@ -2577,10 +2880,10 @@
             const isActive = i === idx;
             btn.classList.toggle('active', isActive);
             btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            btn.setAttribute('tabindex', isActive ? '0' : '-1');
           });
 
           heroImg.style.opacity = '1';
-          heroImg.style.transform = 'scale(1)';
         }, 120);
 
         currentIdx = idx;
@@ -2590,6 +2893,15 @@
         btn.addEventListener('click', function() {
           const idx = parseInt(this.getAttribute('data-idx'), 10);
           displayPiece(idx);
+          resetAutoCycle();
+        });
+        btn.addEventListener('keydown', function(e) {
+          if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+          e.preventDefault();
+          const direction = e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 1;
+          const idx = (currentIdx + direction + piecesData.length) % piecesData.length;
+          displayPiece(idx);
+          thumbBtns[idx].focus();
           resetAutoCycle();
         });
       });
@@ -2613,7 +2925,9 @@
       }
 
       function startAutoCycle() {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        clearInterval(autoTimer);
+        if (document.documentElement.classList.contains('a11y-reduce-motion')) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches && !document.documentElement.classList.contains('a11y-motion-preview')) return;
         autoTimer = setInterval(() => {
           const next = (currentIdx + 1) % piecesData.length;
           displayPiece(next);
@@ -2629,15 +2943,26 @@
 
       // Pausar auto-ciclo al interactuar con el visor
       const stageFrame = document.getElementById('stage-frame');
+      const workbenchZone = document.getElementById('workbench-zone');
       const pieceContainer = document.getElementById('active-piece-container');
       if (stageFrame) {
         stageFrame.addEventListener('mouseenter', () => clearInterval(autoTimer));
         stageFrame.addEventListener('mouseleave', () => resetAutoCycle());
       }
+      if (workbenchZone) {
+        workbenchZone.addEventListener('focusin', () => clearInterval(autoTimer));
+        workbenchZone.addEventListener('focusout', (e) => {
+          if (!workbenchZone.contains(e.relatedTarget)) resetAutoCycle();
+        });
+      }
 
       // 2. Efecto Parallax 3D suave al mover el mouse en el Visor
-      if (stageFrame && pieceContainer && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (stageFrame && pieceContainer) {
         stageFrame.addEventListener('mousemove', (e) => {
+          if (root.classList.contains('a11y-reduce-motion') || (window.matchMedia('(prefers-reduced-motion: reduce)').matches && !root.classList.contains('a11y-motion-preview'))) {
+            pieceContainer.style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg) scale(1)';
+            return;
+          }
           const rect = stageFrame.getBoundingClientRect();
           const x = (e.clientX - rect.left) / rect.width - 0.5;
           const y = (e.clientY - rect.top) / rect.height - 0.5;
@@ -2702,20 +3027,85 @@
       const searchModal = document.getElementById('search-modal');
       const searchClose = document.getElementById('search-close-btn');
       const searchInput = document.getElementById('search-input');
+      const dialogScrim = document.getElementById('dialog-scrim');
+
+      // Patrón de diálogo modal WAI-ARIA: foco atrapado y retorno al disparador.
+      let activeDialog = null;
+      let activeDialogTrigger = null;
+      const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+      function getFocusable(dialog) {
+        return dialog ? Array.from(dialog.querySelectorAll(focusableSelector)).filter(el => !el.hasAttribute('hidden')) : [];
+      }
+
+      function openDialog(dialog, trigger, initialFocus) {
+        if (!dialog) return;
+        if (activeDialog && activeDialog !== dialog) closeDialog(activeDialog, activeDialogTrigger, false);
+        activeDialog = dialog;
+        activeDialogTrigger = trigger || null;
+        dialog.classList.add('open');
+        dialog.setAttribute('aria-hidden', 'false');
+        const isDrawer = dialog === chatDrawer || dialog === a11yDrawer;
+        if (isDrawer && dialogScrim) {
+          dialogScrim.classList.add('open');
+          dialogScrim.setAttribute('aria-hidden', 'false');
+          document.body.classList.add('modal-open');
+        }
+        const target = initialFocus || getFocusable(dialog)[0] || dialog;
+        requestAnimationFrame(() => target.focus());
+      }
+
+      function closeDialog(dialog, trigger, restoreFocus = true) {
+        if (!dialog) return;
+        dialog.classList.remove('open');
+        dialog.setAttribute('aria-hidden', 'true');
+        const isDrawer = dialog === chatDrawer || dialog === a11yDrawer;
+        if (isDrawer && dialogScrim) {
+          dialogScrim.classList.remove('open');
+          dialogScrim.setAttribute('aria-hidden', 'true');
+          document.body.classList.remove('modal-open');
+        }
+        if (activeDialog === dialog) {
+          activeDialog = null;
+          activeDialogTrigger = null;
+          const restoreTarget = trigger || null;
+          if (restoreFocus && restoreTarget && typeof restoreTarget.focus === 'function') restoreTarget.focus();
+        }
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab' || !activeDialog) return;
+        const focusable = getFocusable(activeDialog);
+        if (!focusable.length) {
+          e.preventDefault();
+          activeDialog.focus();
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (!activeDialog.contains(document.activeElement)) {
+          e.preventDefault();
+          (e.shiftKey ? last : first).focus();
+          return;
+        }
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      });
 
       function openSearch() {
         if (!searchModal) return;
-        searchModal.classList.add('open');
-        if (searchInput) {
-          searchInput.value = '';
-          searchInput.focus();
-        }
+        if (searchInput) searchInput.value = '';
+        openDialog(searchModal, searchBtn, searchInput);
       }
 
       function closeSearch() {
         if (!searchModal) return;
-        searchModal.classList.remove('open');
-        if (searchBtn) searchBtn.focus();
+        closeDialog(searchModal, searchBtn);
       }
 
       if (searchBtn) searchBtn.addEventListener('click', openSearch);
@@ -2747,20 +3137,34 @@
       const chatClose = document.getElementById('chatbot-close-btn');
       const chatInput = document.getElementById('chatbot-input');
       const chatSend = document.getElementById('chatbot-send-btn');
+      const chatReset = document.getElementById('chat-reset-btn');
       const chatMessages = document.getElementById('chatbot-messages');
       const quickChips = document.querySelectorAll('.quick-chip');
+      let pendingReplyTimer = null;
+
+      function closeChat() {
+        closeDialog(chatDrawer, chatTrigger);
+        if (chatTrigger) chatTrigger.setAttribute('aria-expanded', 'false');
+      }
+
+      if (dialogScrim) {
+        dialogScrim.addEventListener('click', () => {
+          if (activeDialog === chatDrawer) closeChat();
+          if (activeDialog === a11yDrawer) closeA11y();
+        });
+      }
 
       function toggleChat() {
         if (!chatDrawer) return;
-        const isOpen = chatDrawer.classList.toggle('open');
-        if (chatTrigger) chatTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        const isOpen = chatDrawer.classList.contains('open');
         if (isOpen) {
-          if (a11yDrawer) {
-            a11yDrawer.classList.remove('open');
-            if (a11yTrigger) a11yTrigger.setAttribute('aria-expanded', 'false');
-          }
-          if (chatInput) chatInput.focus();
+          closeChat();
+          return;
         }
+        if (a11yDrawer) closeDialog(a11yDrawer, a11yTrigger, false);
+        if (a11yTrigger) a11yTrigger.setAttribute('aria-expanded', 'false');
+        openDialog(chatDrawer, chatTrigger, chatInput);
+        if (chatTrigger) chatTrigger.setAttribute('aria-expanded', 'true');
       }
 
       if (chatTrigger) chatTrigger.addEventListener('click', toggleChat);
@@ -2771,14 +3175,22 @@
       const a11yDrawer = document.getElementById('a11y-drawer');
       const a11yClose = document.getElementById('a11y-close-btn');
 
+      function closeA11y() {
+        closeDialog(a11yDrawer, a11yTrigger);
+        if (a11yTrigger) a11yTrigger.setAttribute('aria-expanded', 'false');
+      }
+
       function toggleA11y() {
         if (!a11yDrawer) return;
-        const isOpen = a11yDrawer.classList.toggle('open');
-        if (a11yTrigger) a11yTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        if (isOpen && chatDrawer) {
-          chatDrawer.classList.remove('open');
-          if (chatTrigger) chatTrigger.setAttribute('aria-expanded', 'false');
+        const isOpen = a11yDrawer.classList.contains('open');
+        if (isOpen) {
+          closeA11y();
+          return;
         }
+        if (chatDrawer) closeDialog(chatDrawer, chatTrigger, false);
+        if (chatTrigger) chatTrigger.setAttribute('aria-expanded', 'false');
+        openDialog(a11yDrawer, a11yTrigger, a11yClose);
+        if (a11yTrigger) a11yTrigger.setAttribute('aria-expanded', 'true');
       }
 
       if (a11yTrigger) a11yTrigger.addEventListener('click', toggleA11y);
@@ -2847,6 +3259,28 @@
       }
       if (btnMotion) btnMotion.addEventListener('click', () => toggleMotion());
 
+      // Accesibilidad: Vista previa explícita de movimiento para el mockup
+      const btnMotionPreview = document.getElementById('btn-toggle-motion-preview');
+      function toggleMotionPreview(force) {
+        const isNow = force !== undefined ? force : !root.classList.contains('a11y-motion-preview');
+        if (isNow && root.classList.contains('a11y-reduce-motion')) return;
+        root.classList.toggle('a11y-motion-preview', isNow);
+        if (btnMotionPreview) {
+          btnMotionPreview.classList.toggle('active', isNow);
+          btnMotionPreview.setAttribute('aria-pressed', isNow ? 'true' : 'false');
+          btnMotionPreview.textContent = isNow ? 'Activo' : 'Mostrar';
+        }
+        if (stageMotionToggle) {
+          stageMotionToggle.setAttribute('aria-pressed', isNow ? 'true' : 'false');
+          stageMotionToggle.classList.toggle('active', isNow);
+        }
+        if (stageMotionToggleLabel) stageMotionToggleLabel.textContent = isNow ? 'Movimiento activo' : 'Ver movimiento';
+        if (!root.classList.contains('a11y-reduce-motion')) startAutoCycle();
+        try { localStorage.setItem('vertice_a11y_motion_preview', isNow ? '1' : '0'); } catch(e) {}
+      }
+      if (btnMotionPreview) btnMotionPreview.addEventListener('click', () => toggleMotionPreview());
+      if (stageMotionToggle) stageMotionToggle.addEventListener('click', () => toggleMotionPreview());
+
       // Accesibilidad: Resaltar Enlaces
       const btnLinks = document.getElementById('btn-toggle-links');
       function toggleLinks(force) {
@@ -2869,15 +3303,23 @@
           toggleContrast(false);
           toggleDyslexia(false);
           toggleMotion(false);
+          toggleMotionPreview(false);
           toggleLinks(false);
           try {
             localStorage.removeItem('vertice_a11y_scale');
             localStorage.removeItem('vertice_a11y_contrast');
             localStorage.removeItem('vertice_a11y_dyslexia');
             localStorage.removeItem('vertice_a11y_motion');
+            localStorage.removeItem('vertice_a11y_motion_preview');
             localStorage.removeItem('vertice_a11y_links');
           } catch(e) {}
         });
+      }
+
+      if (stageMotionToggle) {
+        const previewIsActive = root.classList.contains('a11y-motion-preview');
+        stageMotionToggle.setAttribute('aria-pressed', previewIsActive ? 'true' : 'false');
+        if (stageMotionToggleLabel) stageMotionToggleLabel.textContent = previewIsActive ? 'Movimiento activo' : 'Ver movimiento';
       }
 
       // Recuperar preferencias de accesibilidad guardadas
@@ -2887,8 +3329,15 @@
         if (localStorage.getItem('vertice_a11y_contrast') === '1') toggleContrast(true);
         if (localStorage.getItem('vertice_a11y_dyslexia') === '1') toggleDyslexia(true);
         if (localStorage.getItem('vertice_a11y_motion') === '1') toggleMotion(true);
+        if (localStorage.getItem('vertice_a11y_motion_preview') === '1') toggleMotionPreview(true);
         if (localStorage.getItem('vertice_a11y_links') === '1') toggleLinks(true);
       } catch(e) {}
+
+      if (stageMotionToggle) {
+        const previewIsActiveAfterRestore = root.classList.contains('a11y-motion-preview');
+        stageMotionToggle.setAttribute('aria-pressed', previewIsActiveAfterRestore ? 'true' : 'false');
+        if (stageMotionToggleLabel) stageMotionToggleLabel.textContent = previewIsActiveAfterRestore ? 'Movimiento activo' : 'Ver movimiento';
+      }
 
       // 9. Movimiento y Animación: 3D Tilt y Spotlight Táctil (Emil Kowalski)
       const interactiveCards = document.querySelectorAll('.product-catalog-card, .precision-hero-card');
@@ -2923,10 +3372,10 @@
       }
 
       const botReplies = {
-        'stl': 'Podés subir tu archivo .STL, .STEP o .OBJ en nuestra sección de cotización. Analizamos la malla, volumen y requerimientos mecánicos para emitir una cotización formal sin costo previo en menos de 2 horas.',
-        'materiales': 'Trabajamos con polímeros certificados de ingeniería: PETG Pro para montajes mecánicos, Nylon PA12 reforzado con Fibra de Carbono, ASA resistente a intemperie UV, PLA de alta definición y resinas de ingeniería 8K.',
-        'envios': 'Despachamos de forma segura mediante Correos de Costa Rica a las 7 provincias del país (San José, Alajuela, Cartago, Heredia, Guanacaste, Puntarenas y Limón) y mensajería express en el GAM.',
-        'tolerancias': 'Nuestros equipos calibrados garantizan tolerancias dimensionales de ±0.05 mm para ensambles mecánicos precisos, acoples tipo H7/g6 y piezas técnicas sin holgura.',
+        'stl': 'Podés subir tu archivo .STL, .STEP o .OBJ en nuestra sección de cotización. El equipo revisa la geometría, el material y los requerimientos antes de emitir una cotización formal sin cobro previo.',
+        'materiales': 'La selección de material se define según el uso, acabado, resistencia y disponibilidad del proyecto. El equipo puede orientarte durante la revisión técnica.',
+        'envios': 'La cobertura, el método de entrega y el plazo se confirman según el destino y las condiciones del proyecto antes de producir.',
+        'tolerancias': 'La tolerancia dimensional se define según la geometría, el material y el uso previsto. El equipo confirma las especificaciones durante la revisión técnica.',
         'precio': 'En Vértice CR, las cotizaciones personalizadas dependen de la geometría exacta, el material técnico elegido y los parámetros de infill. Cada solicitud recibe un desglose técnico antes de cualquier pago.',
         'default': 'Entendido. Para requerimientos especiales de manufactura aditiva o proyectos a medida, podés iniciar una solicitud con tu archivo 3D o contactar al equipo técnico a info@verticecr.com.'
       };
@@ -2938,6 +3387,13 @@
         bubble.textContent = text;
         chatMessages.appendChild(bubble);
         chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function resetChat() {
+        if (!chatMessages) return;
+        if (pendingReplyTimer) clearTimeout(pendingReplyTimer);
+        chatMessages.innerHTML = '<div class="chat-bubble bot">Hola. Puedo orientarte sobre materiales, archivos 3D y el proceso de solicitud. ¿Qué estás preparando: una pieza funcional, un prototipo o una figura?</div>';
+        if (chatInput) chatInput.value = '';
       }
 
       function handleUserQuestion(q) {
@@ -2952,10 +3408,19 @@
         else if (clean.includes('toleran') || clean.includes('precis') || clean.includes('0.05')) replyKey = 'tolerancias';
         else if (clean.includes('precio') || clean.includes('costo') || clean.includes('cuanto')) replyKey = 'precio';
 
-        setTimeout(() => {
+        const typing = document.createElement('div');
+        typing.className = 'chat-bubble bot chat-typing';
+        typing.setAttribute('aria-label', 'El asistente está preparando una respuesta');
+        typing.textContent = 'Revisando la consulta…';
+        chatMessages.appendChild(typing);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        pendingReplyTimer = setTimeout(() => {
+          typing.remove();
           addChatMessage(botReplies[replyKey], 'bot');
         }, 400);
       }
+
+      if (chatReset) chatReset.addEventListener('click', resetChat);
 
       if (chatSend && chatInput) {
         chatSend.addEventListener('click', () => {

@@ -30,15 +30,19 @@ Fase 3: auditoría HF y cierre de UX/visual. React bloqueado.
 16. Contratos API.
 17. Implementación React.
 
-## Actualización 2026-09-25 — cierre HF-01 Hero
+## Actualización 2026-09-25 — cierre completo de HF-01 Home
 
-**HF-01 Home: APROBADO Y CONGELADO como referencia visual del Hero.**
+**HF-01 Home: APROBADO Y CONGELADO en su totalidad como referencia maestra del sitio.**
 
-La sesión de Antigravity implementó y verificó el Hero Workbench con fotografías reales, Leader Line Callout dinámico, eliminación del overlay CAD triangular, escáner láser sutil, Tilt/Parallax ligero y ficha técnica. La revisión actual del HTML en GitHub confirma que estos elementos están implementados en mockups/hf-01-home.html.
+La sesión consolidó la reconstrucción integral de `mockups/hf-01-home.html` a partir de las 9 capturas del usuario y los lineamientos del Anteproyecto (FWD Academy):
+- Estructura editorial numerada (`01 / SELECCIÓN DE TALLER`, `02 / EL MÉTODO`, `03 / SEÑALES DE PRECISIÓN`).
+- Visor Workbench con fotografías reales, anotación Leader Line SVG dinámica y coordenadas CAD.
+- Movimiento continuo a 60 fps: levitación orgánica de la pieza (`heroFloatIdle`), pulso térmico en la recámara (`thermalPulse`), barrido láser de escaneo (`laserSweep`), cinta ticker de telemetría AM continua y ondas concéntricas de radar.
+- Dock flotante apilado en columna vertical: botón superior de Accesibilidad Universal TP (♿, 46px) y botón inferior de Asistente Técnico (💬, 54px con baliza activa).
+- Panel de Accesibilidad Universal TP activo (escala de texto relativa 90%-130%, modo alto contraste `#FFE600`, fuente dislexia, reducción de movimiento y resaltado de navegación).
+- Reglas de negocio confirmadas: cero precios en Home, cotizaciones personalizadas bajo `PENDING_QUOTE / SIN COBRO PREVIO`.
 
-No se utilizará Three.js/WebGL en Home. El visor 3D real queda reservado para HF-03 y HF-05.
-
-**Siguiente foco de mockups:** HF-02 Catálogo y HF-05 Solicitud con archivo.
+**Siguiente foco de trabajo:** HF-02 Catálogo Técnico / Filtros de Materiales y HF-05 Solicitud con archivo 3D.
 
 ## Calidad
 

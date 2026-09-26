@@ -64,33 +64,25 @@ Si un documento contradice una decisión posterior, prevalece la decisión poste
 - El footer completo pertenece principalmente al área pública. Los dashboards no están obligados a mostrar el footer comercial; pueden usar uno técnico compacto o ninguno si el foco operativo lo justifica.
 - Los mockups de Stitch/UXMagic son referencias visuales, no contratos literales de chrome para cada ruta.
 - React puede consumir un Webhook de N8N directamente para el chatbot y/o resumen IA sin añadir un backend intermedio para ese caso.
-## Estado HF-01 — cierre del Hero Workbench — 2026-09-25
+## Estado HF-01 — Cierre Integral de Home — 2026-09-25
 
-**HF-01 Home: referencia visual del Hero completada y verificada en navegador.**
+**HF-01 Home: APROBADO Y CONGELADO en su totalidad como referencia maestra del sitio.**
 
 El archivo mockups/hf-01-home.html consolida:
-- eliminación completa de la capa CAD triangular ficticia y sus cotas/gráficos superpuestos;
-- fotografía real como protagonista del Hero, con fundido perimetral;
-- Leader Line Callout dinámico para las cuatro piezas, con texto técnico y punto de llamada contextual;
-- cambio suave entre Soporte, Engranaje, Dragón y Drone mediante miniaturas;
-- escáner láser metrológico visual sutil y estado decorativo ESCANEANDO;
-- efecto Tilt/Parallax ligero, sin WebGL/Three.js;
-- ficha técnica inferior con referencia, tolerancia y datos de la pieza;
-- soporte de Dark/Light y prefers-reduced-motion.
-
-### Verificación reportada por Antigravity
-Se probó el archivo local en navegador: carga inicial del soporte, cambio a las piezas 02/03/04, actualización del Leader Line y ausencia del overlay triangular. La revisión actual del repositorio confirma que esas implementaciones existen en el HTML.
-
-**Decisión:** HF-01 queda congelado como referencia visual. El visor 3D WebGL/Three.js continúa reservado exclusivamente para HF-03 y HF-05.
-- El frontend consume el endpoint del workflow; no se conecta directamente al nodo AI Agent.
-- Chatbot y resumen Admin pueden compartir infraestructura mediante un campo `mode`, manteniendo contratos y permisos separados.
-- **Visor 3D real vs Hero (2026-09-25):** El Hero utiliza fotografía de estudio de alta fidelidad con interactividad ligera (Parallax 3D / Tilt, línea de llamada técnica contextual y escáner láser metrológico) para garantizar conversión y máximo rendimiento de carga (LCP/FCP). El visor 3D interactivo WebGL/Three.js se reserva exclusivamente para HF-03 (Detalle de Producto) y HF-05 (Solicitud con Archivo 3D), donde la inspección orbital 360° y validación geométrica aportan valor funcional real.
+- estructura narrativa editorial numerada (`01 / SELECCIÓN DE TALLER`, `02 / EL MÉTODO`, `03 / SEÑALES DE PRECISIÓN`);
+- fotografía de estudio real como protagonista del Hero con fundido perimetral alfa;
+- Leader Line Callout dinámico con coordenadas vectoriales exactas y selector vertical de miniaturas;
+- movimiento continuo a 60 fps: levitación de pieza 3D (`heroFloatIdle`), pulso térmico en recámara (`thermalPulse`), barrido de haz láser (`laserSweep`), cinta ticker de telemetría técnica AM y ondas de radar respirando en el fondo;
+- dock flotante en columna vertical apilada: botón superior de Accesibilidad Universal TP (♿, 46px) y botón inferior de Asistente Técnico (💬, 54px con pulso y baliza en línea);
+- panel de Accesibilidad Universal TP (escala de texto relativa 90%-130%, alto contraste nativo, fuente para dislexia, pausa total de movimiento y resaltado de navegación);
+- estricto cumplimiento de regla de negocio: cero precios en Home y estado `PENDING_QUOTE / SIN COBRO PREVIO`;
+- sistema de diseño Obsidian Precision + Lava Orgánica y principios de diseño anti-slop (Impeccable, Emil Kowalski, UI/UX Pro Max).
 
 
-## Navegación de trabajo para esta fase — 2026-09-24
+## Navegación de trabajo para esta fase — 2026-09-25
 
 ### Dónde estamos
-HF-07 y HF-08 están aprobados y congelados. HF-01 Home quedó consolidado como referencia visual del Hero después de la implementación y verificación en navegador del 2026-09-25.
+HF-01 Home, HF-07 Carrito Híbrido y HF-08 Checkout están formalmente aprobados y congelados. El sistema de diseño, la accesibilidad universal TP y los tokens base están plenamente cerrados en `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md` y `docs/05-AUDITORIA-HF-Y-MOCKUPS.md`.
 
 ### Qué falta ahora
 1. Iterar HF-02 Catálogo.
@@ -209,3 +201,6 @@ Los cinco criterios obligatorios están verificados:
 
 No requiere otra iteración de diseño antes de implementación.
 Siguiente bloque: cierre transversal de desktop (Dark/Light, accesibilidad y ayuda).
+
+
+RESPONDER SIEMRPE CON 1 PARRAFO A MENOS QUE SEA NECESARIO EXTENDER EL TEXTO

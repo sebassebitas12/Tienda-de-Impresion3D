@@ -40,3 +40,7 @@ El usuario necesita saber **dónde estamos y hacia dónde vamos**. Al cerrar cua
 - cuál recomendamos y por qué, sin ejecutar un camino distinto al esperado sin avisarlo.
 
 Las instrucciones deben ser prácticas y comprensibles para alguien que no necesita conocer el roadmap completo de memoria.
+
+RESPONDER SIEMRPE CON 1 PARRAFO A MENOS QUE SEA NECESARIO EXTENDER EL TEXTO
+
+

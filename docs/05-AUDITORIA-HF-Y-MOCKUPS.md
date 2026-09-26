@@ -10,7 +10,7 @@ React continúa bloqueado hasta cerrar los bloqueos.
 
 | HF | Pantalla | Estado |
 |---|---|---|
-| 01 | Home | Ajustar |
+| 01 | Home | ✅ CONGELADO / APROBADO |
 | 02 | Catálogo | Ajustar |
 | 03 | Detalle producto | Mantener + refinar |
 | 04 | Selección solicitud | Mantener |
@@ -77,6 +77,43 @@ Negocio + jerarquía + CTA + estados + accesibilidad + responsive + identidad + 
 ## Secuencia
 
 HF-01/05/06 → HF-07 → HF-08 → Login → menú → HF-17 → revisión global → desktop aprobado → mobile/tablet → Design System → arquitectura → código.
+
+
+## HF-01 — Reconstrucción, Auditoría y Aprobación Final (2026-09-25)
+
+A partir de la auditoría de 9 capturas de video del usuario de la versión previa de Codex y el análisis del Anteproyecto (FWD Academy), se reconstruyó íntegramente `mockups/hf-01-home.html` recuperando el trabajo previo e integrando los estándares de producción definitivos:
+
+### 1. Estructura Narrativa Editorial
+- **01 / SELECCIÓN DE TALLER:** Catálogo curado de 6 piezas reales con metrología de capa (`CAPA 0.08 mm - 0.20 mm`), tags de inventario dinámicos (`EN STOCK`, `BAJO PEDIDO`, `NUEVO LOTE / FALLBACK DEMO`), badges de material de ingeniería (PETG Pro, Nylon PA12-CF, Resina 8K, PLA High Detail) y microiluminación spotlight en cursor con tilt 3D suave.
+- **02 / EL MÉTODO:** Split layout editorial que desglosa el protocolo de manufactura aditiva en 4 fases (`01 Análisis de Geometría`, `02 Selección de Material`, `03 Fabricación Paramétrica`, `04 Metrología y Curado ±0.05 mm`) con secuenciador de pulsos en tiempo real (`stepIndexPulse` cada 4s).
+- **03 / SEÑALES DE PRECISIÓN:** 3 tarjetas de métricas industriales con números monumentales monoespaciados (`±0.05 mm Ingeniería`, `8K Material`, `24-48 h Cobertura GAM y 7 Provincias`) y ondas concéntricas de radar respirando activamente en el fondo (`radarPulseMotion`).
+
+### 2. Visor Workbench de Doble Entrada (Hero)
+- **Fotografía de estudio real como protagonista:** Eliminación completa de falsos wireframes tridimensionales superpuestos; integración de 4 piezas maestras (Soporte Modular Lattice, Engranaje Helicoidal Nylon, Dragón Geométrico de Colección, Chasis Drone) con máscara alfa perimetral que funde bordes en el fondo obsidian (`#0D0B09`).
+- **Anotación técnica SVG dinámica (Leader Lines):** Coordenadas nodales vectoriales que se recalculan en tiempo real según la pieza activa, indicando polímero y método de manufactura.
+- **Movimiento vivo a 60 fps:**
+  - Levitación continua y orgánica de la pieza (`heroFloatIdle`) combinada con parallax de mouse.
+  - Pulso respiratorio de la recámara térmica de lava (`thermalPulse`).
+  - Barrido dinámico del haz láser de escaneo con glow de acento (`laserSweep`).
+  - Retícula de mira giratoria (`crosshair-target`) y marcas de coordenadas (`01° 53' N / 70° 30' W`).
+- **Cinta Ticker de Telemetría Técnica AM (Running Marquee):** Banda continua que recorre el ancho de la página con datos de operación en tiempo real (tolerancia ±0.05 mm, cama 110°C, polímeros PA12/PETG/8K, ISO 9001 y despacho nacional).
+
+### 3. Accesibilidad Universal TP (Rúbrica FWD Academy)
+- **Dock Flotante Vertical Apilado:**
+  - Bolita superior: **Accesibilidad Universal TP (♿, 46px)**.
+  - Bolita inferior: **Asistente Técnico Vértice (💬, 54px)** con pulso de lava y baliza en línea verde activa.
+- **Panel TP Integrado (`#a11y-drawer`):**
+  - Escala tipográfica relativa (`--a11y-font-scale` de 90% a 130%) en unidades `rem`.
+  - Modo Alto Contraste nativo (`html.a11y-contrast` con amarillo `#FFE600` sobre negro puro).
+  - Modo Dislexia (`html.a11y-dyslexia` con espaciado expandido de glifos).
+  - Pausa total de movimiento (`html.a11y-reduce-motion` conforme a `prefers-reduced-motion`).
+  - Resaltado de enlaces y foco accesible (`html.a11y-highlights`).
+
+### 4. Reglas de Negocio Verificadas
+- **Cero precios en Home:** Toda llamada a cotización personalizada se rige estrictamente por `PENDING_QUOTE / SIN COBRO PREVIO` (docs/02 y AI_CONTEXT).
+- **Asistente Técnico Local:** Base de conocimiento técnica instantánea sobre requisitos STL, polímeros de ingeniería, logística de envío a 7 provincias y tolerancias mecánicas.
+
+**Resultado de la auditoría:** HF-01 queda **APROBADO Y CONGELADO** como referencia visual y funcional definitiva de la página de inicio.
 
 
 ## HF-07 — Auditoría comparativa UXMagic + Gemini (2026-09-24)
