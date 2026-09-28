@@ -47,15 +47,16 @@ Una solicitud pendiente **nunca** se comporta como producto con `precio × canti
 - Archivos complementarios existentes: `DECISIONES-POST-AUDITORIA.md` (histórico), `auditoriaclaude.md` (conclusiones de auditorías).
 - `docs/ANTEPROYECTO_FINAL.md` es el documento académico; no es fuente diaria de decisiones técnicas.
 
-## Regla de diseño y craft visual
+## Regla de diseño, craft visual y creatividad (¡LIBERTAD CREATIVA!)
 
-- Identidad: **Obsidian Precision Forge + Lava Orgánica** (doc 04).
-- Tokens: usar exclusivamente los definidos en doc 04 (Dark y Light).
-- Geometría: `2px` sharp, `6px` card, `12px` hero, `9999px` pill.
+- **Creatividad Visual:** Aunque el orden de ejecución (el *qué* hacer) es estricto y de orden militar, **el diseño visual (el *cómo* se ve) NO está limitado**. Se espera y se fomenta la exploración de CSS, nuevas animaciones, layouts creativos y el uso intensivo de los repositorios de referencia (Godly, Awwwards, Emil Kowalski, etc.) para elevar HF-01.
+- Identidad base: **Obsidian Precision Forge + Lava Orgánica** (doc 04), pero se puede iterar y expandir.
+- Tokens: usar los definidos en doc 04, pero se pueden proponer mejoras.
+- Geometría base: `2px` sharp, `6px` card, `12px` hero, `9999px` pill.
 - Tipografía: Space Grotesk + JetBrains Mono (Google Fonts).
-- Movimiento: solo `transform` y `opacity` a 60 fps. Respetar `prefers-reduced-motion`.
-- Anti-slop: sin gradientes neón, sin blobs decorativos, sin textos de relleno abstractos (ver repos Impeccable/stop-slop en doc 04).
-- Accesibilidad: WCAG 2.2 AA mínimo. Estados nunca comunicados solo por color.
+- Movimiento: se buscan animaciones fluidas a 60 fps (`transform` y `opacity`), interacciones de hover vivas, y micro-animaciones que den sensación de "premium" y tecnología (siempre respetando `prefers-reduced-motion`).
+- Anti-slop: sin gradientes neón genéricos ni texto relleno. Diseños intencionales.
+- Accesibilidad: WCAG 2.2 AA mínimo.
 
 ## Regla de acompañamiento del usuario
 

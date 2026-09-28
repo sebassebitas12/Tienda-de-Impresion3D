@@ -99,6 +99,11 @@ Los siguientes repositorios están documentados en `docs/04-DISENO-VISUAL-Y-ACCE
 6. Design System formal en código.
 7. Testing/integraciones/calidad.
 
+## Orden Militar vs. Creatividad Visual
+
+- **Ejecución y Flujo (Orden Militar):** Las reglas de negocio, la secuencia de mockups (solo HF-01), y el bloqueo de React son INQUEBRANTABLES.
+- **Craft Visual y CSS (Libertad Creativa):** La IA tiene libertad para proponer e implementar layouts audaces, nuevas animaciones, micro-interacciones, y elevar el diseño usando las referencias de `Godly`, `Awwwards` y `Emil Kowalski`. No hay límites para hacer que HF-01 se vea espectacular y premium, siempre y cuando se mantenga dentro del mood general "Obsidian Precision Forge + Lava Orgánica".
+
 ## Regla de precedencia
 
 Si un documento contradice una decisión posterior, prevalece la decisión posterior registrada aquí y en el documento de dominio. No crear nuevos Markdown si el tema ya tiene un hogar en los 11 documentos numerados.
