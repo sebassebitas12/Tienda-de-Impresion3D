@@ -147,6 +147,10 @@ El usuario pausó antes de corregir navegación y funciones del HTML. **No se ap
 3. Corregir primero rutas y estados de apertura/cierre; luego mejorar chatbot y teclado.
 4. Volver a revisar desktop y responsive y registrar el resultado aquí y en doc 05.
 
+### Aclaración de continuidad — desktop vs responsive — 2026-09-28
+
+La diferencia observada entre el navegador externo y el navegador interno no corresponde a archivos distintos ni a un push incompleto. Ambos apuntan a `mockups/hf-01-home-definitivo.html`; el navegador externo estaba en desktop, aproximadamente `1365px`, y mostró navbar completo, búsqueda, CTA, hero visual y rail de piezas. El navegador interno tenía un viewport estrecho, aproximadamente `500px`, y activó el breakpoint `max-width:1120px`, ocultando los enlaces desktop y mostrando el botón hamburguesa; al abrirlo aparece el menú móvil con `Inicio`, `Piezas destacadas`, `Cómo trabajamos`, `Precisión técnica` y `Solicitar cotización`. No cambiar esta lógica por supuesto error de sincronización. Para futuras comparaciones visuales, usar el mismo ancho de viewport en ambos navegadores.
+
 ## Orden de trabajo vigente — 2026-09-26
 
 1. **→ Iterar HF-01 Home.** ← ESTAMOS AQUÍ (NO ESTÁ CONGELADO). Es el único mockup HTML que se hará.

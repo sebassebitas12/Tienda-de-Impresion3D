@@ -395,3 +395,7 @@ Esta auditoría fue iniciada pero pausada por el usuario antes de modificar el H
 ### Regla de continuidad
 
 No cambiar estilos ni crear otro mockup durante esta auditoría. Primero levantar la matriz elemento → destino → comportamiento esperado; después corregir únicamente `mockups/hf-01-home-definitivo.html`, verificar en navegador y documentar los resultados en esta misma sección.
+
+### Aclaración visual registrada
+
+La captura del navegador interno con el menú plegable y la captura del navegador externo con navbar completo pertenecen al mismo archivo definitivo. La primera usa un viewport responsive menor a `1120px`; la segunda usa desktop alrededor de `1365px`. La ausencia del hamburguesa en desktop y su presencia en el viewport estrecho son comportamiento intencional del CSS, no una diferencia entre local y remoto ni una pérdida del trabajo al hacer push. Comparar ambos mockups con el mismo ancho antes de proponer cambios.
