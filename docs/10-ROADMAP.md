@@ -4,7 +4,7 @@
 
 ## Fase 3 completado
 
-- ✅ HF-01 Home: mockup HTML funcional aprobado y congelado (2026-09-25).
+- 🟡 HF-01 Home: mockup HTML funcional en iteración (NO CONGELADO).
 - ✅ HF-07 Carrito Híbrido: aprobado documental — UXMagic + validación Gemini (2026-09-24).
 - ✅ HF-08 Checkout: aprobado documental — UXMagic + validación Gemini (2026-09-25).
 - ✅ Dark/Light tokens definidos en doc 04.
@@ -14,28 +14,18 @@
 
 ## Ahora — 2026-09-26
 
-1. **→ Iterar HF-02 Catálogo** — correcciones en doc 05: CRC, filtros, sorting, cards, estados.
-2. **Iterar HF-05 Solicitud con archivo** — eliminar precios, visor 3D, dropzone estados.
-3. Refinar HF-03, HF-06, HF-09, HF-15, HF-16 — ajustes menores.
-4. Ajustar HF-10, HF-11, HF-12 — dashboard, productos admin, login.
-5. Rehacer HF-14 — menú móvil con identidad Vértice.
-6. Resolver HF-17 — depende del modelo de datos.
+1. **→ Iterar HF-01 Home** — continuar refinando el mockup HTML como única base del proyecto. NO ESTÁ CONGELADO.
+2. Definir API externa + JWT y contratos de arquitectura antes de React.
+
+*(Nota: No se harán mockups HTML adicionales. Una vez aprobado HF-01, se pasará directamente a React para las demás pantallas)*
 
 ## Después
 
-7. Revisión desktop global.
-8. Mockups mobile 375.
-9. Mockups tablet 768.
-10. Revisión de estados/accesibilidad responsive.
-11. Aprobación HF completa.
-
-## Luego
-
-12. Design System formal.
-13. Arquitectura final y contratos de módulos.
-14. Modelo db.json normalizado (estados de solicitudes).
-15. Contratos API + JWT definidos.
-16. Implementación React.
+3. Implementación React usando HF-01 como base de diseño.
+4. Desarrollo de resto de pantallas (Catálogo, Solicitud, etc.) directamente en React.
+5. Revisión desktop global en la app React.
+6. Responsive y Mobile directamente en React.
+7. Design System formal basado en componentes React.
 
 ## Calidad
 
@@ -61,12 +51,11 @@ No crear otro roadmap paralelo.
 ## Histórico de actualizaciones
 
 ### 2026-09-26
-- HF-07 y HF-08 movidos a "completado" (aprobaciones documentales, no HTML).
-- Dark/Light y accesibilidad movidos a "completado".
-- Foco actualizado a HF-02 + HF-05.
+- Corrección de estado: HF-01 NO está congelado y es el ÚNICO mockup HTML a iterar.
+- El resto de pantallas (incluyendo HF-02 y HF-05) se construirán directamente en React.
 
 ### 2026-09-25
-- HF-01 Home congelado como mockup HTML funcional.
+- HF-01 Home declarado falsamente congelado (revertido el 26).
 - HF-08 aprobado con observación menor (resuelta).
 
 ### 2026-09-24

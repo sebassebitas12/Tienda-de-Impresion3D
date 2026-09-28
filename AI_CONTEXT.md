@@ -14,9 +14,9 @@ Vértice CR es una tienda costarricense de impresión 3D con dos líneas: produc
 | Rama activa | `Pruebas` |
 | Fase | 3 — auditoría HF + cierre visual/UX |
 | React | **BLOQUEADO** hasta cierre de HF desktop + Design System + API/JWT |
-| Mockup HTML oficial | Solo `mockups/hf-01-home.html` (aprobado y congelado 2026-09-25) |
+| Mockup HTML oficial | `mockups/hf-01-home.html` (EN ITERACIÓN, NO CONGELADO) |
 | HF-07 / HF-08 | Aprobados a nivel documental (imágenes UXMagic + validación Gemini, sin HTML propio) |
-| Siguiente foco de mockups | HF-02 Catálogo → HF-05 Solicitud con archivo |
+| Siguiente foco de mockups | **Ninguno.** Solo se hará HF-01 en HTML. Una vez aprobado HF-01, se pasará a React para el resto de pantallas. |
 | Código en `src/` | Scaffold Vite + prototipo estático descartable — NO es base de implementación |
 | `db.json` | JSON válido, pero `r5` usa `SUBMITTED` en vez de `PENDING_QUOTE` (normalizar antes de React) |
 
@@ -91,19 +91,13 @@ Los siguientes repositorios están documentados en `docs/04-DISENO-VISUAL-Y-ACCE
 
 ## Orden de trabajo vigente — 2026-09-26
 
-1. ~~Corregir HF según auditoría.~~ ✅ HF-01 congelado (HTML), HF-07/08 aprobados (documental).
+1. **→ Iterar HF-01 Home.** ← ESTAMOS AQUÍ (NO ESTÁ CONGELADO). Es el único mockup HTML que se hará.
 2. ~~Cerrar Dark/Light, ayuda y accesibilidad.~~ ✅ Definidos en doc 04.
-3. **→ Iterar HF-02 Catálogo.** ← ESTAMOS AQUÍ
-4. Iterar HF-05 Solicitud con archivo (visor 3D real).
-5. Completar pantallas restantes desktop (HF-03, 06, 09–17).
-6. Ajustar Admin + IA (HF-10/11).
-7. Definir API externa + JWT concretamente.
-8. Aprobar desktop completo.
-9. Mockups mobile 375 / tablet 768.
-10. Design System formal.
-11. Arquitectura/datos/API/contratos.
-12. React.
-13. Testing/integraciones/calidad.
+3. Definir API externa + JWT concretamente (y arquitectura base).
+4. **React.** (El resto de pantallas, incluyendo HF-02 y HF-05, se construirán directamente en React basándose en el diseño y la fundación técnica de HF-01).
+5. Mockups mobile 375 / tablet 768 (o responsive en React directamente).
+6. Design System formal en código.
+7. Testing/integraciones/calidad.
 
 ## Regla de precedencia
 
