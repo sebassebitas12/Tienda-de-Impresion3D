@@ -70,10 +70,10 @@ Las instrucciones deben ser prácticas y comprensibles para alguien que no neces
 
 ## Estado rápido del proyecto — 2026-09-26
 
-- **Fase 3** en curso: auditoría HF + cierre visual/UX.
-- HF-01 Home: ✅ congelado (mockup HTML funcional en `mockups/hf-01-home.html`).
+- **Fase 3** en curso: cierre visual/UX de HF-01.
+- HF-01 Home: 🟡 **EN ITERACIÓN (NO CONGELADO)**. Es el único mockup HTML que se trabajará.
 - HF-07/08: ✅ aprobados documental (sin HTML propio).
-- **Siguiente foco:** HF-02 Catálogo → HF-05 Solicitud.
+- **Siguiente foco:** Ninguno aparte de terminar HF-01. Luego se pasa directamente a React.
 - Código `src/`: scaffold Vite descartable; no implementar sobre él.
 - React: bloqueado.
 
