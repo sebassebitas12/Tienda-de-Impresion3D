@@ -78,6 +78,8 @@ El navbar visual de Stitch se conserva como **referencia base oficial de la nave
 - Dark/Light;
 - pequeños refinamientos de spacing, iconografía o responsive.
 
+En HF-01 se conserva un único disparador de tres barras y no se muestra un botón de persona separado. El usuario rechazó el panel desplegable actual y pidió quitarlo; hasta que se defina su siguiente comportamiento, no tratar el contenido actual del panel como aprobado. El navbar central conserva `Inicio`, `Tienda`, `Sobre nosotros` y `Contáctenos` hasta el breakpoint responsive de `820px`.
+
 No se debe reconstruir el navbar desde cero salvo que una prueba real de usabilidad demuestre un problema.
 
 ### Navegación administrativa

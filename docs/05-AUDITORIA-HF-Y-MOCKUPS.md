@@ -398,4 +398,34 @@ No cambiar estilos ni crear otro mockup durante esta auditoría. Primero levanta
 
 ### Aclaración visual registrada
 
-La captura del navegador interno con el menú plegable y la captura del navegador externo con navbar completo pertenecen al mismo archivo definitivo. La primera usa un viewport responsive menor a `1120px`; la segunda usa desktop alrededor de `1365px`. La ausencia del hamburguesa en desktop y su presencia en el viewport estrecho son comportamiento intencional del CSS, no una diferencia entre local y remoto ni una pérdida del trabajo al hacer push. Comparar ambos mockups con el mismo ancho antes de proponer cambios.
+La captura del navegador interno con el menú plegable y la captura del navegador externo con navbar completo pertenecen al mismo archivo definitivo. La primera usa un viewport responsive menor a `820px`; la segunda usa desktop alrededor de `1365px`. Entre `821px` y `1120px` los enlaces centrales siguen visibles en formato compacto. La ausencia del hamburguesa en desktop y su presencia en el viewport estrecho son comportamiento intencional del CSS, no una diferencia entre local y remoto ni una pérdida del trabajo al hacer push. Comparar ambos mockups con el mismo ancho antes de proponer cambios.
+
+### Decisión posterior: menú único de tres barras — 2026-09-28
+
+El usuario indicó que no desea el botón separado de persona. En el candidato definitivo se eliminó `#account-toggle` y se integró su contenido en `#mobile-menu`. Las tres barras (`#menu-toggle`) son ahora el único acceso al panel plegable tanto en desktop como en responsive; dentro aparecen la navegación pública y el bloque `MI ESPACIO` con iniciar sesión, crear cuenta, cuenta, carrito y nueva cotización. Esta decisión queda como referencia obligatoria para la futura implementación React.
+
+### Refinamiento visual de paneles — 2026-09-28
+
+El primer diseño de los paneles se consideró demasiado genérico y denso. La iteración actual mantiene la lógica y cambia la presentación: el menú de barras se organiza por secciones numeradas y conserva el navbar central cuando el ancho todavía permite mostrarlo; el chatbot usa la identidad `Mesa técnica Vértice`, una frase de entrada y tres consultas rápidas como filas de orientación; accesibilidad usa `Ajustes de lectura`, una introducción breve y controles numerados más sobrios. La dirección se verificó en navegador con apertura, cierre por `Escape`, estados ARIA y consola sin errores. La aprobación visual sigue pendiente del usuario.
+
+### Rediseño visual pass 03 — 2026-09-28
+
+El feedback confirmó que el pass anterior había sido superficial fuera del navbar. Se rehízo la composición de los tres paneles en `mockups/hf-01-home-definitivo.html`: el menú ahora funciona visualmente como drawer de operaciones con cabecera, grupos separados y estados hover; la asistencia técnica usa una entrada editorial, filas de intención e input independiente; accesibilidad usa una introducción con acento lava y un bloque de controles agrupados. Se conservaron los disparadores, iconos, funciones, cierre por `Escape` y estados ARIA. La aprobación visual sigue pendiente.
+
+### Rediseño visual pass 04 — 2026-09-28
+
+Se detectó y corrigió un problema de cascada: el CSS del pass 04 estaba antes del pass 03 y por eso el navegador seguía mostrando la versión anterior. La capa final activa deja el menú como un drawer compacto con cabecera `VÉRTICE / MENÚ PRINCIPAL`, navegación numerada, hover lateral y bloque de cuenta distribuido; la asistencia como una herramienta técnica sobria con frase de entrada, consultas rápidas en filas y campo separado; y accesibilidad como un panel de lectura/control con filas numeradas y acciones compactas. Se mantienen los iconos `✦` y `♿`, los disparadores únicos, los estados ARIA y el cierre por teclado. La marca del navbar usa `3D / CR` para comunicar servicio 3D y Costa Rica en lugar de `CR / AM`. Se verificó apertura y cierre de los tres paneles en navegador limpio; HF-01 continúa en iteración y requiere aprobación visual del usuario.
+
+### Rediseño visual pass 05–06 — 2026-09-28
+
+El feedback del usuario confirmó que los paneles todavía necesitaban una reconstrucción de CSS. Se rehízo la capa final del candidato definitivo: menú de barras como drawer editorial con navegación numerada, cuenta primaria destacada y acciones secundarias; chatbot como flujo visual de orientación, consultas rápidas y pregunta; accesibilidad como panel de lectura con introducción acentuada y controles grandes. El pass 06 corrigió el posicionamiento heredado de `.floating-panel`: antes se calculaba respecto al botón y podía salir por arriba del viewport; ahora chatbot y accesibilidad se anclan al viewport, tienen altura máxima responsiva y scroll interno únicamente si el tamaño disponible lo requiere. Se conservaron la lógica existente, `✦`, `♿`, estados ARIA, foco y `Escape`; no se tocó React.
+
+La revisión tomó criterios de [Emil Kowalski](https://github.com/emilkowalski/skills), [Radix Primitives](https://www.radix-ui.com/primitives), [Motion Primitives](https://motion-primitives.com/docs), [Impeccable](https://github.com/pbakaus/impeccable), [Godly](https://godly.design/) y [React Bits](https://reactbits.dev/): jerarquía clara, superficies no genéricas, objetivos táctiles amplios, movimiento corto y estados de foco visibles. Son referencias de criterio, no código copiado. HF-01 continúa **EN ITERACIÓN** hasta aprobación visual del usuario.
+
+### Rediseño de menú y herramientas — 2026-09-28
+
+Tras el feedback de que los estilos previos no habían cambiado lo suficiente, se reestructuró la composición en `mockups/hf-01-home-definitivo.html`: drawer de navegación/cuenta a dos columnas en escritorio y una columna en móvil; se quitó el acceso redundante a iniciar sesión; las tres líneas del menú quedaron centradas; el chatbot organiza las consultas rápidas en tarjetas y separa el campo de pregunta; accesibilidad adopta una superficie clara y controles agrupados. También se retiró la nota técnica del chatbot que repetía información de implementación. Tras el último CSS, se verificó visualmente el botón de tres líneas cerrado; los paneles abiertos y la versión móvil aún requieren una pasada visual. La investigación y enlaces de referencia quedaron en doc 04 y AI_CONTEXT. HF-01 sigue **EN ITERACIÓN** y necesita revisión/aprobación del usuario.
+
+### Corrección del usuario: retirar el menú desplegable — 2026-09-28
+
+El usuario rechazó el panel/lista que abre el botón de tres barras y pidió quitar ese menú, pero conservar el botón. No continuar ajustando ni volver a mostrar el panel rechazado como si fuera una propuesta aceptada. Al retomar, confirmar qué comportamiento debe tener el botón conservado; no inventar destinos ni desplegables alternativos. Chatbot y accesibilidad siguen sin aprobación y requieren rediseño/validación. Para reanudar, consultar la biblioteca ampliada y el protocolo de referencias de `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md`; revisar los cambios locales pendientes y comprobar el resultado en el navegador del usuario.

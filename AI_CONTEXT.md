@@ -86,7 +86,8 @@ Los siguientes repositorios están documentados en `docs/04-DISENO-VISUAL-Y-ACCE
 | Layout y tokens | [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) + [taste-skill](https://github.com/senlindesign/taste-skill) + [design.md](https://github.com/google-labs-code/design.md) | Geometría, paleta, spotlight interactivo |
 | Accesibilidad | [W3C WAI-ARIA APG](https://www.w3.org/WAI/ARIA/apg/) + [MDN Accessibility](https://developer.mozilla.org/en-US/docs/Web/Accessibility) | WCAG 2.2 AA, patrones de teclado, contraste |
 | Copywriting técnico | [Humanizer](https://github.com/blader/humanizer) | Voz de taller costarricense, sin clichés de IA |
-| Referencia visual | [Godly](https://godly.design/) + [Awwwards](https://www.awwwards.com/) + [Refero](https://styles.refero.design/) + [React Bits](https://reactbits.dev/) | Dirección de arte, componentes, dark mode industrial |
+| Referencia visual | [Godly](https://godly.design/sites/) + [Awwwards: Menu Navigation](https://www.awwwards.com/inspiration/menu-navigation-disrupt) + [Siteinspire](https://www.siteinspire.com/) + [Land-book](https://land-book.com/) + [Refero](https://styles.refero.design/) + [React Bits](https://reactbits.dev/) | Dirección de arte, navegación, composición completa y responsive |
+| Paneles y accesibilidad | [Radix Dialog](https://www.radix-ui.com/primitives/docs/components/dialog) + [Radix Popover](https://www.radix-ui.com/primitives/docs/components/popover) + [W3C APG Dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) | Capas, colisiones, foco, teclado y decisiones modal/no modal |
 
 **Al diseñar o iterar cualquier pantalla, consultar estos repos y aplicar los criterios documentados en doc 04.**
 
@@ -105,11 +106,24 @@ Este registro permite continuar el trabajo en un chat nuevo sin depender del his
 
 - Se conservó del local la dirección visual que el usuario prefirió: hero, catálogo, workbench, copy principal, footer y los iconos flotantes `✦` (chat) y `♿` (accesibilidad).
 - Se incorporó del remoto la sensación más iterada: menú plegable de cuenta, jerarquía compacta, búsqueda, acciones de navbar y densidad de información.
-- El navbar del definitivo usa una retícula de tres columnas para mantener los enlaces centrados en desktop; desde `1120px` se repliega intencionalmente a menú compacto.
+- El navbar del definitivo usa una retícula de tres columnas para mantener los enlaces centrados en desktop; entre `821px` y `1120px` conserva los enlaces en formato compacto y solo por debajo de `820px` se repliega al menú.
 - Chatbot y accesibilidad conservan los iconos del local, pero sus paneles ahora usan drawers compactos de geometría Vértice: regla superior lava, etiquetas `01 / ASISTENCIA` y `02 / CONTROL`, controles cuadrados, foco visible y botones táctiles de al menos `44px`.
 - Se añadieron estados de apertura con `aria-expanded`/`aria-hidden`, roles de diálogo, gestión básica de foco y cierre con `Escape`. El cierre también está disponible mediante el botón de cierre o el mismo disparador; el cierre por clic externo no es una dependencia de este candidato.
 - Se eliminó del copy del definitivo cualquier afirmación no definida por el proyecto, incluyendo “cámaras industriales”, “grado industrial”, “22µm SLA” y “18 piezas”. No inventar reemplazos técnicos sin validación del usuario o de los documentos.
 - No se inició React, no se agregaron dependencias y no se convirtió automáticamente el mockup en componentes.
+- Decisión posterior de navbar: el icono de persona no se usa como acceso separado; las tres barras son el único disparador del panel plegable y ese panel contiene navegación pública y todas las acciones de cuenta.
+- Refinamiento visual posterior: el panel de barras usa las secciones `01 / NAVEGACIÓN` y `02 / MI ESPACIO`; el chatbot se presenta como `Mesa técnica Vértice` con consultas rápidas en filas verticales; accesibilidad se presenta como `Ajustes de lectura` con controles numerados y agrupados. No se agregaron capacidades de backend.
+- Refinamiento visual pass 03: menú, asistencia y accesibilidad recibieron una composición propia, no solo cambios de copy: el menú ahora es un drawer de operaciones con jerarquía y estados hover, la asistencia usa una entrada editorial y filas de intención, y accesibilidad usa una introducción destacada más un bloque de controles agrupados. La revisión visual en navegador sigue pendiente de aprobación.
+
+### Rediseño visual pass 04 — 2026-09-28
+
+El diseño del pass 04 no estaba llegando al navegador porque sus reglas quedaban antes del pass 03 y eran sobrescritas. Se corrigió la cascada dejando el pass 04 como capa final activa en `mockups/hf-01-home-definitivo.html`. El menú plegable ahora es un drawer compacto de navegación y cuenta con cabecera `VÉRTICE / MENÚ PRINCIPAL`, numeración, estados hover y cuenta secundaria en dos columnas; el chatbot ahora es una herramienta de orientación con entrada acentuada, consultas como filas y zona de escritura separada; accesibilidad ahora es un panel utilitario de controles numerados, sin tarjetas anidadas innecesarias. Se mantuvieron los iconos locales `✦` y `♿`, el navbar centrado, el cierre por `Escape`, los estados ARIA y el comportamiento existente. El código de marca visible pasó a `3D / CR`: `3D` comunica el servicio y `CR` identifica Costa Rica, evitando la abreviatura ambigua `CR / AM`.
+
+### Rediseño visual pass 05–06 — 2026-09-28
+
+El feedback posterior pidió rehacer el CSS de las tres superficies, no solo cambiar textos. Se añadió una capa final en `mockups/hf-01-home-definitivo.html`: el menú usa un drawer editorial con cabecera, numeración, filas de navegación más legibles, cuenta primaria destacada y acciones secundarias; el chatbot usa una jerarquía de orientación → consultas → pregunta, con tipografía mayor y filas limpias; accesibilidad usa una introducción acentuada y controles de lectura/contraste/movimiento con objetivos táctiles amplios. El pass 06 corrigió la colisión de posicionamiento que dejaba chatbot y accesibilidad parcialmente fuera de la pantalla: ahora ambos paneles se anclan al viewport y limitan su altura de forma responsiva, manteniendo scroll solo cuando el viewport realmente lo exige. Se preservaron comportamiento, iconos `✦`/`♿`, estados ARIA, foco y cierre por `Escape`; no se inició React ni se agregaron dependencias.
+
+La dirección visual se contrastó con criterios de [Emil Kowalski](https://github.com/emilkowalski/skills), [Radix Primitives](https://www.radix-ui.com/primitives), [Motion Primitives](https://motion-primitives.com/docs), [Impeccable](https://github.com/pbakaus/impeccable), [Godly](https://godly.design/) y [React Bits](https://reactbits.dev/). Se tomaron criterios de jerarquía, drawers, foco, movimiento y superficies; no se copió código ni se agregaron capacidades inexistentes.
 
 ### Cómo se aplicaron las skills y referencias
 
@@ -119,7 +133,7 @@ La skill local `asistente-desarrollo-web` se usó como criterio de revisión: ca
 
 - `mockups/hf-01-home-definitivo.html` respondió correctamente en `http://127.0.0.1:5173/mockups/hf-01-home-definitivo.html`.
 - Se revisó visualmente en viewport desktop y en viewport reducido; en desktop el navbar queda centrado y en viewport reducido se activa el comportamiento responsive.
-- Se abrieron y revisaron el menú de cuenta, búsqueda, chatbot y accesibilidad; los paneles cambiaron correctamente sus estados ARIA y no se observaron errores de consola durante la revisión.
+- Se abrieron y revisaron el menú de cuenta, búsqueda, chatbot y accesibilidad; los paneles cambiaron correctamente sus estados ARIA, la composición final se confirmó visualmente en navegador y no se observaron errores de consola durante la revisión.
 - La pestaña del definitivo quedó marcada como entregable para revisión visual del usuario, pero el mockup sigue **NO CONGELADO**.
 
 ### Protocolo para la siguiente IA
@@ -140,6 +154,10 @@ El usuario pausó antes de corregir navegación y funciones del HTML. **No se ap
 - Revisar que el idioma no deje selectores o textos desincronizados y que los enlaces internos actualicen correctamente el estado visual de navegación.
 - Verificar estados vacíos de búsqueda y errores de imagen/ruta sin romper la página.
 
+### Cambio funcional aplicado después de la pausa
+
+En `mockups/hf-01-home-definitivo.html` se eliminó `#account-toggle` y el menú de cuenta separado. `#menu-toggle` quedó visible también en desktop y abre el único panel plegable `#mobile-menu`, que contiene la navegación secundaria y el bloque `MI ESPACIO` con `Iniciar sesión`, `Crear cuenta`, `Mi cuenta`, `Carrito de productos` y `Nueva cotización`; la CTA principal `Cotizar STL` permanece en el navbar. El panel mantiene `aria-expanded`/`aria-hidden`, cierre por el mismo disparador, enlaces y `Escape`. Esta decisión responde directamente al feedback del usuario y debe trasladarse a React.
+
 ### Orden recomendado para retomar
 
 1. Hacer una matriz de navegación del definitivo: elemento, destino actual, destino esperado y estado demo/real.
@@ -149,7 +167,7 @@ El usuario pausó antes de corregir navegación y funciones del HTML. **No se ap
 
 ### Aclaración de continuidad — desktop vs responsive — 2026-09-28
 
-La diferencia observada entre el navegador externo y el navegador interno no corresponde a archivos distintos ni a un push incompleto. Ambos apuntan a `mockups/hf-01-home-definitivo.html`; el navegador externo estaba en desktop, aproximadamente `1365px`, y mostró navbar completo, búsqueda, CTA, hero visual y rail de piezas. El navegador interno tenía un viewport estrecho, aproximadamente `500px`, y activó el breakpoint `max-width:1120px`, ocultando los enlaces desktop y mostrando el botón hamburguesa; al abrirlo aparece el menú móvil con `Inicio`, `Piezas destacadas`, `Cómo trabajamos`, `Precisión técnica` y `Solicitar cotización`. No cambiar esta lógica por supuesto error de sincronización. Para futuras comparaciones visuales, usar el mismo ancho de viewport en ambos navegadores.
+La diferencia observada entre el navegador externo y el navegador interno no corresponde a archivos distintos ni a un push incompleto. Ambos apuntan a `mockups/hf-01-home-definitivo.html`; el navegador externo estaba en desktop, aproximadamente `1365px`, y mostró navbar completo, búsqueda, CTA, hero visual y rail de piezas. El navegador interno tenía un viewport estrecho, aproximadamente `500px`, y activó el breakpoint responsive: los enlaces centrales se conservan entre `821px` y `1120px`, y se ocultan únicamente por debajo de `820px`, donde aparece el botón hamburguesa. Al abrirlo aparece el menú con navegación secundaria y el bloque de cuenta; la CTA `Cotizar STL` permanece en el navbar. No cambiar esta lógica por supuesto error de sincronización. Para futuras comparaciones visuales, usar el mismo ancho de viewport en ambos navegadores.
 
 ## Orden de trabajo vigente — 2026-09-26
 
@@ -180,3 +198,9 @@ Al cerrar cualquier bloque de trabajo, indicar:
 - cuál se recomienda y por qué.
 
 RESPONDER SIEMPRE CON 1 PÁRRAFO A MENOS QUE SEA NECESARIO EXTENDER EL TEXTO.
+
+### Iteración visual de menú y paneles — 2026-09-28
+
+Esta iteración se registró como propuesta, pero el usuario rechazó el diseño del menú desplegable y pidió quitarlo, conservando el botón de tres barras. No reutilizar el panel ni presentarlo como aprobado. El botón queda; la función/estado siguiente debe confirmarse al retomar. Asistencia y accesibilidad tampoco están aprobadas. Las referencias ampliadas y el criterio para aplicarlas están en `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md`; HF-01 sigue NO CONGELADO y React sigue bloqueado.
+
+Siguiente al retomar: decidir qué estado/función acompaña al botón de tres barras sin recrear el panel rechazado; después rediseñar y validar chatbot y accesibilidad con referencias específicas, en desktop y móvil, antes de pedir aprobación visual para congelar HF-01.
