@@ -1,220 +1,178 @@
 # AI_CONTEXT.md — Vértice CR
 
-> Punto de entrada obligatorio. Si no sabes dónde buscar, abre `docs/00-INDICE-Y-MAPA.md`.
+> Punto de entrada obligatorio para cualquier IA. Si no sabes dónde buscar, abre `docs/00-INDICE-Y-MAPA.md`.
+> Última actualización: **2026-09-28**.
 
 ## Producto
+
 Vértice CR es una tienda costarricense de impresión 3D con dos líneas: productos terminados e impresión personalizada con revisión y cotización.
 
-## Estado
-Última actualización: 2026-09-25. Rama: `Pruebas`. Fase: auditoría HF + cierre visual/UX. **React permanece bloqueado.**
+## Estado del proyecto — 2026-09-26
+
+| Dato | Valor |
+|---|---|
+| Rama activa | `Pruebas` |
+| Fase | 3 — auditoría HF + cierre visual/UX |
+| React | **BLOQUEADO** hasta cierre de HF desktop + Design System + API/JWT |
+| Mockup HTML base preservado | `mockups/hf-01-home.html` (referencia local original, no sobrescribir) |
+| Candidato actual de HF-01 | `mockups/hf-01-home-definitivo.html` (EN ITERACIÓN, NO CONGELADO) |
+| HF-07 / HF-08 | Aprobados a nivel documental (imágenes UXMagic + validación Gemini, sin HTML propio) |
+| Siguiente foco de mockups | **Ninguno.** Solo se hará HF-01 en HTML. Una vez aprobado HF-01, se pasará a React para el resto de pantallas. |
+| Código en `src/` | Scaffold Vite + prototipo estático descartable — NO es base de implementación |
+| `db.json` | JSON válido, pero `r5` usa `SUBMITTED` en vez de `PENDING_QUOTE` (normalizar antes de React) |
 
 ## Fuente de verdad documental
-- `AI_CONTEXT.md`: estado global y decisiones de alto nivel.
-- `AGENTS.md`: reglas operativas para agentes.
-- `docs/00-INDICE-Y-MAPA.md`: mapa único.
-- `docs/01-PRODUCTO-Y-ALCANCE.md`: alcance y rúbrica.
-- `docs/02-NEGOCIO-Y-ESTADOS.md`: entidades, reglas y estados.
-- `docs/03-UX-Y-FLUJOS.md`: rutas, flujos y estados UX.
-- `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md`: identidad, Dark/Light y accesibilidad.
-- `docs/05-AUDITORIA-HF-Y-MOCKUPS.md`: hallazgos y pendientes visuales.
-- `docs/06-ARQUITECTURA.md`: arquitectura técnica.
-- `docs/07-DATOS-API-AUTH.md`: db.json, API externa, JWT y N8N.
-- `docs/08-METRICAS-ADMIN-E-IA.md`: dashboard, fórmulas y resumen IA.
-- `docs/09-TESTING-Y-CALIDAD.md`: pruebas y cobertura.
-- `docs/10-ROADMAP.md`: siguiente trabajo.
 
-`docs/ANTEPROYECTO_FINAL.md`, si se necesita, es el documento académico; no es la fuente diaria de decisiones técnicas.
+| Archivo | Qué contiene |
+|---|---|
+| `AI_CONTEXT.md` | **Este archivo.** Estado global, decisiones de alto nivel, punto de entrada. |
+| `AGENTS.md` | Reglas operativas para agentes. Leer siempre. |
+| `docs/00-INDICE-Y-MAPA.md` | Mapa de navegación (tabla "Si te preguntan → Busca en"). |
+| `docs/01-PRODUCTO-Y-ALCANCE.md` | Alcance, roles, MoSCoW y principios. |
+| `docs/02-NEGOCIO-Y-ESTADOS.md` | Entidades, reglas de negocio, ciclo de solicitudes, carrito y checkout. |
+| `docs/03-UX-Y-FLUJOS.md` | Rutas, flujos, estados UX, navbar/footer y responsive. |
+| `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md` | Identidad visual, tokens Dark/Light, accesibilidad WCAG 2.2, ayuda inline, movimiento, benchmark y **repositorios de skills de diseño**. |
+| `docs/05-AUDITORIA-HF-Y-MOCKUPS.md` | Estado de cada HF (17 pantallas), hallazgos y pendientes visuales. |
+| `docs/06-ARQUITECTURA.md` | Estructura técnica objetivo. Esqueleto. |
+| `docs/07-DATOS-API-AUTH.md` | db.json, API externa, JWT, N8N e IA. |
+| `docs/08-METRICAS-ADMIN-E-IA.md` | Dashboard, KPIs, fórmulas y resumen IA. |
+| `docs/09-TESTING-Y-CALIDAD.md` | Jest, cobertura y orden de pruebas. |
+| `docs/10-ROADMAP.md` | Secuencia de trabajo y gates. |
 
-## Decisiones críticas
-- JavaScript/JSX, sin TypeScript.
-- Obsidian Precision Forge + Lava Orgánica.
-- Dark + Light son requisitos.
-- CRC es moneda principal; USD solo como equivalente configurado.
-- Home no muestra precios.
-- Solicitud personalizada no es producto.
-- `PENDING_QUOTE` no tiene precio final, cantidad ni subtotal.
-- Solo una cotización aprobada puede pagarse.
-- IA orienta; admin confirma precio.
-- Admin: KPIs reales, gráficos útiles y resumen IA basado en datos existentes.
-- Ayuda accesible y consistente.
-- API externa real y JWT deben quedar definidos antes de implementación.
-- Mobile 375 y tablet 768 se mockupean después de cerrar desktop.
-- No inventar datos, endpoints, capacidades ni métricas.
+### Archivos complementarios (no numerados)
 
-## Rúbrica académica revisada — 2026-09-25
+| Archivo | Propósito |
+|---|---|
+| `docs/DECISIONES-POST-AUDITORIA.md` | Registro histórico de decisiones post-auditoría (2026-09-24). Refs corregidas 2026-09-26. |
+| `docs/auditoriaclaude.md` | Archivo de trabajo para conclusiones de auditorías de Claude. |
+| `docs/ANTEPROYECTO_FINAL.md` | Documento académico de FWD Academy. No es fuente diaria de decisiones técnicas. |
 
-La rúbrica de `Proyecto_Final_FrontEnd_Actualizado.pdf` fue cruzada con la documentación. `docs/01-PRODUCTO-Y-ALCANCE.md` contiene la matriz vigente: HF-01 es la base visual desktop, pero la entrega completa sigue bloqueada por implementación de Router/servicios, auth y roles, CRUD, API externa real, Jest/Testing Library, IA, dos flujos N8N, evidencias móvil/tablet y demostración de accesibilidad con texto ajustable.
+## Decisiones críticas vigentes — 2026-09-26
 
-## Orden de trabajo
-1. Corregir HF según auditoría.
-2. Cerrar Dark/Light, ayuda y accesibilidad.
-3. Cerrar HF-07/HF-08.
-4. Ajustar Admin + IA.
-5. Definir API externa + JWT.
-6. Aprobar desktop.
-7. Crear mockups mobile/tablet.
-8. Aprobar HF.
-9. Design System.
-10. Arquitectura/datos/API.
-11. React.
-12. Testing/integraciones/calidad.
+1. JavaScript/JSX, sin TypeScript.
+2. Obsidian Precision Forge + Lava Orgánica (no son dos identidades separadas).
+3. Dark + Light son requisitos. Tokens definidos en doc 04.
+4. CRC es moneda principal; USD solo como equivalente configurado con fuente de tipo de cambio.
+5. Home no muestra precios.
+6. Solicitud personalizada NO es producto — nunca usa `quantity × unitPrice`.
+7. `PENDING_QUOTE` no tiene precio final, cantidad ni subtotal.
+8. Solo una cotización aprobada puede pagarse.
+9. IA orienta; admin confirma precio. Etiqueta: `ORIENTATIVO · SUJETO A VALIDACIÓN`.
+10. Admin: KPIs reales, gráficos útiles y resumen IA basado en datos existentes.
+11. Ayuda accesible e inline (HelpDisclosure), no modales de pantalla completa.
+12. API externa real y JWT deben quedar definidos antes de implementación.
+13. Mobile 375 y tablet 768 se mockupean después de cerrar desktop.
+14. No inventar datos, endpoints, capacidades ni métricas.
+15. Navbar público de Stitch conservado como base visual; cambios quirúrgicos solamente.
+16. Footer completo es para páginas públicas; dashboards pueden omitirlo.
+17. React puede consumir un Webhook de N8N directamente para chatbot y resumen IA.
 
-## Regla
-Si un documento contradice una decisión posterior, prevalece la decisión posterior registrada aquí y en el documento de dominio. No crear nuevos Markdown si el tema ya tiene un hogar.
+## Regla de ciclo de solicitudes (crítica)
 
-## Decisión adicional — navegación y N8N (2026-09-24)
+```
+PENDING_QUOTE → IN_REVIEW → QUOTED → AWAITING_APPROVAL → APPROVED → PAID
+```
 
-- El navbar público de Stitch se conserva como base visual; solo tendrá ajustes pequeños y funcionales.
-- El footer completo pertenece principalmente al área pública. Los dashboards no están obligados a mostrar el footer comercial; pueden usar uno técnico compacto o ninguno si el foco operativo lo justifica.
-- Los mockups de Stitch/UXMagic son referencias visuales, no contratos literales de chrome para cada ruta.
-- React puede consumir un Webhook de N8N directamente para el chatbot y/o resumen IA sin añadir un backend intermedio para ese caso.
-## Estado HF-01 — rediseño del Hero Workbench reabierto — 2026-09-25
+Salidas: `REJECTED`, `EXPIRED`, `CANCELLED`.
 
-**Auditoria ChatGPT 2026-09-25:** HF-01 conserva la exploracion aprobada como referencia visual, pero el congelado tecnico queda pendiente de resolver responsive 375/768, targets tactiles, contraste, carga de imagenes y jerarquia de motion. La solicitud de rehacer el Home reabre la iteracion visual controlada. Ver el detalle en `docs/05-AUDITORIA-HF-Y-MOCKUPS.md`.
+## Skills y repositorios de diseño de referencia
 
-**HF-01 Home: reconstrucción visual desde cero completada en el mockup; pendiente validación manual en navegador.**
+Los siguientes repositorios están documentados en `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md` (sección "Sistema de Criterios") y definen las reglas de craft, movimiento, anti-slop y accesibilidad del proyecto:
 
-El archivo mockups/hf-01-home.html consolida:
-- eliminación completa de la capa CAD triangular ficticia y sus cotas/gráficos superpuestos;
-- fotografía real como protagonista del Hero, con fundido perimetral;
-- Leader Line Callout dinámico para las cuatro piezas, con texto técnico y punto de llamada contextual;
-- cambio suave entre Soporte, Engranaje, Dragón y Drone mediante miniaturas;
-- escáner láser metrológico visual sutil y estado decorativo ESCANEANDO;
-- efecto Tilt/Parallax ligero, sin WebGL/Three.js;
-- ficha técnica inferior con referencia, tolerancia y datos de la pieza;
-- soporte de Dark/Light y prefers-reduced-motion.
+| Skill | Repo / Fuente | Aplicación |
+|---|---|---|
+| Físicas de animación | [Emil Kowalski / skills](https://github.com/emilkowalski/skills) | Curvas, tiempos, `will-change`, 60 fps, `prefers-reduced-motion` |
+| Craft anti-slop | [Impeccable](https://github.com/pbakaus/impeccable) + [stop-slop](https://github.com/hardikpandya/stop-slop) | Prohibiciones de clichés, narrativa editorial, craft visual |
+| Layout y tokens | [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) + [taste-skill](https://github.com/senlindesign/taste-skill) + [design.md](https://github.com/google-labs-code/design.md) | Geometría, paleta, spotlight interactivo |
+| Accesibilidad | [W3C WAI-ARIA APG](https://www.w3.org/WAI/ARIA/apg/) + [MDN Accessibility](https://developer.mozilla.org/en-US/docs/Web/Accessibility) | WCAG 2.2 AA, patrones de teclado, contraste |
+| Copywriting técnico | [Humanizer](https://github.com/blader/humanizer) | Voz de taller costarricense, sin clichés de IA |
+| Referencia visual | [Godly](https://godly.design/) + [Awwwards](https://www.awwwards.com/) + [Refero](https://styles.refero.design/) + [React Bits](https://reactbits.dev/) | Dirección de arte, componentes, dark mode industrial |
 
-### Verificación actual
-La revisión estática confirma carga local de assets, cambio de las piezas 01/02/03/04, actualización del Leader Line, ausencia del overlay CAD ficticio, responsive base, reduced-motion, separación de badges, controles de accesibilidad e idioma ES/EN. La validación manual en navegador a 375px, 768px y desktop queda como evidencia pendiente; en el entorno actual no hay una superficie de navegador automatizable.
+**Al diseñar o iterar cualquier pantalla, consultar estos repos y aplicar los criterios documentados en doc 04.**
 
-**Decisión vigente:** HF-01 queda adoptado como referencia visual del sistema y fuente de verdad para el Design System. Los hallazgos de accesibilidad técnica, responsive y evidencia de rúbrica se resolverán en la implementación React; no se abrirá otra ronda de rediseño del mockup. El visor 3D WebGL/Three.js continúa reservado exclusivamente para HF-03 y HF-05.
+## Registro de continuidad — HF-01 definitivo — 2026-09-28
 
-**Interacciones HF-01:** el Hero admite parallax/tilt/foco radial controlado con mouse y el navbar incluye menú de cuenta plegable para login, registro, cuenta, carrito y nueva solicitud; ambos respetan accesibilidad y reduced-motion. Home también incorpora controles flotantes de accesibilidad (tamaño de texto efectivo, contraste, movimiento y restaurar), una superficie visual de asistencia técnica con microcopy para personas expertas y principiantes, y cambio persistente ES/EN; la IA real queda reservada para HF-06.
-- El frontend consume el endpoint del workflow; no se conecta directamente al nodo AI Agent.
-- Chatbot y resumen Admin pueden compartir infraestructura mediante un campo `mode`, manteniendo contratos y permisos separados.
-- **Visor 3D real vs Hero (2026-09-25):** El Hero utiliza fotografía de estudio de alta fidelidad con interactividad ligera (Parallax 3D / Tilt, línea de llamada técnica contextual y escáner láser metrológico) para garantizar conversión y máximo rendimiento de carga (LCP/FCP). El visor 3D interactivo WebGL/Three.js se reserva exclusivamente para HF-03 (Detalle de Producto) y HF-05 (Solicitud con Archivo 3D), donde la inspección orbital 360° y validación geométrica aportan valor funcional real.
+Este registro permite continuar el trabajo en un chat nuevo sin depender del historial de conversación.
 
+### Archivos y regla de preservación
 
-## Navegación de trabajo para esta fase — 2026-09-24
+- **Candidato que se debe abrir y continuar:** `mockups/hf-01-home-definitivo.html`.
+- **Referencia local original preservada:** `mockups/hf-01-home.html`.
+- **Referencia remota preservada:** `mockups/hf-01-home-remoto-pruebas.html`.
+- Los dos archivos de referencia no deben sobrescribirse ni editarse como parte de la siguiente iteración. El definitivo combina decisiones de ambos y es el único HTML de trabajo.
 
-### Dónde estamos
-HF-07 y HF-08 están aprobados y congelados. HF-01 Home quedó consolidado como referencia visual del Hero después de la implementación y verificación en navegador del 2026-09-25.
+### Qué se hizo realmente
 
-### Qué falta ahora
-1. Extraer tokens y componentes del Design System desde HF-01.
-2. Construir el shell/Home en React con accesibilidad, idioma, tema y navegación reales.
-3. Preparar Router, servicios, auth/roles y contratos antes de expandir HF-02/HF-05.
-3. Completar las pantallas restantes de desktop según la auditoría vigente.
-4. Mantener la documentación sincronizada con cada cierre.
+- Se conservó del local la dirección visual que el usuario prefirió: hero, catálogo, workbench, copy principal, footer y los iconos flotantes `✦` (chat) y `♿` (accesibilidad).
+- Se incorporó del remoto la sensación más iterada: menú plegable de cuenta, jerarquía compacta, búsqueda, acciones de navbar y densidad de información.
+- El navbar del definitivo usa una retícula de tres columnas para mantener los enlaces centrados en desktop; desde `1120px` se repliega intencionalmente a menú compacto.
+- Chatbot y accesibilidad conservan los iconos del local, pero sus paneles ahora usan drawers compactos de geometría Vértice: regla superior lava, etiquetas `01 / ASISTENCIA` y `02 / CONTROL`, controles cuadrados, foco visible y botones táctiles de al menos `44px`.
+- Se añadieron estados de apertura con `aria-expanded`/`aria-hidden`, roles de diálogo, gestión básica de foco y cierre con `Escape`. El cierre también está disponible mediante el botón de cierre o el mismo disparador; el cierre por clic externo no es una dependencia de este candidato.
+- Se eliminó del copy del definitivo cualquier afirmación no definida por el proyecto, incluyendo “cámaras industriales”, “grado industrial”, “22µm SLA” y “18 piezas”. No inventar reemplazos técnicos sin validación del usuario o de los documentos.
+- No se inició React, no se agregaron dependencias y no se convirtió automáticamente el mockup en componentes.
 
-### Próximos caminos posibles
-- Recomendado: **HF-02 → HF-05**.
-- Alternativa: cerrar primero la auditoría transversal de Admin + IA.
-- Alternativa: definir API externa + JWT.
+### Cómo se aplicaron las skills y referencias
 
-Cuando el usuario pregunte "¿qué hacemos ahora?", responder primero con el estado actual y luego ofrecer los siguientes pasos posibles. Si existe una opción claramente recomendada por el roadmap, señalarla de forma explícita.
+La skill local `asistente-desarrollo-web` se usó como criterio de revisión: cambios localizados, HTML/CSS/JS legible, comportamiento existente preservado y verificación en navegador. `Emil Kowalski/skills` orientó curvas, transiciones con `transform`/`opacity` y `prefers-reduced-motion`; `Impeccable` y `stop-slop` orientaron la eliminación de clichés, gradientes neón, copy genérico y tarjetas innecesariamente redondeadas; `taste-skill`, `UI/UX Pro Max` y `design.md` orientaron tokens, retícula, contraste y jerarquía; W3C APG/MDN orientaron teclado, foco y ARIA; Humanizer orientó una voz técnica cercana; Godly, Awwwards, Refero y React Bits se consultaron como referencias de dirección, composición y micro-interacción, no como código copiado. También se inspeccionaron Godly y React Bits en navegador para confirmar el tipo de jerarquía editorial y movimiento selectivo buscado.
 
+### Verificación de esta iteración
 
-## Estado de HF-07 — 2026-09-24
+- `mockups/hf-01-home-definitivo.html` respondió correctamente en `http://127.0.0.1:5173/mockups/hf-01-home-definitivo.html`.
+- Se revisó visualmente en viewport desktop y en viewport reducido; en desktop el navbar queda centrado y en viewport reducido se activa el comportamiento responsive.
+- Se abrieron y revisaron el menú de cuenta, búsqueda, chatbot y accesibilidad; los paneles cambiaron correctamente sus estados ARIA y no se observaron errores de consola durante la revisión.
+- La pestaña del definitivo quedó marcada como entregable para revisión visual del usuario, pero el mockup sigue **NO CONGELADO**.
 
-**HF-07 Carrito Híbrido: APROBADO Y CONGELADO.**
+### Protocolo para la siguiente IA
 
-Gemini validó la segunda iteración de UXMagic:
-- `PENDING_QUOTE` correcto.
-- `QUOTED` correcto.
-- `APPROVED` correcto.
-- productos de catálogo separados del flujo de cotizaciones.
-- identidad visual consistente.
-- navbar de Stitch conservado.
+1. Leer `AGENTS.md`, este archivo, `docs/00-INDICE-Y-MAPA.md`, `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md` y `docs/05-AUDITORIA-HF-Y-MOCKUPS.md`.
+2. Abrir el candidato definitivo en navegador y, si hace falta, comparar solo lectura con los dos archivos preservados.
+3. Esperar el feedback visual del usuario y editar únicamente `mockups/hf-01-home-definitivo.html`, salvo que el usuario indique expresamente otra cosa.
+4. No pasar a React ni crear HTML para HF-02/HF-05 hasta que el usuario apruebe HF-01 y exista el cierre mínimo de arquitectura/API indicado en los documentos.
 
-No se requieren más iteraciones de HF-07 antes de implementación.
+### Punto de pausa — auditoría funcional pendiente — 2026-09-28
 
-### Siguiente pantalla
+El usuario pausó antes de corregir navegación y funciones del HTML. **No se aplicaron cambios de código en esta auditoría.** El siguiente chat debe continuar desde `mockups/hf-01-home-definitivo.html` y revisar primero estos puntos:
 
-El foco pasa a **HF-08 Checkout**, que debe resolver el pago de productos y el pago independiente de cotizaciones aprobadas, además de estados, SINPE, facturación, entrega y excepciones.
+- Varias rutas de demostración usan rutas absolutas (`/solicitud`, `/login`, `/registro`, `/cuenta`, `/carrito`, `/catalogo/...` y `/`); con el servidor estático del mockup pueden salir de la pantalla o devolver una ruta inexistente. Decidir con el usuario si deben simular navegación, apuntar a secciones existentes o quedar como rutas preparadas para React.
+- `#chat-submit` tiene apariencia de acción funcional, pero todavía no tiene comportamiento conectado: debe mostrar una respuesta demo, un estado de procesamiento o quedar claramente marcado como preparación para React.
+- Revisar coordinación entre búsqueda, menú de cuenta, menú móvil y paneles flotantes: al abrir uno, los demás deben cerrarse y sus estados `aria-expanded`/`aria-hidden` deben quedar sincronizados.
+- Revisar foco y teclado en búsqueda, cuenta, menú móvil, pestañas del hero, chatbot y accesibilidad; comprobar `Escape`, `Tab`, `Shift+Tab`, `Enter` y flechas del visor.
+- Revisar que el idioma no deje selectores o textos desincronizados y que los enlaces internos actualicen correctamente el estado visual de navegación.
+- Verificar estados vacíos de búsqueda y errores de imagen/ruta sin romper la página.
 
-## Handoff de sesión — 2026-09-24
+### Orden recomendado para retomar
 
-### Estado al pausar
-La fase de mockups avanzó hasta cerrar **HF-07 Carrito Híbrido**. La validación final de Gemini sobre la segunda iteración de UXMagic fue **APROBADO**. HF-07 queda congelado y no debe seguir iterándose salvo que aparezca una contradicción de negocio o una dependencia descubierta posteriormente.
+1. Hacer una matriz de navegación del definitivo: elemento, destino actual, destino esperado y estado demo/real.
+2. Probar cada interacción en navegador con consola limpia antes de editar.
+3. Corregir primero rutas y estados de apertura/cierre; luego mejorar chatbot y teclado.
+4. Volver a revisar desktop y responsive y registrar el resultado aquí y en doc 05.
 
-### HF-07 aprobado
-La pantalla aprobada debe conservar:
-- productos de catálogo con cantidad, precio y subtotal;
-- solicitudes personalizadas separadas del catálogo;
-- `PENDING_QUOTE` sin precio final, cantidad ni subtotal;
-- `QUOTED` con monto presupuestado y acción para revisar la cotización;
-- `APPROVED` con monto aprobado y acción `Pagar cotización`;
-- solicitudes personalizadas sin lógica `quantity × unitPrice`;
-- total de productos separado del flujo de cotizaciones;
-- navbar basado en Stitch/Vértice;
-- identidad Obsidian Precision Forge + Lava Orgánica.
+## Orden de trabajo vigente — 2026-09-26
 
-### Punto exacto de reanudación
-**HF-08 ya está congelado y HF-01 quedó adoptado como guía visual del sistema. El siguiente trabajo ya no es abrir mockups: es Design System, arquitectura y primera implementación React del Home.**
+1. **→ Iterar HF-01 Home.** ← ESTAMOS AQUÍ (NO ESTÁ CONGELADO). Es el único mockup HTML que se hará.
+2. ~~Cerrar Dark/Light, ayuda y accesibilidad.~~ ✅ Definidos en doc 04.
+3. Definir API externa + JWT concretamente (y arquitectura base).
+4. **React.** (El resto de pantallas, incluyendo HF-02 y HF-05, se construirán directamente en React basándose en el diseño y la fundación técnica de HF-01).
+5. Mockups mobile 375 / tablet 768 (o responsive en React directamente).
+6. Design System formal en código.
+7. Testing/integraciones/calidad.
 
-Antes de generar HF-08:
-1. diseñar la separación entre checkout de productos y pago de cotización aprobada;
-2. definir estados y excepciones del checkout;
-3. preparar el prompt maestro para UXMagic tomando HF-07 como referencia aprobada;
-4. generar la primera propuesta HF-08;
-5. auditarla visualmente con Gemini;
-6. iterar hasta aprobación.
+## Orden Militar vs. Creatividad Visual
 
-### HF-08 debe resolver
-- checkout de productos de catálogo;
-- pago independiente de cotización personalizada aprobada;
-- SINPE;
-- facturación/Hacienda;
-- entrega;
-- revisión y confirmación;
-- loading/processing;
-- validación;
-- error;
-- pago pendiente;
-- comprobante SINPE;
-- cotización caducada;
-- cotización rechazada;
-- responsive 375/768 preparado, aunque los mockups responsive se harán después de cerrar desktop.
+- **Ejecución y Flujo (Orden Militar):** Las reglas de negocio, la secuencia de mockups (solo HF-01), y el bloqueo de React son INQUEBRANTABLES.
+- **Craft Visual y CSS (Libertad Creativa):** La IA tiene libertad para proponer e implementar layouts audaces, nuevas animaciones, micro-interacciones, y elevar el diseño usando las referencias de `Godly`, `Awwwards` y `Emil Kowalski`. No hay límites para hacer que HF-01 se vea espectacular y premium, siempre y cuando se mantenga dentro del mood general "Obsidian Precision Forge + Lava Orgánica".
 
-### No hacer al retomar
-- No volver a rediseñar HF-07.
-- No abrir otra ronda de rediseño de HF-01.
-- No crear un backend Node/Express solo para N8N.
-- No mezclar una cotización pendiente con productos de catálogo.
-- No crear documentación paralela fuera de la estructura existente.
+## Regla de precedencia
 
-### Siguiente gran secuencia
-HF-01 como guía → Design System → shell/Home en React → Router y servicios → auth/roles → JSON Server/API externa → HF-02/HF-05 en React → IA/N8N → testing y evidencia responsive/accessibility.
+Si un documento contradice una decisión posterior, prevalece la decisión posterior registrada aquí y en el documento de dominio. No crear nuevos Markdown si el tema ya tiene un hogar en los 11 documentos numerados.
 
+## Regla de acompañamiento
 
-## Estado HF-08 — auditoría 2026-09-24
+Al cerrar cualquier bloque de trabajo, indicar:
+- estado actual del proyecto;
+- qué se terminó o cambió;
+- qué sigue;
+- 2–4 opciones posibles;
+- cuál se recomienda y por qué.
 
-La primera propuesta de HF-08 existe pero todavía no está congelada. Gemini detectó ajustes importantes, principalmente:
-- destino SINPE visible;
-- separar pago de logística;
-- separar Contacto y Facturación en checkout de cotización;
-- mostrar vigencia exacta;
-- corregir stepper contextual.
-
-No avanzar todavía a aprobación HF-08. Hacer una iteración de UXMagic con estas correcciones y luego validar nuevamente.
-
-
-## HF-08 — estado 2026-09-25
-
-La segunda iteración de UXMagic fue auditada visualmente con zoom en secciones críticas.
-Resultado: **APROBADO CON OBSERVACIÓN MENOR**.
-
-Los cinco criterios obligatorios están verificados:
-1. SINPE con sección propia `04 / Método de Pago`, destino `Vértice CR + XXXX-XXXX`, monto dinámico, comprobante y formatos. ✅
-2. Entrega y Método de Pago son tarjetas separadas en ambos checkouts. ✅
-3. Checkout de cotización tiene Contacto y Facturación Electrónica como secciones independientes. ✅
-4. Sidebar muestra monto aprobado `¢112,000` y vigencia `30/09/2026` visible. ✅
-5. Stepper de cotización usa `01 Cotización`; productos conserva `01 Items`. ✅
-
-**Observación menor resuelta:** el número de paso que las secciones muestran es el del stepper compartido (`02 Datos` contiene Contacto + Facturación; `03 Entrega`; `04 Método de Pago`). No es una duplicación de numeración.
-
-**HF-08: APROBADO Y CONGELADO — 2026-09-25.**
-
-No requiere otra iteración de diseño antes de implementación.
-Siguiente bloque: cierre transversal de desktop (Dark/Light, accesibilidad y ayuda).
+RESPONDER SIEMPRE CON 1 PÁRRAFO A MENOS QUE SEA NECESARIO EXTENDER EL TEXTO.

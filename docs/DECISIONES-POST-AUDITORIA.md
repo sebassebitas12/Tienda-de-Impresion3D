@@ -1,4 +1,6 @@
-# Decisiones HF posteriores a auditoría — 2026-09-24
+# Decisiones post-auditoría — Vértice CR
+
+> Creado: **2026-09-24**. Última revisión: **2026-09-26**. Título y refs corregidos.
 
 ## Estado
 
@@ -6,7 +8,7 @@ Rama: `Pruebas`
 Commit de referencia de mockups: `ee144ce`
 Implementación React: **sigue bloqueada**.
 
-Este documento cierra las decisiones que la auditoría HF dejó pendientes y establece la secuencia para terminar Fase 3 sin saltar prematuramente a código.
+Este documento registra las decisiones que la auditoría HF dejó pendientes y establece la secuencia para terminar Fase 3 sin saltar prematuramente a código. El contenido principal ya fue absorbido por los documentos numerados (04, 05, AI_CONTEXT); este archivo se conserva como registro histórico.
 
 ## 1. Identidad visual vigente
 
@@ -265,10 +267,10 @@ No corregir silenciosamente este dato en los mocks sin documentar primero la dec
 Cualquier IA que continúe el proyecto debe leer:
 
 - `AI_CONTEXT.md`
-- `docs/IDENTITY-ROADMAP.md`
-- `docs/VISUAL-IDENTITY-WORKING.md`
-- `docs/fase3_mockups_hf.md`
-- este documento
+- `AGENTS.md`
+- `docs/00-INDICE-Y-MAPA.md`
+- el documento de dominio que corresponda (ver índice)
+- este documento (si necesita contexto histórico de decisiones post-auditoría)
 
 y debe asumir que:
 

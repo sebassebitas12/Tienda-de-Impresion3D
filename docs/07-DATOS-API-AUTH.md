@@ -1,5 +1,7 @@
 # Vértice CR — Datos, API externa, JWT y N8N
 
+> Última actualización: **2026-09-24**.
+
 ## Propósito
 
 Este es el documento para responder: **¿de dónde salen los datos y cómo se conectan los servicios?**
@@ -26,10 +28,6 @@ Antes de implementar debe quedar definido:
 - variable de entorno.
 
 No inventar endpoint ni poner secretos en Git.
-
-### Bloqueador de entrega
-
-El proveedor todavía no está aprobado. El anteproyecto menciona posibles servicios, pero esas menciones no constituyen una integración existente. Elegir un único caso demostrable, documentar su contrato y definir la variable de entorno antes de implementarlo. La integración no debe depender de una clave expuesta en el navegador.
 
 ## JWT
 

@@ -1,6 +1,8 @@
 # Vértice CR — Índice de documentación
 
-**Fuente rápida para humanos y agentes. Si no sabes dónde buscar algo, empieza aquí.**
+> Última actualización: **2026-09-26**.
+
+**Fuente rápida para humanos y agentes. Si no sabes dónde buscar algo, empieza aquí. Si eres una IA, lee primero `AI_CONTEXT.md` y `AGENTS.md`.**
 
 | Si te preguntan... | Busca en |
 |---|---|
@@ -11,6 +13,7 @@
 | ¿Qué pantallas y rutas existen? | 03-UX-Y-FLUJOS.md |
 | ¿Qué pasa en loading/error/empty? | 03-UX-Y-FLUJOS.md |
 | ¿Qué colores, tipografías, temas y accesibilidad usamos? | 04-DISENO-VISUAL-Y-ACCESIBILIDAD.md |
+| ¿Dónde están los repositorios, enlaces directos y benchmark? | 04-DISENO-VISUAL-Y-ACCESIBILIDAD.md |
 | ¿Qué falta corregir de los mockups? | 05-AUDITORIA-HF-Y-MOCKUPS.md |
 | ¿Cómo se construirá técnicamente? | 06-ARQUITECTURA.md |
 | ¿Dónde van API externa, JWT y N8N? | 07-DATOS-API-AUTH.md |
