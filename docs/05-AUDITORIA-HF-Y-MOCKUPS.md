@@ -12,7 +12,7 @@ React continúa bloqueado hasta cerrar los bloqueos.
 
 | HF | Pantalla | Estado |
 |---|---|---|
-| 01 | Home | ✅ CONGELADO / APROBADO — mockup HTML funcional (`mockups/hf-01-home.html`) |
+| 01 | Home | 🟡 EN ITERACIÓN (Único mockup HTML en desarrollo, NO congelado) |
 | 02 | Catálogo | Ajustar |
 | 03 | Detalle producto | Mantener + refinar |
 | 04 | Selección solicitud | Mantener |
@@ -115,8 +115,7 @@ A partir de la auditoría de 9 capturas de video del usuario de la versión prev
 - **Cero precios en Home:** Toda llamada a cotización personalizada se rige estrictamente por `PENDING_QUOTE / SIN COBRO PREVIO` (docs/02 y AI_CONTEXT).
 - **Asistente Técnico Local:** Base de conocimiento técnica instantánea sobre requisitos STL, polímeros de ingeniería, logística de envío a 7 provincias y tolerancias mecánicas.
 
-**Resultado de la auditoría:** HF-01 queda **APROBADO Y CONGELADO** como referencia visual y funcional definitiva de la página de inicio.
-
+**Resultado de la auditoría:** HF-01 **NO ESTÁ CONGELADO**. Se revirtió la decisión de congelarlo el 2026-09-26 porque el usuario aún desea iterar sobre él. Es el único mockup HTML que se trabajará.
 
 ## HF-07 — Auditoría comparativa UXMagic + Gemini (2026-09-24)
 
@@ -275,9 +274,9 @@ Observación de numeración resuelta: Contacto y Facturación son sub-secciones 
 
 Pendientes de iteración en UXMagic aplicando las reglas del cierre transversal de desktop.
 
-### HF-01 — Home (Estado: ✅ APROBADO Y CONGELADO)
+### HF-01 — Home (Estado: 🟡 EN ITERACIÓN)
 
-La implementación final de mockups/hf-01-home.html fue revisada en navegador durante la sesión de Antigravity del 2026-09-25. El resultado coincide con la dirección visual aprobada y elimina el overlay CAD ficticio.
+La implementación de `mockups/hf-01-home.html` sigue en desarrollo y refinamiento bajo las instrucciones directas del usuario. NO está congelado ni aprobado aún.
 
 #### Cambios consolidados
 - Navbar, Hero, pilares, workflow, CTA de cotización y footer conservan la referencia oficial de Stitch/Vértice.
@@ -304,7 +303,7 @@ La implementación final de mockups/hf-01-home.html fue revisada en navegador du
 ### Decisión de arquitectura del Hero
 El Hero queda aprobado como fotografía de alta fidelidad + interactividad ligera. El visor WebGL/Three.js real se reserva para HF-03 Detalle de Producto y HF-05 Solicitud con Archivo 3D.
 
-**Estado: ✅ CONGELADO. No rediseñar HF-01 salvo contradicción funcional o de negocio descubierta posteriormente.**
+**Estado: 🟡 EN ITERACIÓN. Se seguirán haciendo ajustes sobre el HTML hasta que el usuario dé la aprobación final.**
 
 ### HF-02 — Catálogo
 
@@ -344,4 +343,5 @@ Accesibilidad aplicada:
 
 ### Siguiente acción
 
-Generar iteración en UXMagic para HF-01, HF-02 y HF-05 con estas correcciones. Auditar con zoom en los puntos críticos antes de congelar.
+Continuar iterando **exclusivamente** el HTML de `HF-01` basándose en el feedback directo del usuario.
+*(Nota: Ya no se generarán mockups HTML para HF-02, HF-05 ni el resto de pantallas; una vez que HF-01 sea aprobado, el proyecto pasará directamente a su implementación total en React).*
