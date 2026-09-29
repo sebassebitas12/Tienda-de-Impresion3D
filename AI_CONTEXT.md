@@ -204,3 +204,12 @@ RESPONDER SIEMPRE CON 1 PÁRRAFO A MENOS QUE SEA NECESARIO EXTENDER EL TEXTO.
 Esta iteración se registró como propuesta, pero el usuario rechazó el diseño del menú desplegable y pidió quitarlo, conservando el botón de tres barras. No reutilizar el panel ni presentarlo como aprobado. El botón queda; la función/estado siguiente debe confirmarse al retomar. Asistencia y accesibilidad tampoco están aprobadas. Las referencias ampliadas y el criterio para aplicarlas están en `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md`; HF-01 sigue NO CONGELADO y React sigue bloqueado.
 
 Siguiente al retomar: decidir qué estado/función acompaña al botón de tres barras sin recrear el panel rechazado; después rediseñar y validar chatbot y accesibilidad con referencias específicas, en desktop y móvil, antes de pedir aprobación visual para congelar HF-01.
+
+### Hito de Diseño Premium y Mandato Reactbits - 2026-09-28
+El usuario ha validado exitosamente el nivel de calidad visual y ha establecido una **regla de oro absoluta** para todo el futuro desarrollo en React:
+**No se admiten componentes "slop", genéricos o estáticos.**
+Cada botón, menú, dropdown, y tarjeta de producto deberá estar infundido con micro-interacciones inspiradas en las referencias documentadas (Reactbits, Emil Kowalski, Godly). Esto incluye:
+- **Squircles y Glassmorphism:** Uso mandatorio de `backdrop-filter: blur(40px)`, sombras complejas (sombras externas para levitar, sombras internas / `inset` para dar definición) y radios de borde amplios (12px - 16px).
+- **Animaciones y Transiciones Fluidas:** Toda aparición (dropdowns, modales, alertas) debe entrar escalando (`transform: scale(0.96)`) y desvaneciéndose fluidamente, NUNCA apareciendo de golpe con `display: block` sin transición.
+- **Interacciones Táctiles:** Cada hover sobre elementos cliqueables debe producir un resultado táctil: íconos SVG que se escalan, se mueven (ej. flechas), o rotan suavemente.
+- **Vara de Calidad React:** A partir de ahora, todas las iteraciones de React que reemplacen al HTML puro deberán mantener (o mejorar) este mismo nivel de craft. Este esfuerzo visual es donde el usuario pide "canalizar gran parte de la energía".

@@ -1,4 +1,4 @@
-<!doctype html>
+﻿﻿﻿<!doctype html>
 <html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
@@ -758,7 +758,223 @@
         #accessibility-panel .a11y-control small{max-width:230px;font-size:9px}
       }
 
-  </style>
+      /* Menu Lateral Drawer Premium */
+      .mobile-menu { position: fixed !important; inset: 0 !important; z-index: 9999 !important; display: flex !important; justify-content: flex-end !important; pointer-events: none !important; opacity: 0; background: transparent !important; transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important; }
+      .mobile-menu.is-open { pointer-events: auto !important; opacity: 1 !important; }
+      .menu-scrim { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; background: rgba(0, 0, 0, 0.4) !important; backdrop-filter: blur(12px) saturate(120%) !important; border: none !important; cursor: pointer !important; opacity: 0; transition: opacity 0.5s ease !important; }
+      .mobile-menu.is-open .menu-scrim { opacity: 1 !important; }
+      
+      .menu-stage { position: absolute !important; right: 0 !important; top: 0 !important; z-index: 2 !important; width: min(480px, 100vw) !important; height: 100dvh !important; background: rgba(18, 15, 13, 0.95) !important; backdrop-filter: blur(40px) !important; border-left: 1px solid rgba(255, 255, 255, 0.05) !important; display: flex !important; flex-direction: column !important; padding: 0 !important; transform: translateX(100%) !important; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important; box-shadow: -30px 0 80px rgba(0,0,0,0.8) !important; }
+      .mobile-menu.is-open .menu-stage { transform: translateX(0) !important; }
+      
+      .menu-topline { padding: 32px 40px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; border-bottom: 1px solid rgba(255,255,255,0.05) !important; }
+      .menu-topline span { color: var(--lava) !important; font: 11px var(--mono) !important; letter-spacing: 0.2em !important; }
+      .menu-dismiss { display: flex !important; align-items: center !important; justify-content: center !important; width: 40px !important; height: 40px !important; background: transparent !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 50% !important; color: #fff !important; font-size: 0 !important; cursor: pointer !important; transition: all 0.3s ease !important; }
+      .menu-dismiss:hover { background: #fff !important; color: #000 !important; transform: rotate(90deg) !important; }
+      .menu-dismiss b { font-size: 24px !important; font-weight: 300 !important; line-height: 1 !important; }
+      .menu-dismiss span { display: none !important; }
+      
+      .menu-layout { flex: 1 !important; padding: 24px 32px !important; display: flex !important; flex-direction: column !important; gap: 24px !important; overflow-y: auto !important; scrollbar-width: none !important; }
+      .menu-layout::-webkit-scrollbar { display: none !important; }
+      .menu-intro h2 { margin: 0 0 8px !important; font-size: 32px !important; font-weight: 300 !important; line-height: 1.1 !important; letter-spacing: -0.04em !important; color: #fff !important; }
+      .menu-intro p { margin: 0 !important; color: rgba(255,255,255,0.5) !important; font-size: 14px !important; line-height: 1.5 !important; }
+      .menu-kicker { display: inline-block !important; padding: 6px 12px !important; background: color-mix(in srgb, var(--lava) 15%, transparent) !important; color: var(--lava) !important; border-radius: 100px !important; margin-bottom: 12px !important; font: 10px var(--mono) !important; letter-spacing: 0.1em !important; }
+      
+      .menu-destinations { display: flex !important; flex-direction: column !important; gap: 6px !important; background: transparent !important; border: none !important; }
+      .menu-destinations a { display: flex !important; align-items: center !important; gap: 16px !important; padding: 14px 20px !important; background: rgba(0, 0, 0, 0.4) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; color: #fff !important; text-decoration: none !important; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important; position: relative !important; overflow: hidden !important; }
+      .menu-destinations a::before { content: '' !important; position: absolute !important; inset: 0 !important; background: linear-gradient(90deg, color-mix(in srgb, var(--lava) 15%, transparent), transparent) !important; opacity: 0 !important; transition: opacity 0.3s !important; }
+      .menu-destinations a:hover { border-color: var(--lava) !important; transform: translateY(-2px) !important; box-shadow: 0 12px 24px rgba(0,0,0,0.4) !important; }
+      .menu-destinations a:hover::before { opacity: 1 !important; }
+      .menu-destination-index { position: relative !important; z-index: 2 !important; color: rgba(255,255,255,0.4) !important; font: 12px var(--mono) !important; transition: color 0.3s !important; }
+      .menu-destinations a:hover .menu-destination-index { color: var(--lava) !important; }
+      .menu-destinations strong { position: relative !important; z-index: 2 !important; flex: 1 !important; font-size: 20px !important; font-weight: 400 !important; letter-spacing: -0.02em !important; }
+      .menu-destination-arrow { position: relative !important; z-index: 2 !important; color: var(--lava) !important; opacity: 0 !important; font-size: 20px !important; transform: translateX(-16px) !important; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important; }
+      .menu-destinations a:hover .menu-destination-arrow { opacity: 1 !important; transform: translateX(0) !important; }
+      
+      .menu-account { display: block !important; padding: 24px 32px !important; background: rgba(0,0,0,0.5) !important; border-top: 1px solid rgba(255,255,255,0.05) !important; margin-top: auto !important; }
+      .menu-account-label { display: flex !important; justify-content: space-between !important; margin-bottom: 24px !important; color: rgba(255,255,255,0.5) !important; font: 10px var(--mono) !important; letter-spacing: 0.15em !important; }
+      .menu-account-actions { display: block !important; }
+      .menu-login { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 24px !important; background: var(--lava) !important; color: #170d08 !important; border-radius: 16px !important; transition: all 0.3s ease !important; text-decoration: none !important; border: none !important; box-shadow: 0 8px 20px color-mix(in srgb, var(--lava) 25%, transparent) !important; }
+      .menu-login:hover { transform: translateY(-2px) !important; background: #FF7A45 !important; box-shadow: 0 16px 30px color-mix(in srgb, var(--lava) 40%, transparent) !important; }
+      .menu-login strong { display: block !important; font-size: 20px !important; font-weight: 600 !important; letter-spacing: -0.01em !important; }
+      .menu-login small { display: block !important; margin-top: 6px !important; color: rgba(23, 13, 8, 0.8) !important; font-size: 14px !important; }
+      .menu-login b { font-size: 24px !important; font-weight: 400 !important; }
+      .menu-register, .menu-cart { display: none !important; } /* Simplificado para un look editorial */
+
+      /* Arreglo Hamburger (AlineaciÃ³n forzada) */
+      .hamburger { display: block !important; position: relative !important; padding: 0 !important; width: 40px !important; height: 40px !important; }
+      .hamburger i { position: absolute !important; left: 50% !important; top: 50% !important; display: block !important; width: 18px !important; height: 1.5px !important; margin: 0 !important; background: currentColor !important; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important; transform-origin: center !important; }
+      .hamburger i:nth-child(1) { transform: translate(-50%, -6px) !important; }
+      .hamburger i:nth-child(2) { transform: translate(-50%, -50%) !important; }
+      .hamburger i:nth-child(3) { transform: translate(-50%, 5px) !important; }
+      .hamburger[aria-expanded="true"] i:nth-child(1) { transform: translate(-50%, -50%) rotate(45deg) !important; }
+      .hamburger[aria-expanded="true"] i:nth-child(2) { opacity: 0 !important; }
+      .hamburger[aria-expanded="true"] i:nth-child(3) { transform: translate(-50%, -50%) rotate(-45deg) !important; }
+
+      .account-panel-dropdown { position: absolute !important; top: calc(100% + 12px) !important; right: 0 !important; z-index: 100 !important; width: 300px !important; padding: 20px !important; border: 1px solid rgba(255,255,255,0.06) !important; border-radius: 16px !important; background: rgba(22, 18, 15, 0.92) !important; box-shadow: 0 40px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08) !important; backdrop-filter: blur(40px) saturate(150%) !important; pointer-events: none !important; transform-origin: top right !important; transform: scale(0.96) translateY(-8px) !important; opacity: 0 !important; visibility: hidden !important; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important; }
+      .account-panel-dropdown::before { content: '' !important; position: absolute !important; top: 0 !important; left: 24px !important; right: 24px !important; height: 1px !important; background: linear-gradient(90deg, var(--lava), transparent) !important; }
+      .account-panel-dropdown.is-open { pointer-events: auto !important; transform: scale(1) translateY(0) !important; opacity: 1 !important; visibility: visible !important; }
+      .account-dropdown-head { margin-bottom: 12px !important; padding-bottom: 14px !important; border-bottom: 1px solid rgba(255,255,255,0.05) !important; display: flex !important; flex-direction: column !important; gap: 4px !important; }
+      .account-dropdown-head strong { color: #fff !important; font-size: 15px !important; font-weight: 500 !important; letter-spacing: -0.02em !important; }
+      .account-dropdown-head span { color: var(--dim) !important; font: 9px var(--mono) !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; }
+      .account-dropdown-results { display: flex !important; flex-direction: column !important; gap: 2px !important; }
+      .account-dropdown-link { display: flex !important; align-items: center !important; gap: 12px !important; padding: 10px 12px !important; border-radius: 8px !important; color: var(--muted) !important; font-size: 13px !important; font-weight: 500 !important; transition: all 0.2s var(--ease-out) !important; }
+      .account-dropdown-link svg { width: 16px !important; height: 16px !important; fill: none !important; stroke: currentColor !important; stroke-width: 2 !important; opacity: 0.5 !important; transition: opacity 0.2s, transform 0.2s var(--ease-out) !important; }
+      .account-dropdown-link:hover { background: rgba(255,255,255,0.04) !important; color: #fff !important; }
+      .account-dropdown-link:hover svg { opacity: 1 !important; transform: translateX(2px) !important; }
+      .account-dropdown-primary { color: var(--lava) !important; background: color-mix(in srgb, var(--lava) 5%, transparent) !important; font-weight: 600 !important; }
+      .account-dropdown-primary svg { opacity: 1 !important; stroke: var(--lava) !important; }
+      .account-dropdown-primary:hover { background: color-mix(in srgb, var(--lava) 12%, transparent) !important; color: var(--lava) !important; }
+      .account-dropdown-divider { height: 1px !important; background: rgba(255,255,255,0.05) !important; margin: 8px 12px !important; }
+
+      /* Floating Morphing Docks (Chat & Accesibilidad) */
+      :is(#chat-panel, #accessibility-panel) { position: fixed !important; z-index: 100 !important; right: clamp(16px, 3vw, 32px) !important; bottom: 88px !important; width: min(420px, calc(100% - 32px)) !important; max-height: calc(100dvh - 120px) !important; background: rgba(22, 18, 15, 0.85) !important; backdrop-filter: blur(40px) saturate(150%) !important; border: 1px solid rgba(255,255,255,0.06) !important; border-radius: 24px !important; box-shadow: 0 40px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1) !important; padding: 0 !important; transform-origin: bottom right !important; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important; overflow-y: auto !important; overflow-x: hidden !important; scrollbar-width: none !important; display: flex !important; flex-direction: column !important; animation: none !important; }
+      :is(#chat-panel, #accessibility-panel)::-webkit-scrollbar { display: none !important; }
+      :is(#chat-panel, #accessibility-panel):not(.is-open) { opacity: 0 !important; transform: scale(0.9) translateY(40px) !important; pointer-events: none !important; }
+      
+      .chat-masthead, .a11y-heading { padding: 32px !important; background: rgba(0,0,0,0.2) !important; border-bottom: 1px solid rgba(255,255,255,0.05) !important; position: relative !important; display: flex !important; flex-direction: column !important; }
+      .panel-header, .a11y-heading > div { background: none !important; padding: 0 !important; border: none !important; display: block !important; }
+      .panel-header strong, .a11y-title { font-size: 24px !important; font-weight: 300 !important; color: #fff !important; letter-spacing: -0.02em !important; margin: 0 !important; }
+      .panel-header span, .a11y-overline { color: var(--lava) !important; font: 10px var(--mono) !important; letter-spacing: 0.1em !important; display: inline-block !important; padding: 4px 10px !important; background: color-mix(in srgb, var(--lava) 10%, transparent) !important; border-radius: 100px !important; margin-bottom: 12px !important; text-transform: uppercase !important; }
+      .chat-brandmark { display: none !important; }
+      .panel-close { position: absolute !important; right: 24px !important; top: 24px !important; width: 36px !important; height: 36px !important; border: 1px solid rgba(255,255,255,0.1) !important; background: transparent !important; border-radius: 50% !important; color: #fff !important; cursor: pointer !important; transition: all 0.3s ease !important; font-size: 20px !important; display: grid !important; place-items: center !important; font-weight: 300 !important; }
+      .panel-close:hover { background: #fff !important; color: #000 !important; transform: rotate(90deg) !important; }
+      
+      /* Chat Panel - IteraciÃ³n */
+      .chat-content { padding: 32px !important; background: transparent !important; }
+      .chat-intro { font-size: 28px !important; color: #fff !important; font-weight: 300 !important; line-height: 1.1 !important; margin: 0 0 12px !important; letter-spacing: -0.02em !important; }
+      .chat-context { font-size: 14px !important; color: rgba(255,255,255,0.5) !important; margin: 0 0 32px !important; line-height: 1.5 !important; }
+      .chat-suggestions { display: flex !important; flex-direction: column !important; gap: 12px !important; margin: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; }
+      .chat-suggestion { background: rgba(0,0,0,0.3) !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 16px !important; padding: 20px 24px !important; color: #ddd !important; font-size: 15px !important; transition: all 0.3s cubic-bezier(0.16,1,0.3,1) !important; display: flex !important; justify-content: space-between !important; align-items: center !important; cursor: pointer !important; text-align: left !important; position: relative !important; overflow: hidden !important; }
+      .chat-suggestion::before { content: '' !important; position: absolute !important; inset: 0 !important; background: linear-gradient(90deg, color-mix(in srgb, var(--lava) 10%, transparent), transparent) !important; opacity: 0 !important; transition: opacity 0.3s !important; }
+      .chat-suggestion::after { content: 'â†’' !important; position: relative !important; z-index: 2 !important; color: var(--lava) !important; font-family: var(--mono) !important; font-size: 18px !important; opacity: 0; transform: translateX(-10px) !important; transition: all 0.3s !important; }
+      .chat-suggestion:hover { border-color: var(--lava) !important; color: #fff !important; transform: translateY(-2px) !important; box-shadow: 0 12px 24px rgba(0,0,0,0.4) !important; }
+      .chat-suggestion:hover::before { opacity: 1 !important; }
+      .chat-suggestion:hover::after { opacity: 1 !important; transform: translateX(0) !important; }
+      
+      .chat-input-row { padding: 20px 32px 32px !important; background: transparent !important; border: none !important; }
+      .chat-input-label { display: none !important; }
+      .chat-compose { display: flex !important; align-items: center !important; background: rgba(0,0,0,0.5) !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 100px !important; padding: 8px 8px 8px 24px !important; transition: all 0.3s !important; }
+      .chat-compose:focus-within { border-color: var(--lava) !important; box-shadow: 0 0 0 4px color-mix(in srgb, var(--lava) 15%, transparent) !important; }
+      #chat-question { flex: 1 !important; background: transparent !important; border: none !important; color: #fff !important; font-size: 16px !important; outline: none !important; padding: 8px 0 !important; width: 100% !important; }
+      #chat-submit { background: var(--lava) !important; border: none !important; color: #170d08 !important; width: 44px !important; height: 44px !important; border-radius: 50% !important; cursor: pointer !important; transition: transform 0.2s !important; display: grid !important; place-items: center !important; font-size: 20px !important; box-shadow: 0 4px 12px color-mix(in srgb, var(--lava) 30%, transparent) !important; }
+      #chat-submit:hover { transform: scale(1.05) !important; background: #FF7A45 !important; }
+      
+      /* A11y Panel - IteraciÃ³n */
+      .a11y-intro { margin: 0 !important; display: none !important; }
+      .a11y-size, .a11y-toggles { padding: 32px !important; background: transparent !important; }
+      .a11y-section-label { display: flex !important; justify-content: space-between !important; color: rgba(255,255,255,0.4) !important; font: 10px var(--mono) !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; margin-bottom: 24px !important; }
+      .a11y-control-buttons { display: flex !important; gap: 12px !important; }
+      .a11y-control-buttons button { flex: 1 !important; background: rgba(0,0,0,0.3) !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 12px !important; color: #fff !important; transition: all 0.3s !important; padding: 18px 0 !important; font-size: 18px !important; cursor: pointer !important; }
+      .a11y-control-buttons button:hover { border-color: rgba(255,255,255,0.3) !important; transform: translateY(-2px) !important; box-shadow: 0 8px 16px rgba(0,0,0,0.3) !important; }
+      .a11y-control-buttons button[aria-pressed="true"] { background: var(--lava) !important; color: #170d08 !important; border-color: var(--lava) !important; box-shadow: 0 8px 20px color-mix(in srgb, var(--lava) 25%, transparent) !important; }
+      
+      .a11y-control { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 24px 0 !important; border-bottom: 1px solid rgba(255,255,255,0.05) !important; color: #fff !important; cursor: pointer !important; }
+      .a11y-control:last-child { border-bottom: none !important; }
+      .a11y-control > span { font-size: 16px !important; font-weight: 400 !important; display: block !important; color: #fff !important; margin: 0 !important; }
+      .a11y-control small { font-size: 13px !important; color: rgba(255,255,255,0.4) !important; display: block !important; margin-top: 6px !important; line-height: 1.4 !important; }
+      
+      .a11y-toggle { position: relative !important; width: 52px !important; height: 28px !important; background: rgba(255,255,255,0.1) !important; border: 1px solid rgba(255,255,255,0.05) !important; border-radius: 30px !important; cursor: pointer !important; transition: all 0.3s !important; padding: 0 !important; font-size: 0 !important; }
+      .a11y-toggle::after { content: '' !important; position: absolute !important; top: 3px !important; left: 3px !important; width: 20px !important; height: 20px !important; background: #fff !important; border-radius: 50% !important; transition: all 0.3s cubic-bezier(0.16,1,0.3,1) !important; box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important; }
+      .a11y-toggle[aria-pressed="true"] { background: var(--lava) !important; border-color: var(--lava) !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important; }
+      .a11y-toggle[aria-pressed="true"]::after { background: #170d08 !important; transform: translateX(24px) !important; box-shadow: none !important; }
+      .a11y-toggle span, .a11y-toggle i { display: none !important; }
+      
+      .a11y-reset { margin: 0 32px 32px !important; width: calc(100% - 64px) !important; background: rgba(0,0,0,0.3) !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 12px !important; padding: 18px !important; color: #fff !important; font-size: 14px !important; cursor: pointer !important; transition: all 0.3s !important; font-weight: 500 !important; }
+      .a11y-reset:hover { background: rgba(255,255,255,0.1) !important; border-color: rgba(255,255,255,0.2) !important; transform: translateY(-2px) !important; box-shadow: 0 8px 16px rgba(0,0,0,0.3) !important; }
+      
+      @media (max-width: 560px) { .menu-stage { width: 100% !important; } :is(#chat-panel, #accessibility-panel) { right: 10px !important; bottom: 80px !important; width: calc(100% - 20px) !important; } }
+      /* ======================================================= */
+      /* REACTBITS PREMIUM AESTHETICS & MICRO-INTERACTIONS       */
+      /* ======================================================= */
+      
+      .icon-control, .language-toggle, .hamburger {
+        border-radius: 14px !important;
+        background: rgba(255, 255, 255, 0.02) !important;
+        border: 1px solid rgba(255, 255, 255, 0.04) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+        transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+        position: relative !important;
+        overflow: hidden !important;
+      }
+      
+      .icon-control::before, .language-toggle::before, .hamburger::before {
+        content: '' !important;
+        position: absolute !important;
+        inset: 0 !important;
+        background: radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.08), transparent 70%) !important;
+        opacity: 0 !important;
+        transition: opacity 0.3s ease !important;
+      }
+      
+      .icon-control:hover, .language-toggle:hover, .hamburger:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 8px 16px rgba(0, 0, 0, 0.3) !important;
+      }
+      
+      .icon-control:hover::before, .language-toggle:hover::before, .hamburger:hover::before {
+        opacity: 1 !important;
+      }
+      
+      .icon-control:active, .language-toggle:active, .hamburger:active {
+        transform: translateY(1px) scale(0.96) !important;
+      }
+      
+      .icon-control svg, .language-toggle {
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), stroke 0.3s !important;
+      }
+      
+      .icon-control:hover svg {
+        transform: scale(1.15) !important;
+        stroke: #fff !important;
+      }
+      
+      #theme-toggle:hover svg {
+        transform: scale(1.15) rotate(90deg) !important;
+        stroke: #ffd700 !important;
+      }
+      
+      .search-panel {
+        border-radius: 16px !important;
+        background: rgba(22, 18, 15, 0.92) !important;
+        border: 1px solid rgba(255,255,255,0.06) !important;
+        box-shadow: 0 40px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08) !important;
+        backdrop-filter: blur(40px) saturate(150%) !important;
+      }
+      
+      .btn-primary {
+        position: relative !important;
+        background: linear-gradient(135deg, var(--lava), #ff3000) !important;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 8px 24px color-mix(in srgb, var(--lava) 40%, transparent) !important;
+        border: none !important;
+        transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+        overflow: hidden !important;
+      }
+      
+      .btn-primary::after {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important; left: -100% !important; width: 50% !important; height: 100% !important;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent) !important;
+        transform: skewX(-20deg) !important;
+      }
+      
+      .btn-primary:hover {
+        transform: translateY(-2px) scale(1.02) !important;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 12px 32px color-mix(in srgb, var(--lava) 60%, transparent) !important;
+      }
+      
+      .btn-primary:hover::after {
+        animation: btn-shine 0.8s ease-out forwards !important;
+      }
+      
+      @keyframes btn-shine {
+        100% { left: 200%; }
+      }
+
+      </style>
 </head>
 <body>
   <header class="site-header"><div class="header-inner">
@@ -768,22 +984,47 @@
       <button class="icon-control nav-search" id="search-toggle" type="button" aria-label="Buscar piezas y materiales" aria-expanded="false" aria-controls="search-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg></button>
       <a class="btn btn-primary btn-pill header-quote" href="/solicitud">Cotizar STL <span aria-hidden="true">↗</span></a>
       <button class="language-toggle" id="language-toggle" type="button" aria-label="Cambiar idioma. Idioma actual: español" title="Cambiar idioma">ES <span aria-hidden="true">/</span> EN</button>
-      <button class="icon-control" id="theme-toggle" type="button" aria-label="Cambiar tema" title="Cambiar tema"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.4A8 8 0 0 1 8.6 4 8.1 8.1 0 1 0 20 15.4Z"></path></svg></button>
-      <button class="icon-control hamburger" id="menu-toggle" type="button" aria-label="Abrir menú de navegación y cuenta" aria-expanded="false" aria-controls="mobile-menu"><i></i><i></i><i></i></button>
+      <button class="icon-control" id="theme-toggle" type="button" aria-label="Cambiar tema" title="Cambiar tema"><svg viewBox="0 0 24 24" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" fill="none"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg></button>
+      <button class="icon-control hamburger" id="menu-toggle" type="button" aria-label="Abrir menú de cuenta" aria-expanded="false" aria-controls="mobile-menu"><i></i><i></i><i></i></button>
+      <div class="account-panel-dropdown" id="account-menu-panel" role="menu" aria-hidden="true">
+        <div class="account-dropdown-head">
+          <strong>Mi Espacio</strong>
+          <span>Cliente no registrado</span>
+        </div>
+        <div class="account-dropdown-results">
+          <a href="/login" role="menuitem" class="account-dropdown-link account-dropdown-primary">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            Iniciar sesión
+          </a>
+          <a href="/registro" role="menuitem" class="account-dropdown-link">
+            <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+            Crear cuenta
+          </a>
+          <div class="account-dropdown-divider"></div>
+          <a href="/soporte" role="menuitem" class="account-dropdown-link">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            Ayuda y Soporte
+          </a>
+          <a href="/config" role="menuitem" class="account-dropdown-link">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            Configuración
+          </a>
+        </div>
+      </div>
       <div class="search-panel" id="search-panel" role="dialog" aria-modal="false" aria-hidden="true" aria-labelledby="search-panel-title"><div class="search-panel-head"><div><strong id="search-panel-title">Buscar en Vértice</strong><span>PIEZAS / MATERIALES / REFERENCIAS</span></div><button class="panel-close" id="search-close" type="button" aria-label="Cerrar búsqueda">×</button></div><label class="search-label" for="search-input">Buscar por pieza o material</label><input id="search-input" type="search" placeholder="Ej. PETG, engranaje, PRT-001" /><div class="search-results" id="search-results"><a href="/catalogo/p1"><strong>Soporte Modular de Carga</strong><small>PETG PRO · PRT-001</small></a><a href="/catalogo/p5"><strong>Engranaje Helicoidal 60T</strong><small>NYLON PA12 · PRT-002</small></a><a href="/catalogo/p3"><strong>Dragón de Colección Geométrico</strong><small>PLA SILK · PRT-003</small></a></div></div>
     </div>
     <nav class="mobile-menu" id="mobile-menu" aria-label="Navegación y cuenta" aria-hidden="true">
       <button class="menu-scrim" type="button" data-close-menu aria-label="Cerrar menú"></button>
       <div class="menu-stage">
         <div class="menu-topline"><span>VÉRTICE <i>—</i> COSTA RICA</span><button class="menu-dismiss" type="button" data-close-menu><span>Cerrar</span><b aria-hidden="true">×</b></button></div>
-        <div class="menu-layout">
-          <div class="menu-intro"><span class="menu-kicker">NAVEGÁ EL TALLER</span><h2>¿Qué querés<br />explorar?</h2><p>Un acceso directo a cada parte de Vértice.</p></div>
-          <div class="menu-destinations" aria-label="Secciones del sitio">
-            <a href="#inicio"><span class="menu-destination-index">01</span><strong>Inicio</strong><span class="menu-destination-arrow" aria-hidden="true">↗</span></a>
-            <a href="#piezas"><span class="menu-destination-index">02</span><strong>Piezas</strong><span class="menu-destination-arrow" aria-hidden="true">↗</span></a>
-            <a href="#metodo"><span class="menu-destination-index">03</span><strong>Cómo trabajamos</strong><span class="menu-destination-arrow" aria-hidden="true">↗</span></a>
-            <a href="#precision"><span class="menu-destination-index">04</span><strong>Precisión</strong><span class="menu-destination-arrow" aria-hidden="true">↗</span></a>
-          </div>
+      <div class="menu-layout">
+        <div class="menu-intro"><span class="menu-kicker">NAVEGÁ EL TALLER</span><h2>¿Qué querés<br />explorar?</h2><p>Un acceso directo a cada parte de Vértice.</p></div>
+        <div class="menu-destinations" aria-label="Secciones del sitio">
+          <a href="/inicio"><span class="menu-destination-index">01</span><strong>Inicio</strong><span class="menu-destination-arrow" aria-hidden="true">→</span></a>
+          <a href="/tienda"><span class="menu-destination-index">02</span><strong>Tienda</strong><span class="menu-destination-arrow" aria-hidden="true">→</span></a>
+          <a href="/nosotros"><span class="menu-destination-index">03</span><strong>Sobre nosotros</strong><span class="menu-destination-arrow" aria-hidden="true">→</span></a>
+          <a href="/contacto"><span class="menu-destination-index">04</span><strong>Contáctenos</strong><span class="menu-destination-arrow" aria-hidden="true">→</span></a>
+          <a href="/faq"><span class="menu-destination-index">05</span><strong>Preguntas frecuentes</strong><span class="menu-destination-arrow" aria-hidden="true">→</span></a>
         </div>
         <div class="menu-account"><div class="menu-account-label"><span>MI ESPACIO</span><span>CUENTA Y PEDIDOS</span></div><div class="menu-account-actions">
           <a class="menu-login" href="/login"><span><strong>Iniciar sesión</strong><small>Ver pedidos y cotizaciones</small></span><b aria-hidden="true">↗</b></a>
@@ -815,7 +1056,272 @@
 
     <section class="quote-section" aria-labelledby="quote-title"><div class="section-inner"><div class="quote-box reveal"><div><span class="mono-label">04 / Tu proyecto</span><h2 id="quote-title">¿Tenés un archivo<br />que quiere existir?</h2><p>Envíanos STL, STEP u OBJ para una revisión técnica. Primero entendemos el proyecto; después construimos una cotización detallada.</p></div><a class="btn btn-primary btn-pill" href="/solicitud">Cotizar archivo <span aria-hidden="true">↗</span></a></div></div></section>
     <div class="floating-tools" aria-label="Herramientas de asistencia">
-      <div class="floating-slot"><section class="floating-panel chat-panel" id="chat-panel" aria-label="Asistencia técnica" aria-hidden="true"><div class="chat-masthead"><div class="chat-brandmark" aria-hidden="true">✦</div><div class="panel-header"><div><span>ASISTENCIA VÉRTICE</span><strong>Mesa técnica</strong></div><button class="panel-close" type="button" data-close-panel="chat-panel" aria-label="Cerrar asistente">×</button></div></div><div class="chat-content"><p class="chat-intro">¿Qué querés fabricar?</p><p class="chat-context">Elegí un tema para empezar o escribinos tu pregunta.</p><div class="chat-suggestions" aria-label="Temas de consulta"><button class="chat-suggestion" type="button">Materiales</button><button class="chat-suggestion" type="button">Mis archivos</button><button class="chat-suggestion" type="button">Mi diseño</button></div></div><form class="chat-input-row" id="chat-form"><label class="chat-input-label" for="chat-question">TU PREGUNTA</label><div class="chat-compose"><input id="chat-question" type="text" placeholder="Escribí aquí..." aria-label="Pregunta para la asistencia técnica" /><button id="chat-submit" type="submit" aria-label="Enviar pregunta">↑</button></div></form></section><button class="floating-button chat-trigger" id="chat-toggle" type="button" aria-label="Abrir asistencia técnica" aria-expanded="false" aria-controls="chat-panel">✦</button></div>
+      <div class="floating-slot">
+        
+<style id="ai-chat-style">
+      #chat-panel {
+        top: auto !important;
+        bottom: 120px !important; /* Moves it above the floating buttons */
+        right: clamp(20px, 4vw, 58px) !important;
+        left: auto !important;
+        transform: translateY(20px) scale(0.95) !important;
+        transform-origin: bottom right !important;
+        width: 460px !important;
+        max-width: calc(100vw - 40px) !important;
+        padding: 32px !important;
+        border-radius: 20px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 28px !important;
+        background: rgba(14, 12, 10, 0.85) !important;
+        backdrop-filter: blur(80px) saturate(200%) !important;
+        -webkit-backdrop-filter: blur(80px) saturate(200%) !important;
+        border: 1px solid rgba(255,255,255,0.08) !important;
+        box-shadow: 
+          inset 0 1px 0 0 rgba(255,255,255,0.1),
+          0 40px 100px -20px rgba(0,0,0,0.9),
+          0 0 0 1px rgba(0,0,0,0.8) !important;
+      }
+      
+      #chat-panel.is-open {
+        animation: chat-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+      }
+      
+      @keyframes chat-slide-up {
+        0% { opacity: 0; transform: scale(0.9) translateY(20px); filter: blur(4px); }
+        100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+      }
+      
+      .ai-chat-header {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+      }
+      
+      .ai-chat-title-text {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 6px !important;
+      }
+      
+      .ai-chat-title-text strong {
+        font-size: 24px !important;
+        font-family: var(--display) !important;
+        font-weight: 600 !important;
+        color: #fff !important;
+        letter-spacing: -0.03em !important;
+        line-height: 1 !important;
+      }
+      
+      .status-online {
+        font: 10px var(--mono) !important;
+        color: var(--lava) !important;
+        letter-spacing: 0.15em !important;
+        text-transform: uppercase !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+      }
+      
+      .status-dot {
+        display: block !important;
+        width: 6px !important;
+        height: 6px !important;
+        border-radius: 50% !important;
+        background: var(--lava) !important;
+        box-shadow: 0 0 8px var(--lava) !important;
+        animation: ai-pulse-dot 2s ease-in-out infinite alternate !important;
+      }
+      
+      @keyframes ai-pulse-dot {
+        0% { transform: scale(0.8); opacity: 0.2; }
+        100% { transform: scale(1.2); opacity: 0.5; }
+      }
+      
+      .ai-panel-close {
+        width: 36px !important;
+        height: 36px !important;
+        flex-shrink: 0 !important;
+        border: 1px solid rgba(255,255,255,0.08) !important;
+        background: rgba(255,255,255,0.03) !important;
+        color: var(--dim) !important;
+        border-radius: 50% !important;
+        display: grid !important;
+        place-items: center !important;
+        cursor: pointer !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      }
+      
+      .ai-panel-close:hover {
+        background: rgba(255,255,255,0.1) !important;
+        color: #fff !important;
+        transform: scale(1.05) !important;
+      }
+      
+      .ai-message {
+        background: linear-gradient(135deg, rgba(255,87,34,0.12), rgba(255,87,34,0.02)) !important;
+        border-radius: 16px 16px 16px 4px !important;
+        padding: 16px 20px !important;
+        border: 1px solid rgba(255,87,34,0.15) !important;
+        box-shadow: inset 0 2px 0 rgba(255,255,255,0.05), 0 8px 24px rgba(0,0,0,0.2) !important;
+      }
+      
+      .ai-message p {
+        margin: 0 !important;
+        font-size: 15px !important;
+        color: #e8e4df !important;
+        line-height: 1.6 !important;
+        font-weight: 400 !important;
+      }
+      
+      .ai-chat-footer {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px !important;
+      }
+      
+      .ai-chat-chips {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+      }
+      
+      .ai-chip {
+        padding: 8px 16px !important;
+        background: transparent !important;
+        border: 1px solid rgba(255,255,255,0.15) !important;
+        border-radius: 8px !important;
+        color: #b0a8a0 !important;
+        font-size: 13px !important;
+        transition: all 0.3s ease !important;
+        cursor: pointer !important;
+      }
+      
+      .ai-chip:hover {
+        background: rgba(255,255,255,0.08) !important;
+        border-color: #fff !important;
+        color: #fff !important;
+      }
+      
+      .ai-chat-compose {
+        display: flex !important;
+        align-items: center !important;
+        background: rgba(255,255,255,0.03) !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        padding: 6px 6px 6px 20px !important;
+        transition: all 0.3s ease !important;
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.3) !important;
+      }
+      
+      .ai-chat-compose:focus-within {
+        border-color: var(--lava) !important;
+        background: rgba(0,0,0,0.5) !important;
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.5), 0 0 0 1px var(--lava) !important;
+      }
+      
+      .ai-chat-compose input {
+        flex: 1 !important;
+        background: transparent !important;
+        border: none !important;
+        color: #fff !important;
+        font-size: 15px !important;
+        outline: none !important;
+        min-width: 0 !important; /* Fix flexbox input shrinking */
+        pointer-events: auto !important;
+        user-select: auto !important;
+        -webkit-user-select: auto !important;
+      }
+      
+      .ai-chat-compose input::placeholder {
+        color: rgba(255,255,255,0.3) !important;
+      }
+      
+      /* Overriding global ID to fix squishing */
+      #chat-submit.ai-chat-submit-btn {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        padding: 0 16px !important;
+        width: auto !important; /* Overrides 44px */
+        height: 40px !important;
+        border-radius: 8px !important; /* Overrides 50% */
+        background: var(--lava) !important;
+        border: none !important;
+        color: #fff !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        position: relative !important;
+        overflow: hidden !important;
+        flex-shrink: 0 !important;
+      }
+      
+      #chat-submit.ai-chat-submit-btn::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important; left: -100% !important;
+        width: 50% !important; height: 100% !important;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent) !important;
+        transform: skewX(-20deg) !important;
+        transition: left 0.5s ease !important;
+      }
+      
+      #chat-submit.ai-chat-submit-btn:hover {
+        background: #ff6b3d !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 20px rgba(255,87,34,0.3) !important;
+      }
+      
+      #chat-submit.ai-chat-submit-btn:hover::before {
+        animation: btn-shine 0.8s forwards !important;
+      }
+      
+      #chat-submit.ai-chat-submit-btn svg {
+        width: 16px !important;
+        height: 16px !important;
+      }
+</style>
+<section class="floating-panel chat-panel" id="chat-panel" aria-label="Asistencia técnica" aria-hidden="true">
+          <div class="ai-chat-header">
+            <div class="ai-chat-title">
+              <div class="ai-chat-title-text">
+                <strong>Vértice Brain</strong>
+                <span class="status-online"><i class="status-dot"></i> ASISTENTE TÉCNICO EN LÍNEA</span>
+              </div>
+            </div>
+            <button class="ai-panel-close" type="button" data-close-panel="chat-panel" aria-label="Cerrar asistente">
+              <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+          
+          <div class="ai-chat-body">
+            <div class="ai-message">
+              <p>Hola. Soy la IA técnica de Vértice. Estoy aquí para ayudarte a optimizar tus modelos 3D, elegir el material correcto (PETG, PLA, Nylon), o resolver cualquier duda sobre tolerancias y procesos de manufactura.</p>
+            </div>
+          </div>
+          
+          <div class="ai-chat-footer">
+            <div class="ai-chat-chips" aria-label="Temas de consulta">
+              <button class="ai-chip" type="button">Guía de Materiales</button>
+              <button class="ai-chip" type="button">Analizar mi STL</button>
+              <button class="ai-chip" type="button">Tolerancias FDM vs SLA</button>
+            </div>
+            <form class="ai-chat-input-row" id="chat-form">
+              <div class="ai-chat-compose">
+                <input id="chat-question" type="text" placeholder="Escribí tu pregunta o comando..." aria-label="Pregunta para la asistencia técnica" autocomplete="off" />
+                <button id="chat-submit" type="submit" aria-label="Enviar pregunta" class="ai-chat-submit-btn">
+                  <span>Preguntar</span>
+                  <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+        <button class="floating-button chat-trigger" id="chat-toggle" type="button" aria-label="Abrir asistencia técnica" aria-expanded="false" aria-controls="chat-panel">✦</button>
+      </div>
       <div class="floating-slot"><section class="floating-panel accessibility-panel" id="accessibility-panel" aria-label="Opciones de accesibilidad" aria-hidden="true"><div class="a11y-heading"><div><span class="a11y-overline">PREFERENCIAS DE LECTURA</span><h2 class="a11y-title">Hacé la página<br /><em>a tu medida.</em></h2></div><button class="panel-close" type="button" data-close-panel="accessibility-panel" aria-label="Cerrar accesibilidad">×</button></div><p class="a11y-intro">Los ajustes se aplican al instante y podés cambiarlos cuando quieras.</p><div class="a11y-size"><div class="a11y-section-label"><span>Tamaño del texto</span><span>01</span></div><div class="a11y-control-buttons" role="group" aria-label="Tamaño del texto"><button type="button" data-text-size="normal" aria-label="Tamaño normal" aria-pressed="true">A</button><button type="button" data-text-size="large" aria-label="Texto grande" aria-pressed="false">A<sup>+</sup></button><button type="button" data-text-size="xlarge" aria-label="Texto muy grande" aria-pressed="false">A<sup>++</sup></button></div></div><div class="a11y-toggles"><div class="a11y-section-label"><span>Otros ajustes</span><span>02</span></div><div class="a11y-control"><span>Más contraste<small>Refuerza la lectura de textos y bordes</small></span><button type="button" class="a11y-toggle" id="contrast-toggle" aria-pressed="false"><span>Activar</span><i aria-hidden="true"></i></button></div><div class="a11y-control"><span>Menos movimiento<small>Reduce animaciones y transiciones</small></span><button type="button" class="a11y-toggle" id="motion-toggle" aria-pressed="false"><span>Activar</span><i aria-hidden="true"></i></button></div></div><button class="a11y-reset" id="accessibility-reset" type="button">Restablecer preferencias</button></section><button class="floating-button" id="accessibility-toggle" type="button" aria-label="Abrir ajustes de lectura" aria-expanded="false" aria-controls="accessibility-panel">♿</button></div>
     </div>
   </main>
@@ -844,7 +1350,38 @@
       const themeToggle=document.querySelector('#theme-toggle'), savedTheme=localStorage.getItem('vertice-theme'); if(savedTheme)root.dataset.theme=savedTheme; themeToggle.addEventListener('click',()=>{const next=root.dataset.theme==='dark'?'light':'dark';root.dataset.theme=next;localStorage.setItem('vertice-theme',next)}); const languageToggle=document.querySelector('#language-toggle'); const languageNodes=[['.nav-links a:nth-child(1)','Inicio','Home'],['.nav-links a:nth-child(2)','Tienda','Shop'],['.nav-links a:nth-child(3)','Sobre nosotros','About us'],['.nav-links a:nth-child(4)','Contáctenos','Contact'],['.nav-links a:nth-child(5)','Preguntas frecuentes','FAQ'],['.header-quote','Cotizar STL','Get a quote'],['#chat-panel .panel-header span','AYUDA TÉCNICA / CHAT','TECHNICAL HELP / CHAT'],['#chat-panel .chat-intro','¿En qué podemos ayudarte? Elegí una opción o escribí tu pregunta.','How can we help? Choose an option or write your question.'],['#chat-panel .chat-status','Asistente disponible','Assistant available'],['#chat-panel .chat-suggestion:nth-child(1)','Quiero elegir un material','I want to choose a material'],['#chat-panel .chat-suggestion:nth-child(2)','¿Qué archivos puedo enviar?','Which files can I send?'],['#chat-panel .chat-suggestion:nth-child(3)','Necesito ayuda con mi diseño','I need help with my design'],['#chat-panel #chat-question','Escribí tu pregunta...','Write your question...'],['#accessibility-panel .panel-header span','LECTURA Y MOVIMIENTO','READING & MOTION'],['#accessibility-panel .a11y-intro','Elegí cómo querés leer y usar la página. Los cambios se aplican al instante.','Choose how you want to read and use the page. Changes apply instantly.'],['#accessibility-panel .a11y-control:nth-child(1)>span','Tamaño del texto','Text size'],['#accessibility-panel .a11y-control:nth-child(1) small','Cambia el tamaño de las letras','Changes letter size'],['#accessibility-panel .a11y-control:nth-child(2)>span','Más contraste','Higher contrast'],['#accessibility-panel .a11y-control:nth-child(2) small','Hace más visibles bordes y textos','Makes borders and text easier to see'],['#accessibility-panel .a11y-control:nth-child(3)>span','Menos movimiento','Less motion'],['#accessibility-panel .a11y-control:nth-child(3) small','Pausa transiciones y animaciones','Pauses transitions and animations'],['#accessibility-reset','Restablecer ajustes','Reset settings']]; const setLanguage=(language)=>{languageNodes.forEach(([selector,es,en])=>{const node=document.querySelector(selector);if(!node)return;if(selector==='#accessibility-panel .a11y-control:nth-child(1)>span'||selector==='#accessibility-panel .a11y-control:nth-child(2)>span'||selector==='#accessibility-panel .a11y-control:nth-child(3)>span')return;node.textContent=language==='en'?en:es});const labels=[['#accessibility-panel .a11y-control:nth-child(1)>span',language==='en'?'Text size':'Tamaño del texto'],['#accessibility-panel .a11y-control:nth-child(2)>span',language==='en'?'Higher contrast':'Más contraste'],['#accessibility-panel .a11y-control:nth-child(3)>span',language==='en'?'Less motion':'Menos movimiento']];labels.forEach(([selector,label])=>{const node=document.querySelector(selector);if(node)node.firstChild.textContent=label});document.documentElement.lang=language==='en'?'en':'es';languageToggle.classList.toggle('is-en',language==='en');languageToggle.setAttribute('aria-label',language==='en'?'Change language. Current language: English':'Cambiar idioma. Idioma actual: español');localStorage.setItem('vertice-language',language)}; languageToggle.addEventListener('click',()=>setLanguage(localStorage.getItem('vertice-language')==='en'?'es':'en')); setLanguage(localStorage.getItem('vertice-language')||'es');
       const body=document.body, panels=[...document.querySelectorAll('.floating-panel')]; const closePanels=()=>{panels.forEach((panel)=>{panel.classList.remove('is-open');panel.setAttribute('aria-hidden','true')});document.querySelectorAll('[aria-controls$="-panel"]').forEach((button)=>{if(button.id!=='account-toggle')button.setAttribute('aria-expanded','false')})}; const togglePanel=(panelId,button)=>{const panel=document.querySelector(`#${panelId}`),open=!panel.classList.contains('is-open');closePanels();if(open){panel.classList.add('is-open');panel.setAttribute('aria-hidden','false');button.setAttribute('aria-expanded','true')}}; const chatToggle=document.querySelector('#chat-toggle'),accessibilityToggle=document.querySelector('#accessibility-toggle'); chatToggle.addEventListener('click',()=>togglePanel('chat-panel',chatToggle)); accessibilityToggle.addEventListener('click',()=>togglePanel('accessibility-panel',accessibilityToggle)); document.querySelectorAll('[data-close-panel]').forEach((button)=>button.addEventListener('click',closePanels)); document.querySelectorAll('.chat-suggestion').forEach((suggestion)=>suggestion.addEventListener('click',()=>{document.querySelector('#chat-question').value=suggestion.textContent;document.querySelector('#chat-question').focus()}));
       const setTextSize=(size)=>{body.classList.remove('accessibility-large','accessibility-xlarge');if(size==='large')body.classList.add('accessibility-large');if(size==='xlarge')body.classList.add('accessibility-xlarge');document.querySelectorAll('[data-text-size]').forEach((button)=>{const selected=button.dataset.textSize===size;button.classList.toggle('is-active',selected);button.setAttribute('aria-pressed',String(selected))});localStorage.setItem('vertice-text-size',size)}; document.querySelectorAll('[data-text-size]').forEach((button)=>button.addEventListener('click',()=>setTextSize(button.dataset.textSize))); const setSwitch=(button,active)=>{button.setAttribute('aria-pressed',String(active));button.querySelector('span').textContent=active?'Activado':'Activar'}; const contrastToggle=document.querySelector('#contrast-toggle'); contrastToggle.addEventListener('click',()=>{const active=body.classList.toggle('accessibility-high-contrast');setSwitch(contrastToggle,active);localStorage.setItem('vertice-high-contrast',String(active))}); const motionToggle=document.querySelector('#motion-toggle'); motionToggle.addEventListener('click',()=>{const active=body.classList.toggle('accessibility-no-motion');setSwitch(motionToggle,active);localStorage.setItem('vertice-no-motion',String(active))}); document.querySelector('#accessibility-reset').addEventListener('click',()=>{setTextSize('normal');body.classList.remove('accessibility-high-contrast','accessibility-no-motion');setSwitch(contrastToggle,false);setSwitch(motionToggle,false);localStorage.removeItem('vertice-text-size');localStorage.removeItem('vertice-high-contrast');localStorage.removeItem('vertice-no-motion')}); setTextSize(localStorage.getItem('vertice-text-size')||'normal'); if(localStorage.getItem('vertice-high-contrast')==='true'){contrastToggle.click()} if(localStorage.getItem('vertice-no-motion')==='true'){motionToggle.click()}
-      const menuToggle=document.querySelector('#menu-toggle'), menu=document.querySelector('#mobile-menu'); const closeMenu=(restore=false)=>{menu.classList.remove('is-open');menu.setAttribute('aria-hidden','true');menuToggle.setAttribute('aria-expanded','false');if(restore)menuToggle.focus()}; menuToggle.addEventListener('click',()=>{const open=!menu.classList.contains('is-open');closeMenu(false);if(open){menu.classList.add('is-open');menu.setAttribute('aria-hidden','false');menuToggle.setAttribute('aria-expanded','true');menu.querySelector('.menu-dismiss')?.focus()}}); menu.querySelectorAll('[data-close-menu]').forEach((button)=>button.addEventListener('click',()=>closeMenu(true))); menu.querySelectorAll('.menu-destinations a').forEach((link)=>link.addEventListener('click',()=>closeMenu(false))); document.addEventListener('keydown',(event)=>{if(event.key==='Escape'){closePanels();closeMenu(true)}}); document.querySelector('#chat-form').addEventListener('submit',(event)=>event.preventDefault()); document.querySelector('#current-year').textContent=new Date().getFullYear(); renderPiece(0);
+      const menuToggle=document.querySelector('#menu-toggle'), menu=document.querySelector('#mobile-menu'), accountPanel = document.querySelector('#account-menu-panel');
+const closeMenu=(restore=false)=>{
+  menu.classList.remove('is-open'); menu.setAttribute('aria-hidden','true');
+  if(accountPanel) { accountPanel.classList.remove('is-open'); accountPanel.setAttribute('aria-hidden','true'); }
+  menuToggle.setAttribute('aria-expanded','false');
+  if(restore)menuToggle.focus();
+};
+menuToggle.addEventListener('click',()=>{
+  if (window.innerWidth > 1120) {
+    const open = accountPanel.classList.contains('is-open');
+    closeMenu(false);
+    if (!open) {
+      accountPanel.classList.add('is-open');
+      accountPanel.setAttribute('aria-hidden','false');
+      menuToggle.setAttribute('aria-expanded','true');
+    }
+  } else {
+    const open=!menu.classList.contains('is-open');
+    closeMenu(false);
+    if(open){
+      menu.classList.add('is-open');
+      menu.setAttribute('aria-hidden','false');
+      menuToggle.setAttribute('aria-expanded','true');
+      menu.querySelector('.menu-dismiss')?.focus();
+    }
+  }
+});
+document.addEventListener('click', (event) => {
+  if (window.innerWidth > 1120 && accountPanel && accountPanel.classList.contains('is-open') && !accountPanel.contains(event.target) && !menuToggle.contains(event.target)) {
+    closeMenu(false);
+  }
+}); menu.querySelectorAll('[data-close-menu]').forEach((button)=>button.addEventListener('click',()=>closeMenu(true))); menu.querySelectorAll('.menu-destinations a').forEach((link)=>link.addEventListener('click',()=>closeMenu(false))); document.addEventListener('keydown',(event)=>{if(event.key==='Escape'){closePanels();closeMenu(true)}}); document.querySelector('#chat-form').addEventListener('submit',(event)=>event.preventDefault()); document.querySelector('#current-year').textContent=new Date().getFullYear(); renderPiece(0);
     })();
   </script>
   <script>const chatQuestion=document.querySelector('#chat-question');const quoteLink=document.querySelector('.header-quote');const syncLanguageExtras=()=>{const english=localStorage.getItem('vertice-language')==='en';if(chatQuestion)chatQuestion.placeholder=english?'Write your question...':'Escribí tu pregunta...';if(quoteLink)quoteLink.innerHTML=english?'Get a quote <span aria-hidden="true">↗</span>':'Cotizar STL <span aria-hidden="true">↗</span>'};document.querySelector('#language-toggle')?.addEventListener('click',()=>setTimeout(syncLanguageExtras,0));syncLanguageExtras();</script>
