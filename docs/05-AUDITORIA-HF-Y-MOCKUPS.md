@@ -20,6 +20,7 @@ React continúa bloqueado hasta cerrar los bloqueos.
 - La auditoría vigente evalúa HF-01 como **mockup de máxima fidelidad para React**, no como código de producción.
 - El foco inmediato es: bugs visuales, jerarquía comercial, identidad, responsive, estados interactivos y calidad de craft.
 - No convertir una observación histórica en requisito actual sin comprobar su fecha y si fue posteriormente supersedida.
+- **Defectos visuales abiertos (V-01 a V-09):** ver sección «Auditoría visual con render real — 2026-09-29». V-01 y V-04 a V-09 se corrigen en el mockup; V-02 y V-03 pasan a requisitos de React. Mientras haya alguno de los primeros abierto, HF-01 no puede congelarse.
 ## Estado
 
 | HF | Pantalla | Estado |
@@ -546,3 +547,60 @@ Esta pasada toma `hf-01-home-definitivo.html` como **mockup visual**, no como im
 **Auditoría de dirección comercial + visual:** recorrer Hero → catálogo → método → precisión → cotización preguntando en cada sección: “¿esto hace que quiera seguir explorando/comprar?” y “¿qué elemento sobra porque está compitiendo con el producto?”. Después revisar 375/768/1280 y Dark/Light para detectar rupturas visuales.
 
 **Estado: HF-01 EN ITERACIÓN / NO CONGELADO.**
+
+---
+
+## Auditoría visual con render real — 2026-09-29
+
+**Alcance:** solo diseño visual del mockup `mockups/hf-01-home-definitivo.html`. No se evalúa código, rutas, enlaces ni accesibilidad técnica (el mockup no es producción).
+
+**Evidencia:** capturas reales del archivo servido en local y renderizado con Chromium sin interfaz.
+- Oscuro: 1280×800, 768×1024 y 375×812 (hero y página completa).
+- Claro: 1280 y 375 (hero y catálogo).
+- Paneles abiertos (chat, accesibilidad, buscador, menú) en 1280 y 375, tema oscuro.
+- Es evidencia de una sesión de IA, **no aprobación del usuario**. Las capturas no están versionadas; para verificar un hallazgo, abrir el HTML en ese ancho.
+
+### Lo que se ve bien (no tocar sin razón)
+- Hero desktop: producto grande como protagonista, firma Obsidian + Lava reconocible.
+- Catálogo, método, precisión y CTA final: legibles y consistentes en desktop.
+- Tema claro coherente en desktop y móvil.
+- Buscador y accesibilidad: misma familia visual; switches con una sola perilla.
+
+### Decisiones del usuario sobre los hallazgos — 2026-09-29
+
+**Se corrigen en el mockup:** V-01, V-04, V-05, V-06, V-07, V-08, V-09.
+**No se tocan en el mockup, pasan a requisito de React:** V-02 y V-03.
+**Regla general:** cambios mínimos; el desktop que hoy se ve bien no debe cambiar salvo lo que pida cada punto. No mover ni rediseñar lo que no aparece en esta lista.
+
+| ID | Dónde | Qué se ve (defecto) | Vista | Decisión |
+|---|---|---|---|---|
+| V-04 | Fotos del hero y del catálogo | Se percibe el borde rectangular de la foto sobre el fondo; el fundido perimetral que describe la documentación no se nota. Las fotos parecen pegadas. | 1280 / 375 | **Corregir; es el cambio más notorio y se hace primero.** Fundir el borde de la foto con la superficie que la contiene (máscara o degradado hacia el color de fondo), sin cambiar el encuadre ni el recorte de las piezas. Mostrar antes/después en 1280 y 375 para que el usuario apruebe antes de seguir. |
+| V-01 | Botones flotantes ✦ y ♿ (`.floating-tools`, fijos abajo a la derecha) | Tapan contenido: en 1280 la flecha ↓ del riel, en 768 las miniaturas 2 y 3, en 375 el texto «Revisión por etapas» y la etiqueta «EN STOCK» de la primera tarjeta. | 1280 / 768 / 375 | **Corregir.** Los botones se ocultan parcialmente hacia el borde derecho mientras hay scroll y vuelven al detenerse. Conservar iconos ✦ y ♿, tamaño, esquina y la posición donde abren chat y accesibilidad. **No reubicar botones ni paneles de forma que la ventana abra en el lado opuesto o separada de su botón** (el usuario lo considera un error visual). No ocultar mientras haya un panel abierto ni con el botón enfocado. Con movimiento reducido (sistema o ajuste manual), sin animación de ocultado. **Comprobar también en reposo** (arriba, sin scroll): si en 1280×800 o 768 el botón sigue tapando la flecha ↓ o las miniaturas, ajustar mínimamente la posición del riel. |
+| V-05 | Menú «Mi Espacio» | Panel translúcido: texto del hero («REVISIÓN ACTIVA») se transparenta detrás de las filas «Iniciar sesión» y «Crear cuenta». | 1280 | **Corregir.** Fondo casi opaco (95 % o más) con desenfoque de fondo fuerte, de modo que el hero se intuya como color pero no se lea texto detrás. Mantener borde, regla lava y colores del panel. |
+| V-06 | Cabecera del buscador | Dos etiquetas seguidas y redundantes («VÉRTICE / CATÁLOGO» y «CATÁLOGO / BÚSQUEDA»). Los metadatos de cada resultado (material · PRT) son diminutos y casi ilegibles. | 1280 / 375 | **Corregir.** Dejar una sola etiqueta (conservar isotipo y el título «Buscar una pieza»). Subir el tamaño de los metadatos hasta que se lean sin zoom (sugerencia: no bajar de 11 px). |
+| V-07 | Chat | Las flechas ↗ de las tres opciones quedan pegadas abajo a la derecha de cada fila. Hay un hueco grande entre la última opción y la caja de escritura. | 1280 / 375 | **Corregir.** Centrar verticalmente la flecha en cada fila y acercar la caja de escritura a las opciones. No cambiar marco, paleta, marca ni copy del chat (ya aprobados como concepto). |
+| V-08 | Menú en móvil | Título «¿Qué querésexplorar?» sin espacio entre líneas (en el HTML lleva un `<br />` que en la vista móvil no separa). Botón de cerrar con un círculo dentro de un cuadrado. | 375 | **Corregir.** Devolver el espacio entre «querés» y «explorar» y dejar el botón de cerrar con una sola forma. |
+| V-09 | Sección Precisión y footer | Etiquetas en inglés (`A / DIMENSIONAL`, `B / MATERIALS`, `C / DELIVERY`) en una página en español. En el footer, «Contacto técnico por correo» tiene tamaño y estilo distintos al resto de enlaces. | 1280 | **Corregir.** Traducir el texto visible de las tres etiquetas y dar al enlace del footer el mismo estilo que los demás. **No construir idioma ni tamaño de texto globales en el mockup:** esos ajustes son demo de esta página y su requisito para React ya está documentado en `docs/04` («Ajustes globales en React y alcance del mockup»). |
+| V-02 | Hero en móvil | En la primera pantalla solo hay titular, texto, botones y estadísticas; el producto queda fuera y el workbench empieza al borde inferior. | 375 (y parcialmente 768) | **No se toca en el mockup. Requisito de React:** en 375 el producto debe verse en la primera pantalla; reinterpretar la composición móvil, no apilar la de desktop. Ver `docs/03` (Responsive). |
+| V-03 | Catálogo, tarjeta PRT-006 | Wireframe naranja, etiqueta `FALLBACK DEMO` y texto «Fallback oficial en wireframe…». | todas | **No se toca en el mockup.** Las seis tarjetas del mockup son ejemplos ilustrativos. **Requisito de React:** el catálogo mostrará productos reales con datos reales; no se replica el placeholder. Esta observación reemplaza la de la auditoría anterior que la trataba como bug bloqueante. |
+
+### No verificado en esta pasada
+- Movimiento: scan, parallax, entradas y hover (las capturas son estáticas).
+- Paneles abiertos en 768 y en tema claro.
+- Cambio a las piezas 2, 3 y 4 del hero.
+- Dispositivo móvil físico, anchos intermedios (por ejemplo 739 o 937) y lector de pantalla.
+- Posible anomalía sin confirmar: con el menú abierto en 1280, la 4.ª miniatura del riel se vio vacía; no se reprodujo en las demás capturas.
+
+### Orden de trabajo para la siguiente IA
+1. Leer `AGENTS.md`, `AI_CONTEXT.md` y esta sección. Editar **solo** `mockups/hf-01-home-definitivo.html`.
+2. Capturar el «antes» en 1280×800, 768×1024 y 375×812, oscuro y claro.
+3. **V-04 primero.** Mostrar antes/después al usuario y esperar su aprobación antes de continuar.
+4. Luego V-01, V-05, V-06, V-07, V-08 y V-09, un cambio por defecto.
+5. Recapturar los mismos anchos y temas, y comprobar que el desktop no cambió salvo lo pedido.
+6. Actualizar esta sección (estado real de cada ID con la evidencia) y `AI_CONTEXT.md`. No declarar «verificado» ni «aprobado» sin capturas y sin aprobación explícita del usuario.
+
+### Criterio para congelar HF-01 (solo lo visual)
+1. V-01 y V-04 a V-09 corregidos y recapturados en 1280, 768 y 375, oscuro y claro.
+2. Ningún control flotante tapa contenido, ni en movimiento ni en reposo.
+3. Los hallazgos de jerarquía comercial de la auditoría anterior (hero con demasiadas señales, catálogo más tienda, disciplina de micro-etiquetas y movimiento) revisados con el usuario.
+4. Aprobación explícita del usuario registrada aquí. Hasta entonces: **EN ITERACIÓN / NO CONGELADO**.

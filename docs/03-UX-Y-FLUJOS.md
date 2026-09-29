@@ -59,6 +59,8 @@ WCAG 2.2 incorpora Consistent Help (3.2.6) y requisitos sobre texto alternativo,
 
 375px móvil, 768px tablet, 1280px+ desktop.
 
+Requisito de la Home en móvil (auditoría visual 2026-09-29, V-02 en `docs/05`): en 375 px el producto debe verse en la primera pantalla; la composición móvil se reinterpreta, no apila la de desktop.
+
 Mobile/tablet se mockupearán después de cerrar desktop, pero la estructura debe soportarlos desde el inicio.
 
 ## Regla

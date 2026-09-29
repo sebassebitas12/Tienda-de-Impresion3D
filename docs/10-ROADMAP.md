@@ -23,7 +23,7 @@ Convertir HF-01 en la referencia visual de máxima fidelidad de la Home y cerrar
 ### Pendientes antes del gate
 
 1. Auditoría visual profunda de HF-01.
-2. Resolver bugs visuales y rupturas responsive.
+2. Resolver bugs visuales y rupturas responsive: defectos V-01 y V-04 a V-09 registrados en `05` (V-02 y V-03 pasan a requisitos de React).
 3. Cerrar navegación/header, chat y accesibilidad.
 4. Verificar que la Home comunique tienda/producto, no solo dirección de arte.
 5. Aprobar formalmente HF-01.

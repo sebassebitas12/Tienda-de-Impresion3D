@@ -649,3 +649,14 @@ Anthropic frontend-design plantea que la identidad debe salir del dominio y que 
 **HF-01 sigue EN ITERACIÓN.**
 
 El mockup ya tiene una identidad visual fuerte. El siguiente salto no consiste en meter más cosas: consiste en **afinar jerarquía, producto, composición, movimiento y deseo comercial**. Antes de congelarlo, la auditoría debe buscar específicamente bugs visuales, desequilibrios de espacio, elementos que compitan con el producto, responsive defectuoso y estados que parezcan placeholders.
+
+### Criterios visuales derivados del render real — 2026-09-29
+
+Reglas duraderas que salen de los hallazgos V-01 a V-09 de `docs/05`. Aplican al mockup y a React.
+
+- **Los controles flotantes no pueden tapar contenido** en ningún ancho, ni en reposo ni durante el scroll. En HF-01 se resuelve ocultándolos parcialmente hacia el borde mientras hay scroll; no se reubican los botones ni los paneles que abren junto a ellos.
+- **Móvil es reinterpretación:** en React, el producto debe verse en la primera pantalla de 375 px; no basta con apilar la columna de texto y dejar el producto debajo.
+- **Catálogo real en React:** no se replica el placeholder ni la etiqueta de fallback del mockup; un producto sin foto es un estado diseñado, no un fallback técnico.
+- **Las fotos deben integrarse a la superficie** (fundido o encuadre intencional); un rectángulo visible pegado dentro de la tarjeta se considera defecto.
+- **Popovers y menús sobre el hero son casi opacos** (95 % o más) con desenfoque de fondo fuerte: nada del fondo debe leerse detrás de texto interactivo.
+- **Un idioma por pantalla:** etiquetas técnicas de interfaz en el idioma activo; no mezclar inglés en la versión en español.

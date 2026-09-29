@@ -82,6 +82,13 @@ Las referencias externas sirven para extraer principios. Registrar fuente, patr�
 - Search compacto con estado sin resultados.
 - Dark/Light y reduced motion contemplados.
 
+### Defectos visuales abiertos (render real, 2026-09-29)
+Detalle, decisiones del usuario, orden de trabajo y criterio de cierre en `docs/05`, sección «Auditoría visual con render real».
+- **Se corrigen en el mockup** (prioridad V-04, luego el resto): V-04 fotos con borde rectangular visible (fundirlas; cambio más notorio, requiere antes/después y aprobación); V-01 botones flotantes tapan contenido (ocultarlos parcialmente durante el scroll); V-05 menú «Mi Espacio» translúcido (casi opaco + blur); V-06 cabecera y metadatos del buscador; V-07 flechas y hueco del chat; V-08 título y botón cerrar del menú móvil; V-09 etiquetas en inglés en Precisión y estilo del enlace del footer.
+- **Requisitos de React, no se tocan en el mockup:** V-02 (en móvil el producto debe verse en la primera pantalla); V-03 (PRT-006 y las demás tarjetas son ejemplos del mockup; el catálogo real vendrá con datos reales).
+- Idioma y tamaño de texto globales no entran en el mockup; están documentados como requisito de React en `docs/04`.
+- No hay archivos del mockup modificados todavía por estos hallazgos.
+
 ### Aún en iteración
 - auditoría visual global;
 - equilibrio entre producto y telemetría decorativa del hero;
@@ -195,4 +202,4 @@ Antes de editar:
 6. verifica;
 7. documenta.
 
-**Punto actual:** terminar la auditoría visual de HF-01 y cerrar el gate de React sin saltos ni deuda documental.
+**Punto actual:** la auditoría visual con render real ya está hecha y las decisiones del usuario están registradas (V-01 a V-09 en `docs/05`). Siguiente bloque: en `mockups/hf-01-home-definitivo.html`, V-04 primero (antes/después en 1280 y 375 para aprobación del usuario), luego V-01, V-05, V-06, V-07, V-08 y V-09; recapturar 1280 / 768 / 375 en oscuro y claro y actualizar `docs/05`. React sigue bloqueado.
