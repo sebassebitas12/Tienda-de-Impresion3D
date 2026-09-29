@@ -1,5 +1,7 @@
 # Decisiones post-auditoría — Vértice CR
 
+> **ESTADO: HISTÓRICO / CONTEXTO.** Las decisiones vigentes se resuelven primero en `AGENTS.md`, `AI_CONTEXT.md` y los documentos de dominio `01–10`.
+
 > Creado: **2026-09-24**. Última revisión: **2026-09-26**. Título y refs corregidos.
 
 ## Estado
