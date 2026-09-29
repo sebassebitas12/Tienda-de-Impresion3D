@@ -1,7 +1,7 @@
 # AI_CONTEXT.md — Vértice CR
 
 > Punto de entrada obligatorio para cualquier IA. Si no sabes dónde buscar, abre `docs/00-INDICE-Y-MAPA.md`.
-> Última actualización: **2026-09-28**.
+> Última actualización: **2026-09-29**.
 
 ## Producto
 
@@ -12,10 +12,10 @@ Vértice CR es una tienda costarricense de impresión 3D con dos líneas: produc
 | Dato | Valor |
 |---|---|
 | Rama activa | `Pruebas` |
-| Fase | 3 — auditoría HF + cierre visual/UX |
+| Fase | 3 — auditoría HF + cierre visual/UX (auditoría visual en curso) |
 | React | **BLOQUEADO** hasta cierre de HF desktop + Design System + API/JWT |
 | Mockup HTML base preservado | `mockups/hf-01-home.html` (referencia local original, no sobrescribir) |
-| Candidato actual de HF-01 | `mockups/hf-01-home-definitivo.html` (EN ITERACIÓN, NO CONGELADO) |
+| Candidato actual de HF-01 | `mockups/hf-01-home-definitivo.html` (EN ITERACIÓN, NO CONGELADO; revisar buscador compacto, menú plegable restaurado, flecha de ficha y switches en navegador) |
 | HF-07 / HF-08 | Aprobados a nivel documental (imágenes UXMagic + validación Gemini, sin HTML propio) |
 | Siguiente foco de mockups | **Ninguno.** Solo se hará HF-01 en HTML. Una vez aprobado HF-01, se pasará a React para el resto de pantallas. |
 | Código en `src/` | Scaffold Vite + prototipo estático descartable — NO es base de implementación |
@@ -66,6 +66,8 @@ Vértice CR es una tienda costarricense de impresión 3D con dos líneas: produc
 15. Navbar público de Stitch conservado como base visual; cambios quirúrgicos solamente.
 16. Footer completo es para páginas públicas; dashboards pueden omitirlo.
 17. React puede consumir un Webhook de N8N directamente para chatbot y resumen IA.
+18. **Identidad transversal para HTML y React:** conservar la marca completa, no solo los colores. Reutilizar logo/isotipo, tipografías, geometría y tokens oficiales; jamás inventar un monograma o avatar de reemplazo. Al autorizar React, centralizar assets/tokens y validar cada componente dentro del contexto real de HF-01. Ver contrato obligatorio en `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md`.
+19. **Documentación continua obligatoria:** cada agente actualiza `AI_CONTEXT.md` y el documento de dominio en el mismo bloque en que toma decisiones, cambia/valida algo o deja pendientes; nunca espera a que el usuario lo pida. Para HF-01, doc 05 registra el cambio y su estado, doc 04 conserva el sistema visual y las referencias, y este archivo deja el estado/punto de continuación. HF-01 es la especificación visual de máxima fidelidad para React: preservar las decisiones aprobadas de composición, navbar, botones, paneles, tipografía, geometría, espaciado, iconografía, estados, interacciones, responsive y accesibilidad; no limitar la continuidad a paleta/logo ni reemplazarla por UI genérica. Véase el protocolo de `AGENTS.md` y el contrato visual en docs 04/05.
 
 ## Regla de ciclo de solicitudes (crítica)
 
@@ -77,7 +79,7 @@ Salidas: `REJECTED`, `EXPIRED`, `CANCELLED`.
 
 ## Skills y repositorios de diseño de referencia
 
-Los siguientes repositorios están documentados en `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md` (sección "Sistema de Criterios") y definen las reglas de craft, movimiento, anti-slop y accesibilidad del proyecto:
+Las siguientes fuentes informan la investigación de diseño, revisión frontend y accesibilidad; no son mandatos visuales por sí mismas. Las reglas del proyecto están en `AGENTS.md` y doc 04, y las decisiones visuales aprobadas en HF-01 prevalecen:
 
 | Skill | Repo / Fuente | Aplicación |
 |---|---|---|
@@ -86,10 +88,17 @@ Los siguientes repositorios están documentados en `docs/04-DISENO-VISUAL-Y-ACCE
 | Layout y tokens | [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) + [taste-skill](https://github.com/senlindesign/taste-skill) + [design.md](https://github.com/google-labs-code/design.md) | Geometría, paleta, spotlight interactivo |
 | Accesibilidad | [W3C WAI-ARIA APG](https://www.w3.org/WAI/ARIA/apg/) + [MDN Accessibility](https://developer.mozilla.org/en-US/docs/Web/Accessibility) | WCAG 2.2 AA, patrones de teclado, contraste |
 | Copywriting técnico | [Humanizer](https://github.com/blader/humanizer) | Voz de taller costarricense, sin clichés de IA |
-| Referencia visual y UI | [Godly](https://godly.design/sites/) + [Awwwards](https://www.awwwards.com/) + [Refero](https://styles.refero.design/) + [21st.dev](https://21st.dev/) + [React Bits](https://reactbits.dev/) | Dirección de arte, micro-interacciones premium, composición completa y catálogos de React |
+| Galerías de sitios | [Godly](https://godly.design/sites/) + [Awwwards](https://www.awwwards.com/) + [Siteinspire](https://www.siteinspire.com/) + [Land-book](https://land-book.com/) + [CSS Design Awards](https://www.cssdesignawards.com/) + [The FWA](https://thefwa.com/) + [CSS Nectar](https://cssnectar.com/) + [Curated](https://curated.design/) + [Httpster](https://httpster.net/) + [Minimal Gallery](https://minimal.gallery/) | Composición y dirección de arte; validar aparte claridad, mobile y accesibilidad |
+| Flujos y pantallas de producto | [Mobbin](https://mobbin.com/) + [Refero](https://refero.design/) + [Pageflows](https://pageflows.com/) + [Lapa Ninja](https://www.lapa.ninja/) + [One Page Love](https://onepagelove.com/inspiration) + [Commerce Cream](https://commercecream.com/) | Estados reales de búsqueda, navegación, onboarding, formularios y compra |
+| Componentes y movimiento React | [React Bits](https://reactbits.dev/) + [Motion Primitives](https://motion-primitives.com/docs) + [Magic UI](https://magicui.design/docs) + [Aceternity UI](https://ui.aceternity.com/components) + [shadcn/ui](https://ui.shadcn.com/) + [21st.dev](https://21st.dev/) | Ideas de componentes y movimiento: adaptar con criterio; revisar licencia (React Bits MIT + Commons Clause) y dependencias |
+| Primitivas accesibles React | [Radix](https://www.radix-ui.com/primitives) + [Base UI](https://base-ui.com/react/overview/about) + [React Aria](https://react-aria.adobe.com/) + [Headless UI](https://headlessui.com/) + [Floating UI](https://floating-ui.com/) + [W3C APG](https://www.w3.org/WAI/ARIA/apg/) | Teclado, foco, semántica, lector de pantalla y posicionamiento; la documentación oficial sigue siendo autoridad |
+| Skills y guías para agentes | [Vercel Agent Skills](https://github.com/vercel-labs/agent-skills) + [Web Interface Guidelines](https://github.com/vercel-labs/web-interface-guidelines) + [Anthropic frontend-design](https://github.com/anthropics/skills/tree/main/skills/frontend-design) | Insumos potenciales para diseño/revisión asistidos por IA; no instalados, verificar versión/licencia y reconciliar con las reglas locales |
+| UI conversacional con IA (futuro) | [Vercel AI Elements](https://github.com/vercel/ai-elements) | Referencia de estados de chat; usa Next.js, AI SDK, shadcn/ui y Tailwind: no integrar al HTML/Vite sin aprobación arquitectónica |
 | Paneles y accesibilidad | [Radix Dialog](https://www.radix-ui.com/primitives/docs/components/dialog) + [Radix Popover](https://www.radix-ui.com/primitives/docs/components/popover) + [W3C APG Dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) | Capas, colisiones, foco, teclado y decisiones modal/no modal |
 
 **Al diseñar o iterar cualquier pantalla, consultar estos repos y aplicar los criterios documentados en doc 04.**
+
+El banco ampliado, el protocolo de comparación y las advertencias de licencias/compatibilidad están en la sección **“Investigación adicional: componentes, UI con IA y agentes frontend”** de doc 04. Consultar fuentes según la pregunta concreta; no adoptar de forma automática sus estética, paquetes o skills.
 
 ## Registro de continuidad — HF-01 definitivo — 2026-09-28
 
@@ -205,14 +214,21 @@ Esta iteración se registró como propuesta, pero el usuario rechazó el diseño
 
 Siguiente al retomar: decidir qué estado/función acompaña al botón de tres barras sin recrear el panel rechazado; después rediseñar y validar chatbot y accesibilidad con referencias específicas, en desktop y móvil, antes de pedir aprobación visual para congelar HF-01.
 
-### Hito de Diseño Premium y Mandato Reactbits - 2026-09-28
-El usuario ha validado exitosamente el nivel de calidad visual y ha establecido una **regla de oro absoluta** para todo el futuro desarrollo en React:
-**No se admiten componentes "slop", genéricos o estáticos.**
-Cada botón, menú, dropdown, y tarjeta de producto deberá estar infundido con micro-interacciones inspiradas en las referencias documentadas (Reactbits, Emil Kowalski, Godly). Esto incluye:
-- **Squircles y Glassmorphism:** Uso mandatorio de `backdrop-filter: blur(40px)`, sombras complejas (sombras externas para levitar, sombras internas / `inset` para dar definición) y radios de borde amplios (12px - 16px).
-- **Animaciones y Transiciones Fluidas:** Toda aparición (dropdowns, modales, alertas) debe entrar escalando (`transform: scale(0.96)`) y desvaneciéndose fluidamente, NUNCA apareciendo de golpe con `display: block` sin transición.
-- **Interacciones Táctiles:** Cada hover sobre elementos cliqueables debe producir un resultado táctil: íconos SVG que se escalan, se mueven (ej. flechas), o rotan suavemente.
-- **Vara de Calidad React:** A partir de ahora, todas las iteraciones de React que reemplacen al HTML puro deberán mantener (o mejorar) este mismo nivel de craft. Este esfuerzo visual es donde el usuario pide "canalizar gran parte de la energía".
+### Iteración del chatbot basada en referencias visuales — 2026-09-29
+
+El usuario eligió del concepto generado por Gemini la ventana de geometría achaflanada (esquinas cortadas, ni totalmente cuadradas ni redondas) y pidió una conversación real, espaciosa, como el ejemplo de chat adjunto, no un bloque de opciones comprimido. Se actualizó solo el panel de chatbot en `mockups/hf-01-home-definitivo.html`: encabezado propio, mensaje de bienvenida, tres sugerencias como respuestas iniciales y compositor fijo inferior; se retiraron afirmaciones no confirmadas como “IA técnica”, “en línea” y funciones técnicas inventadas. En escritorio el panel queda a la izquierda de los botones flotantes; en móvil, encima de ellos para evitar colisión. En una segunda corrección se sustituyó la letra “V” provisional por el isotipo real de Vértice desde `mockups/favicon.png`, también usado en el avatar del mensaje; el microcopy del encabezado ahora sigue la firma “VÉRTICE CR / ASISTENCIA”, y el label dejó de usar forma de píldora genérica. Diseño aún pendiente de feedback explícito; no congela HF-01. No se cambió accesibilidad ni se inició React.
+
+### Iteración visual chatbot: unión con workbench — 2026-09-29
+
+Se añadió al final de `mockups/hf-01-home-definitivo.html` la capa `chat-identity-pass-02`: vidrio ahumado casi opaco y con blur, retícula tenue tomada del hero, contorno cobrizo facetado, montura para el isotipo, burbuja de bienvenida con borde asimétrico, rutas numeradas sin tarjetas y compositor inferior facetado. Se añadió movimiento discreto de borde/entrada con respeto a reducción de movimiento; sin cambio de paleta ni de funciones. Verificación a 900×570: composición junto a botones, `Escape` cierra y restablece ARIA, sin errores de consola. Pendiente revisión en navegador externo a ancho desktop y móvil, y aprobación del usuario; React sigue bloqueado. Referencias y justificación en docs 04/05.
+
+### Corrección de criterio de referencias y movimiento — 2026-09-29
+
+Queda supersedida la nota histórica “Mandato Reactbits” del 2026-09-28 en cuanto imponía glassmorphism/`blur(40px)`, radios de 12–16 px, escalado fijo y microinteracciones obligatorias en cada control. Esas reglas no fueron una aprobación visual del usuario y contradicen los tokens y la geometría de doc 04. Las referencias sirven para comparar soluciones concretas; ningún efecto, librería o estilo se vuelve obligatorio por aparecer en React Bits u otra galería. El movimiento se usa cuando informa o confirma una acción y respeta `prefers-reduced-motion`; cada componente React futuro debe derivarse de decisiones aprobadas en HF-01 y del sistema visual, una vez superados los gates.
+
+### Banco ampliado de referencias frontend — 2026-09-29
+
+Se investigaron galerías de sitios y flujos, bibliotecas de componentes/movimiento, primitivas accesibles y repositorios de skills para agentes; el inventario, su propósito y el protocolo de selección están en doc 04. No se modificó el mockup, no se inició React, no se instalaron dependencias ni skills. React Bits usa MIT + Commons Clause, por lo que hay que revisar su texto completo; Vercel AI Elements está ligado a un stack Next.js/AI SDK/shadcn/Tailwind y queda como referencia, no como integración aprobada. HF-01 sigue EN ITERACIÓN y no congelado. Próxima prioridad: retomar la auditoría de extremo a extremo con capturas inspeccionadas por vista/estado, usando estas fuentes para resolver dudas puntuales y registrando brechas antes de recomendar congelar.
 
 ### Punto de pausa y traspaso de guardia - Fin de sesión 2026-09-28
 
@@ -223,3 +239,33 @@ Cada botón, menú, dropdown, y tarjeta de producto deberá estar infundido con 
 **Qué debe hacer la próxima IA al retomar (Mañana):**
 1. **Chatbot (Funcionalidad):** El diseño visual está listo, pero el usuario indicó que falta **iterar la funcionalidad (comportamiento JS/lógica)** del panel de chat y del panel de accesibilidad (ej. que la IA responda, que se abra el panel de ayuda, etc.). *Nota del usuario antes de dormir: "aun debemos iterar el chatbot y accesibilidad pero todavia no"*.
 2. Cuando el usuario despierte y pida continuar, pregúntale si quiere **empezar directamente con la lógica JS del chatbot en el HTML** o si quiere avanzar con la arquitectura/React, recordando que React sigue bloqueado hasta tener el HTML y la arquitectura de API cerrados. No toques el CSS del chatbot a menos que el usuario lo pida explícitamente, ya que está aprobado visualmente.
+
+### Continuación actual — 2026-09-29
+
+El chatbot conserva la dirección que gustó al usuario. En la última iteración pidió flecha real para cada opción (no guion, círculo ni carácter tipográfico) y un marco exterior sin recortes. Se implementó una flecha SVG ascendente-diagonal inspirada en el affordance de navegación de shadcn/ui; permanece tenue en reposo y gana énfasis al hover/foco. Se quitó el `clip-path` del marco exterior y se le dio borde continuo con radios asimétricos suaves; las marcas circulares de la página principal se dejaron intactas. Esta iteración requiere confirmación visual en navegador con panel abierto, especialmente en móvil. El selector de tema conserva el comportamiento verificado: oscuro muestra sol para cambiar a claro y claro muestra luna para cambiar a oscuro. HF-01 no está congelado, accesibilidad sin aprobar y React continúa bloqueado.
+
+### Movimiento y accesibilidad — continuación 2026-09-29
+
+Se renovó el panel de accesibilidad y se reforzó la interacción en `mockups/hf-01-home-definitivo.html`: entrada/realce secuencial sutil para el panel, sus grupos y sugerencias del chat; control manual y respeto a `prefers-reduced-motion`; escala A/A+/A++; alto contraste que se adapta a Dark/Light; switches semánticos con `aria-checked`, etiqueta estable y descripción; preferencias persistentes y reset sincronizado; idioma ES/EN también para nombres accesibles. Los diálogos no modales ya no atrapan `Tab`; `Escape` y cierre restauran foco. Revisado por teclado en navegador desktop 900×570: escala, contraste claro, restablecimiento, apertura/cierre, atributos ARIA y desactivación de animación. Fuentes: [Emil Kowalski — review animations](https://github.com/emilkowalski/skills/blob/d16ebe60d09a5ba2afcb7054ede9d0a10c9f6128/skills/review-animations/SKILL.md), [MDN — reduced motion](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Media_queries/Using_for_accessibility), [W3C APG — switch](https://www.w3.org/WAI/ARIA/apg/patterns/switch/). Pendiente: prueba visual en viewport móvil y revisión con lector de pantalla; sin afirmar conformidad WCAG completa. HF-01 sigue en iteración, accesibilidad todavía espera aprobación visual y React continúa bloqueado.
+
+### Continuación visual — animación compartida de paneles — 2026-09-29
+
+En HF-01, chatbot y accesibilidad usan ahora la misma entrada de panel (300 ms, misma curva y desplazamiento); el stagger de las sugerencias del chat se mantiene. El ajuste manual de movimiento reducido y `prefers-reduced-motion` desactivan ambas entradas. Aún falta validar los paneles en móvil; HF-01 no está congelado, accesibilidad requiere aprobación visual y React continúa bloqueado.
+
+### Anotaciones del panel de accesibilidad — 2026-09-29
+
+Se detectó que una regla heredada ocultaba el thumb del switch y que se mezclaban `aria-pressed` con `role="switch"`; se mostró el indicador y se unificó el estado en `aria-checked`. Verificado en navegador a 739×572: ambos controles alternan visual/semánticamente y reset los apaga. Se retiró numeración decorativa repetida de secciones, proceso, chat, accesos y panel, conservando datos técnicos reales. El texto aclara que idioma/tamaño son demo acotada a HF-01: en React, traducción y escala tipográfica deberán ser globales en todas las rutas y contenido dinámico, con persistencia acordada; no dar esto por cumplido por el comportamiento parcial del prototipo. Pendiente viewport móvil estrecho/aprobación visual. HF-01 sigue en iteración y React bloqueado.
+
+### Continuación — búsqueda, menú y enlaces — 2026-09-29
+
+En HF-01 se rehízo el buscador como popover pequeño anclado al header con marca Vértice; se restauró el menú como lista plegable (el usuario rechazó la pantalla completa) y se recuperó la flecha de “Ver ficha”. Se consultaron Algolia Autocomplete y el command menu de shadcn/ui; los criterios aplicados están en doc 04 y la auditoría en doc 05. El CSS está escrito pero falta captura verificable con paneles abiertos porque los disparadores no respondieron mediante el navegador de prueba. Retomar con screenshot de búsqueda abierta, menú abierto, enlace de ficha y viewport móvil; no marcar aprobado/congelado hasta revisión del usuario. React continúa bloqueado.
+
+**Actualización de verificación del mismo bloque:** el buscador y el menú se abrieron por teclado y se capturaron en desktop a 948×572. La búsqueda presenta isotipo/material/referencia sin invadir el hero; el menú es una lista vertical compacta, sin scrim completo. La captura de fichas permitió corregir y verificar “Ver ficha ↗” una sola vez. Pendiente viewport móvil, Escape/retorno de foco, estados de resultados y pase global; HF-01 continúa sin congelar.
+
+**Verificación de búsqueda completada parcialmente — 2026-09-29:** capturas de escritorio confirman que `nylon` filtra a un resultado y que una consulta sin coincidencias oculta resultados y muestra un estado vacío. Se corrigió la cascada que ignoraba `[hidden]`. El menú compacto y una sola flecha “Ver ficha ↗” también se capturaron en desktop. Aún faltan pruebas de Escape/retorno de foco, 390 px, lector de pantalla y auditoría visual global; no congelar HF-01 ni desbloquear React por este bloque.
+
+### Diferencia del menú entre Brave y navegador local — 2026-09-29
+
+La captura elegida es el popover “Mi Espacio” ya presente en el HTML; el navegador local estaba a 937 px y caía en la variante de navegación completa, activada hasta 1120 px. Como a 821–1120 px los enlaces centrales siguen visibles, se ajustó el breakpoint de interacción: `>820px` usa el popover de cuenta y `<=820px` conserva la lista plegable móvil. Captura posterior a 937 px y prueba móvil/Escape pendientes. Mantener el dropdown elegido como la referencia del estado tablet/desktop; HF-01 sigue EN ITERACIÓN y React bloqueado.
+
+**Verificación posterior:** a 937×572 se capturó el panel compacto abierto (296×274 px), sin la lista de navegación duplicada. `Escape` actualizó los estados ARIA a cerrado y devolvió el foco al disparador. Falta revisar la rama `<=820px` con captura; HF-01 no está congelado.

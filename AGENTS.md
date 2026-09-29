@@ -1,6 +1,6 @@
 # AGENTS.md — Vértice CR
 
-> Última actualización: **2026-09-26**. Cualquier IA que trabaje en este repo debe leer este archivo completo antes de hacer cualquier cambio.
+> Última actualización: **2026-09-29**. Cualquier IA que trabaje en este repo debe leer este archivo completo antes de hacer cualquier cambio.
 
 ## Antes de trabajar
 
@@ -43,6 +43,11 @@ Una solicitud pendiente **nunca** se comporta como producto con `precio × canti
 
 - No crear un Markdown nuevo si la información pertenece a uno de los 11 documentos numerados.
 - Si una decisión transversal cambia, actualizar `AI_CONTEXT.md` Y el documento de dominio.
+- **Documentar es parte obligatoria de cada bloque de trabajo, no una tarea opcional ni algo que se haga solo si el usuario lo pide.** Al tomar una decisión, cambiar código/diseño, investigar una referencia que afecte el producto, verificar un resultado o dejar trabajo pendiente, actualizar en ese mismo bloque `AI_CONTEXT.md` y el documento de dominio correspondiente. No esperar al final del chat ni a que el usuario lo recuerde.
+- Para HF-01, registrar decisiones y resultado real en `docs/05-AUDITORIA-HF-Y-MOCKUPS.md`; mantener los criterios visuales reutilizables y las referencias que los fundamentan en `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md`. Actualizar el resumen/estado y punto exacto para retomar en `AI_CONTEXT.md`.
+- HF-01 es la especificación visual de referencia más fiel de la página: documentar no solo marca y colores, sino composición, navbar, enlaces, botones, ventanas y overlays, geometría, tipografía, espaciado, iconos, estados, interacciones, comportamiento responsive y accesibilidad. Lo que se construya en React debe reproducir las decisiones aprobadas del mockup, sin reinterpretarlas ni sustituirlas por componentes genéricos. Si algo todavía no está aprobado, señalarlo como pendiente, no como contrato cerrado.
+- Diferenciar claramente lo implementado y verificado, lo decidido pero pendiente de implementar y lo aún no aprobado. Registrar referencias concretas consultadas y qué criterio se adaptó cuando hayan influido en el resultado; nunca afirmar una consulta o verificación que no ocurrió.
+- Mantener las actualizaciones concisas y en el documento existente de dominio; no crear un Markdown por cada mensaje ni duplicar el historial completo. Al cerrar cada bloque, comprobar que otro agente pueda saber qué cambió, qué falta y dónde continuar sin depender del chat.
 - El índice (`00-INDICE-Y-MAPA.md`) debe seguir siendo corto y navegable.
 - Archivos complementarios existentes: `DECISIONES-POST-AUDITORIA.md` (histórico), `auditoriaclaude.md` (conclusiones de auditorías).
 - `docs/ANTEPROYECTO_FINAL.md` es el documento académico; no es fuente diaria de decisiones técnicas.
