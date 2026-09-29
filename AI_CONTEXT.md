@@ -280,20 +280,19 @@ El usuario iteró los detalles visuales faltantes del Chatbot, Accesibilidad y M
 2. Si la revisión es aprobada por el usuario, **declarar HF-01 formalmente CONGELADO**.
 3. Iniciar el traspaso a React (Fase 4 del Roadmap) o definir el cierre de Arquitectura/API (Fase 3), según la prioridad del usuario.
 
-## Relevo de auditoría visual — 2026-09-29
+## Relevo de auditoría visual HF-01 — 2026-09-29
 
-Se continúa la auditoría de hf-01-home-definitivo.html con foco en craft, conversión, identidad y preparación para React. Estado sigue EN ITERACIÓN / NO CONGELADO.
+HF-01 debe tratarse como **mockup visual de máxima fidelidad para React**, no como código que deba quedar production-ready. La auditoría actual debe priorizar bugs visuales, coherencia de identidad, jerarquía, responsive, movimiento, presentación de producto y oportunidades de conversión.
 
-Hallazgos prioritarios:
-- Placeholder visible PRT-006 / FALLBACK DEMO rompe la ilusión comercial.
-- Claims/datos específicos de Home deben validarse contra contrato antes de congelar.
-- Light actual del HTML necesita corrección de contraste del acento.
-- Switches de accesibilidad usan aria-pressed en markup y aria-checked en JS sin role=switch.
-- #menu-toggle controla distintos paneles según breakpoint pero mantiene aria-controls=mobile-menu.
-- Navbar del HTML no coincide con el contrato de navegación pública documentado.
-- La cascada CSS contiene muchas capas de overrides y !important; consolidar después de la última decisión visual y antes de React.
-- La dirección comercial debe evolucionar de “workbench técnico” a “producto deseable con precisión como evidencia”.
-- El buscador ya está visualmente encaminado; React deberá llevarlo a combobox/teclado real.
-- No pasar a React ni declarar congelado hasta completar revisión visual real a 375 / 768 / 1280, Dark/Light y teclado/foco.
+Referencias que deben seguir usándose: banco de `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md`; Impeccable; Anthropic frontend-design; taste-skill; UI UX Pro Max; Godly; Awwwards; Siteinspire; Land-book; Commerce Cream; Mobbin; Refero; Pageflows; Codrops.
 
-**Punto de continuación:** claims/placeholder → accesibilidad/ARIA → consistencia de navbar → limpieza de craft y composición comercial → auditoría visual real.
+Dirección de revisión:
+- producto primero;
+- precisión como evidencia, no como protagonista absoluto;
+- identidad Vértice consistente;
+- movimiento intencional;
+- nada de AI slop o decoración repetitiva;
+- responsive como reinterpretación;
+- buscar bugs visuales reales, no problemas de arquitectura que no afecten la apariencia del mockup.
+
+No generar imágenes para esta auditoría. HF-01 continúa EN ITERACIÓN / NO CONGELADO.
