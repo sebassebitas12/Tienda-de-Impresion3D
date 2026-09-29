@@ -499,3 +499,33 @@ Referencias de búsqueda contrastadas: [Algolia Autocomplete](https://www.algoli
 La diferencia que reportó el usuario era por breakpoint, no por archivos: la ventana local medía 937 px y el código solo mostraba el popover “Mi Espacio” por encima de 1120 px. En `821–1120px` los enlaces principales ya están visibles pero el botón abría una segunda lista de navegación, mientras que en Brave desktop aparecía el popover compacto de la captura elegida. Se cambió la condición de interacción a `>820px`: en tablet/desktop el botón abre “Mi Espacio”; bajo `821px` conserva la lista de navegación plegable. Pendiente capturar tras el cambio a 937 px y comprobar Escape/foco y móvil; no declarar visualmente verificado hasta obtener esas capturas.
 
 **Verificación:** en navegador local a 937×572, el botón abrió `#account-menu-panel` (296×274 px), con “Mi Espacio”, estado de cliente y los cuatro accesos de la referencia; no abrió la lista de navegación. Captura inspeccionada tras completar la animación. `Escape` cerró el panel, dejó `aria-expanded=false`/`aria-hidden=true` y devolvió foco al botón. La rama móvil (`<=820px`) aún requiere captura; HF-01 sigue en iteración.
+
+---
+
+## Auditoría de relevo — 2026-09-29
+
+La auditoría se amplía de “funciona/no funciona” a craft visual, coherencia de identidad y capacidad de conversión, porque HF-01 será la referencia más fiel para React.
+
+### Hallazgos concretos en el HTML actual
+
+- hf-01-home-definitivo.html tiene 1772 líneas y una gran cantidad de capas CSS posteriores que redefinen las mismas superficies con !important. La dirección visual es fuerte, pero la cascada ya es una fuente de riesgo.
+- El catálogo contiene PRT-006 con placeholder-product.jpg y copy FALLBACK DEMO. Esto debe salir de la referencia visual antes del congelado.
+- El HTML contiene datos/claims específicos que no están cerrados como contrato en los documentos de producto/negocio: ±0.05 mm, GAM + 7 provincias, CORREOS DE COSTA RICA, FDM / SLA, RESINA 8K y conteos de stock. El historial de este documento contiene referencias antiguas y algunas ya fueron identificadas como claims no respaldados; no usarlo por sí solo como autorización.
+- Los radios efectivos del HTML son mucho más numerosos que la geometría base documentada. Mantener los cantos facetados que ya forman parte del lenguaje aprobado, pero consolidarlos en tokens/excepciones explícitas antes de React.
+- El tema Light del HTML usa #c9450d como lava y #e25f2a como lava-light. Contra #f4f0e9 dan aproximadamente 4.26:1 y 3.13:1 respectivamente; el segundo no sirve como texto normal y el primero queda por debajo del objetivo 4.5:1 establecido para texto en doc 04.
+- Los switches de accesibilidad usan aria-pressed en el markup pero el JS actualiza aria-checked; falta role=switch.
+- #menu-toggle mantiene aria-controls=mobile-menu aunque desktop abre #account-menu-panel.
+- La navegación pública del HTML actual, Inicio / Tienda / Método / Precisión, no coincide con el contrato de navegación descrito en docs/03-UX-Y-FLUJOS.md.
+- Los iconos flotantes ✦ y ♿ deben sustituirse en React por iconos SVG consistentes.
+- El buscador ya tiene estado con coincidencias/sin coincidencias y cierre con Escape; para React falta convertir el filtrado demo en un patrón combobox real con navegación de teclado y estado activo.
+- El hero tiene suficiente identidad, pero debe reducirse la dependencia de telemetría decorativa y aumentar la percepción de producto/resultado real.
+
+### Referencias utilizadas para este pase
+
+Se contrastaron patrones de ecommerce/3D y sistemas de interacción de Formlabs, Awwwards, Algolia y Web Interface Guidelines. Se mantuvieron como criterios, no como diseños para copiar. Ver docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md para el banco de referencias.
+
+### Estado
+
+**HF-01: EN ITERACIÓN / NO CONGELADO.**
+
+Bloqueadores para el siguiente gate: claims y datos visibles, Light contrast, switches ARIA, menú responsive/ARIA, placeholder del catálogo, consolidación visual de CSS y revisión real de 375/768/1280 en ambos temas. La auditoría actual es suficientemente concluyente para mejorar la dirección, pero no sustituye la captura visual real del navegador.
