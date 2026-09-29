@@ -126,10 +126,16 @@ Reglas de aplicación Light:
 
 ## Reglas de geometría
 
+### Contrato base
+
 - `border-radius: 2px` — inputs, badges de datos, etiquetas técnicas.
-- `border-radius: 6px` — cards de producto y secciones.
-- `border-radius: 12px` — showcase oval del hero únicamente.
+- `border-radius: 6px` — cards de producto y superficies secundarias.
+- `border-radius: 12px` — referencia base para superficies hero.
 - Sin `border-radius` universal aplicado a todo.
+
+### Excepciones de HF-01 en evaluación
+
+HF-01 puede usar radios mayores o asimétricos en composiciones facetadas del workbench, chatbot y superficies destacadas cuando la geometría aporte identidad. Estas variantes **no se convierten en tokens globales de React hasta que el usuario apruebe HF-01**. La auditoría debe distinguir entre una excepción intencional de composición y un radio heredado de una iteración anterior.
 
 
 ## Accesibilidad — reglas concretas
