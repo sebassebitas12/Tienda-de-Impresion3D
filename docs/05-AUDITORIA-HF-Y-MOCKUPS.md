@@ -502,30 +502,39 @@ La diferencia que reportó el usuario era por breakpoint, no por archivos: la ve
 
 ---
 
-## Auditoría de relevo — 2026-09-29
+## Auditoría visual de fidelidad HF-01 → React — 2026-09-29
 
-La auditoría se amplía de “funciona/no funciona” a craft visual, coherencia de identidad y capacidad de conversión, porque HF-01 será la referencia más fiel para React.
+Esta pasada toma `hf-01-home-definitivo.html` como **mockup visual**, no como implementación productiva. El criterio principal es: ¿puede este archivo convertirse en la referencia más fiel del futuro React sin que la identidad o la calidad percibida se degraden?
 
-### Hallazgos concretos en el HTML actual
+### Resuelto / fuerte
+- Identidad visual Vértice reconocible: Obsidian Precision Forge + Lava Orgánica.
+- Hero con producto dominante y lenguaje de workbench.
+- Catálogo con estructura comercial y estética técnica.
+- Chatbot con tratamiento visual propio, no widget genérico.
+- Panel de accesibilidad integrado al mismo lenguaje visual.
+- Search compacto y estados de vacío ya considerados.
+- Movimiento reducido y estados interactivos ya contemplados en el mockup.
 
-- hf-01-home-definitivo.html tiene 1772 líneas y una gran cantidad de capas CSS posteriores que redefinen las mismas superficies con !important. La dirección visual es fuerte, pero la cascada ya es una fuente de riesgo.
-- El catálogo contiene PRT-006 con placeholder-product.jpg y copy FALLBACK DEMO. Esto debe salir de la referencia visual antes del congelado.
-- El HTML contiene datos/claims específicos que no están cerrados como contrato en los documentos de producto/negocio: ±0.05 mm, GAM + 7 provincias, CORREOS DE COSTA RICA, FDM / SLA, RESINA 8K y conteos de stock. El historial de este documento contiene referencias antiguas y algunas ya fueron identificadas como claims no respaldados; no usarlo por sí solo como autorización.
-- Los radios efectivos del HTML son mucho más numerosos que la geometría base documentada. Mantener los cantos facetados que ya forman parte del lenguaje aprobado, pero consolidarlos en tokens/excepciones explícitas antes de React.
-- El tema Light del HTML usa #c9450d como lava y #e25f2a como lava-light. Contra #f4f0e9 dan aproximadamente 4.26:1 y 3.13:1 respectivamente; el segundo no sirve como texto normal y el primero queda por debajo del objetivo 4.5:1 establecido para texto en doc 04.
-- Los switches de accesibilidad usan aria-pressed en el markup pero el JS actualiza aria-checked; falta role=switch.
-- #menu-toggle mantiene aria-controls=mobile-menu aunque desktop abre #account-menu-panel.
-- La navegación pública del HTML actual, Inicio / Tienda / Método / Precisión, no coincide con el contrato de navegación descrito en docs/03-UX-Y-FLUJOS.md.
-- Los iconos flotantes ✦ y ♿ deben sustituirse en React por iconos SVG consistentes.
-- El buscador ya tiene estado con coincidencias/sin coincidencias y cierre con Escape; para React falta convertir el filtrado demo en un patrón combobox real con navegación de teclado y estado activo.
-- El hero tiene suficiente identidad, pero debe reducirse la dependencia de telemetría decorativa y aumentar la percepción de producto/resultado real.
+### Hallazgos visuales de prioridad
+1. El hero tiene suficientes elementos distintivos, pero debe verificarse que el producto siga siendo el foco cuando coinciden scan, estado, líder, meta, riel y parallax.
+2. El catálogo necesita sentirse más tienda y menos inventario técnico: la información técnica debe apoyar el producto, no competir con él.
+3. `PRT-006` con `placeholder-product.jpg` / `FALLBACK DEMO` rompe la ilusión de catálogo final y debe resolverse como pieza real o estado visual intencional.
+4. La geometría de radios/cantos necesita una revisión de consistencia: mantener las asimetrías que forman firma de marca y recortar las que solo sobrevivieron de iteraciones anteriores.
+5. El motion debe tener jerarquía: una o dos experiencias memorables + feedback de interacción, no animación distribuida por todo el documento.
+6. Los micro-labels técnicos deben sobrevivir solo cuando aporten lectura: no eliminar el lenguaje técnico, depurarlo.
+7. La experiencia debe comunicar “tienda especializada” dentro del primer scroll y no parecer principalmente una demo de dirección de arte.
+8. La versión mobile debe reinterpretar la composición y conservar la firma, no simplemente apilar desktop.
 
-### Referencias utilizadas para este pase
+### Referencias aplicadas
+- Impeccable: anti-slop, jerarquía, restraint y craft. https://github.com/pbakaus/impeccable
+- Anthropic frontend-design: identidad específica al dominio, movimiento con propósito y estructura que comunica. https://github.com/anthropics/skills/tree/main/skills/frontend-design
+- Taste Skill: extraer decisiones concretas de diseño en vez de describir una página como “moderna”. https://github.com/senlindesign/taste-skill
+- UI UX Pro Max: sistemas de layout, responsive y composición. https://github.com/nextlevelbuilder/ui-ux-pro-max-skill
+- Codrops: interacciones de producto, grids, motion y 3D como extensión del contenido. citeturn360901search0turn360901search1turn360901search2
+- Galerías del banco de doc 04: Godly, Awwwards, Siteinspire, Land-book, Commerce Cream, Mobbin, Refero, Pageflows y Codrops.
 
-Se contrastaron patrones de ecommerce/3D y sistemas de interacción de Formlabs, Awwwards, Algolia y Web Interface Guidelines. Se mantuvieron como criterios, no como diseños para copiar. Ver docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md para el banco de referencias.
+### Próximo bloque recomendado
 
-### Estado
+**Auditoría de dirección comercial + visual:** recorrer Hero → catálogo → método → precisión → cotización preguntando en cada sección: “¿esto hace que quiera seguir explorando/comprar?” y “¿qué elemento sobra porque está compitiendo con el producto?”. Después revisar 375/768/1280 y Dark/Light para detectar rupturas visuales.
 
-**HF-01: EN ITERACIÓN / NO CONGELADO.**
-
-Bloqueadores para el siguiente gate: claims y datos visibles, Light contrast, switches ARIA, menú responsive/ARIA, placeholder del catálogo, consolidación visual de CSS y revisión real de 375/768/1280 en ambos temas. La auditoría actual es suficientemente concluyente para mejorar la dirección, pero no sustituye la captura visual real del navegador.
+**Estado: HF-01 EN ITERACIÓN / NO CONGELADO.**
