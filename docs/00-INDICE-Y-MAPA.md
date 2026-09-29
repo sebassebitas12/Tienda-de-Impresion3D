@@ -1,35 +1,71 @@
 # Vértice CR — Índice de documentación
 
-> Última actualización: **2026-09-26**.
+> **Última actualización:** 2026-09-29  
+> **Estado:** ACTIVO  
+> **Uso:** mapa rápido para humanos y agentes.
 
-**Fuente rápida para humanos y agentes. Si no sabes dónde buscar algo, empieza aquí. Si eres una IA, lee primero `AI_CONTEXT.md` y `AGENTS.md`.**
+## Arranque de un agente
 
-| Si te preguntan... | Busca en |
+Lee primero:
+
+1. `AGENTS.md`
+2. `AI_CONTEXT.md`
+3. este índice
+4. el dominio de la tarea
+5. el archivo exacto que se va a tocar
+
+Para la primera implementación de React, leer además `01, 02, 03, 04, 06, 07, 09 y 10`.
+
+## Mapa por pregunta
+
+| Necesitas saber | Fuente principal |
 |---|---|
-| ¿Qué es Vértice? ¿Qué entra al proyecto? | 01-PRODUCTO-Y-ALCANCE.md |
-| ¿Qué puede hacer cliente/admin? | 01-PRODUCTO-Y-ALCANCE.md |
-| ¿Cómo funciona una solicitud personalizada? | 02-NEGOCIO-Y-ESTADOS.md |
-| ¿Qué significan los estados? | 02-NEGOCIO-Y-ESTADOS.md |
-| ¿Qué pantallas y rutas existen? | 03-UX-Y-FLUJOS.md |
-| ¿Qué pasa en loading/error/empty? | 03-UX-Y-FLUJOS.md |
-| ¿Qué colores, tipografías, temas y accesibilidad usamos? | 04-DISENO-VISUAL-Y-ACCESIBILIDAD.md |
-| ¿Dónde están los repositorios, enlaces directos y benchmark? | 04-DISENO-VISUAL-Y-ACCESIBILIDAD.md |
-| ¿Qué falta corregir de los mockups? | 05-AUDITORIA-HF-Y-MOCKUPS.md |
-| ¿Cómo se construirá técnicamente? | 06-ARQUITECTURA.md |
-| ¿Dónde van API externa, JWT y N8N? | 07-DATOS-API-AUTH.md |
-| ¿Qué métricas debe mostrar Admin y cómo se calculan? | 08-METRICAS-ADMIN-E-IA.md |
-| ¿Cómo se prueba? | 09-TESTING-Y-CALIDAD.md |
-| ¿Qué hacemos ahora? | 10-ROADMAP.md |
+| Producto, alcance, roles, rúbrica | `01-PRODUCTO-Y-ALCANCE.md` |
+| Entidades, estados, carrito, checkout, cotizaciones | `02-NEGOCIO-Y-ESTADOS.md` |
+| Rutas, flujos, navbar, responsive, estados UX | `03-UX-Y-FLUJOS.md` |
+| Identidad, tokens, referencias, accesibilidad, motion | `04-DISENO-VISUAL-Y-ACCESIBILIDAD.md` |
+| Estado y auditoría de HF/mockups | `05-AUDITORIA-HF-Y-MOCKUPS.md` |
+| Arquitectura React y límites entre capas | `06-ARQUITECTURA.md` |
+| Datos, API, JWT, N8N, archivos 3D | `07-DATOS-API-AUTH.md` |
+| Admin, métricas y IA operativa | `08-METRICAS-ADMIN-E-IA.md` |
+| Testing, cobertura y calidad | `09-TESTING-Y-CALIDAD.md` |
+| Orden de ejecución y gates | `10-ROADMAP.md` |
 
-## Fuentes de autoridad
+## Autoridad documental
 
-1. AI_CONTEXT.md — estado y decisiones globales.
-2. AGENTS.md — reglas para agentes.
-3. Este índice — mapa de navegación.
-4. Los documentos numerados — detalle por dominio.
+La autoridad se resuelve así:
 
-Si existe documentación antigua que contradice esta estructura, prevalece la decisión más reciente registrada aquí y en AI_CONTEXT.
+**Usuario → `AGENTS.md` → documento de dominio vigente → `AI_CONTEXT.md` → historial → académico.**
 
-## Regla
+No uses un documento histórico para invalidar una decisión vigente.
 
-No crear otro Markdown para una decisión que ya tenga hogar aquí.
+`00` solo navega; no define reglas de negocio o diseño.
+
+## Tipos de documentación
+
+### Activa
+
+`01–10` son la base de trabajo. Sus decisiones vigentes deben mantenerse concisas y aplicables directamente.
+
+### Snapshot
+
+`AI_CONTEXT.md` resume el estado actual, decisiones críticas y punto de continuación. No debe convertirse en un diario de sesiones.
+
+### Auditoría / historial
+
+`05-AUDITORIA-HF-Y-MOCKUPS.md` conserva evidencia, hallazgos y evolución de mockups.
+
+`DECISIONES-POST-AUDITORIA.md` y `auditoriaclaude.md` son referencias históricas y deben estar marcadas como tales.
+
+### Académica
+
+`ANTEPROYECTO_FINAL.md` sirve para documentación académica y evidencia formal; no es fuente diaria de implementación.
+
+## Regla documental
+
+No crear otro Markdown para una decisión que ya tenga hogar.
+
+Cada cambio importante debe dejar:
+- una decisión durable en el documento de dominio;
+- un snapshot breve en `AI_CONTEXT.md`;
+- historial detallado solo cuando la evolución lo necesite.
