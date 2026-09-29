@@ -1,63 +1,104 @@
 # Vértice CR — Roadmap
 
-> Última actualización: **2026-09-26**. Fase actual: 3 — auditoría HF + cierre visual/UX. React bloqueado.
+> **Última actualización:** 2026-09-29  
+> **Estado:** ACTIVO  
+> **Fase actual:** 3 — cierre visual/UX de HF-01.  
+> **React:** BLOQUEADO.
 
-## Fase 3 completado
+## Fase 3 — Cierre de diseño
 
-- 🟡 HF-01 Home: mockup HTML funcional en iteración (NO CONGELADO).
-- ✅ HF-07 Carrito Híbrido: aprobado documental — UXMagic + validación Gemini (2026-09-24).
-- ✅ HF-08 Checkout: aprobado documental — UXMagic + validación Gemini (2026-09-25).
-- ✅ Dark/Light tokens definidos en doc 04.
-- ✅ Accesibilidad WCAG 2.2 y mecanismo de ayuda definidos en doc 04.
-- ✅ Benchmark de competidores documentado.
-- ✅ Skills de diseño (Emil Kowalski, Impeccable, UI/UX Pro Max, etc.) integrados en doc 04.
+### Objetivo
 
-## Ahora — 2026-09-26
+Convertir HF-01 en la referencia visual de máxima fidelidad de la Home y cerrar el contrato mínimo necesario para pasar a React sin improvisar.
 
-1. **→ Iterar HF-01 Home** — continuar refinando el mockup HTML como única base del proyecto. NO ESTÁ CONGELADO.
-2. Definir API externa + JWT y contratos de arquitectura antes de React.
+### Estado actual
 
-*(Nota: No se harán mockups HTML adicionales. Una vez aprobado HF-01, se pasará directamente a React para las demás pantallas)*
+- HF-01: 🟡 **EN ITERACIÓN / NO CONGELADO**
+- Dark/Light: definidos en `04`.
+- Accesibilidad: criterios definidos; paneles requieren validación visual completa.
+- Referencias de diseño: consolidadas en `04`.
+- Mockup HTML: `mockups/hf-01-home-definitivo.html`.
+- No se crean más mockups HTML para las demás pantallas.
 
-## Después
+### Pendientes antes del gate
 
-3. Implementación React usando HF-01 como base de diseño.
-4. Desarrollo de resto de pantallas (Catálogo, Solicitud, etc.) directamente en React.
-5. Revisión desktop global en la app React.
-6. Responsive y Mobile directamente en React.
-7. Design System formal basado en componentes React.
+1. Auditoría visual profunda de HF-01.
+2. Resolver bugs visuales y rupturas responsive.
+3. Cerrar navegación/header, chat y accesibilidad.
+4. Verificar que la Home comunique tienda/producto, no solo dirección de arte.
+5. Aprobar formalmente HF-01.
 
-## Calidad
+## Preflight antes de React
 
-17. Jest + Testing Library.
-18. N8N workflows.
-19. API externa integrada.
-20. IA integrada.
-21. Auditoría responsive/accessibility.
-22. Build + coverage ≥ 70%.
+Cuando HF-01 sea aprobado, no saltar directamente a componentes. Primero cerrar:
 
-## Gate de React
+1. **Producto/negocio:** alcance, estados y reglas de `01–02`.
+2. **UX:** rutas y flujos de `03`.
+3. **Diseño:** tokens, responsive y accesibilidad de `04–05`.
+4. **Arquitectura:** estructura y límites de `06`.
+5. **Datos/API/auth:** contratos y normalización de `07`.
+6. **Testing:** estrategia y scripts reales de `09`.
+7. **Dependencias:** instalar únicamente las aprobadas y necesarias.
+8. **Gate final:** verificar que documentación y repo coincidan.
 
-No empezar React hasta que estén cerrados:
-- negocio + estados;
-- HF desktop aprobados;
-- Dark/Light aplicados;
-- accesibilidad definida;
-- API/JWT definidos;
-- modelo de datos normalizado.
+## Fase 4 — Fundaciones React
 
-No crear otro roadmap paralelo.
+Orden recomendado:
 
-## Histórico de actualizaciones
+1. limpiar scaffold Vite;
+2. aplicar tokens/estilos globales;
+3. crear App shell/layout;
+4. routing;
+5. providers;
+6. services/adapters y acceso a datos;
+7. primitives/components compartidos;
+8. Home fiel a HF-01;
+9. features por flujo de negocio;
+10. estados y errores;
+11. tests por bloque;
+12. revisión visual contra HF-01.
 
-### 2026-09-26
-- Corrección de estado: HF-01 NO está congelado y es el ÚNICO mockup HTML a iterar.
-- El resto de pantallas (incluyendo HF-02 y HF-05) se construirán directamente en React.
+## Fase 5 — Integraciones
 
-### 2026-09-25
-- HF-01 Home declarado falsamente congelado (revertido el 26).
-- HF-08 aprobado con observación menor (resuelta).
+- API externa.
+- JWT/auth.
+- JSON Server.
+- N8N.
+- IA.
+- archivos 3D.
 
-### 2026-09-24
-- HF-07 Carrito Híbrido congelado tras 2 iteraciones UXMagic.
-- Primera propuesta HF-08 auditada con ajustes importantes.
+Cada integración entra después de que exista su contrato y una prueba mínima.
+
+## Fase 6 — Cobertura del producto
+
+Completar las rutas y features restantes directamente en React, siguiendo `03`, `06` y los flujos de `02`.
+
+No crear una segunda colección de mockups HTML.
+
+## Fase 7 — Calidad y cierre
+
+- lint;
+- tests relevantes;
+- coverage objetivo definido en `09`;
+- build;
+- responsive;
+- accessibility;
+- estados vacíos/error/loading/processing;
+- revisión visual;
+- documentación final.
+
+## Definition of Done de React
+
+Una feature queda terminada solo si:
+- respeta el dominio;
+- usa las capas de `06`;
+- cubre estados relevantes;
+- funciona por teclado cuando aplica;
+- conserva identidad visual;
+- tiene tests relevantes;
+- pasa lint/build;
+- documenta decisiones nuevas.
+
+## Regla
+
+No avanzar por “tener algo funcionando”. Avanzar cuando el bloque actual tiene evidencia suficiente para no contaminar el siguiente.
