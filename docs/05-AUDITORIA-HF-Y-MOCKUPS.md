@@ -12,6 +12,14 @@ Auditoría global del 2026-09-24 sobre mockups de mockups/HFcompletos. Commit de
 
 React continúa bloqueado hasta cerrar los bloqueos.
 
+## Snapshot operativo — 2026-09-29
+
+- HF-01: **EN ITERACIÓN / NO CONGELADO**.
+- Fuente actual: `mockups/hf-01-home-definitivo.html`.
+- `mockups/hf-01-home.html` y `mockups/hf-01-home-remoto-pruebas.html` son referencias comparativas; no sobrescribir.
+- La auditoría vigente evalúa HF-01 como **mockup de máxima fidelidad para React**, no como código de producción.
+- El foco inmediato es: bugs visuales, jerarquía comercial, identidad, responsive, estados interactivos y calidad de craft.
+- No convertir una observación histórica en requisito actual sin comprobar su fecha y si fue posteriormente supersedida.
 ## Estado
 
 | HF | Pantalla | Estado |
