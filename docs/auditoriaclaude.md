@@ -1,5 +1,7 @@
 # Auditoría Completa del Repositorio — Vértice CR
 
+> **ESTADO: HISTÓRICO.** Este snapshot no es fuente de verdad actual. Ver `AGENTS.md`, `AI_CONTEXT.md` y `docs/01–10` antes de ejecutar cualquiera de sus recomendaciones.
+
 > **Fecha:** 2026-09-25 · **Rama:** `Pruebas` · **Commit HEAD:** `968839e`
 > **Fase declarada:** 3 — auditoría HF + cierre visual/UX · **React: BLOQUEADO**
 
