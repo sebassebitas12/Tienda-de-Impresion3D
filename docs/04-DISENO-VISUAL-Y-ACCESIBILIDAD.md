@@ -279,6 +279,11 @@ Esta sección consolida las decisiones de diseño, ingeniería visual y accesibi
 | **3D-ego (CR)** | Competidor Local | [3degocr.com](https://www.3degocr.com/) | Benchmark mercado nacional Costa Rica. |
 | **Acro 3D Print (CR)** | Competidor Local | [acro3dprint.com](https://acro3dprint.com/) | Benchmark mercado nacional Costa Rica. |
 | **Factory 3D CR (CR)** | Competidor Local | [factory3dcr.com](https://factory3dcr.com/) | Benchmark mercado nacional Costa Rica. |
+| **GSAP** | Librería de Animación | [gsap.com](https://gsap.com/) | Secuencias de animación complejas, scroll triggers y manipulación avanzada del DOM a 60fps. |
+| **Anime.js** | Librería de Animación | [animejs.com](https://animejs.com/) | Animaciones ligeras basadas en keyframes, SVG paths y orquestación de timelines. |
+| **Motion.dev (Framer Motion)** | Librería React | [motion.dev](https://motion.dev/) | Físicas de resorte (springs), animaciones de layout compartidas, exit animations y micro-interacciones para React. |
+| **React Spring** | Librería React | [react-spring.dev](https://react-spring.dev/) | Físicas puras basadas en resortes fluidos, ideal para interpolaciones físicas reactivas. |
+| **21st.dev** | Componentes React | [21st.dev](https://21st.dev/) | Repositorio de micro-interacciones avanzadas, inspiración en craft de código y diseño premium. |
 
 ---
 

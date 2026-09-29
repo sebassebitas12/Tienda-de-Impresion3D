@@ -81,12 +81,12 @@ Los siguientes repositorios están documentados en `docs/04-DISENO-VISUAL-Y-ACCE
 
 | Skill | Repo / Fuente | Aplicación |
 |---|---|---|
-| Físicas de animación | [Emil Kowalski / skills](https://github.com/emilkowalski/skills) | Curvas, tiempos, `will-change`, 60 fps, `prefers-reduced-motion` |
+| Físicas y Animación | [Emil Kowalski / skills](https://github.com/emilkowalski/skills) + [Motion.dev](https://motion.dev/) + [GSAP](https://gsap.com/) + [React Spring](https://react-spring.dev/) + [Anime.js](https://animejs.com/) | Curvas, tiempos, físicas de resortes (springs), orquestación compleja, 60 fps, `prefers-reduced-motion` |
 | Craft anti-slop | [Impeccable](https://github.com/pbakaus/impeccable) + [stop-slop](https://github.com/hardikpandya/stop-slop) | Prohibiciones de clichés, narrativa editorial, craft visual |
 | Layout y tokens | [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) + [taste-skill](https://github.com/senlindesign/taste-skill) + [design.md](https://github.com/google-labs-code/design.md) | Geometría, paleta, spotlight interactivo |
 | Accesibilidad | [W3C WAI-ARIA APG](https://www.w3.org/WAI/ARIA/apg/) + [MDN Accessibility](https://developer.mozilla.org/en-US/docs/Web/Accessibility) | WCAG 2.2 AA, patrones de teclado, contraste |
 | Copywriting técnico | [Humanizer](https://github.com/blader/humanizer) | Voz de taller costarricense, sin clichés de IA |
-| Referencia visual | [Godly](https://godly.design/sites/) + [Awwwards: Menu Navigation](https://www.awwwards.com/inspiration/menu-navigation-disrupt) + [Siteinspire](https://www.siteinspire.com/) + [Land-book](https://land-book.com/) + [Refero](https://styles.refero.design/) + [React Bits](https://reactbits.dev/) | Dirección de arte, navegación, composición completa y responsive |
+| Referencia visual y UI | [Godly](https://godly.design/sites/) + [Awwwards](https://www.awwwards.com/) + [Refero](https://styles.refero.design/) + [21st.dev](https://21st.dev/) + [React Bits](https://reactbits.dev/) | Dirección de arte, micro-interacciones premium, composición completa y catálogos de React |
 | Paneles y accesibilidad | [Radix Dialog](https://www.radix-ui.com/primitives/docs/components/dialog) + [Radix Popover](https://www.radix-ui.com/primitives/docs/components/popover) + [W3C APG Dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) | Capas, colisiones, foco, teclado y decisiones modal/no modal |
 
 **Al diseñar o iterar cualquier pantalla, consultar estos repos y aplicar los criterios documentados en doc 04.**
