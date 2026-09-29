@@ -213,3 +213,13 @@ Cada botón, menú, dropdown, y tarjeta de producto deberá estar infundido con 
 - **Animaciones y Transiciones Fluidas:** Toda aparición (dropdowns, modales, alertas) debe entrar escalando (`transform: scale(0.96)`) y desvaneciéndose fluidamente, NUNCA apareciendo de golpe con `display: block` sin transición.
 - **Interacciones Táctiles:** Cada hover sobre elementos cliqueables debe producir un resultado táctil: íconos SVG que se escalan, se mueven (ej. flechas), o rotan suavemente.
 - **Vara de Calidad React:** A partir de ahora, todas las iteraciones de React que reemplacen al HTML puro deberán mantener (o mejorar) este mismo nivel de craft. Este esfuerzo visual es donde el usuario pide "canalizar gran parte de la energía".
+
+### Punto de pausa y traspaso de guardia - Fin de sesión 2026-09-28
+
+**Estado al cerrar la sesión:**
+1. **Chatbot (Visual):** El rediseño visual del panel flotante del Vértice Brain fue implementado con éxito en `mockups/hf-01-home-definitivo.html` aislando su CSS con `<style id="ai-chat-style">` (ubicado a partir de la línea ~1059) y aplicando `!important` para sortear el CSS global heredado. El panel ahora tiene dimensiones correctas, usa "Obsidian Precision Forge", se ancla 120px arriba para no tapar los triggers, y el botón de submit recuperó su forma ovalada `pill` con el texto visible. El usuario aprueba esta estética.
+2. **Documentación:** Se formalizaron e inyectaron las referencias premium de animación en `AI_CONTEXT.md` y `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md` (GSAP, Anime.js, Framer Motion, React Spring, 21st.dev). Se definió a **Framer Motion** como herramienta clave para cumplir el "Mandato Reactbits". El código se comiteó y pusheó a la rama `Pruebas`.
+
+**Qué debe hacer la próxima IA al retomar (Mañana):**
+1. **Chatbot (Funcionalidad):** El diseño visual está listo, pero el usuario indicó que falta **iterar la funcionalidad (comportamiento JS/lógica)** del panel de chat y del panel de accesibilidad (ej. que la IA responda, que se abra el panel de ayuda, etc.). *Nota del usuario antes de dormir: "aun debemos iterar el chatbot y accesibilidad pero todavia no"*.
+2. Cuando el usuario despierte y pida continuar, pregúntale si quiere **empezar directamente con la lógica JS del chatbot en el HTML** o si quiere avanzar con la arquitectura/React, recordando que React sigue bloqueado hasta tener el HTML y la arquitectura de API cerrados. No toques el CSS del chatbot a menos que el usuario lo pida explícitamente, ya que está aprobado visualmente.
