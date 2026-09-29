@@ -12,6 +12,10 @@ Cobertura mínima objetivo:
 - lines >= 70%;
 - statements >= 70%.
 
+## Estrategia
+
+La prueba sigue la misma dirección que la arquitectura: cuanto más pura y estable sea una pieza, antes se prueba; los flujos completos se validan después.
+
 ## Orden
 
 1. utils y reglas puras;
@@ -20,9 +24,14 @@ Cobertura mínima objetivo:
 4. hooks;
 5. componentes críticos;
 6. flujos;
-7. errores;
-8. coverage;
-9. build/lint.
+7. errores y estados vacíos;
+8. accesibilidad/interacción crítica;
+9. coverage;
+10. build/lint.
+
+## Preflight de scripts
+
+No documentar comandos como ejecutables hasta que existan en `package.json`. Antes de la primera feature React, deben estar definidos como mínimo los scripts reales para lint, build y test; luego añadir watch/coverage según la estrategia acordada.
 
 ## Casos críticos
 
