@@ -269,3 +269,13 @@ En HF-01 se rehízo el buscador como popover pequeño anclado al header con marc
 La captura elegida es el popover “Mi Espacio” ya presente en el HTML; el navegador local estaba a 937 px y caía en la variante de navegación completa, activada hasta 1120 px. Como a 821–1120 px los enlaces centrales siguen visibles, se ajustó el breakpoint de interacción: `>820px` usa el popover de cuenta y `<=820px` conserva la lista plegable móvil. Captura posterior a 937 px y prueba móvil/Escape pendientes. Mantener el dropdown elegido como la referencia del estado tablet/desktop; HF-01 sigue EN ITERACIÓN y React bloqueado.
 
 **Verificación posterior:** a 937×572 se capturó el panel compacto abierto (296×274 px), sin la lista de navegación duplicada. `Escape` actualizó los estados ARIA a cerrado y devolvió el foco al disparador. Falta revisar la rama `<=820px` con captura; HF-01 no está congelado.
+
+### Punto de pausa y traspaso de guardia local — 2026-09-29
+
+**Estado actual:**
+El usuario iteró los detalles visuales faltantes del Chatbot, Accesibilidad y Menú en `mockups/hf-01-home-definitivo.html` (comiteado bajo el mensaje `hmtlhome01 para revicion de congelamiento`) y solicitó una **auditoría estrictamente visual** (espaciado, estética, alineación según "Obsidian Precision Forge") para determinar si la pantalla ya puede "congelarse". Debido a una limitación de red con Playwright, se pausó la revisión para continuar en otro entorno local.
+
+**Qué hacer al retomar (Siguiente IA):**
+1. Realizar o solicitar la revisión visual del Chatbot, Accesibilidad y Menú Hamburguesa. Validar que no haya textos muy grandes, botones deformes ni exceso de bordes (anti-slop).
+2. Si la revisión es aprobada por el usuario, **declarar HF-01 formalmente CONGELADO**.
+3. Iniciar el traspaso a React (Fase 4 del Roadmap) o definir el cierre de Arquitectura/API (Fase 3), según la prioridad del usuario.
