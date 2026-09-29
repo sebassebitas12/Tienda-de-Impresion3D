@@ -579,68 +579,67 @@ En HF-01, idioma y tamaño de texto son interacciones de demostración limitadas
 
 ---
 
-## Auditoría de craft visual, coherencia y conversión — 2026-09-29
+## Auditoría visual orientada a fidelidad HF-01 → React — 2026-09-29
 
-**Objetivo del relevo:** evaluar HF-01 como futura referencia visual de React, no solo como HTML funcional. El criterio es que Vértice se perciba como una tienda de impresión 3D premium y técnicamente creíble, con identidad propia, producto protagonista y una interfaz moderna que convierta por percepción sin inventar capacidades.
+Esta revisión trata `hf-01-home-definitivo.html` exclusivamente como **mockup de máxima fidelidad para el futuro React**. No se evalúa con el estándar de código de producción: la pregunta es si la experiencia visual, la composición, la identidad y los estados están suficientemente bien resueltos como para convertirse en la fuente de verdad del frontend.
 
-### Diagnóstico general
+### Criterio usado
 
-HF-01 ya tiene una dirección visual reconocible y superior a un landing genérico: marca real, tipografía coherente, workbench, retícula, acento Lava, producto grande, catálogo y microinteracciones. Sin embargo, el HTML está entrando en una fase de deuda de override visual: el archivo tiene 1772 líneas y la misma superficie recibe múltiples capas sucesivas de CSS con numerosos !important, radios y colores fuera de los tokens. Esto no es un problema de que el diseño sea complejo; es un problema de que el mismo diseño está siendo reescrito varias veces y puede producir regresiones silenciosas.
+Se cruzó el mockup actual con:
+- el mood aprobado **Obsidian Precision Forge + Lava Orgánica**;
+- el criterio anti-slop de Impeccable y los principios de frontend-design de Anthropic: evitar plantillas, adornos sin función, movimiento genérico y composición repetitiva;
+- taste-skill y UI/UX Pro Max como referencia para decisiones concretas de spacing, jerarquía, densidad y design DNA;
+- Godly, Awwwards, Siteinspire, Land-book, Commerce Cream, Mobbin, Refero, Pageflows y Codrops como benchmark de páginas completas, ecommerce, navegación y experiencias de producto;
+- Radix / React Aria / Vercel Web Interface Guidelines para que los comportamientos previstos puedan trasladarse después a React sin romper la experiencia.
 
-El objetivo de las siguientes iteraciones debe ser: **más carácter comercial, menos dashboard técnico disfrazado de Home**. La sofisticación debe venir de composición, producto, fotografía, jerarquía, movimiento con propósito y microinteracciones; no de acumular indicadores, líneas de escaneo, estados ficticios o métricas ornamentales.
+### Lo que ya funciona
 
-### Hallazgos bloqueantes / de alta prioridad
+**La identidad existe.** No parece una tienda genérica de impresión 3D: el workbench, la paleta oscura, el Lava, la retícula, la tipografía y los detalles técnicos forman un lenguaje propio.
 
-**1. El sexto producto rompe la ilusión de tienda real.** `PRT-006` usa placeholder-product.jpg y copy explícito de fallback/demo. Aunque técnicamente sea válido para un mockup, visualmente comunica “prototipo incompleto” justo dentro de la sección que debe vender. Para la versión de referencia debe utilizarse una imagen de producto real del banco o reducir el catálogo a piezas visualmente resueltas.
+**El hero tiene un concepto reconocible.** La pieza grande, el panel técnico, el riel de miniaturas y el movimiento de pointer hacen que el objeto se sienta físico. Esto está alineado con el principio de Anthropic de abrir la página con la característica más propia del dominio, no con un hero SaaS genérico.
 
-**2. La Home todavía contiene señales técnicas que no deben convertirse automáticamente en claims comerciales.** El HTML muestra ±0.05 mm, FDM / SLA, GAM + 7 provincias, CORREOS DE COSTA RICA, RESINA 8K, conteos de stock y otros datos específicos. Algunos aparecen en historial de auditoría, pero no están consolidados como contrato en los documentos de producto/negocio. docs/01, 02 y 07 obligan a no inventar capacidades, y docs/01 declara fuera de esta entrega la logística integrada. Antes de congelar HF-01, cada dato visible debe clasificarse como respaldado por modelo/documentación, dato demo claramente marcado, o eliminado.
+**El catálogo tiene material para vender visualmente.** Las fotografías/product shots, tags de material y microinteracciones ya generan una sensación de taller/producto. El siguiente salto no es agregar más tarjetas: es elevar la presentación de cada objeto.
 
-**3. El tema Light no cumple de forma segura la regla de contraste para texto.** El HTML usa --lava:#c9450d sobre --ink:#f4f0e9: contraste aproximado 4.26:1, inferior al objetivo 4.5:1 para texto normal definido en este documento. --lava-light:#e25f2a sobre ese fondo queda alrededor de 3.13:1, por lo que no debe utilizarse como texto normal en Light. El acento oscuro puede seguir funcionando para UI donde aplique 3:1, pero el texto necesita una variante más oscura. Verificar visualmente antes de convertir tokens del mockup en Design System.
+**Los paneles ya dejaron de sentirse completamente genéricos.** Chat y accesibilidad tienen una firma visual propia y el chatbot está integrado al lenguaje de workbench. Esto es más valioso que añadir efectos adicionales.
 
-**4. Los switches de accesibilidad tienen una semántica inconsistente.** El HTML usa botones con aria-pressed, mientras el JS actualiza aria-checked; además no aparece role=switch. La documentación ya decidió role=switch + aria-checked como patrón. Es un defecto concreto que debe corregirse antes de considerar terminado el panel.
+### Hallazgos visuales que sí importan
 
-**5. El trigger de hamburguesa cambia de función según breakpoint, pero su aria-controls no cambia.** #menu-toggle declara aria-controls=mobile-menu aunque en desktop abre #account-menu-panel. Es una inconsistencia semántica real. Además #account-menu-panel usa role=menu para un patrón que visualmente se comporta más como popover de cuenta. La solución debe ser un patrón de disclosure/popover coherente, o actualizar el estado semántico según contexto.
+**1. El hero todavía concentra demasiadas señales simultáneas.** Scan line, estado, coordenadas, nota técnica, línea de líder, meta inferior, riel y parallax son buenos ingredientes individualmente. Juntos, existe riesgo de que el usuario mire primero la interfaz y después el producto. La dirección correcta es que el producto gane la batalla visual y que la instrumentación aparezca como evidencia secundaria. Codrops muestra ejemplos recientes donde la interactividad 3D y los efectos se usan para profundizar la percepción del objeto, no para competir con él. citeturn360901search1turn360901search2
 
-### Coherencia de identidad
+**2. El catálogo aún se siente algo panel de piezas y no suficiente tienda.** Los códigos REF, tolerancias, tags, stock y categorías construyen credibilidad técnica, pero la presentación debe hacer que uno quiera tocar/comprar/abrir la ficha. Una mejora futura para React es reforzar la relación **imagen → nombre → beneficio/uso → acción**, dejando los metadatos técnicos como segunda capa.
 
-**6. El sistema geométrico se ha expandido demasiado.** La especificación base usa 2px / 6px / 12px / pill, con excepciones justificadas. El HTML actual contiene radios desde 2px hasta 28px, además de 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 16, 18, 22 y múltiples radios asimétricos. Los cantos facetados pueden ser una firma de Vértice, pero deben convertirse en una excepción documentada y no en una acumulación de valores por iteración.
+**3. El sexto producto con `placeholder-product.jpg` y `FALLBACK DEMO` es un bug visual del mockup, aunque no sea un bug de producción.** Al verse dentro del mismo grid, rompe la ilusión de catálogo final. Para una maqueta que debe representar el futuro sitio, este estado debe desaparecer o ser convertido en un estado deliberadamente diseñado como “próximamente”, no como fallback técnico.
 
-**7. La cascada CSS se está convirtiendo en riesgo visual.** Existen numerosas redefiniciones finales para #chat-panel, #search-panel, .mobile-menu, .floating-panel, etc. con !important. Esto permite iterar rápido, pero ya dificulta saber cuál es el estilo real. Antes de pasar a React, la versión aprobada debe consolidar los estilos en una sola capa final para que HF-01 sea una especificación legible y reproducible.
+**4. La geometría sí está creando identidad, pero hay demasiadas excepciones.** No hace falta que todo tenga el mismo radio —eso sería genérico—, pero las variantes deben sentirse intencionales. Conviene separar visualmente tres familias: superficies estructurales, controles y cantos facetados de Vértice. La irregularidad debe parecer diseñada, no acumulada.
 
-**8. La navegación pública no coincide con el contrato documental actual.** El HTML muestra Inicio / Tienda / Método / Precisión, mientras docs/03-UX-Y-FLUJOS.md define la navegación pública base como Inicio / Tienda / Sobre nosotros / Contáctenos y mantiene FAQ como ruta pública. Esto debe resolverse antes de congelar porque la navegación es parte de la arquitectura de información.
+**5. El uso de micro-etiquetas técnicas necesita más disciplina.** El proyecto ya documenta que labels, numeración y divisores deben comunicar información y no simplemente decorar. El mockup tiene varias capas de WORKBENCH, REF, tags, separadores y nomenclatura. No hay que eliminarlos todos; hay que asegurar que cada uno responda una pregunta real del usuario.
 
-### Conversión / vender por cómo se ve
+**6. El movimiento necesita una jerarquía.** Actualmente hay hero entrance, reveal sections, parallax, scan, pulse y micro-hover. La referencia correcta no es más animación, sino mejor coreografía. Impeccable y Anthropic coinciden en evitar la suma de pequeños movimientos genéricos y reservar el movimiento para orientar, confirmar o crear un momento memorable. urlImpeccablehttps://impeccable.style/
 
-**9. El catálogo tiene demasiado lenguaje de inventario y poco lenguaje de producto.** Los códigos REF, tolerancias, tags y estados construyen una estética técnica fuerte, pero en conjunto pueden hacer que la Home se perciba como un panel de inventario. La primera pieza debería tener más jerarquía visual y narrativa; las demás pueden funcionar como una galería curada. Formlabs es una referencia útil: el producto/resultado ocupa el centro y los atributos técnicos apoyan una propuesta de valor clara. https://formlabs.com/3d-printers/form-4l/
+**7. El CTA principal todavía puede sentirse más de ecommerce especializado.** `Explorar piezas` funciona, pero la página debería producir rápidamente una sensación de “quiero ver qué venden” y no solamente “quiero explorar este experimento visual”. La respuesta no necesariamente es cambiar el texto: puede ser hacer que la primera interacción con el hero y el catálogo revele producto/uso con más fuerza.
 
-**10. Falta una capa de confianza que no dependa de métricas inventadas.** La secuencia actual Hero → catálogo → método → precisión → cotización es buena, pero la sección de precisión vuelve a cargar la narrativa de números. Parte de ese espacio debería usar señales sustentadas por el proyecto: revisión humana, selección de material según uso, cotización antes de producción y separación entre producto terminado y solicitud personalizada. No hace falta inventar clientes, porcentajes ni volumen.
+### Oportunidades fuertes para el futuro React
 
-**11. El hero tiene excelentes ingredientes, pero algunos efectos parecen teatro técnico.** scan-line, REVISIÓN ACTIVA, pulsos de estado, coordenadas y múltiples marcas de workbench construyen atmósfera, pero demasiados elementos en movimiento hacen que la página parezca una simulación. Awwwards muestra casos de ecommerce/3D donde el movimiento se integra al descubrimiento del producto, no como decoración independiente. La meta debe ser hacer que el producto se sienta físico. https://www.awwwards.com/inspiration/easy-search-and-navigation-digitron-3d-immersive-site
+**Producto primero.** El componente de producto debería poder cambiar de estado con imagen, variante, material y acción sin perder la composición visual.
 
-**12. Los CTAs están bien encaminados, pero el CTA del header es más estrecho que el flujo documentado.** Cotizar STL puede interpretarse como “solo STL”, mientras la documentación actual todavía requiere alinear formatos y contrato de upload. El nombre final debe coincidir con la capacidad aprobada.
+**Hover/interaction con consecuencia.** En vez de agregar más efectos a las tarjetas, una interacción podría revelar un segundo ángulo, material, pequeña ficha técnica o transición de imagen. Codrops tiene referencias actuales de grids de producto donde el movimiento cambia la percepción del producto y no solo desplaza una tarjeta. citeturn360901search0turn360901search7
 
-**13. Los iconos flotantes todavía se sienten como prototipo.** ✦ y ♿ como caracteres Unicode pueden variar por sistema operativo y tienen un peso visual distinto al resto de la iconografía. Para React deben convertirse en SVG consistente con el stroke del producto.
+**Descubrimiento progresivo.** El hero puede seguir siendo editorial, pero el usuario debería entender muy rápido que está ante una tienda. La experiencia ideal es: impacto visual → descubrir objeto → entender para qué sirve → entrar a ficha/cotizar.
 
-### Búsqueda
+**Profundidad visual sin Three.js en el hero.** La decisión documentada sigue siendo correcta: usar composición, fotografía, parallax ligero, máscaras, motion y microinteracciones en Home; reservar el visor WebGL real para las rutas de producto y solicitud.
 
-La dirección actual del buscador compacto es correcta y evita tapar el hero. Algolia recomienda autocomplete rápido, relevante y operable por teclado; para una tienda, esto sugiere evolucionar el resultado visual hacia producto + miniatura + material/referencia, en lugar de una lista tipo tabla. En React deberá añadirse navegación por teclado y estado activo real. https://www.algolia.com/products/features/search-autocomplete
+**Responsive como reinterpretación, no reducción.** En 375/768 el objetivo no es encoger el desktop: hay que conservar la firma visual y elegir qué elementos sobreviven. El riel vertical, metadatos, copy y decoraciones pueden cambiar de composición sin perder la identidad.
 
-### Referencias externas aplicadas al criterio
+### Referencia anti-slop
 
-- Formlabs: producto y beneficio primero; atributos técnicos como evidencia de valor. https://formlabs.com/3d-printers/form-4l/
-- Awwwards / DIGITRON: búsqueda, 3D products y shopping como experiencia de descubrimiento. https://www.awwwards.com/inspiration/easy-search-and-navigation-digitron-3d-immersive-site
-- Awwwards / E-Comm 43: navegación, producto y responsive pensados conjuntamente para ecommerce. https://www.awwwards.com/inspiration/sidebar-menus-e-comm-43-shopify-experience
-- Algolia Autocomplete: sugerencias, resultados rápidos, teclado y descubrimiento contextual. https://www.algolia.com/products/features/search-autocomplete
-- Vercel Web Interface Guidelines: foco visible, gestión de foco, targets móviles de 44px y teclado. https://vercel.com/design/guidelines
+La revisión de Impeccable es especialmente útil porque identifica como señales de diseño generado: exceso de tarjetas, sombras repetidas, etiquetas decorativas, icon tiles y movimientos distribuidos sin propósito. El propio skill recomienda gastar la audacia en un lugar y mantener el resto disciplinado. Ese principio encaja muy bien con Vértice: **el objeto/proceso debe ser el gran protagonista; la interfaz tiene que sostenerlo, no competir con él.** urlImpeccablehttps://github.com/pbakaus/impeccable
 
-### Prioridad de la siguiente pasada
+### Referencia de diseño distintivo
 
-1. Eliminar FALLBACK DEMO / placeholder de la experiencia comercial.
-2. Resolver claims/datos visibles contra la documentación oficial.
-3. Corregir Light contrast y semántica de switches.
-4. Corregir contrato aria del menú responsive.
-5. Limpiar la cascada CSS y consolidar tokens/geométricas.
-6. Reforzar catálogo y hero para deseo de producto, no solo precisión técnica.
-7. Auditar visualmente 375 / 768 / 1280 en Dark + Light antes de congelar.
+Anthropic frontend-design plantea que la identidad debe salir del dominio y que los elementos estructurales solo deben existir cuando transmiten información. Para Vértice eso significa que la retícula, geometría, numeración técnica y nomenclatura deben parecer nacidas del taller, no pegadas encima como decoración. urlAnthropic frontend-designhttps://github.com/anthropics/skills/tree/main/skills/frontend-design
 
-**Estado:** HF-01 continúa EN ITERACIÓN / NO CONGELADO.
+### Estado
+
+**HF-01 sigue EN ITERACIÓN.**
+
+El mockup ya tiene una identidad visual fuerte. El siguiente salto no consiste en meter más cosas: consiste en **afinar jerarquía, producto, composición, movimiento y deseo comercial**. Antes de congelarlo, la auditoría debe buscar específicamente bugs visuales, desequilibrios de espacio, elementos que compitan con el producto, responsive defectuoso y estados que parezcan placeholders.
