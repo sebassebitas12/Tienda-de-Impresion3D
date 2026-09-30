@@ -771,3 +771,17 @@ Referencias:
 - https://tympanus.net/codrops/2017/02/08/inspiration-search-ui-effects/
 
 Regla: extraer **una interacción reusable** por referencia; rechazar demos que añadan dependencia, ruido o falsos datos.
+
+
+#### Aplicación 02 — enlaces, navegación y focus-within
+
+Patrones extraídos:
+- **Motion Primitives / Animated Background:** la interacción debe ayudar a seguir el elemento activo/hover, no llamar atención por sí sola.
+- **Codrops / CSS line + button hover:** una línea, desplazamiento o relleno interno corto puede dar respuesta táctil sin cambiar la geometría base.
+
+Aplicación Vértice:
+- NavLink: micro-lift de 1 px + línea lava con easing, equivalente en hover y focus-visible.
+- LinkText: subrayado que se revela + flecha que se desplaza 2 px.
+- IconButton: hover/focus coherentes y press más físico.
+- ProductCard, Método y Precisión: `:focus-within` recibe el mismo feedback visual que hover para no privilegiar mouse.
+- Sin librerías nuevas; todo CSS y respetando reduced motion.
