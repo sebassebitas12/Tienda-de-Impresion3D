@@ -1,152 +1,360 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Button, 
-  RevealOnScroll, 
-  ProductCard, 
-  SectionBlock, 
-  SignalMetric 
+import {
+  Button,
+  RevealOnScroll,
+  ProductCard,
+  SectionBlock
 } from '../components/ui/index.js';
-import { usePreferences } from '../hooks/usePreferences.js';
-import { useTheme } from '../hooks/useTheme.js';
 import '../styles/home.css';
 
+const heroPieces = [
+  {
+    image: '/images/hero-soporte.jpg',
+    alt: 'Soporte modular de carga en PETG',
+    material: 'PETG PRO',
+    process: '/ ESTRUCTURA LATTICE',
+    title: 'Soporte Modular de Carga',
+    description: 'Estructura mecánica con alivios lattice de alta rigidez',
+    ref: 'REF: PRT-001',
+    tolerance: '±0.05 mm',
+    target: 'M 0 0 L 45 0 L 155 93',
+    dot: [155, 93],
+    label: 'Pieza 1, soporte modular'
+  },
+  {
+    image: '/images/producto-engranaje.jpg',
+    alt: 'Engranaje helicoidal de precisión en nylon',
+    material: 'NYLON PA12',
+    process: '/ MÓDULO 2.0',
+    title: 'Engranaje Helicoidal 60T',
+    description: 'Transmisión de bajo ruido para ciclos mecánicos continuos',
+    ref: 'REF: PRT-002',
+    tolerance: 'MÓDULO 2.0',
+    target: 'M 0 0 L 45 0 L 138 76',
+    dot: [138, 76],
+    label: 'Pieza 2, engranaje helicoidal'
+  },
+  {
+    image: '/images/producto-dragon.jpg',
+    alt: 'Dragón geométrico articulado',
+    material: 'PLA SILK',
+    process: '/ ACABADO IRIDISCENTE',
+    title: 'Dragón de Colección',
+    description: 'Escultura de facetas con articulaciones internas continuas',
+    ref: 'REF: PRT-003',
+    tolerance: 'ARTICULADO',
+    target: 'M 0 0 L 45 0 L 148 101',
+    dot: [148, 101],
+    label: 'Pieza 3, dragón geométrico'
+  },
+  {
+    image: '/images/producto-drone.jpg',
+    alt: 'Brazo de chasis de drone en ASA',
+    material: 'ASA CARBON',
+    process: '/ RESISTENCIA UV',
+    title: 'Brazo de Chasis Drone',
+    description: 'Estructura tubular para motor brushless y alto impacto',
+    ref: 'REF: PRT-004',
+    tolerance: 'RESISTENCIA UV',
+    target: 'M 0 0 L 45 0 L 128 70',
+    dot: [128, 70],
+    label: 'Pieza 4, brazo de drone'
+  }
+];
+
+const temporaryProductImage = '/images/producto-temporal.png';
+
+const featuredProducts = [
+  {
+    id: 'p1',
+    reference: 'REF: PRT-001 · ±0.05 MM',
+    name: 'Soporte de Alta Precisión Modular',
+    description: 'Geometría lattice optimizada con alivios de peso para montajes mecánicos y rigidez estructural.',
+    material: 'PETG PRO',
+    categoryName: 'Piezas funcionales',
+    stock: 14,
+    stockLabel: 'EN STOCK (14)',
+    stockStatus: 'in-stock',
+    status: 'ACTIVE',
+    images: [temporaryProductImage]
+  },
+  {
+    id: 'p2',
+    reference: 'REF: PRT-002 · MÓDULO 2.0',
+    name: 'Engranaje de Nylon de Precisión 60T',
+    description: 'Dientes helicoidales para transmisión de bajo nivel sonoro y resistencia continua al desgaste.',
+    material: 'NYLON PA12',
+    categoryName: 'Mecánica / Robótica',
+    stock: 21,
+    stockLabel: 'EN STOCK (21)',
+    stockStatus: 'in-stock',
+    status: 'ACTIVE',
+    images: [temporaryProductImage]
+  },
+  {
+    id: 'p3',
+    reference: 'REF: PRT-003 · IRIDISCENTE',
+    name: 'Dragón de Colección Geométrico',
+    description: 'Escultura low-poly con articulaciones internas continuas, impresa en una sola pieza móvil.',
+    material: 'PLA SILK',
+    categoryName: 'Colección / Arte',
+    stock: 0,
+    stockLabel: 'BAJO PEDIDO',
+    stockStatus: 'order',
+    status: 'ACTIVE',
+    images: [temporaryProductImage]
+  },
+  {
+    id: 'p4',
+    reference: 'REF: PRT-004 · RESISTENCIA UV',
+    name: 'Brazo de Chasis de Drone Pro',
+    description: 'Estructura tubular con montura para motor brushless y amortiguación elástica de impacto.',
+    material: 'ASA CARBON',
+    categoryName: 'Aeroespacial / Drones',
+    stock: 8,
+    stockLabel: 'EN STOCK (8)',
+    stockStatus: 'in-stock',
+    status: 'ACTIVE',
+    images: [temporaryProductImage]
+  },
+  {
+    id: 'p5',
+    reference: 'REF: PRT-005 · CAPA 0.08 MM',
+    name: 'Maqueta de Rascacielos Cúbico',
+    description: 'Modelo arquitectónico de precisión con vanos definidos, terrazas y textura de fachada limpia.',
+    material: 'PLA HIGH DETAIL',
+    categoryName: 'Arquitectura',
+    stock: 0,
+    stockLabel: 'BAJO PEDIDO',
+    stockStatus: 'order',
+    status: 'ACTIVE',
+    images: [temporaryProductImage]
+  },
+  {
+    id: 'p6',
+    reference: 'REF: PRT-006 · TEMPORAL',
+    name: 'Busto de Precisión Cibernético',
+    description: 'Referencia temporal del catálogo mientras se incorporan fotografías reales de producto.',
+    material: 'RESINA 8K',
+    categoryName: 'Prototipo',
+    stock: 1,
+    stockLabel: 'NUEVO LOTE',
+    stockStatus: 'in-stock',
+    status: 'ACTIVE',
+    images: [temporaryProductImage]
+  }
+];
+
 export function Home() {
-  const { copy } = usePreferences();
-  
-  // Example dummy products for the catalog highlight
-  const featuredProducts = [
-    { id: '1', ref: 'PRT-006', name: 'Soporte Estructural Articulado', description: 'Pieza de carga de alto rendimiento para ensamblajes.', material: 'PETG CF', category: 'Ingeniería', stock: 12, price: 18500, image: '/placeholder.jpg' },
-    { id: '2', ref: 'MEC-012', name: 'Engranaje Helicoidal', description: 'Transmisión de fuerza silenciosa y precisa.', material: 'Nylon 12', category: 'Mecánica', stock: 5, price: 24000, image: '/placeholder.jpg' },
-    { id: '3', ref: 'CUS-099', name: 'Carcasa Protectora IP67', description: 'Protección contra polvo y agua para sensores.', material: 'TPU 95A', category: 'Electrónica', stock: 0, price: 15000, image: '/placeholder.jpg' }
-  ];
+  const [activePiece, setActivePiece] = useState(0);
+  const visualRef = useRef(null);
+  const photoWrapRef = useRef(null);
+  const piece = heroPieces[activePiece];
+
+  useEffect(() => {
+    const visual = visualRef.current;
+    const photoWrap = photoWrapRef.current;
+    if (!visual || !photoWrap) return undefined;
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (reducedMotion.matches) return undefined;
+
+    const resetMotion = () => {
+      visual.style.setProperty('--pointer-x', '50%');
+      visual.style.setProperty('--pointer-y', '50%');
+      visual.style.setProperty('--note-x', '0px');
+      visual.style.setProperty('--note-y', '0px');
+      photoWrap.style.setProperty('--tilt-x', '0deg');
+      photoWrap.style.setProperty('--tilt-y', '0deg');
+      photoWrap.style.setProperty('--parallax-x', '0px');
+      photoWrap.style.setProperty('--parallax-y', '0px');
+    };
+
+    const handlePointerMove = (event) => {
+      const rect = visual.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - 0.5;
+      const y = (event.clientY - rect.top) / rect.height - 0.5;
+
+      visual.style.setProperty('--pointer-x', `${((x + 0.5) * 100).toFixed(1)}%`);
+      visual.style.setProperty('--pointer-y', `${((y + 0.5) * 100).toFixed(1)}%`);
+      visual.style.setProperty('--note-x', `${(x * -5).toFixed(2)}px`);
+      visual.style.setProperty('--note-y', `${(y * -5).toFixed(2)}px`);
+      photoWrap.style.setProperty('--tilt-x', `${(y * -2).toFixed(2)}deg`);
+      photoWrap.style.setProperty('--tilt-y', `${(x * 2).toFixed(2)}deg`);
+      photoWrap.style.setProperty('--parallax-x', `${(x * 8).toFixed(2)}px`);
+      photoWrap.style.setProperty('--parallax-y', `${(y * 8).toFixed(2)}px`);
+    };
+
+    visual.addEventListener('pointermove', handlePointerMove);
+    visual.addEventListener('pointerleave', resetMotion);
+
+    return () => {
+      visual.removeEventListener('pointermove', handlePointerMove);
+      visual.removeEventListener('pointerleave', resetMotion);
+    };
+  }, []);
+
+  const selectRelativePiece = (offset) => {
+    setActivePiece((current) => (current + offset + heroPieces.length) % heroPieces.length);
+  };
 
   return (
     <>
-      {/* 1. HERO WORKBENCH */}
-      <section className="hero">
+      <section className="hero" id="inicio" aria-labelledby="hero-title">
         <div className="hero-inner">
           <div className="hero-grid">
-            <RevealOnScroll className="hero-copy">
-              <div className="hero-kicker">
-                <span className="mono-label">SISTEMA EN LÍNEA</span>
-              </div>
-              <h1>Servicio de impresión 3D <em>preciso</em> para la industria.</h1>
+            <div className="hero-copy">
+              <div className="hero-kicker mono-label">Manufactura aditiva / San José, CR</div>
+              <h1 id="hero-title">Lo que imaginas.<br /><em>Hecho preciso.</em></h1>
               <p className="hero-lede">
-                Desde prototipos rápidos hasta lotes de piezas finales. 
-                Sube tu modelo, selecciona el material y recibe una cotización en horas.
+                Piezas funcionales, prototipos y objetos de alto detalle fabricados con criterio técnico,
+                materiales correctos y una revisión humana en cada etapa.
               </p>
               <div className="hero-actions">
-                <Button as={Link} to="/solicitud" variant="primary" className="btn-pill">
-                  Cotizar Archivo 3D <span aria-hidden="true">↗</span>
+                <Button as="a" href="#piezas" variant="primary" className="btn-pill">
+                  Explorar piezas <span aria-hidden="true">↓</span>
                 </Button>
-                <Button as={Link} to="/catalogo" variant="ghost" className="btn-pill">
-                  Ver Catálogo
+                <Button as={Link} to="/solicitud" variant="ghost">
+                  Tengo un archivo <span aria-hidden="true">↗</span>
                 </Button>
               </div>
-              <div className="hero-signals">
-                <div><span className="signal-value">±0.05 mm</span><span className="signal-text">Tolerancia dimensional</span></div>
-                <div><span className="signal-value">24-48h</span><span className="signal-text">Tiempo de respuesta</span></div>
-                <div><span className="signal-value">CR</span><span className="signal-text">Envío a todo el país</span></div>
+              <div className="hero-signals" aria-label="Capacidades principales">
+                <div><span className="signal-value">±0.05 mm</span><span className="signal-text">Tolerancia objetivo</span></div>
+                <div><span className="signal-value">FDM / SLA</span><span className="signal-text">Procesos disponibles</span></div>
+                <div><span className="signal-value">Por etapas</span><span className="signal-text">Revisión por etapas</span></div>
               </div>
-            </RevealOnScroll>
-            
-            <RevealOnScroll className="hero-visual" delay={100}>
-              {/* Aquí irá la foto del producto, las anotaciones SVG y el telemetría */}
-              <div className="hero-photo-wrap">
-                <div className="scan-line" />
-                <div className="visual-status"><i></i> SISTEMA ACTIVO</div>
+            </div>
+
+            <div className="hero-visual" ref={visualRef} aria-label="Pieza destacada interactiva">
+              <span className="visual-coordinate">WORKBENCH</span>
+              <div className="hero-photo-wrap" ref={photoWrapRef}>
+                <img
+                  className="hero-photo"
+                  src={piece.image}
+                  alt={piece.alt}
+                  width="700"
+                  height="560"
+                  fetchPriority="high"
+                  decoding="async"
+                />
+                <div className="scan-line" aria-hidden="true" />
+                <div className="visual-status" aria-hidden="true"><i /> REVISIÓN ACTIVA</div>
+                <div className="visual-note" aria-hidden="true">
+                  <strong>{piece.material}</strong>
+                  <span>{piece.process}</span>
+                </div>
+                <svg className="visual-note-line" viewBox="0 0 185 130" aria-hidden="true">
+                  <path d={piece.target} />
+                  <circle cx={piece.dot[0]} cy={piece.dot[1]} r="3" />
+                </svg>
                 <div className="visual-meta">
                   <div>
-                    <h2>Prototipo Funcional</h2>
-                    <p>PETG + Fibra de Carbono</p>
+                    <h2>{piece.title}</h2>
+                    <p>{piece.description}</p>
                   </div>
-                  <div className="visual-ref">REF<br/>PT-29A</div>
+                  <div className="visual-ref">{piece.ref}<br />{piece.tolerance}</div>
                 </div>
               </div>
-            </RevealOnScroll>
+
+              <div className="thumb-rail">
+                <button className="rail-arrow" type="button" aria-label="Pieza anterior" onClick={() => selectRelativePiece(-1)}>↑</button>
+                <div className="thumb-list" role="tablist" aria-label="Piezas destacadas">
+                  {heroPieces.map((item, index) => (
+                    <button
+                      key={item.ref}
+                      className={`thumb${index === activePiece ? ' is-active' : ''}`}
+                      type="button"
+                      role="tab"
+                      aria-selected={index === activePiece}
+                      aria-label={item.label}
+                      onClick={() => setActivePiece(index)}
+                    >
+                      <img src={item.image} alt="" loading="lazy" decoding="async" />
+                    </button>
+                  ))}
+                </div>
+                <button className="rail-arrow" type="button" aria-label="Pieza siguiente" onClick={() => selectRelativePiece(1)}>↓</button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 2. CATÁLOGO DESTACADO */}
-      <SectionBlock title="Piezas de Alta Demanda" kicker="01 / CATÁLOGO" description="Explora nuestros productos pre-diseñados listos para manufactura.">
+      <SectionBlock
+        id="piezas"
+        title={<>Objetos que<br />resuelven algo.</>}
+        kicker="Selección de taller"
+        description="Una selección de piezas funcionales y modelos de colección. El catálogo muestra referencias; la cotización ocurre después de revisar tu solicitud."
+      >
         <div className="catalog-grid">
-          {featuredProducts.map(product => (
+          {featuredProducts.map((product) => (
             <RevealOnScroll key={product.id}>
-              <ProductCard product={product} />
+              <ProductCard product={product} linkAs={Link} to={`/producto/${product.id}`} />
             </RevealOnScroll>
           ))}
         </div>
       </SectionBlock>
 
-      {/* 3. EL MÉTODO (MANIFIESTO) */}
       <section className="section manifesto">
         <div className="section-inner manifesto-grid">
           <RevealOnScroll className="manifesto-copy">
-            <h2 className="section-heading">Nuestra <span>precisión</span> es tu ventaja.</h2>
-            <p>
-              Controlamos cada variable del proceso, desde la humedad del filamento hasta 
-              la temperatura de la cámara de impresión, para asegurar que cada capa se 
-              fusione perfectamente.
-            </p>
+            <span className="mono-label">El método</span>
+            <h2>No imprimimos<br />por imprimir.<br /><span>Resolvemos.</span></h2>
+            <p>Una pieza empieza mucho antes de tocar la cama de impresión: revisamos geometría, esfuerzo, material y acabado para que el resultado tenga sentido fuera de la pantalla.</p>
           </RevealOnScroll>
           <div className="process-list">
             {[
-              { num: '01', title: 'Análisis Geométrico', desc: 'Evaluamos tu modelo buscando voladizos, puentes y áreas de tensión.' },
-              { num: '02', title: 'Selección de Material', desc: 'Asignamos el termoplástico correcto según los requerimientos mecánicos y térmicos.' },
-              { num: '03', title: 'Corte (Slicing) Optimizado', desc: 'Configuramos perímetros, relleno y orientación para maximizar la resistencia isotrópica.' },
-              { num: '04', title: 'Control de Calidad', desc: 'Verificación de tolerancia dimensional antes del envío.' }
-            ].map((step, idx) => (
-              <RevealOnScroll key={step.num} delay={idx * 100} className="process-item">
-                <span className="process-number">{step.num}</span>
-                <div>
-                  <h3>{step.title}</h3>
-                  <p>{step.desc}</p>
-                </div>
-                <span className="process-arrow">↗</span>
+              ['Entender el archivo', 'Revisión de malla, escala, orientación y puntos críticos.'],
+              ['Elegir el material', 'Definimos el polímero según esfuerzo, temperatura y acabado.'],
+              ['Fabricar con control', 'Impresión aditiva con supervisión y revisión dimensional.'],
+              ['Entregar una pieza lista', 'Curado, acabado, verificación y despacho seguro.']
+            ].map(([title, description], index) => (
+              <RevealOnScroll key={title} delay={index * 100} className="process-item">
+                <span className="process-number">{String(index + 1).padStart(2, '0')}</span>
+                <div><h3>{title}</h3><p>{description}</p></div>
+                <span className="process-arrow" aria-hidden="true">↗</span>
               </RevealOnScroll>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 4. SEÑALES / ESPECIFICACIONES */}
       <section className="section spec-section">
         <div className="section-inner">
           <div className="spec-grid">
             <RevealOnScroll className="spec-card">
-              <span className="spec-index">01.</span>
-              <h3>Tolerancias Industriales</h3>
-              <p>Logramos precisión dimensional de ±0.05 mm en piezas técnicas mediante la calibración constante de ejes lineales y flujo de extrusión.</p>
-              <span className="spec-chip">/ VOLUMEN MAX: 300x300x400mm</span>
+              <span className="spec-index">A / DIMENSIONAL</span>
+              <h3>±0.05 mm</h3>
+              <p>Tolerancia objetivo para piezas y ajustes que necesitan repetibilidad.</p>
+              <span className="spec-chip">VERIFICACIÓN MANUAL</span>
             </RevealOnScroll>
             <RevealOnScroll className="spec-card" delay={100}>
-              <span className="spec-index">02.</span>
-              <h3>Materiales de Ingeniería</h3>
-              <p>Trabajamos con polímeros avanzados como Nylon, TPU flexible, ASA resistente a UV, y compuestos reforzados con Fibra de Carbono.</p>
-              <span className="spec-chip">/ TEMP MAX: 300°C</span>
+              <span className="spec-index">B / MATERIALES</span>
+              <h3>Polímeros técnicos</h3>
+              <p>PETG, Nylon CF, ASA, PLA de detalle y resina para distintos usos.</p>
+              <span className="spec-chip">FDM + SLA</span>
             </RevealOnScroll>
             <RevealOnScroll className="spec-card" delay={200}>
-              <span className="spec-index">03.</span>
-              <h3>Prototipado a Producción</h3>
-              <p>Desde una pieza única para validación de concepto hasta lotes pequeños y medianos listos para uso final o ensamblaje.</p>
-              <span className="spec-chip">/ VOLUMEN: 1 - 500 uds</span>
+              <span className="spec-index">C / ENTREGAS</span>
+              <h3>GAM + 7 provincias</h3>
+              <p>Prototipado y entregas coordinadas desde San José, Costa Rica.</p>
+              <span className="spec-chip">CORREOS DE COSTA RICA</span>
             </RevealOnScroll>
           </div>
         </div>
       </section>
 
-      {/* 5. CTA COTIZACIÓN */}
       <section className="section quote-section">
         <div className="section-inner">
           <RevealOnScroll className="quote-box">
             <div>
-              <h2>¿Tienes un proyecto en mente?</h2>
-              <p>Sube tu archivo STL o STEP y recibe un análisis de fabricabilidad y una cotización exacta sin compromiso.</p>
+              <span className="mono-label">Tu proyecto</span>
+              <h2>¿Tenés un archivo<br />que quiere existir?</h2>
+              <p>Envíanos STL, STEP u OBJ para una revisión técnica antes de cotizar.</p>
             </div>
             <Button as={Link} to="/solicitud" variant="primary" className="btn-pill">
-              Iniciar Cotización <span aria-hidden="true">↗</span>
+              Iniciar solicitud <span aria-hidden="true">↗</span>
             </Button>
           </RevealOnScroll>
         </div>
