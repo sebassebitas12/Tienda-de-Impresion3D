@@ -610,3 +610,17 @@ El **Gate de React** está abierto.
 2. Ningún control flotante tapa contenido, ni en movimiento ni en reposo.
 3. Los hallazgos de jerarquía comercial de la auditoría anterior (hero con demasiadas señales, catálogo más tienda, disciplina de micro-etiquetas y movimiento) revisados con el usuario.
 4. Aprobación explícita del usuario registrada aquí. Hasta entonces: **EN ITERACIÓN / NO CONGELADO**.
+
+---
+
+## Implementación React — Capa 2 Home (2026-09-30)
+
+- Se preserva `mockups/hf-01-home-definitivo.html` como artefacto **CONGELADO**; no fue editado.
+- El panel derecho del Hero fue trasladado a `src/pages/Home.jsx` con la estructura aprobada: fotografía principal, `.scan-line`, estado, anotación técnica + leader line SVG, telemetría y `.thumb-rail`.
+- Las cuatro piezas del visor usan los assets aprobados de HF-01 publicados en `public/images/`.
+- El movimiento de puntero replica el tilt/parallax del mockup y se desactiva con `prefers-reduced-motion`.
+- V-02 pasa a implementación React: en móvil el orden del Hero se reinterpreta para mostrar el workbench antes del bloque de texto secundario/acciones/señales, evitando que el producto quede completamente fuera del primer viewport.
+- Las seis `ProductCard` del destacado conservan material, referencia y estado visual de stock de HF-01, pero usan `/images/producto-temporal.png` porque el usuario aún no dispone de fotografías reales de catálogo. Este raster es un placeholder visual intencional y temporal; no debe confundirse con evidencia de producto real.
+- `ProductCard` acepta ahora un estado `order`/label explícito para representar “BAJO PEDIDO” sin forzarlo a “SIN STOCK”.
+
+**Verificación pendiente:** build/lint/tests y captura visual del React real en 1280/768/375, dark/light. No se declara cierre visual de Capa 2 hasta esa evidencia.
