@@ -678,3 +678,33 @@ Cambios:
 - popovers de header y menú se derivan de HF-01; Stitch queda únicamente para inventario de rutas, contenido y estados.
 
 Esta corrección refuerza la regla de producto: **HF-01 define el lenguaje visual a expandir a todas las rutas**.
+
+
+### Pasada visual React — acercamiento fuerte a HF-01 (2026-09-30)
+
+Objetivo del bloque: llevar Home React a una composición mucho más cercana al HF-01 congelado y eliminar acumulación de CSS/parches de iteraciones anteriores.
+
+#### Cambios estructurales
+- `src/styles/home.css` fue reconstruido como **una única capa React** derivada de HF-01; se eliminaron selectores legacy de `.product-card/.product-image` y overrides superpuestos.
+- `src/styles/shell.css` fue reconstruido como **una única capa de shell**, eliminando breakpoints duplicados que producían resultados distintos según ancho.
+- Se restauró el encabezado completo de **Señales de precisión** que faltaba en React.
+- El método dejó de renderizar numeración editorial redundante, en línea con la limpieza aprobada del HF.
+- El CTA final recuperó copy/intención del mockup: revisión técnica primero, cotización después.
+
+#### Fidelidad / craft
+- Hero mantiene retícula, producto protagonista, marco rotado, scan, callout, ficha técnica, riel y parallax ligero.
+- ProductCard se alinea al HF en proporciones, materialidad, badges, fundido de imagen y hover corto.
+- Método recibe interacción lineal discreta; no se añadieron tarjetas nuevas.
+- Precisión recupera heading, grid continuo y feedback sutil por tarjeta.
+- CTA final conserva composición del HF y una única línea de acento.
+- Chat, accesibilidad, hamburger, search y Mi Espacio permanecen dentro del lenguaje HF-01, sin numeraciones decorativas ni estética Stitch.
+
+#### Motion
+- `RevealOnScroll` implementa ahora realmente la prop `delay`; antes se filtraba al DOM y el stagger no existía.
+- Reveal, hover y entradas respetan `prefers-reduced-motion` y el ajuste global `data-motion="reduced"`.
+- Referencias Codrops/Scrolltide se usaron para criterio de profundidad y timing, no para copiar demos ni añadir GSAP/Three/WebGL.
+
+#### Verificación disponible
+- Auditoría estática: no quedan breakpoints duplicados en Home/shell ni selectores legacy de ProductCard.
+- No existe evidencia de navegador conectado para esta pasada, por lo que **no se declara fidelidad visual verificada ni Capa 2 cerrada**.
+- Siguiente evidencia necesaria: render local 1280 / 768 / 375, Dark/Light, Hero completo y paneles abiertos; el usuario aprueba/rechaza el resultado visual.
