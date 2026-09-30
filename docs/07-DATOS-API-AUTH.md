@@ -146,3 +146,41 @@ No crear un JWT firmado en React, no considerar buscar usuario por email como au
 Antes de conectar Login debe resolverse el **contrato concreto de autenticación académica** (backend/proveedor/endpoint). Mientras ese contrato se cierra sí se puede construir la capa UI, service interface, provider state, guards y tests mediante adapters/mocks.
 
 Auth debe cerrarse antes del Admin funcional; Admin debe validar rol y no depender de ocultar botones como mecanismo de autorización.
+
+
+### Base React de Auth implementada — 2026-09-30
+
+Se implementó la parte de Auth que no depende de inventar backend:
+
+- `src/services/authService.js`: contrato adapter-based; normaliza sesiones y rechaza respuestas incompletas;
+- `AuthProvider`: restore/login/register/logout, pending/error, rol y estado autenticado;
+- `RequireAuth` y `RequireRole`;
+- Login y Registro reales en React;
+- `/cuenta` y `/pedidos/:id` protegidos;
+- `/admin/*` protegido por rol `admin`;
+- AuthLayout visual derivado de HF-01;
+- tests de service/provider/restore/login/logout/guards/rol.
+
+El adapter por defecto devuelve `AUTH_NOT_CONFIGURED` para login/registro. Esto es intencional: el frontend no fabrica JWT ni contraseñas mientras no exista el contrato concreto del backend.
+
+#### Contrato esperado del adapter
+
+`login(credentials)` / `register(payload)` deben devolver una sesión normalizada o mapeable a:
+
+~~~js
+{
+  user: {
+    id,
+    name,
+    email,
+    role,
+    status
+  },
+  token
+}
+~~~
+
+`restoreSession()` devuelve esa sesión o `null`.
+`logout(session)` invalida/cierra la sesión según el backend elegido.
+
+El almacenamiento/persistencia del token pertenece al adapter concreto; no queda hardcodeado en la UI ni en el Provider.
