@@ -77,21 +77,21 @@ Layouts, routing, providers y navegación base.
 - Los defectos visuales nuevos se corrigen, pero **Home ya no bloquea iniciar Auth**.
 - HF-01 sigue siendo el sistema visual que se expande a todos los módulos.
 
-### Capa 3 — Autenticación 🔴 SIGUIENTE BLOQUE ACTIVO
+### Capa 3 — Autenticación 🟠 EN CURSO
 Objetivo: tener una autenticación académica real y verificable antes de construir Admin.
 
 Orden:
-1. cerrar contrato concreto de backend/JWT sin inventar endpoint;
-2. implementar `authService`/adapter separado de UI;
-3. convertir `AuthProvider` de guest fijo a sesión real;
-4. Login con loading/error/invalid session;
-5. Registro según contrato disponible;
-6. persistencia/restauración de sesión;
-7. logout;
-8. guards de rutas autenticadas;
-9. guard de rol admin;
-10. tests de login, logout, sesión inválida y permisos;
-11. aplicar lenguaje HF-01 al AuthLayout sin crear una estética paralela.
+1. cerrar contrato concreto de backend/JWT sin inventar endpoint; 🔴 pendiente
+2. implementar `authService`/adapter separado de UI; ✅
+3. convertir `AuthProvider` de guest fijo a sesión real; ✅
+4. Login con loading/error/invalid session; ✅ base React
+5. Registro según contrato disponible; ✅ base React
+6. persistencia/restauración de sesión; 🟠 interfaz lista, depende del adapter real
+7. logout; ✅ interfaz/provider
+8. guards de rutas autenticadas; ✅
+9. guard de rol admin; ✅
+10. tests de login, logout, sesión inválida y permisos; ✅
+11. aplicar lenguaje HF-01 al AuthLayout sin crear una estética paralela. ✅ base visual
 
 **Estado detectado:** existen `AuthProvider`, `useAuth`, `AuthLayout`, rutas `/login` y `/registro`, pero actualmente son scaffolding. `db.json.users` contiene identidad/rol/estado, no credenciales. No simular seguridad empresarial ni fabricar JWT en frontend.
 
