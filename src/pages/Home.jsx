@@ -73,10 +73,6 @@ export function Home() {
     };
   }, []);
 
-  useEffect(() => {
-    setActivePiece(current => Math.min(current, heroPieces.length - 1));
-  }, [heroPieces.length]);
-
   const selectRelativePiece = (offset) => {
     setActivePiece(current => (current + offset + heroPieces.length) % heroPieces.length);
   };
