@@ -184,6 +184,7 @@ Fuentes principales:
 - Codrops
 - Radix / React Aria
 - Vercel Web Interface Guidelines
+- Scrolltide — motion, scroll-driven interaction, componentes/shaders y proceso de construcción por etapas
 
 No instalar ni copiar una referencia por aparecer en esta lista.
 
@@ -205,7 +206,9 @@ Antes de editar:
 - **Catálogo destacado:** las seis referencias visuales de HF-01 están cargadas con sus badges Material/Stock. Como todavía no existen fotografías reales de catálogo, todas usan temporalmente `/images/producto-temporal.png`; este asset es explícitamente provisional y no representa un producto real.
 - **Assets del mockup publicados:** `hero-soporte.jpg`, `producto-engranaje.jpg`, `producto-dragon.jpg`, `producto-drone.jpg` y `producto-maqueta.jpg` fueron reutilizados desde `mockups/images/` en `public/images/` sin alterar el mockup congelado.
 
-**Siguiente bloque exacto:** verificar build/lint/tests de la Capa 2 y realizar auditoría visual React en 1280/768/375 (dark/light). No declarar fidelidad visual cerrada hasta tener evidencia de render real.
+**Siguiente bloque exacto:** continuar la auditoría de Capa 2 y cerrar los elementos de HF-01 aún ausentes en React: chatbot/asistente, accesibilidad y preferencias globales (idioma, escala tipográfica, contraste/movimiento y persistencia). Después de cerrar y verificar Home, la siguiente superficie es **Tienda / Catálogo**, seguida por Detalle de producto → Solicitud personalizada → Carrito → Checkout → Cuenta/Pedidos → páginas secundarias → Admin → integraciones → auditoría global. El orden durable vive en `docs/10-ROADMAP.md`.
+
+**Referencia nueva:** Scrolltide queda registrada en `docs/04` como banco para motion cinematográfico, scroll, componentes y proceso de construcción. Regla: páginas sirven para estudiar resultado/comportamiento; repositorios sirven para estudiar implementación/licencia/dependencias. Ninguna referencia sustituye HF-01 ni justifica instalar una librería automáticamente.
 
 **Contexto confirmado por el usuario:** entrega académica frontend, con visión
 de migrar a servicios reales. Pagos/facturación reales fuera del alcance actual.
