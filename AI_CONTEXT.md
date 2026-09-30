@@ -206,7 +206,7 @@ Antes de editar:
 - **Catálogo destacado:** las seis referencias visuales de HF-01 están cargadas con sus badges Material/Stock. Como todavía no existen fotografías reales de catálogo, todas usan temporalmente `/images/producto-temporal.png`; este asset es explícitamente provisional y no representa un producto real.
 - **Assets del mockup publicados:** `hero-soporte.jpg`, `producto-engranaje.jpg`, `producto-dragon.jpg`, `producto-drone.jpg` y `producto-maqueta.jpg` fueron reutilizados desde `mockups/images/` en `public/images/` sin alterar el mockup congelado.
 
-**Siguiente bloque exacto:** Capa 2 continúa en aprobación visual. Se restauró el menú de cuenta compacto del HF-01 después de una regresión visual: cabecera Mi Espacio/estado, iconos por fila, login/registro, divisor, ayuda y preferencias; sin flechas repetitivas ni Carrito en desktop. La navegación principal permanece dentro del desplegable solo bajo 821 px. El cambio pasó lint, tests, check:ui y build en CI; falta aprobación visual local del usuario. **No pasar a Tienda hasta aprobación de Home.**
+**Siguiente bloque exacto:** Capa 2 continúa en aprobación visual. Reauditoría de chrome aplicada tras capturas del usuario: flotantes recuperan auto-hide lateral durante scroll; búsqueda, idioma, tema, CTA y hamburger tienen roles visuales distintos; Search y Mi Espacio ya no comparten estilos por accidente. Falta gate CI verde del commit final y nueva aprobación visual local. **No pasar a Tienda hasta aprobación de Home.**
 
 **Skills de proyecto activas:** `.agents/skills/vertice-continuity/SKILL.md` y `.agents/skills/vertice-visual-audit/SKILL.md`. Nuevas skills/referencias aportadas por el usuario se evalúan por utilidad real; no se incorporan automáticamente.
 
