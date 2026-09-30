@@ -1,1 +1,62 @@
-import { useEffect, useRef } from 'react';\nimport './ui.css';\n\nexport function RevealOnScroll({\n  as: Tag = 'div',\n  children,\n  className = '',\n  delay = 0,\n  style,\n  ...props\n}) {\n  const ref = useRef(null);\n\n  useEffect(() => {\n    const element = ref.current;\n    if (!element) return undefined;\n\n    const media = window.matchMedia('(prefers-reduced-motion: reduce)');\n    const reduced = media.matches || document.documentElement.dataset.motion === 'reduced';\n\n    if (reduced || !window.IntersectionObserver) {\n      element.dataset.reveal = 'visible';\n      return undefined;\n    }\n\n    element.dataset.reveal = 'pending';\n\n    const observer = new IntersectionObserver(entries => {\n      if (entries.some(entry => entry.isIntersecting)) {\n        element.dataset.reveal = 'visible';\n        observer.disconnect();\n      }\n    }, { threshold: 0.12 });\n\n    const show = event => {\n      if (event.matches) {\n        element.dataset.reveal = 'visible';\n        observer.disconnect();\n      }\n    };\n\n    media.addEventListener('change', show);\n    observer.observe(element);\n\n    return () => {\n      observer.disconnect();\n      media.removeEventListener('change', show);\n      delete element.dataset.reveal;\n    };\n  }, []);\n\n  const mergedStyle = {\n    ...style,\n    '--reveal-delay': Math.max(0, Number(delay) || 0) + 'ms',\n  };\n\n  return (\n    <Tag {...props} ref={ref} style={mergedStyle} className={'v-reveal ' + className}>\n      {children}\n    </Tag>\n  );\n}\n
+import { useEffect, useRef } from 'react';
+import './ui.css';
+
+export function RevealOnScroll({
+  as: Tag = 'div',
+  children,
+  className = '',
+  delay = 0,
+  style,
+  ...props
+}) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return undefined;
+
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const reduced = media.matches || document.documentElement.dataset.motion === 'reduced';
+
+    if (reduced || !window.IntersectionObserver) {
+      element.dataset.reveal = 'visible';
+      return undefined;
+    }
+
+    element.dataset.reveal = 'pending';
+
+    const observer = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) {
+        element.dataset.reveal = 'visible';
+        observer.disconnect();
+      }
+    }, { threshold: 0.12 });
+
+    const show = event => {
+      if (event.matches) {
+        element.dataset.reveal = 'visible';
+        observer.disconnect();
+      }
+    };
+
+    media.addEventListener('change', show);
+    observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+      media.removeEventListener('change', show);
+      delete element.dataset.reveal;
+    };
+  }, []);
+
+  const mergedStyle = {
+    ...style,
+    '--reveal-delay': Math.max(0, Number(delay) || 0) + 'ms',
+  };
+
+  return (
+    <Tag {...props} ref={ref} style={mergedStyle} className={'v-reveal ' + className}>
+      {children}
+    </Tag>
+  );
+}
