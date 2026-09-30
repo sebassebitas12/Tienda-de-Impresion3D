@@ -262,7 +262,7 @@ Producto e información útil son protagonistas. Los efectos nunca deben ocultar
 
 ## Chrome de aplicación: navbar y footer
 
-El navbar público tomado de Stitch se conserva como referencia visual aprobada. Los cambios deben ser quirúrgicos: rutas, autenticación, accesibilidad, tema y pequeños ajustes de espaciado/iconografía. No crear una estética de navegación nueva sin una razón UX documentada.
+El navbar público y el resto del chrome deben seguir el lenguaje visual de HF-01. Stitch puede ayudar a recordar rutas, acciones y contenido funcional, pero no define la estética del navbar, footer, paneles ni controles.
 
 El footer de marca funciona como componente de contexto público. No debe forzarse dentro de dashboards administrativos cuando reduzca el espacio útil o compita con la operación. El admin puede utilizar un footer técnico compacto o prescindir de él.
 
@@ -714,17 +714,11 @@ No instalar GSAP, Three.js, WebGL, Lenis, Framer Motion ni otra dependencia solo
 **Repositorios:** no se verificó desde el sitio un repositorio público oficial de Scrolltide. Si aparece uno concreto, debe evaluarse con la regla anterior antes de registrarlo como fuente oficial. No atribuir repositorios externos a Scrolltide sin evidencia.
 
 
-### Menú plegable Stitch → React — decisión aplicada 2026-09-30
+### Rol de Stitch/UXMagic en implementación — corrección 2026-09-30
 
-Se revalidaron los assets de Stitch/UX del repo, especialmente `mockups/lista plegable.jpg` y `mockups/HFcompletos/Figura_11_Menú_Desplegable.png`.
+Stitch/UXMagic **no es referencia visual** para la implementación React. Se conserva únicamente como apoyo para inventario de páginas, contenido esperado, flujos y estados. El diseño de cualquier pantalla debe derivarse del sistema visual de HF-01 y de las decisiones aprobadas del proyecto.
 
-Patrón adoptado para React:
-- hamburger limpio de tres líneas, sin caja visual pesada;
-- transformación a X al abrir;
-- popover oscuro, compacto y anclado al trigger;
-- filas con icono + texto y separadores claros;
-- jerarquía simple, sin drawer a pantalla completa;
-- en desktop/tablet con navegación visible, el panel muestra **Mi Espacio/cuenta** y utilidades;
-- bajo 821 px, el mismo panel incorpora también la navegación principal.
-
-No se copian datos demostrativos de Stitch (por ejemplo usuario admin, notificaciones o facturación). Se reutiliza únicamente la composición/patrón visual con datos y rutas reales de Vértice.
+Para hamburger, menús, popovers, chat, accesibilidad, botones y cualquier otra superficie compartida:
+- primero se consulta HF-01 y su historial aprobado en docs/05;
+- después se adapta ese lenguaje a React y a la accesibilidad;
+- Stitch puede confirmar qué acciones/contenido deberían existir, pero no cómo deben verse.
