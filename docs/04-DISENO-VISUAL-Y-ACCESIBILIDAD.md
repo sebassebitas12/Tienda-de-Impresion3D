@@ -712,3 +712,19 @@ Aplicación útil para Vértice:
 No instalar GSAP, Three.js, WebGL, Lenis, Framer Motion ni otra dependencia solo porque aparezca en Scrolltide. La Home mantiene la decisión de usar fotografía, CSS, máscaras, parallax ligero y motion; WebGL real queda para rutas donde aporte valor funcional.
 
 **Repositorios:** no se verificó desde el sitio un repositorio público oficial de Scrolltide. Si aparece uno concreto, debe evaluarse con la regla anterior antes de registrarlo como fuente oficial. No atribuir repositorios externos a Scrolltide sin evidencia.
+
+
+### Menú plegable Stitch → React — decisión aplicada 2026-09-30
+
+Se revalidaron los assets de Stitch/UX del repo, especialmente `mockups/lista plegable.jpg` y `mockups/HFcompletos/Figura_11_Menú_Desplegable.png`.
+
+Patrón adoptado para React:
+- hamburger limpio de tres líneas, sin caja visual pesada;
+- transformación a X al abrir;
+- popover oscuro, compacto y anclado al trigger;
+- filas con icono + texto y separadores claros;
+- jerarquía simple, sin drawer a pantalla completa;
+- en desktop/tablet con navegación visible, el panel muestra **Mi Espacio/cuenta** y utilidades;
+- bajo 821 px, el mismo panel incorpora también la navegación principal.
+
+No se copian datos demostrativos de Stitch (por ejemplo usuario admin, notificaciones o facturación). Se reutiliza únicamente la composición/patrón visual con datos y rutas reales de Vértice.
