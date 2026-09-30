@@ -711,3 +711,19 @@ Objetivo del bloque: llevar Home React a una composición mucho más cercana al 
 
 
 - **R-H15 — regresión de sintaxis en RevealOnScroll:** una actualización automática escribió secuencias literales `\n` dentro de `src/components/ui/RevealOnScroll.jsx`, provocando `Invalid Unicode escape sequence` en Vite. Se corrigió reescribiendo el archivo con saltos de línea reales y se comprobó que ya no contiene escapes `\n` literales. El build/render local debe volver a ejecutarse por el usuario tras pull.
+
+
+### Gate automatizado de entrega — GitHub Actions
+
+Tras la regresión de sintaxis de `RevealOnScroll.jsx`, se añadió `.github/workflows/verify.yml` para verificar cada push a `Pruebas`.
+
+Checks:
+- instalación limpia con `npm ci`;
+- lint;
+- Jest;
+- build aislado del UI Kit (`check:ui`);
+- build de producción Vite.
+
+La primera ejecución detectó un error adicional real en `Home.jsx` (`react-hooks/set-state-in-effect`) antes de una nueva entrega. Se eliminó el efecto innecesario. La segunda ejecución consiguió lint/tests/UI build/build en success.
+
+Regla durable: no solicitar `git pull` para cambios de código hasta tener el commit final con el gate verde. La aprobación visual del usuario sigue siendo independiente del CI.
