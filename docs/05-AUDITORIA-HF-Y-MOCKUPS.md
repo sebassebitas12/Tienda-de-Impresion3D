@@ -663,3 +663,18 @@ Revisar render real de Home en 1280 / 768 / 375, dark/light y paneles abiertos. 
 - Stitch no aporta patrón visual aquí; únicamente inventario funcional/contenido. La apariencia debe permanecer dentro del sistema HF-01.
 
 **Verificación pendiente:** render local del estado cerrado/abierto del hamburger en desktop, 768 y 375; foco/Escape siguen cubiertos por la primitiva `Panel` pero requieren evidencia visual antes de cierre.
+
+
+### Corrección de jerarquía visual React — HF-01 sobre Stitch
+
+Se corrigió una desviación de implementación detectada por el usuario: React estaba tomando patrones visuales de Stitch para hamburger/paneles, cuando Stitch solo debe informar alcance funcional/estructural.
+
+Cambios:
+- se eliminó la dependencia visual de Stitch en hamburger/lista plegable;
+- se retiraron iconos/patrones de dashboard genérico del menú React;
+- se eliminaron índices editoriales decorativos `01 / ...`, `02 / ...` de chat/accesibilidad;
+- chatbot vuelve a identidad HF-01: isotipo real, superficie workbench, retícula sutil, geometría asimétrica, filas sobrias y flecha funcional;
+- accesibilidad vuelve a una superficie utilitaria del mismo sistema visual, sin telemetría decorativa;
+- popovers de header y menú se derivan de HF-01; Stitch queda únicamente para inventario de rutas, contenido y estados.
+
+Esta corrección refuerza la regla de producto: **HF-01 define el lenguaje visual a expandir a todas las rutas**.
