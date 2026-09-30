@@ -72,10 +72,10 @@ Layouts, routing, providers y navegación base.
 Orden interno:
 1. Hero/workbench y assets. ✅
 2. Catálogo destacado y placeholder visual temporal mientras no existan fotos reales. ✅
-3. Auditar fidelidad real en 1280 / 768 / 375, dark/light. 🟠 Segunda pasada estática completada; pendiente render local y aprobación del usuario.
+3. Auditar fidelidad real en 1280 / 768 / 375, dark/light. 🟠 Pasada visual React fuerte completada; pendiente render local y aprobación del usuario.
 4. Completar elementos de HF-01 aún ausentes en React: chatbot/asistente y panel de accesibilidad. 🟠 Estructura/estilos restaurados; pendiente aprobación visual.
 5. Cerrar preferencias globales definidas en docs/04: idioma, escala tipográfica, contraste/movimiento y persistencia entre rutas. 🟠 Implementadas en Home/shell; pendiente comprobación visual integral.
-6. Corregir hallazgos de auditoría sin rediseñar el mockup congelado.
+6. Corregir hallazgos de auditoría sin rediseñar el mockup congelado. 🟠 Reestructuración visual mayor completada; pendiente feedback del render local.
 7. Cerrar Capa 2 con lint/build/tests disponibles + evidencia visual. Solo entonces pasar a Tienda.
 
 ### Capa 3 — Tienda / Catálogo
