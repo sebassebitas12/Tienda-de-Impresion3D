@@ -110,6 +110,18 @@ Evita AI-slop: tarjetas anidadas sin necesidad, gradientes neón, glassmorphism 
 
 La creatividad visual es amplia dentro de la identidad; la calidad debe aumentar, no volverse ruido.
 
+## 7.1 Skills, repos y referencias aportadas por el usuario
+
+Cuando el usuario comparta una skill, repositorio, página, técnica, comando o workflow externo:
+
+1. evalúa primero si resuelve un problema real del proyecto;
+2. contrástalo con stack, arquitectura, licencias y decisiones vigentes;
+3. si aporta, adapta solo la parte útil y documenta por qué;
+4. si es redundante, incompatible, innecesario o añade complejidad sin beneficio, descártalo explícitamente;
+5. no incorporar herramientas solo porque aparezcan en un video, lista o tendencia.
+
+Las skills del proyecto viven preferentemente en `.agents/skills/<nombre>/SKILL.md` y deben ser pequeñas, enfocadas y basadas en tareas/repeticiones reales del proyecto. No crear skills solapadas ni mega-skills que dupliquen `AGENTS.md`.
+
 ## 8. React: reglas no negociables
 
 - JavaScript/JSX; no TypeScript.
