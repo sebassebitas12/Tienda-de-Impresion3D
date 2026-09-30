@@ -208,7 +208,7 @@ Antes de editar:
 - **Catálogo destacado:** las seis referencias visuales de HF-01 están cargadas con sus badges Material/Stock. Como todavía no existen fotografías reales de catálogo, todas usan temporalmente `/images/producto-temporal.png`; este asset es explícitamente provisional y no representa un producto real.
 - **Assets del mockup publicados:** `hero-soporte.jpg`, `producto-engranaje.jpg`, `producto-dragon.jpg`, `producto-drone.jpg` y `producto-maqueta.jpg` fueron reutilizados desde `mockups/images/` en `public/images/` sin alterar el mockup congelado.
 
-**Siguiente bloque exacto:** prioridad académica reajustada a **Auth → Admin → IA**. Home pasa a estabilización visual y puede recibir correcciones en paralelo, pero ya no bloquea Auth. Siguiente implementación funcional: cerrar contrato concreto de auth/JWT, construir authService/provider/login/registro/session/guards/tests y aplicar HF-01 al AuthLayout. Después: Admin protegido por rol; luego IA/N8N. No inventar JWT, endpoints ni contraseñas.
+**Siguiente bloque exacto:** Auth ya está **EN CURSO**: service adapter-based, AuthProvider con sesión/pending/error, Login, Registro, restore/logout, RequireAuth, RequireRole, protección de `/cuenta`, `/pedidos/:id` y `/admin/*`, AuthLayout HF-01 y tests están implementados. Falta únicamente cerrar el **contrato concreto del backend/JWT** para conectar el adapter real; no inventar endpoint ni credenciales. Después de Auth: Admin → IA.
 
 **Skills de proyecto activas:** `.agents/skills/vertice-continuity/SKILL.md` y `.agents/skills/vertice-visual-audit/SKILL.md`. Nuevas skills/referencias aportadas por el usuario se evalúan por utilidad real; no se incorporan automáticamente.
 
