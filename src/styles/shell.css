@@ -203,7 +203,9 @@
 .search-panel{
   width:min(388px,calc(100vw - 32px));
   max-height:calc(100dvh - 104px);
-  overflow:auto;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
   padding:0;
   border:1px solid var(--line-strong);
   border-radius:10px 3px 10px 3px;
@@ -275,11 +277,141 @@
   font-size:10px;
 }
 
+.search-panel .v-input:focus{
+  outline:none;
+  border-color:var(--lava);
+  box-shadow:
+    0 0 0 1px var(--lava),
+    0 0 0 4px color-mix(in srgb,var(--lava) 9%,transparent),
+    inset 0 1px 0 color-mix(in srgb,var(--paper) 5%,transparent);
+}
+.search-panel-content{
+  display:grid;
+  gap:12px;
+}
+.search-panel-hint{
+  margin:0;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.5;
+}
+.search-shortcuts-label{
+  color:var(--dim);
+  font:8px var(--mono);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.search-shortcuts{
+  display:grid;
+  border-top:1px solid var(--line);
+}
+.search-shortcuts a,
+.search-query-action{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 18px;
+  align-items:center;
+  gap:14px;
+  min-height:58px;
+  padding:11px 4px;
+  border-bottom:1px solid var(--line);
+  color:var(--muted);
+  text-align:left;
+  transition:color .18s var(--ease-ui),padding .22s var(--ease-out),background .18s var(--ease-ui);
+}
+.search-shortcuts a::before,
+.search-query-action::before{
+  content:'';
+  position:absolute;
+  inset:5px -6px;
+  z-index:-1;
+  border-radius:7px 2px 7px 2px;
+  background:color-mix(in srgb,var(--lava) 7%,transparent);
+  opacity:0;
+  transform:scaleX(.94);
+  transform-origin:left;
+  transition:opacity .18s var(--ease-ui),transform .22s var(--ease-out);
+}
+.search-shortcuts a:hover,
+.search-shortcuts a:focus-visible,
+.search-query-action:hover,
+.search-query-action:focus-visible{
+  padding-left:9px;
+  color:var(--paper);
+}
+.search-shortcuts a:hover::before,
+.search-shortcuts a:focus-visible::before,
+.search-query-action:hover::before,
+.search-query-action:focus-visible::before{
+  opacity:1;
+  transform:scaleX(1);
+}
+.search-shortcuts strong,
+.search-query-action strong{
+  display:block;
+  color:inherit;
+  font-size:12px;
+  font-weight:600;
+}
+.search-shortcuts small,
+.search-query-action small{
+  display:block;
+  margin-top:3px;
+  color:var(--dim);
+  font-size:9px;
+  line-height:1.4;
+}
+.search-shortcuts a > span:last-child,
+.search-query-arrow{
+  justify-self:end;
+  color:var(--lava);
+  font:11px var(--mono);
+  transition:transform .18s var(--ease-out);
+}
+.search-shortcuts a:hover > span:last-child,
+.search-shortcuts a:focus-visible > span:last-child,
+.search-query-action:hover .search-query-arrow,
+.search-query-action:focus-visible .search-query-arrow{
+  transform:translate(2px,-2px);
+}
+.search-query-action{
+  grid-template-columns:24px minmax(0,1fr) 18px;
+  width:100%;
+  border-top:1px solid var(--line);
+}
+.search-query-mark{
+  display:grid;
+  place-items:center;
+  width:24px;
+  height:24px;
+  border:1px solid color-mix(in srgb,var(--lava) 45%,var(--line));
+  border-radius:7px 2px 7px 2px;
+  color:var(--lava);
+  font:13px var(--mono);
+}
+.account-panel-dropdown,
+.search-panel{
+  scrollbar-width:thin;
+  scrollbar-color:color-mix(in srgb,var(--lava) 38%,var(--line-strong)) transparent;
+}
+.account-panel-dropdown::-webkit-scrollbar,
+.search-panel::-webkit-scrollbar{
+  width:6px;
+  height:0;
+}
+.account-panel-dropdown::-webkit-scrollbar-thumb,
+.search-panel::-webkit-scrollbar-thumb{
+  border-radius:999px;
+  background:color-mix(in srgb,var(--lava) 38%,var(--line-strong));
+}
+
 /* HF-01 compact account dropdown. */
 .account-panel-dropdown{
   width:300px;
   max-height:calc(100dvh - 104px);
-  overflow:auto;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
   padding:20px;
   border:1px solid color-mix(in srgb,var(--paper) 7%,transparent);
   border-radius:16px 4px 16px 4px;
