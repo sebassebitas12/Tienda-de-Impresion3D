@@ -176,6 +176,25 @@ Después de cambios visuales: inspecciona los estados afectados en los breakpoin
 
 Nunca declares “aprobado”, “funciona” o “verificado” sin evidencia.
 
+### Gate CI obligatorio antes de entrega
+
+Para cualquier cambio de código en `Pruebas`, no indicar al usuario que haga `pull` hasta que el commit final tenga GitHub Actions **verde** en `.github/workflows/verify.yml`.
+
+El gate debe comprobar como mínimo:
+- `npm ci`;
+- `npm run lint`;
+- `npm test`;
+- `npm run check:ui`;
+- `npm run build`.
+
+Si falla un check:
+1. inspeccionar logs;
+2. corregir;
+3. esperar una nueva ejecución;
+4. repetir hasta verde.
+
+El workflow ejecuta todos los checks aunque uno falle para obtener diagnóstico completo. **No sustituye la aprobación visual humana ni demuestra el render local**, pero sí bloquea entregas con errores de sintaxis, lint, tests o build.
+
 ## 11. Documentación obligatoria
 
 Cada bloque que cambie una decisión, diseño, código, dato o verificación debe actualizar en el mismo bloque:
