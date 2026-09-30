@@ -116,9 +116,40 @@ export function Navbar({ onReading }) {
                 label={copy.searchLabel}
                 value={query}
                 onChange={event => setQuery(event.target.value)}
+                autoComplete="off"
               />
-              <p>{copy.searchHint}</p>
-              <Button type="submit" variant="ghost" fullWidth>{copy.searchSubmit}</Button>
+
+              <div className="search-panel-content">
+                {query.trim() ? (
+                  <button type="submit" className="search-query-action">
+                    <span className="search-query-mark" aria-hidden="true">⌕</span>
+                    <span>
+                      <strong>{copy.searchFor} “{query.trim()}”</strong>
+                      <small>{copy.searchQueryHint}</small>
+                    </span>
+                    <span className="search-query-arrow" aria-hidden="true">↗</span>
+                  </button>
+                ) : (
+                  <>
+                    <p className="search-panel-hint">{copy.searchHint}</p>
+                    <span className="search-shortcuts-label">{copy.searchShortcuts}</span>
+                    <div className="search-shortcuts">
+                      <Link to="/catalogo" onClick={closePanel}>
+                        <span><strong>{copy.catalog}</strong><small>{copy.searchCatalogHint}</small></span>
+                        <span aria-hidden="true">↗</span>
+                      </Link>
+                      <Link to="/materiales" onClick={closePanel}>
+                        <span><strong>{copy.materials}</strong><small>{copy.searchMaterialsHint}</small></span>
+                        <span aria-hidden="true">↗</span>
+                      </Link>
+                      <Link to="/requisitos" onClick={closePanel}>
+                        <span><strong>{copy.requirements}</strong><small>{copy.searchRequirementsHint}</small></span>
+                        <span aria-hidden="true">↗</span>
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </div>
             </form>
           </Panel>
 
