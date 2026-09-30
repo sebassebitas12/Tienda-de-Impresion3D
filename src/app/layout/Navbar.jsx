@@ -5,6 +5,34 @@ import { useTheme } from '../../hooks/useTheme.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
 import { useAuth } from '../../hooks/useAuth.js';
 
+
+function AccountMenuIcon({ type }) {
+  const common = {
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.8,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    'aria-hidden': true,
+  };
+
+  if (type === 'login') {
+    return <svg {...common}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>;
+  }
+
+  if (type === 'register') {
+    return <svg {...common}><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><path d="M20 8v6M17 11h6" /></svg>;
+  }
+
+  if (type === 'support') {
+    return <svg {...common}><circle cx="12" cy="12" r="10" /><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3" /><path d="M12 17h.01" /></svg>;
+  }
+
+  return <svg {...common}><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" /></svg>;
+}
+
+
 export function Navbar({ onReading }) {
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, copy } = usePreferences();
@@ -103,7 +131,7 @@ export function Navbar({ onReading }) {
             onClose={closePanel}
             triggerRef={menuTrigger}
           >
-            <div className="account-menu-head">
+            <div className="account-dropdown-head">
               <strong>{copy.space}</strong>
               <span>{user?.name || copy.guest}</span>
             </div>
@@ -121,21 +149,27 @@ export function Navbar({ onReading }) {
 
             <div className="account-dropdown-results">
               <Link className="account-dropdown-link account-dropdown-primary" to={user ? '/cuenta' : '/login'} onClick={closePanel}>
-                <span>{user ? copy.account : copy.login}<small>{copy.accountHint}</small></span>
-                <span aria-hidden="true">↗</span>
+                <AccountMenuIcon type="login" />
+                <span>{user ? copy.account : copy.login}</span>
               </Link>
-              {!user && <Link className="account-dropdown-link" to="/registro" onClick={closePanel}>
-                <span>{copy.register}</span><span aria-hidden="true">↗</span>
-              </Link>}
-              <Link className="account-dropdown-link" to="/carrito" onClick={closePanel}>
-                <span>{copy.cart}</span><span aria-hidden="true">↗</span>
-              </Link>
+
+              {!user && (
+                <Link className="account-dropdown-link" to="/registro" onClick={closePanel}>
+                  <AccountMenuIcon type="register" />
+                  <span>{copy.register}</span>
+                </Link>
+              )}
+
               <div className="account-dropdown-divider" />
+
               <Link className="account-dropdown-link" to="/faq" onClick={closePanel}>
-                <span>{copy.support}</span><span aria-hidden="true">↗</span>
+                <AccountMenuIcon type="support" />
+                <span>{copy.support}</span>
               </Link>
+
               <button type="button" className="account-dropdown-link" onClick={() => { closePanel(); onReading(); }}>
-                <span>{copy.settings}</span><span aria-hidden="true">↗</span>
+                <AccountMenuIcon type="settings" />
+                <span>{copy.settings}</span>
               </button>
             </div>
           </Panel>
