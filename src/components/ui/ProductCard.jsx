@@ -8,15 +8,17 @@ import { PriceTag } from './PriceTag.jsx';
 export function ProductCard({ product, linkAs, href, to, showPrice = false }) {
   const [failedSource, setFailedSource] = useState(null);
   const src = product.images?.[0];
-  const available = product.stock > 0 && product.status === 'ACTIVE';
+  const inferredAvailable = product.stock > 0 && product.status === 'ACTIVE';
+  const stockStatus = product.stockStatus ?? (inferredAvailable ? 'in-stock' : 'out');
+  const stockLabel = product.stockLabel ?? (inferredAvailable ? 'En stock (' + product.stock + ')' : 'Sin stock');
+  const unavailable = product.status !== 'ACTIVE' || stockStatus === 'out';
+
   return (
-    <Card hover className="v-product-card" data-unavailable={!available}>
+    <Card hover className="v-product-card" data-unavailable={unavailable}>
       <div className="v-product-image">
         <div className="v-product-meta">
           <Badge variant="material-tag">{product.material}</Badge>
-          <Badge variant="stock-tag" status={available ? 'in-stock' : 'out'}>
-            {available ? 'En stock (' + product.stock + ')' : 'Sin stock'}
-          </Badge>
+          <Badge variant="stock-tag" status={stockStatus}>{stockLabel}</Badge>
         </div>
         {src && failedSource !== src ?
           <img src={src} alt={product.name + ' en ' + product.material} loading="lazy" decoding="async" onError={() => setFailedSource(src)} /> :
