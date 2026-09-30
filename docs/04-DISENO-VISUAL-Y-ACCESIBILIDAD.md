@@ -660,3 +660,39 @@ Reglas duraderas que salen de los hallazgos V-01 a V-09 de `docs/05`. Aplican al
 - **Las fotos deben integrarse a la superficie** (fundido o encuadre intencional); un rectángulo visible pegado dentro de la tarjeta se considera defecto.
 - **Popovers y menús sobre el hero son casi opacos** (95 % o más) con desenfoque de fondo fuerte: nada del fondo debe leerse detrás de texto interactivo.
 - **Un idioma por pantalla:** etiquetas técnicas de interfaz en el idioma activo; no mezclar inglés en la versión en español.
+---
+
+## Uso de referencias externas: páginas y repositorios — 2026-09-30
+
+Las referencias externas no tienen la misma función ni autoridad que HF-01. Se usan para **extraer patrones concretos**, nunca para sustituir la identidad de Vértice ni para copiar una solución completa sin contraste.
+
+### Páginas / showcases
+
+Sirven principalmente para estudiar **resultado y comportamiento**: composición, jerarquía, tratamiento de producto, motion, scroll, hover, transiciones, ecommerce, navegación, responsive y densidad.
+
+Flujo de uso: identificar el problema → observar un patrón concreto → describir qué aporta y qué se descarta → adaptarlo a Obsidian Precision Forge + Lava Orgánica → implementar con el stack actual → verificarlo dentro de Vértice.
+
+### Repositorios / código abierto
+
+Sirven principalmente para estudiar **cómo está construido** un patrón: estructura de componentes, estado, interacción, animación, scroll, canvas/WebGL, accesibilidad, reduced motion, teclado, foco, rendimiento y tests.
+
+Antes de reutilizar código o una dependencia: verificar que el repo sea realmente la fuente esperada, revisar licencia, dependencias/bundle, compatibilidad con React 19 + Vite + JS/JSX, extraer la técnica mínima y preferir las primitivas actuales si una librería nueva no está justificada.
+
+**Regla:** una página puede justificar una dirección visual; un repositorio puede justificar una técnica de implementación. Ninguno invalida HF-01 congelado, el dominio ni la arquitectura.
+
+### Scrolltide
+
+**Fuente:** https://www.scrolltide.co/
+
+Se incorpora como referencia de **motion cinematográfico y producto interactivo**. Su biblioteca pública muestra templates, componentes, secciones, UI, shaders y experiencias scroll-driven orientadas a stacks como React/Vite/Next.js, Framer Motion, GSAP, Three.js, WebGL y shaders.
+
+Aplicación útil para Vértice:
+- estudiar heroes donde el movimiento profundiza la percepción del objeto;
+- estudiar carouseles/depth interactions para producto sin convertir el sitio en una demo;
+- estudiar fondos/shaders como referencia de iluminación y profundidad, **no** para introducir lava literal;
+- estudiar prompts que especifican layout, tipografía, motion y comportamiento para evitar resultados genéricos de IA;
+- usar su Academy como referencia de proceso: construir efectos por etapas y auditar fallos.
+
+No instalar GSAP, Three.js, WebGL, Lenis, Framer Motion ni otra dependencia solo porque aparezca en Scrolltide. La Home mantiene la decisión de usar fotografía, CSS, máscaras, parallax ligero y motion; WebGL real queda para rutas donde aporte valor funcional.
+
+**Repositorios:** no se verificó desde el sitio un repositorio público oficial de Scrolltide. Si aparece uno concreto, debe evaluarse con la regla anterior antes de registrarlo como fuente oficial. No atribuir repositorios externos a Scrolltide sin evidencia.
