@@ -206,7 +206,7 @@ Antes de editar:
 - **Catálogo destacado:** las seis referencias visuales de HF-01 están cargadas con sus badges Material/Stock. Como todavía no existen fotografías reales de catálogo, todas usan temporalmente `/images/producto-temporal.png`; este asset es explícitamente provisional y no representa un producto real.
 - **Assets del mockup publicados:** `hero-soporte.jpg`, `producto-engranaje.jpg`, `producto-dragon.jpg`, `producto-drone.jpg` y `producto-maqueta.jpg` fueron reutilizados desde `mockups/images/` en `public/images/` sin alterar el mockup congelado.
 
-**Siguiente bloque exacto:** Capa 2 continúa en corrección/auditoría. Se completó una segunda pasada estática contra HF-01 y se corrigieron: doble offset del Hero, hamburger ausente, herramientas flotantes, paneles Chat/Accesibilidad, Search/Mi Espacio, breakpoint 821–1120, conflicto móvil, alto contraste, acabado de ProductCard y pills/localización. Falta comprobar el render real local en 1280/768/375 dark/light y corregir cualquier diferencia que el usuario rechace. **No pasar a Tienda hasta aprobación visual de Home.**
+**Siguiente bloque exacto:** Capa 2 sigue en cierre visual. Tras la segunda pasada, se corrigió también el bloque **hamburger + lista plegable** usando los mockups Stitch del repo (`mockups/lista plegable.jpg` y Figura 11) como referencia: icono real de tres barras/X, popover compacto anclado y navegación solo bajo 821 px. Falta render local y aprobación del usuario; **no pasar a Tienda**.
 
 **Skills de proyecto activas:** `.agents/skills/vertice-continuity/SKILL.md` y `.agents/skills/vertice-visual-audit/SKILL.md`. Nuevas skills/referencias aportadas por el usuario se evalúan por utilidad real; no se incorporan automáticamente.
 
