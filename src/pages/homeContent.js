@@ -49,6 +49,10 @@ const content = {
       ['Fabricar con control', 'Impresión aditiva con supervisión y revisión dimensional.'],
       ['Entregar una pieza lista', 'Curado, acabado, verificación y despacho seguro.'],
     ],
+    precisionKicker: 'Señales de precisión',
+    precisionTitleA: 'La técnica también',
+    precisionTitleB: 'se puede sentir.',
+    precisionIntro: 'Un sistema visual sobrio para que los datos ayuden a leer el trabajo, sin convertir la página en un panel de control.',
     specs: [
       ['A / DIMENSIONAL', '±0.05 mm', 'Tolerancia objetivo para piezas y ajustes que necesitan repetibilidad.', 'VERIFICACIÓN MANUAL'],
       ['B / MATERIALES', 'Polímeros técnicos', 'PETG, Nylon CF, ASA, PLA de detalle y resina para distintos usos.', 'FDM + SLA'],
@@ -57,8 +61,8 @@ const content = {
     projectKicker: 'Tu proyecto',
     projectTitleA: '¿Tenés un archivo',
     projectTitleB: 'que quiere existir?',
-    projectIntro: 'Envíanos STL, STEP u OBJ para una revisión técnica antes de cotizar.',
-    startRequest: 'Iniciar solicitud',
+    projectIntro: 'Envíanos STL, STEP u OBJ para una revisión técnica. Primero entendemos el proyecto; después construimos una cotización detallada.',
+    startRequest: 'Cotizar archivo',
     viewProduct: 'Ver ficha',
     imageUnavailable: 'Imagen no disponible',
     heroPieces: {
@@ -108,6 +112,10 @@ const content = {
       ['Manufacture with control', 'Additive manufacturing with supervision and dimensional review.'],
       ['Deliver a ready part', 'Curing, finishing, verification and secure dispatch.'],
     ],
+    precisionKicker: 'Precision signals',
+    precisionTitleA: 'Technique should also',
+    precisionTitleB: 'be something you feel.',
+    precisionIntro: 'A restrained visual system where data helps explain the work without turning the page into a control panel.',
     specs: [
       ['A / DIMENSIONAL', '±0.05 mm', 'Target tolerance for parts and fits that need repeatability.', 'MANUAL VERIFICATION'],
       ['B / MATERIALS', 'Technical polymers', 'PETG, Nylon CF, ASA, detail PLA and resin for different uses.', 'FDM + SLA'],
@@ -116,8 +124,8 @@ const content = {
     projectKicker: 'Your project',
     projectTitleA: 'Have a file',
     projectTitleB: 'that should exist?',
-    projectIntro: 'Send us STL, STEP or OBJ for a technical review before quoting.',
-    startRequest: 'Start request',
+    projectIntro: 'Send us STL, STEP or OBJ for a technical review. We understand the project first, then build a detailed quote.',
+    startRequest: 'Quote a file',
     viewProduct: 'View details',
     imageUnavailable: 'Image unavailable',
     heroPieces: {
