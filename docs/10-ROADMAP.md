@@ -43,6 +43,8 @@ Todos los requisitos del gate fueron cerrados antes de iniciar React:
 
 ## Fase 4 — Fundaciones React
 
+**Prioridad actual de entrega:** Auth → Admin → IA, indicada por el profesor y adoptada como orden operativo del proyecto.
+
 Orden recomendado:
 
 1. limpiar scaffold Vite;
@@ -60,7 +62,7 @@ Orden recomendado:
 
 ## Secuencia operativa de construcción React
 
-Esta es la guía de continuación para agentes. Si una sesión termina, el siguiente agente toma el **primer bloque no cerrado** de esta lista, salvo instrucción explícita del usuario.
+> **Prioridad académica reajustada 2026-09-30:** el profesor indicó **Autenticación → Admin → IA**. Esta instrucción cambia el orden operativo anterior. Con pocos días disponibles, el proyecto se construye por **vertical slices funcionales** y el lenguaje visual HF-01 se integra en cada slice; no se espera a terminar toda la estética del sitio para comenzar funciones.
 
 ### Capa 0 — UI Kit ✅
 Primitivas, estados base y componentes compartidos.
@@ -68,68 +70,83 @@ Primitivas, estados base y componentes compartidos.
 ### Capa 1 — App Shell ✅
 Layouts, routing, providers y navegación base.
 
-### Capa 2 — Home HF-01 🟠 EN CURSO
-Orden interno:
-1. Hero/workbench y assets. ✅
-2. Catálogo destacado y placeholder visual temporal mientras no existan fotos reales. ✅
-3. Auditar fidelidad real en 1280 / 768 / 375, dark/light. 🟠 Pasada visual React fuerte completada; pendiente render local y aprobación del usuario.
-4. Completar elementos de HF-01 aún ausentes en React: chatbot/asistente y panel de accesibilidad. 🟠 Estructura/estilos restaurados; pendiente aprobación visual.
-5. Cerrar preferencias globales definidas en docs/04: idioma, escala tipográfica, contraste/movimiento y persistencia entre rutas. 🟠 Implementadas en Home/shell; pendiente comprobación visual integral.
-6. Corregir hallazgos de auditoría sin rediseñar el mockup congelado. 🟠 Reestructuración visual mayor completada; pendiente feedback del render local.
-7. Cerrar Capa 2 con lint/build/tests disponibles + evidencia visual. Solo entonces pasar a Tienda.
+### Capa 2 — Home HF-01 🟠 ESTABILIZACIÓN VISUAL
+- Hero/workbench, catálogo destacado, shell y preferencias globales ya están implementados.
+- CI obligatorio activo y verde antes de cada entrega.
+- El usuario continúa auditando visualmente Home.
+- Los defectos visuales nuevos se corrigen, pero **Home ya no bloquea iniciar Auth**.
+- HF-01 sigue siendo el sistema visual que se expande a todos los módulos.
 
-### Capa 3 — Tienda / Catálogo
-- ruta /catalogo;
-- listado, búsqueda/filtros y estados loading/empty/error;
-- ProductCard con datos reales cuando existan;
-- responsive y preferencias globales heredadas;
-- no inventar productos, stock, precios ni fotos.
+### Capa 3 — Autenticación 🔴 SIGUIENTE BLOQUE ACTIVO
+Objetivo: tener una autenticación académica real y verificable antes de construir Admin.
 
-### Capa 4 — Detalle de producto
-- ruta /producto/:id;
-- producto, material, stock, especificaciones y acción comercial según datos reales;
-- ayuda consistente y accesibilidad;
-- interacciones visuales/3D solo si aportan al producto y tienen justificación.
+Orden:
+1. cerrar contrato concreto de backend/JWT sin inventar endpoint;
+2. implementar `authService`/adapter separado de UI;
+3. convertir `AuthProvider` de guest fijo a sesión real;
+4. Login con loading/error/invalid session;
+5. Registro según contrato disponible;
+6. persistencia/restauración de sesión;
+7. logout;
+8. guards de rutas autenticadas;
+9. guard de rol admin;
+10. tests de login, logout, sesión inválida y permisos;
+11. aplicar lenguaje HF-01 al AuthLayout sin crear una estética paralela.
 
-### Capa 5 — Solicitud personalizada
-- /solicitud;
-- /solicitud/archivo;
-- /solicitud/ayuda-diseno;
-- upload y estados;
-- revisión antes de cotización;
-- respetar docs/02 y no convertir PENDING_QUOTE en producto.
+**Estado detectado:** existen `AuthProvider`, `useAuth`, `AuthLayout`, rutas `/login` y `/registro`, pero actualmente son scaffolding. `db.json.users` contiene identidad/rol/estado, no credenciales. No simular seguridad empresarial ni fabricar JWT en frontend.
 
-### Capa 6 — Carrito
-- /carrito;
-- separar productos de solicitudes/cotizaciones;
-- totales únicamente donde el dominio los permita.
+### Capa 4 — Admin
+Entra inmediatamente después de Auth porque depende de identidad/rol.
 
-### Capa 7 — Checkout
-- /checkout/productos;
-- /checkout/solicitud;
-- stepper, datos, entrega, revisión y estados de pago/simulación según alcance académico.
+Prioridad:
+- guard `admin`;
+- shell/dashboard;
+- pedidos;
+- solicitudes/cotizaciones;
+- catálogo;
+- clientes;
+- métricas desde datos reales del repo;
+- loading/empty/error/permisos;
+- diseño derivado de HF-01, no dashboard genérico.
 
-### Capa 8 — Auth, cuenta y pedidos
-- registro/acceso dentro del alcance académico;
-- /cuenta;
-- /pedidos/:id;
-- cotizaciones, aprobación y seguimiento según contratos vigentes.
+### Capa 5 — IA / N8N
+Entra después de que Auth + Admin tengan contratos y datos suficientes.
 
-### Capa 9 — Páginas públicas secundarias
-FAQ, Sobre nosotros, Contacto y equivalentes ya definidos por navegación/alcance. Reutilizar shell y preferencias globales.
+Primero:
+- `aiService.js`;
+- webhook N8N normalizado;
+- chatbot `mode: "chat"`;
+- resumen admin `mode: "admin_summary"`;
+- errores/timeouts/loading;
+- etiqueta **ORIENTATIVO · SUJETO A VALIDACIÓN** donde corresponda;
+- IA nunca inventa números ni emite cotización final.
 
-### Capa 10 — Admin
-Dashboard y rutas /admin/* siguiendo docs/02, docs/06 y docs/08.
+### Capa 6 — Tienda / Catálogo
+Listado, búsqueda/filtros, ProductCard y estados reales.
 
-### Capa 11 — Integraciones
-API/JSON Server, JWT/auth, N8N, IA y archivos 3D cuando la UI y el contrato correspondiente estén listos. Las simulaciones académicas deben estar documentadas.
+### Capa 7 — Detalle de producto
+`/producto/:id` con datos reales y estados.
 
-### Capa 12 — Auditoría y cierre global
-Tests, lint, build, coverage, responsive 375/768/1280, Dark/Light, accesibilidad, estados, rendimiento y revisión visual transversal.
+### Capa 8 — Solicitud personalizada
+Upload, revisión y ciclo de cotización según docs/02.
 
-### Regla de avance
+### Capa 9 — Carrito + Checkout
+Separar catálogo de solicitud/cotización aprobada.
 
-**No saltar a la siguiente capa porque “ya se ve”.** Si el usuario detecta una omisión de la capa actual —por ejemplo chatbot, accesibilidad o preferencias globales en Home— se resuelve antes de declarar la capa cerrada.
+### Capa 10 — Cuenta / Pedidos + páginas públicas secundarias
+Cuenta, pedidos, FAQ, Sobre nosotros, Contacto, Materiales, Requisitos, etc.
+
+### Capa 11 — Auditoría y cierre global
+Coverage, lint, build, responsive 375/768/1280, Dark/Light, accesibilidad, estados y revisión visual transversal.
+
+### Regla de avance reajustada
+
+No usar “terminar toda la estética primero” ni “hacer toda la lógica primero”.
+
+El flujo es:
+**contrato → slice funcional → estados → tests/CI → identidad HF-01 → aprobación → siguiente slice**.
+
+Home puede seguir recibiendo correcciones visuales durante Auth/Admin si el usuario detecta defectos, pero no debe absorber días completos mientras faltan funciones obligatorias.
 
 ## Fase 5 — Integraciones
 
