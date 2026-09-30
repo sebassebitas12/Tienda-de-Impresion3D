@@ -708,3 +708,6 @@ Objetivo del bloque: llevar Home React a una composición mucho más cercana al 
 - Auditoría estática: no quedan breakpoints duplicados en Home/shell ni selectores legacy de ProductCard.
 - No existe evidencia de navegador conectado para esta pasada, por lo que **no se declara fidelidad visual verificada ni Capa 2 cerrada**.
 - Siguiente evidencia necesaria: render local 1280 / 768 / 375, Dark/Light, Hero completo y paneles abiertos; el usuario aprueba/rechaza el resultado visual.
+
+
+- **R-H15 — regresión de sintaxis en RevealOnScroll:** una actualización automática escribió secuencias literales `\n` dentro de `src/components/ui/RevealOnScroll.jsx`, provocando `Invalid Unicode escape sequence` en Vite. Se corrigió reescribiendo el archivo con saltos de línea reales y se comprobó que ya no contiene escapes `\n` literales. El build/render local debe volver a ejecutarse por el usuario tras pull.
