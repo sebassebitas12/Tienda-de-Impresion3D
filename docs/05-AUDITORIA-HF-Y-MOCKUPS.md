@@ -740,3 +740,6 @@ Regla durable: no solicitar `git pull` para cambios de código hasta tener el co
 - **R-H19 — scrollbar horizontal accidental en Mi Espacio:** `overflow:auto` habilitaba ambos ejes en el popover. Se cambió Search/Mi Espacio a `overflow-y:auto` + `overflow-x:hidden`, overscroll contenido y scrollbar vertical fino.
 - **R-H20 — búsqueda visualmente vacía:** el popover era solo input + hint + botón. Se enriqueció sin inventar catálogo: estado vacío con accesos reales a Catálogo/Materiales/Requisitos; estado con query ofrece una única acción contextual para buscar ese término. Se añadió feedback de foco/hover y jerarquía visual propia.
 - **R-H21 — microinteracciones como sistema:** se inició un banco por componente en docs/04. Primer patrón aplicado a botón primario: lavado interno corto + sombra contenida; sin librerías nuevas.
+
+
+- **R-H22 — scroll anidado en popovers:** además del `overflow:auto` del panel externo, la primitiva `.v-panel__body` añadía un segundo scroll interno. En Search/Mi Espacio se desactivó ese overflow interno, se mantuvo un único eje vertical externo y se añadieron `min-width:0` / `overflow-wrap:anywhere` en filas para impedir desbordes horizontales.
