@@ -747,3 +747,6 @@ Regla durable: no solicitar `git pull` para cambios de código hasta tener el co
 
 - **R-H23 — microinteracciones sin equivalencia de teclado:** varias mejoras solo respondían a `:hover`. Se añadió `:focus-visible` / `:focus-within` equivalente en nav links, links de acción, icon buttons, ProductCard, Método y Precisión.
 - **R-H24 — feedback de enlaces demasiado plano:** NavLink y LinkText mantienen la geometría HF-01, pero ahora añaden reveal de línea, micro-lift y desplazamiento de flecha de 1–2 px; no se añadieron elementos decorativos permanentes.
+
+
+- **R-H25 — control de tema perdió el carácter del HF-01:** React había convertido el selector de tema en un icon button genérico. Se restauró el lenguaje del control aprobado: 42×42, borde lava fino, fondo oscuro técnico, icono exclusivo sol/luna y microinteracción de rotación/escala/press. Se mantiene accesibilidad y reduced-motion global.
