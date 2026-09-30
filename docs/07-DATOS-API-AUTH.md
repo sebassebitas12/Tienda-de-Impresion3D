@@ -120,3 +120,29 @@ El contrato definitivo se validará durante la implementación del workflow.
 Un webhook público no sustituye autenticación/autorización. Si el endpoint se usa para información privada del admin, debe existir una estrategia de autenticación/autorización y validación del usuario/rol. Las claves de proveedores de IA nunca van en React.
 
 N8N no es fuente de verdad del negocio.
+
+
+## Estado de implementación Auth — 2026-09-30
+
+Prioridad académica actual: **Autenticación → Admin → IA**.
+
+### Lo que ya existe
+- `AuthProvider` y `useAuth`;
+- `AuthLayout`;
+- rutas `/login` y `/registro`;
+- usuarios con `id`, `name`, `email`, `role`, `status` en `db.json`.
+
+### Lo que NO existe todavía
+- endpoint/backend concreto de login;
+- credenciales/passwords en el modelo actual;
+- emisión/refresh/invalidación real de JWT;
+- persistencia real de sesión;
+- guards de autenticación/rol;
+- formularios Login/Registro funcionales.
+
+### Regla de implementación
+No crear un JWT firmado en React, no considerar buscar usuario por email como autenticación y no inventar contraseñas para los usuarios actuales.
+
+Antes de conectar Login debe resolverse el **contrato concreto de autenticación académica** (backend/proveedor/endpoint). Mientras ese contrato se cierra sí se puede construir la capa UI, service interface, provider state, guards y tests mediante adapters/mocks.
+
+Auth debe cerrarse antes del Admin funcional; Admin debe validar rol y no depender de ocultar botones como mecanismo de autorización.
