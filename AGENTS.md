@@ -122,6 +122,26 @@ Cuando el usuario comparta una skill, repositorio, página, técnica, comando o 
 
 Las skills del proyecto viven preferentemente en `.agents/skills/<nombre>/SKILL.md` y deben ser pequeñas, enfocadas y basadas en tareas/repeticiones reales del proyecto. No crear skills solapadas ni mega-skills que dupliquen `AGENTS.md`.
 
+## 7.2 Autoridad visual: HF-01 vs Stitch
+
+**HF-01 congelado define el lenguaje visual del producto completo, no solo Home.**
+Su identidad, geometría, superficies, tipografía, motion, densidad, iconografía y relación producto/interfaz deben expandirse de forma coherente a Tienda, Producto, Solicitud, Carrito, Checkout, Cuenta y Admin.
+
+Los mockups de **Stitch/UXMagic** del repositorio se usan únicamente como referencia de:
+- inventario de pantallas/rutas;
+- contenido aproximado que necesita cada pantalla;
+- estructura funcional y flujos;
+- estados/casos de uso que no deben olvidarse.
+
+**Stitch no tiene autoridad sobre estilo visual, componentes, chrome, paneles, botones, tarjetas, spacing ni motion.** No copiar su estética ni usarla para resolver una pantalla cuando HF-01 ya ofrece un lenguaje de diseño extrapolable.
+
+Orden para decisiones visuales:
+1. instrucción explícita actual del usuario;
+2. decisiones visuales aprobadas registradas en docs/04 y docs/05;
+3. HF-01 congelado como fuente visual primaria y sistema a expandir;
+4. referencias externas aprobadas solo como apoyo técnico/inspiración puntual;
+5. Stitch/UXMagic únicamente para alcance funcional/estructural, nunca como dirección estética.
+
 ## 8. React: reglas no negociables
 
 - JavaScript/JSX; no TypeScript.
