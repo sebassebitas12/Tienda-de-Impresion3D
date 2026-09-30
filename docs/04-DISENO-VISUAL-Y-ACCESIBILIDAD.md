@@ -749,3 +749,25 @@ Decisiones vigentes:
 Referencias aplicadas:
 - https://www.navbar.gallery/blog/best-dropdown-navigation-bar-designs
 - https://motion-primitives.com/docs/animated-background
+
+
+### Banco de microinteracciones por componente — 2026-09-30
+
+Las referencias externas se investigan por **problema concreto**, no por estética completa.
+
+| Componente | Patrón útil | Fuente | Adaptación Vértice |
+| --- | --- | --- | --- |
+| Botón primario | relleno/feedback sutil en hover, sin animar toda la página | Codrops — Button Hover Animations | lavado luminoso corto dentro del CTA + elevación mínima; sin partículas ni WebGL |
+| Listas / menús | fondo de selección que guía el foco entre filas | Motion Primitives — Animated Background | fondo tenue por fila, desplazamiento de 2 px y flecha funcional; implementación CSS propia |
+| Búsqueda | sugerencias/acciones inmediatas mientras se escribe | Algolia autocomplete/search UX | no inventar productos: mostrar acción de búsqueda real + accesos a Catálogo, Materiales y Requisitos |
+| Apertura de búsqueda | entrada con carácter sin overlay invasivo | Codrops — Search UI Effects | mantener popover anclado al navbar y enriquecer estados/foco, no fullscreen |
+| Scroll / utilidades | esconder controles que invaden contenido durante desplazamiento | HF-01 congelado | flotantes se retraen lateralmente y desactivan pointer-events durante scroll |
+
+Referencias:
+- https://tympanus.net/codrops/2021/02/17/ideas-for-css-button-hover-animations/
+- https://motion-primitives.com/docs/animated-background
+- https://www.algolia.com/blog/ux/autocomplete-how-search-suggestions-increase-conversions
+- https://www.algolia.com/blog/ux/the-3-key-search-box-ux-design-elements
+- https://tympanus.net/codrops/2017/02/08/inspiration-search-ui-effects/
+
+Regla: extraer **una interacción reusable** por referencia; rechazar demos que añadan dependencia, ruido o falsos datos.
