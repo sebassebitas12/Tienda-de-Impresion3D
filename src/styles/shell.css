@@ -69,8 +69,7 @@
 }
 
 /* Each navbar control has a distinct role; avoid one generic button treatment. */
-.header-search,
-.header-theme{
+.header-search{
   width:42px !important;
   min-width:42px !important;
   height:42px !important;
@@ -82,16 +81,95 @@
   box-shadow:none !important;
 }
 .header-search:hover,
-.header-theme:hover{
+.header-search:focus-visible{
   transform:none !important;
   border-color:color-mix(in srgb,var(--lava) 65%,var(--line-strong)) !important;
   background:color-mix(in srgb,var(--paper) 3%,transparent) !important;
   color:var(--paper) !important;
 }
-.header-search svg,
-.header-theme svg{
+.header-search svg{
   width:17px !important;
   height:17px !important;
+}
+
+/* Theme control restored from the frozen HF-01 language. */
+.header-theme{
+  position:relative;
+  width:42px !important;
+  min-width:42px !important;
+  height:42px !important;
+  min-height:42px !important;
+  overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--lava) 78%,var(--line-strong)) !important;
+  border-radius:9px 3px 9px 3px !important;
+  background:
+    radial-gradient(circle at 50% -25%,color-mix(in srgb,var(--lava) 10%,transparent),transparent 70%),
+    color-mix(in srgb,var(--ink-soft) 88%,transparent) !important;
+  color:var(--paper) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb,var(--paper) 7%,transparent),
+    0 0 0 1px color-mix(in srgb,var(--lava) 4%,transparent) !important;
+  transition:
+    border-color .2s var(--ease-ui),
+    background .2s var(--ease-ui),
+    box-shadow .2s var(--ease-ui),
+    transform .18s var(--ease-out) !important;
+}
+.header-theme::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(135deg,transparent 30%,color-mix(in srgb,var(--lava-light) 11%,transparent) 50%,transparent 70%);
+  opacity:0;
+  transform:translateX(-45%);
+  transition:opacity .18s var(--ease-ui),transform .32s var(--ease-out);
+}
+.header-theme:hover,
+.header-theme:focus-visible{
+  transform:translateY(-1px) !important;
+  border-color:var(--lava) !important;
+  background:
+    radial-gradient(circle at 50% -20%,color-mix(in srgb,var(--lava) 16%,transparent),transparent 72%),
+    color-mix(in srgb,var(--panel) 92%,transparent) !important;
+  color:var(--paper) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb,var(--paper) 10%,transparent),
+    0 8px 18px color-mix(in srgb,var(--lava) 12%,transparent) !important;
+}
+.header-theme:hover::before,
+.header-theme:focus-visible::before{
+  opacity:1;
+  transform:translateX(45%);
+}
+.header-theme:active{
+  transform:translateY(0) scale(.96) !important;
+}
+.header-theme > span,
+.header-theme .theme-toggle-icon{
+  position:relative;
+  z-index:1;
+  display:grid;
+  place-items:center;
+}
+.header-theme .theme-toggle-icon{
+  width:18px;
+  height:18px;
+}
+.header-theme .theme-toggle-icon svg{
+  width:18px !important;
+  height:18px !important;
+  transition:transform .34s cubic-bezier(.2,.8,.2,1),color .2s var(--ease-ui);
+}
+.header-theme:hover .theme-icon-sun,
+.header-theme:focus-visible .theme-icon-sun{
+  color:var(--lava-light);
+  transform:rotate(45deg) scale(1.08);
+}
+.header-theme:hover .theme-icon-moon,
+.header-theme:focus-visible .theme-icon-moon{
+  color:var(--lava-light);
+  transform:rotate(-10deg) translateY(-1px) scale(1.08);
 }
 .header-search[aria-expanded="true"]{
   border-color:var(--lava) !important;
