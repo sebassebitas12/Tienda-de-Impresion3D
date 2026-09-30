@@ -16,10 +16,9 @@ Stack objetivo: React + Vite + JavaScript/JSX, con las integraciones definidas e
 
 ## 2. Estado actual
 
-- Fase: **3 — cierre visual/UX de HF-01**.
-- HF-01: **EN ITERACIÓN / NO CONGELADO**.
-- Único mockup HTML que se itera: `mockups/hf-01-home-definitivo.html`.
-- React: **BLOQUEADO**.
+- Fase: **4 — Implementación React (Acomodo y Base)**.
+- HF-01: **CONGELADO** (Aprobación final dada el 2026-09-30).
+- React: **DESBLOQUEADO** (Gate Abierto).
 - Dark/Light: definidos.
 - Identidad: **Obsidian Precision Forge + Lava Orgánica**.
 - El objetivo visual no es “más efectos”; es una Home con identidad fuerte que venda por producto, composición y percepción.
@@ -82,12 +81,12 @@ Las referencias externas sirven para extraer principios. Registrar fuente, patr�
 - Search compacto con estado sin resultados.
 - Dark/Light y reduced motion contemplados.
 
-### Defectos visuales abiertos (render real, 2026-09-29)
+### Defectos visuales cerrados e implementados (render real, 2026-09-29)
 Detalle, decisiones del usuario, orden de trabajo y criterio de cierre en `docs/05`, sección «Auditoría visual con render real».
-- **Se corrigen en el mockup** (prioridad V-04, luego el resto): V-04 fotos con borde rectangular visible (fundirlas; cambio más notorio, requiere antes/después y aprobación); V-01 botones flotantes tapan contenido (ocultarlos parcialmente durante el scroll); V-05 menú «Mi Espacio» translúcido (casi opaco + blur); V-06 cabecera y metadatos del buscador; V-07 flechas y hueco del chat; V-08 título y botón cerrar del menú móvil; V-09 etiquetas en inglés en Precisión y estilo del enlace del footer.
+- **Implementados en el mockup** (V-01, V-04 a V-09): ✅ V-04 fundido en fotos; ✅ V-01 scroll en botones flotantes; ✅ V-05 opacidad en «Mi Espacio»; ✅ V-06 buscador simplificado; ✅ V-07 chat (flechas y hueco); ✅ V-08 título y botón cerrar en móvil; ✅ V-09 etiquetas español en Precisión y footer.
 - **Requisitos de React, no se tocan en el mockup:** V-02 (en móvil el producto debe verse en la primera pantalla); V-03 (PRT-006 y las demás tarjetas son ejemplos del mockup; el catálogo real vendrá con datos reales).
 - Idioma y tamaño de texto globales no entran en el mockup; están documentados como requisito de React en `docs/04`.
-- No hay archivos del mockup modificados todavía por estos hallazgos.
+- Pendiente: Aprobación final del usuario para congelar HF-01 visualmente.
 
 ### Aún en iteración
 - auditoría visual global;
@@ -202,4 +201,4 @@ Antes de editar:
 6. verifica;
 7. documenta.
 
-**Punto actual:** la auditoría visual con render real ya está hecha y las decisiones del usuario están registradas (V-01 a V-09 en `docs/05`). Siguiente bloque: en `mockups/hf-01-home-definitivo.html`, V-04 primero (antes/después en 1280 y 375 para aprobación del usuario), luego V-01, V-05, V-06, V-07, V-08 y V-09; recapturar 1280 / 768 / 375 en oscuro y claro y actualizar `docs/05`. React sigue bloqueado.
+**Punto actual:** HF-01 ha sido oficialmente congelado. React Gate está abierto. Siguiente bloque: Iniciar el paso 1 y 2 del orden de arranque de React (Limpiar scaffold Vite y aplicar tokens/estilos globales basados en el manual del sistema de diseño).
