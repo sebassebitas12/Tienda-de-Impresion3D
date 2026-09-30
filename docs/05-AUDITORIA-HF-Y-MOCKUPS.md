@@ -743,3 +743,7 @@ Regla durable: no solicitar `git pull` para cambios de código hasta tener el co
 
 
 - **R-H22 — scroll anidado en popovers:** además del `overflow:auto` del panel externo, la primitiva `.v-panel__body` añadía un segundo scroll interno. En Search/Mi Espacio se desactivó ese overflow interno, se mantuvo un único eje vertical externo y se añadieron `min-width:0` / `overflow-wrap:anywhere` en filas para impedir desbordes horizontales.
+
+
+- **R-H23 — microinteracciones sin equivalencia de teclado:** varias mejoras solo respondían a `:hover`. Se añadió `:focus-visible` / `:focus-within` equivalente en nav links, links de acción, icon buttons, ProductCard, Método y Precisión.
+- **R-H24 — feedback de enlaces demasiado plano:** NavLink y LinkText mantienen la geometría HF-01, pero ahora añaden reveal de línea, micro-lift y desplazamiento de flecha de 1–2 px; no se añadieron elementos decorativos permanentes.
