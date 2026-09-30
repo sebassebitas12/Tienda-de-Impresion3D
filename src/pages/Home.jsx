@@ -192,7 +192,6 @@ export function Home() {
           <div className="process-list">
             {content.methods.map(([title, description], index) => (
               <RevealOnScroll key={title} delay={index * 100} className="process-item">
-                <span className="process-number">{String(index + 1).padStart(2, '0')}</span>
                 <div><h3>{title}</h3><p>{description}</p></div>
                 <span className="process-arrow" aria-hidden="true">↗</span>
               </RevealOnScroll>
@@ -201,8 +200,15 @@ export function Home() {
         </div>
       </section>
 
-      <section className="section spec-section">
+      <section className="section spec-section" id="precision" aria-labelledby="precision-title">
         <div className="section-inner">
+          <RevealOnScroll as="header" className="section-heading precision-heading">
+            <div>
+              <span className="mono-label">{content.precisionKicker}</span>
+              <h2 id="precision-title">{content.precisionTitleA}<br />{content.precisionTitleB}</h2>
+            </div>
+            <p>{content.precisionIntro}</p>
+          </RevealOnScroll>
           <div className="spec-grid">
             {content.specs.map(([index, title, description, chip], position) => (
               <RevealOnScroll key={index} className="spec-card" delay={position * 100}>
