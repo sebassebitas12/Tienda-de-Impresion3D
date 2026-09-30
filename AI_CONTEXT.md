@@ -199,14 +199,16 @@ Antes de editar:
 6. verifica;
 7. documenta.
 
-**Punto actual:** HF-01 **CONGELADO** y React Gate **ABIERTO**. 
+**Punto actual:** HF-01 **CONGELADO** y React Gate **ABIERTO**.
+
+**Prioridad académica nueva:** por indicación del profesor, el orden operativo es **Autenticación → Admin → IA**. Se trabaja por slices funcionales con estética HF-01 integrada; no se espera a completar todas las páginas visualmente antes de funciones. 
 - **Capa 0 (UI Kit):** Completada y testeada (100%).
 - **Capa 1 (App Shell):** Completada (100%). Layouts (`PublicLayout`, `AdminLayout`, `AuthLayout`), Routing (`react-router-dom`), Providers y estilos base (`shell.css`) implementados. El error de NPM (`brace-expansion`) fue parcheado y el servidor levanta en `localhost:5173`.
 - **Capa 2 (Home - En proceso):** Hero workbench de HF-01 reconstruido en React con assets publicados en `public/images/`, riel de miniaturas, escáner, anotación SVG, telemetría y parallax/tilt con respeto a reduced motion. V-02 se aborda reordenando el Hero en móvil para que el producto aparezca dentro del primer viewport.
 - **Catálogo destacado:** las seis referencias visuales de HF-01 están cargadas con sus badges Material/Stock. Como todavía no existen fotografías reales de catálogo, todas usan temporalmente `/images/producto-temporal.png`; este asset es explícitamente provisional y no representa un producto real.
 - **Assets del mockup publicados:** `hero-soporte.jpg`, `producto-engranaje.jpg`, `producto-dragon.jpg`, `producto-drone.jpg` y `producto-maqueta.jpg` fueron reutilizados desde `mockups/images/` en `public/images/` sin alterar el mockup congelado.
 
-**Siguiente bloque exacto:** Capa 2 sigue en aprobación visual. Se recuperó el control de tema del HF-01 como utility button con identidad propia (borde lava, geometría compacta, sol/luna y microinteracción sutil). Esta familia podrá reutilizarse selectivamente en controles compactos, no indiscriminadamente. Falta CI verde y aprobación visual local. **No pasar a Tienda hasta aprobación de Home.**
+**Siguiente bloque exacto:** prioridad académica reajustada a **Auth → Admin → IA**. Home pasa a estabilización visual y puede recibir correcciones en paralelo, pero ya no bloquea Auth. Siguiente implementación funcional: cerrar contrato concreto de auth/JWT, construir authService/provider/login/registro/session/guards/tests y aplicar HF-01 al AuthLayout. Después: Admin protegido por rol; luego IA/N8N. No inventar JWT, endpoints ni contraseñas.
 
 **Skills de proyecto activas:** `.agents/skills/vertice-continuity/SKILL.md` y `.agents/skills/vertice-visual-audit/SKILL.md`. Nuevas skills/referencias aportadas por el usuario se evalúan por utilidad real; no se incorporan automáticamente.
 
