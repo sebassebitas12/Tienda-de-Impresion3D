@@ -35,13 +35,33 @@ jobs:
         run: npm ci
 
       - name: Lint
+        id: lint
+        continue-on-error: true
         run: npm run lint
 
       - name: Tests
+        id: tests
+        continue-on-error: true
         run: npm test
 
       - name: UI build check
+        id: ui
+        continue-on-error: true
         run: npm run check:ui
 
       - name: Production build
+        id: build
+        continue-on-error: true
         run: npm run build
+
+      - name: Verification gate
+        if: always()
+        run: |
+          echo "lint=${{ steps.lint.outcome }}"
+          echo "tests=${{ steps.tests.outcome }}"
+          echo "ui=${{ steps.ui.outcome }}"
+          echo "build=${{ steps.build.outcome }}"
+          test "${{ steps.lint.outcome }}" = "success"
+          test "${{ steps.tests.outcome }}" = "success"
+          test "${{ steps.ui.outcome }}" = "success"
+          test "${{ steps.build.outcome }}" = "success"
