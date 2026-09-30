@@ -153,6 +153,24 @@ Orden para decisiones visuales:
 - No sustituir decisiones visuales aprobadas por componentes genéricos de una librería.
 - Mantener separación clara entre páginas, features, hooks, services, utils y estilos según `docs/06`.
 
+## 8.1 Autenticación académica — decisión vigente
+
+Por indicación explícita del profesor, Vértice **no tendrá backend real de autenticación** en esta entrega.
+
+Contrato vigente:
+- **JSON Server** es el backend académico y fuente local de usuarios/datos.
+- `db.json.users` puede almacenar credenciales **demo** para login/registro académico.
+- El **JWT es simulado en frontend** para demostrar sesión, expiración, roles y guards.
+- El token simulado **no representa seguridad criptográfica real** y debe documentarse como tal.
+- Login: buscar usuario por email en JSON Server, comparar credencial demo, validar `status`, generar token simulado y crear sesión.
+- Registro: validar email único, crear usuario `customer/ACTIVE` en JSON Server, generar token simulado y crear sesión.
+- Restore: leer sesión/token local, validar expiración y volver a consultar el usuario en JSON Server.
+- Logout: limpiar token/sesión local.
+- Admin: acceso por `role === "admin"` mediante guards.
+- **N8N no participa en autenticación**; se reserva para IA/automatizaciones.
+
+Esta decisión **supersede** cualquier instrucción anterior que prohibiera generar JWT simulado o almacenar credenciales demo en `db.json`. Sigue prohibido presentarlo como seguridad de producción.
+
 ## 9. Gate de React
 
 React no comienza hasta que estén cerrados:
@@ -235,4 +253,4 @@ Si existen varias rutas posibles, explica brevemente sus diferencias; no avances
 - HF-01: **CONGELADO** (aprobación del usuario, 2026-09-30).
 - React Gate: **ABIERTO** (todos los requisitos del gate superados).
 - Mockup de referencia visual: `mockups/hf-01-home-definitivo.html` (congelado, no se edita).
-- Siguiente bloque: orquestación del UI Kit (primitivas en `src/components/ui/`) y estructura de carpetas según `docs/06`.
+- Siguiente bloque: conectar Auth React al adapter académico JSON Server + JWT simulado; después Admin → IA.
