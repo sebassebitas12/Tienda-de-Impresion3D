@@ -624,3 +624,32 @@ El **Gate de React** está abierto.
 - `ProductCard` acepta ahora un estado `order`/label explícito para representar “BAJO PEDIDO” sin forzarlo a “SIN STOCK”.
 
 **Verificación pendiente:** build/lint/tests y captura visual del React real en 1280/768/375, dark/light. No se declara cierre visual de Capa 2 hasta esa evidencia.
+
+
+---
+
+## Auditoría estática React — Capa 2 (2026-09-30, pasada 2)
+
+Comparación realizada contra `mockups/hf-01-home-definitivo.html` congelado y la implementación actual de React/CSS.
+
+### Hallazgos estructurales confirmados
+
+- **R-H01 — doble offset superior del Home:** `#main-content` añadía 78 px y el Hero conservaba el padding superior del HF. Corregido: Home no suma ese offset adicional.
+- **R-H02 — hamburger visualmente ausente en desktop:** el JSX existía, pero `.hamburger` estaba oculto y solo reaparecía bajo breakpoint. Corregido: vuelve a existir como acceso persistente al panel, con estado abierto/cerrado.
+- **R-H03 — herramientas flotantes sin comportamiento visual HF:** `.floating-tools` no tenía posicionamiento fixed específico en React. Corregido: chat/accesibilidad vuelven al borde inferior derecho.
+- **R-H04 — chatbot y accesibilidad renderizados como Panel genérico:** no reproducían posición, escala ni jerarquía del HF. Corregido mediante styling específico del shell manteniendo la primitiva accesible `Panel`.
+- **R-H05 — search y Mi Espacio sin popover HF:** los paneles existían funcionalmente pero sin composición/posicionamiento equivalente. Corregido como paneles compactos anclados al header.
+- **R-H06 — breakpoint de navbar contradictorio:** React ocultaba links desde 1120 px mientras HF final conserva navegación entre 821–1120 px. Corregido.
+- **R-H07 — media queries móviles contradictorias:** coexistían dos bloques `max-width:560px` que redefinían altura del workbench, insets y spacing. Se consolidó una única interpretación móvil React.
+- **R-H08 — alto contraste sin efecto visual:** el provider sí escribía `data-contrast`, pero no existían tokens CSS asociados. Corregido para dark/light y focus visible.
+- **R-H09 — clases HF antiguas vs. clases `v-*`:** varios acabados del catálogo permanecían definidos sobre `.product-card/.product-image` mientras React renderiza `.v-product-card/.v-product-image`. Se alinearon cards, imágenes, hover y headings del catálogo.
+- **R-H10 — pills no aplicadas:** Home pasaba una clase `btn-pill` heredada del mockup, pero el componente React usa la prop/clase `v-button--pill`. Corregido usando la API real de `Button`.
+- **R-H11 — localización incompleta de ProductCard:** Home ya enviaba labels traducidos, pero `ProductCard` los ignoraba. Corregido para CTA, fallback de imagen y alt temporal.
+
+### Estado de verificación
+
+Estos son **hallazgos estáticos confirmados por código**. No se declara todavía verificación visual final porque no hubo navegador conectado/render real de esta pasada. La aprobación visual sigue correspondiendo al usuario después de recibir el build local.
+
+### Próxima comprobación
+
+Revisar render real de Home en 1280 / 768 / 375, dark/light y paneles abiertos. Si aparecen defectos visuales adicionales, corregir antes de declarar Capa 2 cerrada.
