@@ -201,12 +201,11 @@ Antes de editar:
 **Punto actual:** HF-01 **CONGELADO** y React Gate **ABIERTO**. 
 - **Capa 0 (UI Kit):** Completada y testeada (100%).
 - **Capa 1 (App Shell):** Completada (100%). Layouts (`PublicLayout`, `AdminLayout`, `AuthLayout`), Routing (`react-router-dom`), Providers y estilos base (`shell.css`) implementados. El error de NPM (`brace-expansion`) fue parcheado y el servidor levanta en `localhost:5173`.
-- **Capa 2 (Home - En proceso):** Se creó el andamiaje (`Home.jsx` y `home.css`) usando los componentes del UI Kit. El Layout general funciona pero **falta la implementación de alta fidelidad del Hero y los Assets**.
+- **Capa 2 (Home - En proceso):** Hero workbench de HF-01 reconstruido en React con assets publicados en `public/images/`, riel de miniaturas, escáner, anotación SVG, telemetría y parallax/tilt con respeto a reduced motion. V-02 se aborda reordenando el Hero en móvil para que el producto aparezca dentro del primer viewport.
+- **Catálogo destacado:** las seis referencias visuales de HF-01 están cargadas con sus badges Material/Stock. Como todavía no existen fotografías reales de catálogo, todas usan temporalmente `/images/producto-temporal.png`; este asset es explícitamente provisional y no representa un producto real.
+- **Assets del mockup publicados:** `hero-soporte.jpg`, `producto-engranaje.jpg`, `producto-dragon.jpg`, `producto-drone.jpg` y `producto-maqueta.jpg` fueron reutilizados desde `mockups/images/` en `public/images/` sin alterar el mockup congelado.
 
-**Próximos pasos exactos (Lo que la IA debe hacer a continuación):**
-1. **Copiar Assets:** Mover las imágenes de `mockups/images/` (`hero-soporte.jpg`, `producto-engranaje.jpg`, etc.) a `public/images/`.
-2. **Reconstruir el Hero (`Home.jsx`):** Extraer del `hf-01-home-definitivo.html` el HTML/SVG exacto del panel derecho del Hero (el riel de miniaturas `.thumb-rail`, la foto principal `.hero-photo-wrap`, el escáner láser `.scan-line`, las anotaciones `.visual-note` y la telemetría `.visual-meta`). Conectar los estados de interacción (efecto parallax/tilt del mouse).
-3. **Poblar Catálogo Destacado:** Usar las imágenes reales (`producto-engranaje.jpg`, etc.) en las `ProductCard` de la Home en lugar del placeholder, aplicando los tags correctos (Material, Stock).
+**Siguiente bloque exacto:** verificar build/lint/tests de la Capa 2 y realizar auditoría visual React en 1280/768/375 (dark/light). No declarar fidelidad visual cerrada hasta tener evidencia de render real.
 
 **Contexto confirmado por el usuario:** entrega académica frontend, con visión
 de migrar a servicios reales. Pagos/facturación reales fuera del alcance actual.
