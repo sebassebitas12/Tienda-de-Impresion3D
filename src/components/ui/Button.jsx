@@ -1,20 +1,40 @@
 import './ui.css';
 
 export function Button({
-  variant = 'primary', pill = false, fullWidth = false, loading = false,
-  loadingLabel = 'Procesando…', disabled = false, children, className = '', type = 'button', ...props
+  as: Component = 'button',
+  variant = 'primary',
+  pill = false,
+  fullWidth = false,
+  loading = false,
+  loadingLabel = 'Procesando…',
+  disabled = false,
+  children,
+  className = '',
+  type = 'button',
+  ...props
 }) {
   const appearance = variant === 'ghost' ? 'ghost' : 'primary';
   const classes = [
-    'v-button', 'v-button--' + appearance,
+    'v-button',
+    'v-button--' + appearance,
     (pill || variant === 'pill') && 'v-button--pill',
-    (fullWidth || variant === 'full-width') && 'v-button--full', className,
+    (fullWidth || variant === 'full-width') && 'v-button--full',
+    className,
   ].filter(Boolean).join(' ');
 
+  const interactiveProps = Component === 'button'
+    ? { type, disabled: disabled || loading }
+    : { 'aria-disabled': disabled || loading || undefined };
+
   return (
-    <button {...props} className={classes} type={type} disabled={disabled || loading} aria-busy={loading || undefined}>
+    <Component
+      {...props}
+      {...interactiveProps}
+      className={classes}
+      aria-busy={loading || undefined}
+    >
       {loading && <span className="v-spinner" aria-hidden="true" />}
       {loading ? loadingLabel : children}
-    </button>
+    </Component>
   );
 }
