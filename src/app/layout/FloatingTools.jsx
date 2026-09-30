@@ -32,7 +32,7 @@ export function FloatingTools({ active, onActiveChange }) {
 
   return (
     <>
-      <div className="floating-tools" aria-label={copy.tools} data-scrolling={scrolling && !active}>
+      <div className="floating-tools" aria-label={copy.tools} data-scrolling={scrolling && !active} data-panel-open={Boolean(active)}>
         <IconButton
           ref={chatTrigger}
           className="chat-trigger"
