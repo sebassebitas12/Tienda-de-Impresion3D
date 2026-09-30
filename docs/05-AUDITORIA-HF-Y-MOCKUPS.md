@@ -182,7 +182,7 @@ La segunda iteración de UXMagic fue revisada mediante una validación visual fi
 - `APPROVED` con monto aprobado y acción `Pagar cotización`.
 - Las solicitudes personalizadas no usan `quantity × unitPrice`.
 - El total de productos se mantiene separado del flujo de cotizaciones.
-- Navbar de Stitch/Vértice conservado.
+- Navbar funcional conservado; la dirección visual vigente se deriva de HF-01.
 - Identidad Obsidian Precision Forge + Lava Orgánica consistente.
 - Microcopy redundante eliminado.
 - Estructura preparada para responsive 375px/768px.
@@ -290,7 +290,7 @@ Pendientes de iteración en UXMagic aplicando las reglas del cierre transversal 
 La implementación de `mockups/hf-01-home.html` sigue en desarrollo y refinamiento bajo las instrucciones directas del usuario. NO está congelado ni aprobado aún.
 
 #### Cambios consolidados
-- Navbar, Hero, pilares, workflow, CTA de cotización y footer conservan la referencia oficial de Stitch/Vértice.
+- Navbar, Hero, pilares, workflow, CTA de cotización y footer forman parte del lenguaje visual de HF-01 que debe expandirse al resto del producto.
 - Home no muestra precios.
 - Las tarjetas del catálogo destacado usan imágenes reales y metadata técnica.
 - Se eliminó completamente la malla SVG triangular, círculos y cotas fijas que fingían una anotación CAD.
@@ -658,8 +658,8 @@ Revisar render real de Home en 1280 / 768 / 375, dark/light y paneles abiertos. 
 ### Corrección adicional de Capa 2 — hamburger / lista plegable
 
 - **R-H12 — hamburger mal maquetado:** `IconButton` envuelve el contenido en un `span`, pero el CSS anterior trataba las tres barras como hijos directos del botón. Resultado: el icono no reproducía el hamburger aprobado. Corregido usando el wrapper real y posiciones absolutas de las tres barras.
-- **R-H13 — panel plegable demasiado genérico:** el menú React usaba el `Panel` genérico con cabecera y navegación duplicada en desktop. Se reconstruyó tomando como referencia `mockups/lista plegable.jpg` / Figura 11: popover oscuro compacto, filas icono+texto, divisores y jerarquía de cuenta.
+- **R-H13 — panel plegable demasiado genérico:** el menú React usaba el `Panel` genérico con cabecera y navegación duplicada en desktop. La corrección visual debe derivarse de HF-01; los mockups Stitch solo sirven para comprobar qué opciones/acciones necesita contener.
 - **R-H14 — duplicación de navegación:** en anchos >820 px se oculta la navegación dentro del popover porque el navbar ya la presenta. Bajo 821 px, la lista principal reaparece dentro del desplegable.
-- No se trasladaron datos falsos del mockup Stitch; solo el patrón visual y de interacción.
+- Stitch no aporta patrón visual aquí; únicamente inventario funcional/contenido. La apariencia debe permanecer dentro del sistema HF-01.
 
 **Verificación pendiente:** render local del estado cerrado/abierto del hamburger en desktop, 768 y 375; foco/Escape siguen cubiertos por la primitiva `Panel` pero requieren evidencia visual antes de cierre.
