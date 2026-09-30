@@ -1,31 +1,29 @@
 # Vértice CR — Auditoría HF y mockups
 
-> Última actualización: **2026-09-29**.
+> Última actualización: **2026-09-30**.
 
-## Regla permanente de registro y continuidad
+## Estado oficial
 
-Cada agente documenta de forma continua, en el mismo bloque de trabajo y sin esperar a que el usuario lo solicite. Para HF-01, cualquier cambio, decisión, referencia aplicada, verificación o pendiente se registra aquí con su estado real; los criterios reutilizables y referencias viven en `docs/04-DISENO-VISUAL-Y-ACCESIBILIDAD.md`, y el estado/punto de continuación se refleja en `AI_CONTEXT.md`. HF-01 es el mockup de máxima fidelidad de la página y la base visual para React: registrar la solución completa (layout, navbar, botones, ventanas, tipografía, geometría, espaciado, iconos, estados, comportamiento, responsive y accesibilidad), no solo color o marca. Solo decisiones aprobadas son contrato para React; el resto permanece claramente marcado como iteración pendiente. Ver regla obligatoria en `AGENTS.md`.
+> **HF-01: CONGELADO** (aprobación del usuario, 2026-09-30).  
+> **React Gate: ABIERTO.**  
+> Las secciones históricas de este documento que digan “EN ITERACIÓN” o “NO CONGELADO” son snapshots del momento en que fueron escritas; no contradicen la decisión de congelación.
 
 ## Referencia
 
 Auditoría global del 2026-09-24 sobre mockups de mockups/HFcompletos. Commit de referencia: ee144ce.
 
-React continúa bloqueado hasta cerrar los bloqueos.
+## Snapshot operativo — 2026-09-29 (histórico)
 
-## Snapshot operativo — 2026-09-29
-
-- HF-01: **EN ITERACIÓN / NO CONGELADO**.
+- HF-01: **CONGELADO** (actualizado 2026-09-30 por aprobación del usuario).
 - Fuente actual: `mockups/hf-01-home-definitivo.html`.
 - `mockups/hf-01-home.html` y `mockups/hf-01-home-remoto-pruebas.html` son referencias comparativas; no sobrescribir.
-- La auditoría vigente evalúa HF-01 como **mockup de máxima fidelidad para React**, no como código de producción.
-- El foco inmediato es: bugs visuales, jerarquía comercial, identidad, responsive, estados interactivos y calidad de craft.
-- No convertir una observación histórica en requisito actual sin comprobar su fecha y si fue posteriormente supersedida.
-- **Defectos visuales abiertos (V-01 a V-09):** ver sección «Auditoría visual con render real — 2026-09-29». V-01 y V-04 a V-09 se corrigen en el mockup; V-02 y V-03 pasan a requisitos de React. Mientras haya alguno de los primeros abierto, HF-01 no puede congelarse.
+- La auditoría vigente evaluó HF-01 como **mockup de máxima fidelidad para React**, no como código de producción.
+- **Defectos visuales (V-01 a V-09):** ver sección «Auditoría visual con render real». V-01 y V-04 a V-09 se implementaron en el mockup; V-02 y V-03 son requisitos de React. Deuda visual conocida se traslada a la implementación React.
 ## Estado
 
 | HF | Pantalla | Estado |
 |---|---|---|
-| 01 | Home | 🟡 EN ITERACIÓN (Único mockup HTML en desarrollo, NO congelado) |
+| 01 | Home | ✅ CONGELADO (2026-09-30) |
 | 02 | Catálogo | Ajustar |
 | 03 | Detalle producto | Mantener + refinar |
 | 04 | Selección solicitud | Mantener |

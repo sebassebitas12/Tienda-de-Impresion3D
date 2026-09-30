@@ -180,7 +180,8 @@ Si existen varias rutas posibles, explica brevemente sus diferencias; no avances
 ## 14. Estado actual
 
 - Rama de trabajo: `Pruebas`.
-- Fase: cierre de HF-01 / preparación de React.
-- HF-01: **EN ITERACIÓN / NO CONGELADO**.
-- React: **BLOQUEADO** hasta superar el gate.
-- El único mockup HTML que se itera es `mockups/hf-01-home-definitivo.html`.
+- Fase: **4 — Fundaciones React**.
+- HF-01: **CONGELADO** (aprobación del usuario, 2026-09-30).
+- React Gate: **ABIERTO** (todos los requisitos del gate superados).
+- Mockup de referencia visual: `mockups/hf-01-home-definitivo.html` (congelado, no se edita).
+- Siguiente bloque: orquestación del UI Kit (primitivas en `src/components/ui/`) y estructura de carpetas según `docs/06`.

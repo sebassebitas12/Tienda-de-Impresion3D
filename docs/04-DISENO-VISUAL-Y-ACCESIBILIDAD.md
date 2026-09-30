@@ -1,6 +1,6 @@
 # Vértice CR — Diseño visual, temas y accesibilidad
 
-> Última actualización: **2026-09-29**.
+> Última actualización: **2026-09-30**.
 
 ## Dirección vigente
 
@@ -19,7 +19,7 @@ La paleta por sí sola no hace que un componente pertenezca a Vértice. Cada pan
 - Al habilitar React, centralizar los tokens y recursos compartidos y ofrecer una primitiva común de marca (logotipo/isotipo) para evitar recreaciones diferentes por pantalla. Los componentes no deben fijar una paleta, tipografía o estilo genérico separado de los tokens del producto.
 - Validar cada componente dentro de la página real, no aislado: comparar navbar, hero, catálogo y controles flotantes; comprobar que su jerarquía, escala, bordes, acentos, iconografía y copy parezcan parte del mismo producto. El chatbot de HF-01 es una iteración de esta regla, aún pendiente de aprobación.
 
-React continúa bloqueado por los gates del proyecto. Esta regla define cómo preservar la identidad cuando se autorice implementarlo; no autoriza comenzar componentes React antes de tiempo.
+React Gate está abierto (2026-09-30). Esta regla define cómo preservar la identidad al implementar componentes React; los tokens y recursos compartidos deben centralizarse desde el inicio.
 
 ## Contrato de fidelidad visual HF-01 → React y documentación continua
 

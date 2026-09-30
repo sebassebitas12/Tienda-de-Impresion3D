@@ -1,9 +1,9 @@
 # Vértice CR — Roadmap
 
-> **Última actualización:** 2026-09-29  
+> **Última actualización:** 2026-09-30  
 > **Estado:** ACTIVO  
-> **Fase actual:** 3 — cierre visual/UX de HF-01.  
-> **React:** BLOQUEADO.
+> **Fase actual:** 4 — Fundaciones React.  
+> **React:** DESBLOQUEADO (Gate abierto 2026-09-30).
 
 ## Fase 3 — Cierre de diseño
 
@@ -13,11 +13,11 @@ Convertir HF-01 en la referencia visual de máxima fidelidad de la Home y cerrar
 
 ### Estado actual
 
-- HF-01: 🟡 **EN ITERACIÓN / NO CONGELADO**
+- HF-01: ✅ **CONGELADO** (aprobación del usuario, 2026-09-30).
 - Dark/Light: definidos en `04`.
-- Accesibilidad: criterios definidos; paneles requieren validación visual completa.
+- Accesibilidad: criterios definidos en `04`.
 - Referencias de diseño: consolidadas en `04`.
-- Mockup HTML: `mockups/hf-01-home-definitivo.html`.
+- Mockup HTML de referencia: `mockups/hf-01-home-definitivo.html` (congelado).
 - No se crean más mockups HTML para las demás pantallas.
 
 ### Pendientes antes del gate
@@ -28,18 +28,18 @@ Convertir HF-01 en la referencia visual de máxima fidelidad de la Home y cerrar
 4. Verificar que la Home comunique tienda/producto, no solo dirección de arte.
 5. Aprobar formalmente HF-01.
 
-## Preflight antes de React
+## Preflight antes de React — SUPERADO ✅ (2026-09-30)
 
-Cuando HF-01 sea aprobado, no saltar directamente a componentes. Primero cerrar:
+Todos los requisitos del gate fueron cerrados antes de iniciar React:
 
-1. **Producto/negocio:** alcance, estados y reglas de `01–02`.
-2. **UX:** rutas y flujos de `03`.
-3. **Diseño:** tokens, responsive y accesibilidad de `04–05`.
-4. **Arquitectura:** estructura y límites de `06`.
-5. **Datos/API/auth:** contratos y normalización de `07`.
-6. **Testing:** estrategia y scripts reales de `09`.
-7. **Dependencias:** instalar únicamente las aprobadas y necesarias.
-8. **Gate final:** verificar que documentación y repo coincidan.
+1. **Producto/negocio:** alcance, estados y reglas cerrados en `01–02`.
+2. **UX:** rutas y flujos estables en `03`.
+3. **Diseño:** tokens, responsive y accesibilidad definidos en `04–05`.
+4. **Arquitectura:** estructura y límites cerrados en `06`.
+5. **Datos/API/auth:** contratos y normalización definidos en `07`.
+6. **Testing:** estrategia preparada en `09`.
+7. **Dependencias:** se instalan según necesidad documentada.
+8. **Gate final:** documentación y repo alineados.
 
 ## Fase 4 — Fundaciones React
 

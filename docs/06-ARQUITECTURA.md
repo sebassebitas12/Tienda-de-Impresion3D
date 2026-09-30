@@ -1,6 +1,6 @@
 # Vértice CR — Arquitectura
 
-> Última actualización: **2026-09-24**.
+> Última actualización: **2026-09-30**.
 
 ## Principio
 
@@ -59,15 +59,65 @@ Acceso a JSON Server, API externa, auth, IA y N8N. Cada servicio normaliza respu
 ### `src/utils/`
 Funciones puras, validaciones y cálculos sin efectos secundarios.
 
-### `src/components/`
+### `src/components/` (UI Kit y Compartidos)
 Solo piezas realmente compartidas entre dominios. Una pieza propia de una feature debe permanecer en su feature.
+Para optimizar el desarrollo y mantener coherencia global, esta capa incluye el **UI Kit (Primitivas)** extraído del mockup congelado HF-01 y de los contratos documentados en `docs/02–04`:
+
+#### Interacción y controles
+- `Button` — Variantes: `primary` (CTA lava), `ghost` (borde), `pill` (redondeado), `full-width`. Estados: `default`, `hover`, `active`, `disabled`, `loading` (spinner + deshabilitado para evitar dobles envíos).
+- `IconButton` — Controles cuadrados/redondos de 42–50 px: cerrar panel (×), flechas del visor (`.rail-arrow`), hamburguesa, tema, búsqueda, carrito y botones flotantes (`floating-button`).
+- `LinkText` — Enlace con affordance de flecha (“Ver ficha ↗”, `.text-link`). Variantes: inline y standalone.
+
+#### Datos y estado
+- `Badge` — Etiquetas de material (`.material-tag`), stock (`.stock-tag` con variantes `in-stock`, `order`, `out`), chips de especificación (`.spec-chip`) y estados de solicitud (`PENDIENTE DE COTIZACIÓN`, `APROBADO`, etc.).
+- `StatusIndicator` — Punto vivo con pulso (`.chat-status i`, `.visual-status i`) para estados en línea y alarmas.
+- `PriceTag` — Precio en CRC con moneda y formato mono. Nunca se usa para solicitudes PENDING_QUOTE.
+- `MonoLabel` — Texto técnico pequeño en JetBrains Mono (`.mono-label`, coordenadas, índices, referencias PRT).
+
+#### Superficies y contenedores
+- `Card` — Superficie base con variantes de radio (sharp 2px, card 6px, hero 12px) y hover con elevación. Se usa para productos, procesos, specs y resumen.
+- `Panel` / `Drawer` — Contenedor flotante para chatbot, accesibilidad, menú móvil, búsqueda y cuenta. Incluye: cabecera con título/cierre, cuerpo con scroll, animación de entrada, `aria-hidden`/`aria-expanded`, cierre por Escape y retorno de foco.
+- `SectionBlock` — Wrapper de sección con título, subtítulo y mono-label de kicker (patrón `.section` + `.section-heading` + `.mono-label`).
+
+#### Formularios
+- `Input` — Campo de texto con label explícito, placeholder, estados (focus, error, disabled) y `aria-describedby` para errores.
+- `SearchInput` — Campo de búsqueda con popover de resultados, estado vacío y teclado.
+- `Select` — Selector con opciones.
+- `Checkbox` / `Switch` — Controles de accesibilidad (`.a11y-toggle`, `.a11y-control-buttons button`) con `aria-checked`/`aria-pressed`.
+- `FileDropzone` — Upload de archivos 3D con estados: idle, drag-over, processing, success, error-format, error-size. (Feature de HF-05, pero el componente base se comparte).
+
+#### Navegación
+- `NavLink` — Enlace de navegación con underline animado y `aria-current="page"` (`.nav-links a`).
+- `BrandLogo` — Isotipo + nombre de marca. Variantes: completo y compacto (solo isotipo).
+- `ThemeToggle` — Botón sol/luna con cambio de tema y `aria-label` sincronizado.
+- `LanguageToggle` — Selector ES/EN (`.language-toggle`).
+
+#### Feedback
+- `Skeleton` — Shimmer de carga para cards de producto, textos y imágenes.
+- `EmptyState` — Mensaje de estado vacío con CTA (“No hay productos con estos filtros” + “Limpiar filtros”).
+- `ErrorState` — Mensaje de error con acción de reintentar.
+- `Toast` / `Notification` — Feedback breve no bloqueante.
+
+#### Tipografía y decoración
+- `SectionKicker` — Numeración de sección (`01 / SELECCIÓN DE TALLER`) en mono naranjo.
+- `SignalMetric` — Número monoespaciado grande con label debajo (`.signal-value` + `.signal-text`).
+- `RevealOnScroll` — Wrapper con `IntersectionObserver` para entrada animada (`.reveal`).
+
+#### Comercio (componentes compartidos entre features)
+- `ProductCard` — Compone `Card` + imagen + `Badge` (material, stock) + ref mono + nombre + descripción + footer (categoría + `LinkText`).
+- `HelpDisclosure` — Inline disclosure con trigger `?` y `aria-expanded`. Definido en `docs/04`.
+- `QuoteSummaryPanel` — Resumen lateral de cotización con monto, vigencia y CTA.
+- `CartItem` — Base para item de carrito (variantes: catálogo y solicitud personalizada).
+- `StepperBar` — Indicador de pasos de checkout con `aria-current="step"`.
+- `SinpePaymentBlock` — Bloque de pago SINPE con destino, comprobante y estados.
 
 ### `src/styles/`
-Tokens, temas y estilos globales derivados de `docs/04`.
+Tokens, temas y estilos globales derivados de `docs/04`. Incluye variables CSS de la identidad Obsidian Precision Forge + Lava Orgánica, tipografías, motion tokens y clases utilitarias base.
 
 ## Dirección de dependencias
 
 La dependencia debe ir hacia abajo:
+
 
 `app/pages/features → hooks/services/utils → APIs/datos`
 
@@ -96,10 +146,10 @@ Nunca números operativos escritos directamente en un componente de dashboard.
 
 JSON Server + frontend no equivalen a seguridad empresarial. JWT se incorporará como requisito académico de autenticación/autorización, con responsabilidades separadas.
 
-## Gate
+## Gate — SUPERADO ✅ (2026-09-30)
 
-No implementar React hasta:
-- HF aprobado;
+Requisitos cerrados antes de iniciar React:
+- HF aprobado y congelado;
 - Dark/Light definidos;
 - accesibilidad definida;
 - modelo de negocio estable;

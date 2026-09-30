@@ -1,6 +1,6 @@
 # AI_CONTEXT.md — Vértice CR
 
-> **Última actualización:** 2026-09-29  
+> **Última actualización:** 2026-09-30  
 > **Estado:** SNAPSHOT ACTIVO  
 > **Rama:** `Pruebas`  
 > **No es un diario:** este archivo resume el presente. El historial detallado vive en los documentos de dominio.
@@ -86,16 +86,13 @@ Detalle, decisiones del usuario, orden de trabajo y criterio de cierre en `docs/
 - **Implementados en el mockup** (V-01, V-04 a V-09): ✅ V-04 fundido en fotos; ✅ V-01 scroll en botones flotantes; ✅ V-05 opacidad en «Mi Espacio»; ✅ V-06 buscador simplificado; ✅ V-07 chat (flechas y hueco); ✅ V-08 título y botón cerrar en móvil; ✅ V-09 etiquetas español en Precisión y footer.
 - **Requisitos de React, no se tocan en el mockup:** V-02 (en móvil el producto debe verse en la primera pantalla); V-03 (PRT-006 y las demás tarjetas son ejemplos del mockup; el catálogo real vendrá con datos reales).
 - Idioma y tamaño de texto globales no entran en el mockup; están documentados como requisito de React en `docs/04`.
-- Pendiente: Aprobación final del usuario para congelar HF-01 visualmente.
 
-### Aún en iteración
-- auditoría visual global;
-- equilibrio entre producto y telemetría decorativa del hero;
-- percepción de tienda vs. panel técnico;
-- responsive real;
-- comportamiento final del hamburger;
-- aprobación visual final de chatbot/accesibilidad;
-- algunos elementos de catálogo que todavía parecen demo.
+### Deuda visual conocida (se resuelve en React, no bloquea congelación)
+- Responsive real (V-02: en 375 px el producto debe verse en la primera pantalla).
+- Datos de catálogo reales vs. ejemplos de mockup (V-03).
+- Equilibrio final entre producto y telemetría decorativa del hero.
+- Comportamiento final del hamburger (funcionalidad React, no HTML estático).
+- Validación de accesibilidad con tecnología asistiva real.
 
 ### Regla
 No tratar como contrato React algo que aún esté marcado como pendiente.
@@ -120,7 +117,7 @@ La UI no contiene reglas de negocio complejas ni accede directamente a JSON Serv
 
 Referencia: `docs/07`.
 
-Antes de React deben cerrarse:
+Definidos y cerrados para el gate:
 - modelo normalizado;
 - estados de solicitudes;
 - contratos API;
@@ -152,7 +149,7 @@ No iniciar implementación completa hasta tener:
 
 ## 13. Orden de arranque de React
 
-Cuando el gate abra:
+Cuando el gate abra: → **ABIERTO (2026-09-30)**
 
 1. limpiar scaffold Vite;
 2. aplicar tokens/global styles;
@@ -201,4 +198,4 @@ Antes de editar:
 6. verifica;
 7. documenta.
 
-**Punto actual:** HF-01 ha sido oficialmente congelado. React Gate está abierto. Siguiente bloque: Iniciar el paso 1 y 2 del orden de arranque de React (Limpiar scaffold Vite y aplicar tokens/estilos globales basados en el manual del sistema de diseño).
+**Punto actual:** HF-01 **CONGELADO** y React Gate **ABIERTO** (2026-09-30). Pasos 1–2 (Limpieza Vite y tokens globales) completados. Siguiente bloque: creación del **UI Kit (Primitivas)** documentado en `docs/06` sección `src/components/`, seguido de estructura de carpetas, App Shell/Layout y Routing.
