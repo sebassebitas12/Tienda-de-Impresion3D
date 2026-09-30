@@ -65,7 +65,7 @@ export function Navbar({ onReading }) {
         <div className="header-actions">
           <IconButton
             ref={searchTrigger}
-            className="nav-search"
+            className="nav-search header-search"
             label={copy.search}
             aria-expanded={panel === 'search'}
             aria-controls="search-panel"
@@ -81,8 +81,8 @@ export function Navbar({ onReading }) {
             {copy.quote}<span aria-hidden="true">↗</span>
           </Link>
 
-          <LanguageToggle language={language} onChange={setLanguage} />
-          <ThemeToggle theme={theme} onToggle={setTheme} label={theme === 'dark' ? copy.light : copy.dark} />
+          <LanguageToggle className="header-language" language={language} onChange={setLanguage} />
+          <ThemeToggle className="header-theme" theme={theme} onToggle={setTheme} label={theme === 'dark' ? copy.light : copy.dark} />
 
           <IconButton
             ref={menuTrigger}
@@ -99,7 +99,7 @@ export function Navbar({ onReading }) {
             id="search-panel"
             className="search-panel"
             open={panel === 'search'}
-            title={copy.searchTitle}
+            title={<span className="search-panel-title"><img src="/favicon-32.png" alt="" />{copy.searchTitle}</span>}
             closeLabel={copy.close}
             onClose={closePanel}
             triggerRef={searchTrigger}
