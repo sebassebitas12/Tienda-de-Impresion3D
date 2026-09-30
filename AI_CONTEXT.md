@@ -206,7 +206,7 @@ Antes de editar:
 - **Catálogo destacado:** las seis referencias visuales de HF-01 están cargadas con sus badges Material/Stock. Como todavía no existen fotografías reales de catálogo, todas usan temporalmente `/images/producto-temporal.png`; este asset es explícitamente provisional y no representa un producto real.
 - **Assets del mockup publicados:** `hero-soporte.jpg`, `producto-engranaje.jpg`, `producto-dragon.jpg`, `producto-drone.jpg` y `producto-maqueta.jpg` fueron reutilizados desde `mockups/images/` en `public/images/` sin alterar el mockup congelado.
 
-**Siguiente bloque exacto:** Capa 2 sigue en pasada de aprobación visual. Se corrigió una regresión bloqueante en `RevealOnScroll.jsx` causada por secuencias `\n` literales que rompían Vite con `Invalid Unicode escape sequence`. El archivo ya contiene saltos de línea reales y conserva el stagger. Tras `git pull`, volver a levantar/renderizar Home y continuar la auditoría visual; **no pasar a Tienda hasta aprobación de Home.**
+**Siguiente bloque exacto:** Capa 2 sigue en aprobación visual, pero ahora existe un gate CI obligatorio en `.github/workflows/verify.yml`. Antes de pedir `pull`, el commit final debe pasar `npm ci`, lint, tests, `check:ui` y build. El CI ya detectó y permitió corregir un `setState` innecesario en `Home.jsx` además de la regresión de sintaxis previa. Falta confirmar verde del commit final y luego render local/aprobación visual del usuario; **no pasar a Tienda hasta aprobación de Home.**
 
 **Skills de proyecto activas:** `.agents/skills/vertice-continuity/SKILL.md` y `.agents/skills/vertice-visual-audit/SKILL.md`. Nuevas skills/referencias aportadas por el usuario se evalúan por utilidad real; no se incorporan automáticamente.
 
