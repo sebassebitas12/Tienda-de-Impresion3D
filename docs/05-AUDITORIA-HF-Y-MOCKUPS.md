@@ -727,3 +727,6 @@ Checks:
 La primera ejecución detectó un error adicional real en `Home.jsx` (`react-hooks/set-state-in-effect`) antes de una nueva entrega. Se eliminó el efecto innecesario. La segunda ejecución consiguió lint/tests/UI build/build en success.
 
 Regla durable: no solicitar `git pull` para cambios de código hasta tener el commit final con el gate verde. La aprobación visual del usuario sigue siendo independiente del CI.
+
+
+- **R-H16 — regresión visual del menú de cuenta:** el panel React se alejó del desplegable compacto ya resuelto en HF-01 y apareció como una lista genérica con flechas repetidas y contenido extra. Se restauró la composición compacta del HF-01: cabecera Mi Espacio/estado, iconos reales por fila, login/registro, divisor, ayuda y preferencias. Se retiró Carrito del panel desktop y se mantuvo la navegación principal solo para móvil. CI obligatorio ejecutado tras el cambio.
