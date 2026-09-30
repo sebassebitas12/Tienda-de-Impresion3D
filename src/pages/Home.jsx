@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Button,
@@ -6,159 +6,37 @@ import {
   ProductCard,
   SectionBlock
 } from '../components/ui/index.js';
+import { usePreferences } from '../hooks/usePreferences.js';
+import { FEATURED_PRODUCTS, HERO_PIECES, getHomeContent } from './homeContent.js';
 import '../styles/home.css';
 
-const heroPieces = [
-  {
-    image: '/images/hero-soporte.jpg',
-    alt: 'Soporte modular de carga en PETG',
-    material: 'PETG PRO',
-    process: '/ ESTRUCTURA LATTICE',
-    title: 'Soporte Modular de Carga',
-    description: 'Estructura mecánica con alivios lattice de alta rigidez',
-    ref: 'REF: PRT-001',
-    tolerance: '±0.05 mm',
-    target: 'M 0 0 L 45 0 L 155 93',
-    dot: [155, 93],
-    label: 'Pieza 1, soporte modular'
-  },
-  {
-    image: '/images/producto-engranaje.jpg',
-    alt: 'Engranaje helicoidal de precisión en nylon',
-    material: 'NYLON PA12',
-    process: '/ MÓDULO 2.0',
-    title: 'Engranaje Helicoidal 60T',
-    description: 'Transmisión de bajo ruido para ciclos mecánicos continuos',
-    ref: 'REF: PRT-002',
-    tolerance: 'MÓDULO 2.0',
-    target: 'M 0 0 L 45 0 L 138 76',
-    dot: [138, 76],
-    label: 'Pieza 2, engranaje helicoidal'
-  },
-  {
-    image: '/images/producto-dragon.jpg',
-    alt: 'Dragón geométrico articulado',
-    material: 'PLA SILK',
-    process: '/ ACABADO IRIDISCENTE',
-    title: 'Dragón de Colección',
-    description: 'Escultura de facetas con articulaciones internas continuas',
-    ref: 'REF: PRT-003',
-    tolerance: 'ARTICULADO',
-    target: 'M 0 0 L 45 0 L 148 101',
-    dot: [148, 101],
-    label: 'Pieza 3, dragón geométrico'
-  },
-  {
-    image: '/images/producto-drone.jpg',
-    alt: 'Brazo de chasis de drone en ASA',
-    material: 'ASA CARBON',
-    process: '/ RESISTENCIA UV',
-    title: 'Brazo de Chasis Drone',
-    description: 'Estructura tubular para motor brushless y alto impacto',
-    ref: 'REF: PRT-004',
-    tolerance: 'RESISTENCIA UV',
-    target: 'M 0 0 L 45 0 L 128 70',
-    dot: [128, 70],
-    label: 'Pieza 4, brazo de drone'
-  }
-];
-
-const temporaryProductImage = '/images/producto-temporal.png';
-
-const featuredProducts = [
-  {
-    id: 'p1',
-    reference: 'REF: PRT-001 · ±0.05 MM',
-    name: 'Soporte de Alta Precisión Modular',
-    description: 'Geometría lattice optimizada con alivios de peso para montajes mecánicos y rigidez estructural.',
-    material: 'PETG PRO',
-    categoryName: 'Piezas funcionales',
-    stock: 14,
-    stockLabel: 'EN STOCK (14)',
-    stockStatus: 'in-stock',
-    status: 'ACTIVE',
-    images: [temporaryProductImage]
-  },
-  {
-    id: 'p2',
-    reference: 'REF: PRT-002 · MÓDULO 2.0',
-    name: 'Engranaje de Nylon de Precisión 60T',
-    description: 'Dientes helicoidales para transmisión de bajo nivel sonoro y resistencia continua al desgaste.',
-    material: 'NYLON PA12',
-    categoryName: 'Mecánica / Robótica',
-    stock: 21,
-    stockLabel: 'EN STOCK (21)',
-    stockStatus: 'in-stock',
-    status: 'ACTIVE',
-    images: [temporaryProductImage]
-  },
-  {
-    id: 'p3',
-    reference: 'REF: PRT-003 · IRIDISCENTE',
-    name: 'Dragón de Colección Geométrico',
-    description: 'Escultura low-poly con articulaciones internas continuas, impresa en una sola pieza móvil.',
-    material: 'PLA SILK',
-    categoryName: 'Colección / Arte',
-    stock: 0,
-    stockLabel: 'BAJO PEDIDO',
-    stockStatus: 'order',
-    status: 'ACTIVE',
-    images: [temporaryProductImage]
-  },
-  {
-    id: 'p4',
-    reference: 'REF: PRT-004 · RESISTENCIA UV',
-    name: 'Brazo de Chasis de Drone Pro',
-    description: 'Estructura tubular con montura para motor brushless y amortiguación elástica de impacto.',
-    material: 'ASA CARBON',
-    categoryName: 'Aeroespacial / Drones',
-    stock: 8,
-    stockLabel: 'EN STOCK (8)',
-    stockStatus: 'in-stock',
-    status: 'ACTIVE',
-    images: [temporaryProductImage]
-  },
-  {
-    id: 'p5',
-    reference: 'REF: PRT-005 · CAPA 0.08 MM',
-    name: 'Maqueta de Rascacielos Cúbico',
-    description: 'Modelo arquitectónico de precisión con vanos definidos, terrazas y textura de fachada limpia.',
-    material: 'PLA HIGH DETAIL',
-    categoryName: 'Arquitectura',
-    stock: 0,
-    stockLabel: 'BAJO PEDIDO',
-    stockStatus: 'order',
-    status: 'ACTIVE',
-    images: [temporaryProductImage]
-  },
-  {
-    id: 'p6',
-    reference: 'REF: PRT-006 · TEMPORAL',
-    name: 'Busto de Precisión Cibernético',
-    description: 'Referencia temporal del catálogo mientras se incorporan fotografías reales de producto.',
-    material: 'RESINA 8K',
-    categoryName: 'Prototipo',
-    stock: 1,
-    stockLabel: 'NUEVO LOTE',
-    stockStatus: 'in-stock',
-    status: 'ACTIVE',
-    images: [temporaryProductImage]
-  }
-];
-
 export function Home() {
+  const { language } = usePreferences();
+  const content = getHomeContent(language);
   const [activePiece, setActivePiece] = useState(0);
   const visualRef = useRef(null);
   const photoWrapRef = useRef(null);
-  const piece = heroPieces[activePiece];
+
+  const heroPieces = useMemo(
+    () => HERO_PIECES.map(piece => ({ ...piece, ...content.heroPieces[piece.id] })),
+    [content],
+  );
+
+  const featuredProducts = useMemo(
+    () => FEATURED_PRODUCTS.map(product => ({ ...product, ...content.products[product.id] })),
+    [content],
+  );
+
+  const piece = heroPieces[activePiece] ?? heroPieces[0];
 
   useEffect(() => {
     const visual = visualRef.current;
     const photoWrap = photoWrapRef.current;
     if (!visual || !photoWrap) return undefined;
 
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (reducedMotion.matches) return undefined;
+    const systemReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const manuallyReducedMotion = document.documentElement.dataset.motion === 'reduced';
+    if (systemReducedMotion.matches || manuallyReducedMotion) return undefined;
 
     const resetMotion = () => {
       visual.style.setProperty('--pointer-x', '50%');
@@ -195,8 +73,12 @@ export function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    setActivePiece(current => Math.min(current, heroPieces.length - 1));
+  }, [heroPieces.length]);
+
   const selectRelativePiece = (offset) => {
-    setActivePiece((current) => (current + offset + heroPieces.length) % heroPieces.length);
+    setActivePiece(current => (current + offset + heroPieces.length) % heroPieces.length);
   };
 
   return (
@@ -205,29 +87,26 @@ export function Home() {
         <div className="hero-inner">
           <div className="hero-grid">
             <div className="hero-copy">
-              <div className="hero-kicker mono-label">Manufactura aditiva / San José, CR</div>
-              <h1 id="hero-title">Lo que imaginas.<br /><em>Hecho preciso.</em></h1>
-              <p className="hero-lede">
-                Piezas funcionales, prototipos y objetos de alto detalle fabricados con criterio técnico,
-                materiales correctos y una revisión humana en cada etapa.
-              </p>
+              <div className="hero-kicker mono-label">{content.heroKicker}</div>
+              <h1 id="hero-title">{content.heroTitle}<br /><em>{content.heroAccent}</em></h1>
+              <p className="hero-lede">{content.heroLead}</p>
               <div className="hero-actions">
                 <Button as="a" href="#piezas" variant="primary" className="btn-pill">
-                  Explorar piezas <span aria-hidden="true">↓</span>
+                  {content.explore} <span aria-hidden="true">↓</span>
                 </Button>
                 <Button as={Link} to="/solicitud" variant="ghost">
-                  Tengo un archivo <span aria-hidden="true">↗</span>
+                  {content.hasFile} <span aria-hidden="true">↗</span>
                 </Button>
               </div>
-              <div className="hero-signals" aria-label="Capacidades principales">
-                <div><span className="signal-value">±0.05 mm</span><span className="signal-text">Tolerancia objetivo</span></div>
-                <div><span className="signal-value">FDM / SLA</span><span className="signal-text">Procesos disponibles</span></div>
-                <div><span className="signal-value">Por etapas</span><span className="signal-text">Revisión por etapas</span></div>
+              <div className="hero-signals" aria-label={content.capabilities}>
+                <div><span className="signal-value">±0.05 mm</span><span className="signal-text">{content.tolerance}</span></div>
+                <div><span className="signal-value">FDM / SLA</span><span className="signal-text">{content.processes}</span></div>
+                <div><span className="signal-value">{content.stagedValue}</span><span className="signal-text">{content.stagedReview}</span></div>
               </div>
             </div>
 
-            <div className="hero-visual" ref={visualRef} aria-label="Pieza destacada interactiva">
-              <span className="visual-coordinate">WORKBENCH</span>
+            <div className="hero-visual" ref={visualRef} aria-label={content.featuredPieces}>
+              <span className="visual-coordinate">{content.workbench}</span>
               <div className="hero-photo-wrap" ref={photoWrapRef}>
                 <img
                   className="hero-photo"
@@ -239,7 +118,7 @@ export function Home() {
                   decoding="async"
                 />
                 <div className="scan-line" aria-hidden="true" />
-                <div className="visual-status" aria-hidden="true"><i /> REVISIÓN ACTIVA</div>
+                <div className="visual-status" aria-hidden="true"><i /> {content.activeReview}</div>
                 <div className="visual-note" aria-hidden="true">
                   <strong>{piece.material}</strong>
                   <span>{piece.process}</span>
@@ -258,11 +137,11 @@ export function Home() {
               </div>
 
               <div className="thumb-rail">
-                <button className="rail-arrow" type="button" aria-label="Pieza anterior" onClick={() => selectRelativePiece(-1)}>↑</button>
-                <div className="thumb-list" role="tablist" aria-label="Piezas destacadas">
+                <button className="rail-arrow" type="button" aria-label={content.previousPiece} onClick={() => selectRelativePiece(-1)}>↑</button>
+                <div className="thumb-list" role="tablist" aria-label={content.featuredPieces}>
                   {heroPieces.map((item, index) => (
                     <button
-                      key={item.ref}
+                      key={item.id}
                       className={`thumb${index === activePiece ? ' is-active' : ''}`}
                       type="button"
                       role="tab"
@@ -274,7 +153,7 @@ export function Home() {
                     </button>
                   ))}
                 </div>
-                <button className="rail-arrow" type="button" aria-label="Pieza siguiente" onClick={() => selectRelativePiece(1)}>↓</button>
+                <button className="rail-arrow" type="button" aria-label={content.nextPiece} onClick={() => selectRelativePiece(1)}>↓</button>
               </div>
             </div>
           </div>
@@ -283,14 +162,20 @@ export function Home() {
 
       <SectionBlock
         id="piezas"
-        title={<>Objetos que<br />resuelven algo.</>}
-        kicker="Selección de taller"
-        subtitle="Una selección de piezas funcionales y modelos de colección. El catálogo muestra referencias; la cotización ocurre después de revisar tu solicitud."
+        title={<>{content.catalogTitleA}<br />{content.catalogTitleB}</>}
+        kicker={content.catalogKicker}
+        subtitle={content.catalogIntro}
       >
         <div className="catalog-grid">
-          {featuredProducts.map((product) => (
+          {featuredProducts.map(product => (
             <RevealOnScroll key={product.id}>
-              <ProductCard product={product} linkAs={Link} to={`/producto/${product.id}`} />
+              <ProductCard
+                product={product}
+                linkAs={Link}
+                to={`/producto/${product.id}`}
+                viewLabel={content.viewProduct}
+                imageUnavailableLabel={content.imageUnavailable}
+              />
             </RevealOnScroll>
           ))}
         </div>
@@ -299,17 +184,12 @@ export function Home() {
       <section className="section manifesto">
         <div className="section-inner manifesto-grid">
           <RevealOnScroll className="manifesto-copy">
-            <span className="mono-label">El método</span>
-            <h2>No imprimimos<br />por imprimir.<br /><span>Resolvemos.</span></h2>
-            <p>Una pieza empieza mucho antes de tocar la cama de impresión: revisamos geometría, esfuerzo, material y acabado para que el resultado tenga sentido fuera de la pantalla.</p>
+            <span className="mono-label">{content.methodKicker}</span>
+            <h2>{content.methodTitleA}<br />{content.methodTitleB}<br /><span>{content.methodTitleC}</span></h2>
+            <p>{content.methodIntro}</p>
           </RevealOnScroll>
           <div className="process-list">
-            {[
-              ['Entender el archivo', 'Revisión de malla, escala, orientación y puntos críticos.'],
-              ['Elegir el material', 'Definimos el polímero según esfuerzo, temperatura y acabado.'],
-              ['Fabricar con control', 'Impresión aditiva con supervisión y revisión dimensional.'],
-              ['Entregar una pieza lista', 'Curado, acabado, verificación y despacho seguro.']
-            ].map(([title, description], index) => (
+            {content.methods.map(([title, description], index) => (
               <RevealOnScroll key={title} delay={index * 100} className="process-item">
                 <span className="process-number">{String(index + 1).padStart(2, '0')}</span>
                 <div><h3>{title}</h3><p>{description}</p></div>
@@ -323,24 +203,14 @@ export function Home() {
       <section className="section spec-section">
         <div className="section-inner">
           <div className="spec-grid">
-            <RevealOnScroll className="spec-card">
-              <span className="spec-index">A / DIMENSIONAL</span>
-              <h3>±0.05 mm</h3>
-              <p>Tolerancia objetivo para piezas y ajustes que necesitan repetibilidad.</p>
-              <span className="spec-chip">VERIFICACIÓN MANUAL</span>
-            </RevealOnScroll>
-            <RevealOnScroll className="spec-card" delay={100}>
-              <span className="spec-index">B / MATERIALES</span>
-              <h3>Polímeros técnicos</h3>
-              <p>PETG, Nylon CF, ASA, PLA de detalle y resina para distintos usos.</p>
-              <span className="spec-chip">FDM + SLA</span>
-            </RevealOnScroll>
-            <RevealOnScroll className="spec-card" delay={200}>
-              <span className="spec-index">C / ENTREGAS</span>
-              <h3>GAM + 7 provincias</h3>
-              <p>Prototipado y entregas coordinadas desde San José, Costa Rica.</p>
-              <span className="spec-chip">CORREOS DE COSTA RICA</span>
-            </RevealOnScroll>
+            {content.specs.map(([index, title, description, chip], position) => (
+              <RevealOnScroll key={index} className="spec-card" delay={position * 100}>
+                <span className="spec-index">{index}</span>
+                <h3>{title}</h3>
+                <p>{description}</p>
+                <span className="spec-chip">{chip}</span>
+              </RevealOnScroll>
+            ))}
           </div>
         </div>
       </section>
@@ -349,12 +219,12 @@ export function Home() {
         <div className="section-inner">
           <RevealOnScroll className="quote-box">
             <div>
-              <span className="mono-label">Tu proyecto</span>
-              <h2>¿Tenés un archivo<br />que quiere existir?</h2>
-              <p>Envíanos STL, STEP u OBJ para una revisión técnica antes de cotizar.</p>
+              <span className="mono-label">{content.projectKicker}</span>
+              <h2>{content.projectTitleA}<br />{content.projectTitleB}</h2>
+              <p>{content.projectIntro}</p>
             </div>
             <Button as={Link} to="/solicitud" variant="primary" className="btn-pill">
-              Iniciar solicitud <span aria-hidden="true">↗</span>
+              {content.startRequest} <span aria-hidden="true">↗</span>
             </Button>
           </RevealOnScroll>
         </div>
