@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { BrandLogo, Button, IconButton, Input, LanguageToggle, NavLink, Panel, ThemeToggle } from '../../components/ui/index.js';
+import { BrandLogo, IconButton, Input, LanguageToggle, NavLink, Panel, ThemeToggle } from '../../components/ui/index.js';
 import { useTheme } from '../../hooks/useTheme.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
 import { useAuth } from '../../hooks/useAuth.js';
