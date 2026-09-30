@@ -730,3 +730,8 @@ Regla durable: no solicitar `git pull` para cambios de código hasta tener el co
 
 
 - **R-H16 — regresión visual del menú de cuenta:** el panel React se alejó del desplegable compacto ya resuelto en HF-01 y apareció como una lista genérica con flechas repetidas y contenido extra. Se restauró la composición compacta del HF-01: cabecera Mi Espacio/estado, iconos reales por fila, login/registro, divisor, ayuda y preferencias. Se retiró Carrito del panel desktop y se mantuvo la navegación principal solo para móvil. CI obligatorio ejecutado tras el cambio.
+
+
+- **R-H17 — chrome React y flotantes no coincidían con HF-01:** capturas reales mostraron los botones flotantes invadiendo el workbench durante scroll y un navbar donde búsqueda/idioma/tema parecían variantes del mismo control genérico. Se restauró el auto-hide lateral de HF-01 (`translateX(60px)`, opacidad reducida, sin pointer-events mientras hay scroll), se diferenciaron los roles visuales de búsqueda/idioma/tema/CTA/hamburger y se separaron completamente las reglas de Search y Mi Espacio.
+- **R-H18 — colisión Search/Mi Espacio:** una edición anterior dejó `.search-panel,.account-panel-dropdown` compartiendo propiedades específicas de cuenta. Se corrigió: ambos popovers conservan anclaje común pero tienen geometría, padding y contenido propios.
+- Referencias externas usadas únicamente como criterio: Navbar Gallery para dropdown compacto/escaneable y Motion Primitives para feedback ligero de selección/hover. Sin dependencias nuevas ni cambio de identidad.
