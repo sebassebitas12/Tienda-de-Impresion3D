@@ -785,3 +785,24 @@ Aplicación Vértice:
 - IconButton: hover/focus coherentes y press más físico.
 - ProductCard, Método y Precisión: `:focus-within` recibe el mismo feedback visual que hover para no privilegiar mouse.
 - Sin librerías nuevas; todo CSS y respetando reduced motion.
+
+
+#### Aplicación 03 — utility button de tema
+
+El usuario pidió recuperar específicamente el control de tema del HF-01 porque su lenguaje técnico compacto sí aporta identidad.
+
+Patrón aplicado:
+- 42×42;
+- borde lava fino;
+- fondo casi negro con brillo radial mínimo;
+- geometría compacta/asimétrica;
+- sol/luna exclusivos según el destino del cambio;
+- hover con rotación/escala muy corta del icono;
+- active con compresión física mínima;
+- focus-visible comparte feedback con hover.
+
+Referencias externas usadas solo para comportamiento:
+- Codrops / Creative Button Styles: efectos CSS simples y sutiles por hover/click.
+- Codrops / Subtle Click Feedback Effects: feedback táctil corto para controles de icono.
+
+El patrón **no se replica automáticamente en todos los botones**. Se considera una familia de utility controls para acciones compactas donde el icono es el protagonista.
