@@ -285,7 +285,7 @@ export function Home() {
         id="piezas"
         title={<>Objetos que<br />resuelven algo.</>}
         kicker="Selección de taller"
-        description="Una selección de piezas funcionales y modelos de colección. El catálogo muestra referencias; la cotización ocurre después de revisar tu solicitud."
+        subtitle="Una selección de piezas funcionales y modelos de colección. El catálogo muestra referencias; la cotización ocurre después de revisar tu solicitud."
       >
         <div className="catalog-grid">
           {featuredProducts.map((product) => (
