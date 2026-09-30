@@ -58,6 +58,79 @@ Orden recomendado:
 11. tests por bloque;
 12. revisión visual contra HF-01.
 
+## Secuencia operativa de construcción React
+
+Esta es la guía de continuación para agentes. Si una sesión termina, el siguiente agente toma el **primer bloque no cerrado** de esta lista, salvo instrucción explícita del usuario.
+
+### Capa 0 — UI Kit ✅
+Primitivas, estados base y componentes compartidos.
+
+### Capa 1 — App Shell ✅
+Layouts, routing, providers y navegación base.
+
+### Capa 2 — Home HF-01 🟠 EN CURSO
+Orden interno:
+1. Hero/workbench y assets. ✅
+2. Catálogo destacado y placeholder visual temporal mientras no existan fotos reales. ✅
+3. Auditar fidelidad real en 1280 / 768 / 375, dark/light. 🟠 Auditoría del usuario en curso.
+4. Completar elementos de HF-01 aún ausentes en React: chatbot/asistente y panel de accesibilidad.
+5. Cerrar preferencias globales definidas en docs/04: idioma, escala tipográfica, contraste/movimiento y persistencia entre rutas.
+6. Corregir hallazgos de auditoría sin rediseñar el mockup congelado.
+7. Cerrar Capa 2 con lint/build/tests disponibles + evidencia visual. Solo entonces pasar a Tienda.
+
+### Capa 3 — Tienda / Catálogo
+- ruta /catalogo;
+- listado, búsqueda/filtros y estados loading/empty/error;
+- ProductCard con datos reales cuando existan;
+- responsive y preferencias globales heredadas;
+- no inventar productos, stock, precios ni fotos.
+
+### Capa 4 — Detalle de producto
+- ruta /producto/:id;
+- producto, material, stock, especificaciones y acción comercial según datos reales;
+- ayuda consistente y accesibilidad;
+- interacciones visuales/3D solo si aportan al producto y tienen justificación.
+
+### Capa 5 — Solicitud personalizada
+- /solicitud;
+- /solicitud/archivo;
+- /solicitud/ayuda-diseno;
+- upload y estados;
+- revisión antes de cotización;
+- respetar docs/02 y no convertir PENDING_QUOTE en producto.
+
+### Capa 6 — Carrito
+- /carrito;
+- separar productos de solicitudes/cotizaciones;
+- totales únicamente donde el dominio los permita.
+
+### Capa 7 — Checkout
+- /checkout/productos;
+- /checkout/solicitud;
+- stepper, datos, entrega, revisión y estados de pago/simulación según alcance académico.
+
+### Capa 8 — Auth, cuenta y pedidos
+- registro/acceso dentro del alcance académico;
+- /cuenta;
+- /pedidos/:id;
+- cotizaciones, aprobación y seguimiento según contratos vigentes.
+
+### Capa 9 — Páginas públicas secundarias
+FAQ, Sobre nosotros, Contacto y equivalentes ya definidos por navegación/alcance. Reutilizar shell y preferencias globales.
+
+### Capa 10 — Admin
+Dashboard y rutas /admin/* siguiendo docs/02, docs/06 y docs/08.
+
+### Capa 11 — Integraciones
+API/JSON Server, JWT/auth, N8N, IA y archivos 3D cuando la UI y el contrato correspondiente estén listos. Las simulaciones académicas deben estar documentadas.
+
+### Capa 12 — Auditoría y cierre global
+Tests, lint, build, coverage, responsive 375/768/1280, Dark/Light, accesibilidad, estados, rendimiento y revisión visual transversal.
+
+### Regla de avance
+
+**No saltar a la siguiente capa porque “ya se ve”.** Si el usuario detecta una omisión de la capa actual —por ejemplo chatbot, accesibilidad o preferencias globales en Home— se resuelve antes de declarar la capa cerrada.
+
 ## Fase 5 — Integraciones
 
 - API externa.
