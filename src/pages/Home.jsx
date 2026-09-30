@@ -91,7 +91,7 @@ export function Home() {
               <h1 id="hero-title">{content.heroTitle}<br /><em>{content.heroAccent}</em></h1>
               <p className="hero-lede">{content.heroLead}</p>
               <div className="hero-actions">
-                <Button as="a" href="#piezas" variant="primary" className="btn-pill">
+                <Button as="a" href="#piezas" variant="primary" pill>
                   {content.explore} <span aria-hidden="true">↓</span>
                 </Button>
                 <Button as={Link} to="/solicitud" variant="ghost">
@@ -162,6 +162,7 @@ export function Home() {
 
       <SectionBlock
         id="piezas"
+        className="catalog-section"
         title={<>{content.catalogTitleA}<br />{content.catalogTitleB}</>}
         kicker={content.catalogKicker}
         subtitle={content.catalogIntro}
@@ -223,7 +224,7 @@ export function Home() {
               <h2>{content.projectTitleA}<br />{content.projectTitleB}</h2>
               <p>{content.projectIntro}</p>
             </div>
-            <Button as={Link} to="/solicitud" variant="primary" className="btn-pill">
+            <Button as={Link} to="/solicitud" variant="primary" pill>
               {content.startRequest} <span aria-hidden="true">↗</span>
             </Button>
           </RevealOnScroll>
