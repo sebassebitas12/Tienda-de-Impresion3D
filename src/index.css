@@ -122,3 +122,27 @@ html[data-motion="reduced"] *::after {
 }
 
 [hidden] { display: none !important; }
+
+
+/* Global reading preference: high contrast */
+html[data-contrast="high"] {
+  --paper: #ffffff;
+  --muted: #eee7dc;
+  --dim: #d2c7b8;
+  --line: #8d7b68;
+  --line-strong: #cbbbaa;
+}
+
+html[data-theme="light"][data-contrast="high"] {
+  --paper: #111111;
+  --muted: #36312b;
+  --dim: #51483d;
+  --line: #75695c;
+  --line-strong: #41372f;
+}
+
+html[data-contrast="high"] :is(a,button,input,textarea,select,[tabindex]):focus-visible {
+  outline: 3px solid var(--paper);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px var(--ink);
+}
