@@ -206,7 +206,7 @@ Antes de editar:
 - **Catálogo destacado:** las seis referencias visuales de HF-01 están cargadas con sus badges Material/Stock. Como todavía no existen fotografías reales de catálogo, todas usan temporalmente `/images/producto-temporal.png`; este asset es explícitamente provisional y no representa un producto real.
 - **Assets del mockup publicados:** `hero-soporte.jpg`, `producto-engranaje.jpg`, `producto-dragon.jpg`, `producto-drone.jpg` y `producto-maqueta.jpg` fueron reutilizados desde `mockups/images/` en `public/images/` sin alterar el mockup congelado.
 
-**Siguiente bloque exacto:** Capa 2 sigue en cierre visual. Corregir paneles, hamburger, menús, botones y chrome tomando **HF-01 + decisiones aprobadas de docs/05** como autoridad visual. Stitch/UXMagic se usa solo para inventario de páginas, contenido y flujo; no para estética. Falta render local y aprobación del usuario; **no pasar a Tienda**.
+**Siguiente bloque exacto:** Capa 2 sigue en cierre visual. Ya se corrigió la jerarquía equivocada HF/Stitch en React: Stitch queda solo como referencia funcional/estructural; hamburger, menú, chat, accesibilidad y popovers vuelven a derivarse de HF-01. También se eliminaron índices decorativos tipo `01 / ASISTENCIA` y `02 / CONTROL`. Falta render local y aprobación del usuario; **no pasar a Tienda**.
 
 **Skills de proyecto activas:** `.agents/skills/vertice-continuity/SKILL.md` y `.agents/skills/vertice-visual-audit/SKILL.md`. Nuevas skills/referencias aportadas por el usuario se evalúan por utilidad real; no se incorporan automáticamente.
 
