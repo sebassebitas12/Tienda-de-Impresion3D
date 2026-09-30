@@ -198,4 +198,18 @@ Antes de editar:
 6. verifica;
 7. documenta.
 
-**Punto actual:** HF-01 **CONGELADO** y React Gate **ABIERTO** (2026-09-30). Pasos 1–2 (Limpieza Vite y tokens globales) completados. Siguiente bloque: creación del **UI Kit (Primitivas)** documentado en `docs/06` sección `src/components/`, seguido de estructura de carpetas, App Shell/Layout y Routing.
+**Punto actual:** HF-01 **CONGELADO** y React Gate **ABIERTO**. 
+- **Capa 0 (UI Kit):** Completada y testeada (100%).
+- **Capa 1 (App Shell):** Completada (100%). Layouts (`PublicLayout`, `AdminLayout`, `AuthLayout`), Routing (`react-router-dom`), Providers y estilos base (`shell.css`) implementados. El error de NPM (`brace-expansion`) fue parcheado y el servidor levanta en `localhost:5173`.
+- **Capa 2 (Home - En proceso):** Se creó el andamiaje (`Home.jsx` y `home.css`) usando los componentes del UI Kit. El Layout general funciona pero **falta la implementación de alta fidelidad del Hero y los Assets**.
+
+**Próximos pasos exactos (Lo que la IA debe hacer a continuación):**
+1. **Copiar Assets:** Mover las imágenes de `mockups/images/` (`hero-soporte.jpg`, `producto-engranaje.jpg`, etc.) a `public/images/`.
+2. **Reconstruir el Hero (`Home.jsx`):** Extraer del `hf-01-home-definitivo.html` el HTML/SVG exacto del panel derecho del Hero (el riel de miniaturas `.thumb-rail`, la foto principal `.hero-photo-wrap`, el escáner láser `.scan-line`, las anotaciones `.visual-note` y la telemetría `.visual-meta`). Conectar los estados de interacción (efecto parallax/tilt del mouse).
+3. **Poblar Catálogo Destacado:** Usar las imágenes reales (`producto-engranaje.jpg`, etc.) en las `ProductCard` de la Home en lugar del placeholder, aplicando los tags correctos (Material, Stock).
+
+**Contexto confirmado por el usuario:** entrega académica frontend, con visión
+de migrar a servicios reales. Pagos/facturación reales fuera del alcance actual.
+El usuario aportará la rúbrica para definir las simulaciones posteriores.
+`docs/07` aún no detalla auth/almacenamiento/SINPE; `db.json` tiene un estado
+histórico SUBMITTED que debe resolverse explícitamente antes de conectar solicitudes.

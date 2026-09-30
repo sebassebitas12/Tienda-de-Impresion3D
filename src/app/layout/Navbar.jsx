@@ -1,0 +1,71 @@
+import { useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { BrandLogo, Button, IconButton, Input, LanguageToggle, NavLink, Panel, ThemeToggle } from '../../components/ui/index.js';
+import { useTheme } from '../../hooks/useTheme.js';
+import { usePreferences } from '../../hooks/usePreferences.js';
+import { useAuth } from '../../hooks/useAuth.js';
+
+export function Navbar({ onReading }) {
+  const { theme, setTheme } = useTheme();
+  const { language, setLanguage, copy } = usePreferences();
+  const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [panel, setPanel] = useState(null);
+  const [query, setQuery] = useState('');
+  const searchTrigger = useRef(null);
+  const menuTrigger = useRef(null);
+  const searchField = useRef(null);
+  const links = [['/', 'home'], ['/catalogo', 'shop'], ['/nosotros', 'about'], ['/contacto', 'contact']];
+  const toggle = name => setPanel(current => current === name ? null : name);
+
+  return (
+    <header className="site-header">
+      <a className="skip-link" href="#main-content">{copy.skip}</a>
+      <div className="header-inner">
+        <BrandLogo as={Link} to="/" />
+        <nav className="nav-links" aria-label={copy.navigation}>
+          {links.map(([path, key]) => <NavLink as={Link} key={path} to={path} current={location.pathname === path}>{copy[key]}</NavLink>)}
+        </nav>
+        <div className="header-actions">
+          <IconButton ref={searchTrigger} className="nav-search" label={copy.search} aria-expanded={panel === 'search'}
+            aria-controls="search-panel" onClick={() => toggle('search')}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="10.8" cy="10.8" r="6.8" /><path d="m16 16 5 5" /></svg>
+          </IconButton>
+          <Link className="v-button v-button--primary v-button--pill header-quote" to="/solicitud">{copy.quote}<span aria-hidden="true">↗</span></Link>
+          <LanguageToggle language={language} onChange={setLanguage} />
+          <ThemeToggle theme={theme} onToggle={setTheme} label={theme === 'dark' ? copy.light : copy.dark} />
+          <IconButton ref={menuTrigger} className="hamburger" label={copy.openMenu} aria-expanded={panel === 'menu'}
+            aria-controls="account-menu-panel" onClick={() => toggle('menu')}><i /><i /><i /></IconButton>
+
+          <Panel id="search-panel" className="search-panel" open={panel === 'search'} title={copy.searchTitle}
+            closeLabel={copy.close} onClose={() => setPanel(null)} triggerRef={searchTrigger} initialFocusRef={searchField}>
+            <form onSubmit={event => { event.preventDefault(); setPanel(null); navigate('/catalogo' + (query.trim() ? '?buscar=' + encodeURIComponent(query.trim()) : '')); }}>
+              <Input ref={searchField} type="search" label={copy.searchLabel} value={query} onChange={event => setQuery(event.target.value)} />
+              <p>{copy.searchHint}</p><Button type="submit" variant="ghost" fullWidth>{copy.searchSubmit}</Button>
+            </form>
+          </Panel>
+
+          <Panel id="account-menu-panel" className="account-panel-dropdown" open={panel === 'menu'} title={copy.space}
+            closeLabel={copy.close} onClose={() => setPanel(null)} triggerRef={menuTrigger}>
+            <p className="account-guest">{user?.name || copy.guest}</p>
+            <nav className="mobile-menu-nav" aria-label={copy.navigation}>
+              {links.map(([path, key]) => <Link key={path} to={path} onClick={() => setPanel(null)}>{copy[key]}<span aria-hidden="true">↗</span></Link>)}
+              <Link to="/faq" onClick={() => setPanel(null)}>{copy.faq}<span aria-hidden="true">↗</span></Link>
+            </nav>
+            <div className="account-dropdown-results">
+              <Link className="account-dropdown-link account-dropdown-primary" to={user ? '/cuenta' : '/login'} onClick={() => setPanel(null)}>
+                <span>{user ? copy.account : copy.login}<small>{copy.accountHint}</small></span><span aria-hidden="true">↗</span>
+              </Link>
+              {!user && <Link className="account-dropdown-link" to="/registro" onClick={() => setPanel(null)}>{copy.register}</Link>}
+              <Link className="account-dropdown-link" to="/carrito" onClick={() => setPanel(null)}>{copy.cart}</Link>
+              <div className="account-dropdown-divider" />
+              <Link className="account-dropdown-link" to="/faq" onClick={() => setPanel(null)}>{copy.support}</Link>
+              <button type="button" className="account-dropdown-link" onClick={() => { setPanel(null); onReading(); }}>{copy.settings}</button>
+            </div>
+          </Panel>
+        </div>
+      </div>
+    </header>
+  );
+}

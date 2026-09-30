@@ -12,6 +12,14 @@ La UI no accede directamente a JSON Server ni contiene reglas de negocio complej
 
 React 19, Vite 8, JavaScript/JSX, React Router DOM, JSON Server, Jest + Testing Library, Recharts, N8N, API externa y servicio de IA.
 
+### Dependencias de verificación de fundaciones (2026-09-30)
+
+Se incorporan Jest, babel-jest, jest-environment-jsdom, @babel/preset-env,
+@babel/preset-react, @testing-library/react, @testing-library/user-event y
+@testing-library/jest-dom para ejecutar la estrategia de `docs/09`: interacciones
+de teclado, formularios, doble envío y separación de precios/cotizaciones.
+Babel se limita a los tests JSX; Vite sigue compilando la aplicación.
+
 ## Estructura objetivo
 
 ~~~text
@@ -61,6 +69,32 @@ Funciones puras, validaciones y cálculos sin efectos secundarios.
 
 ### `src/components/` (UI Kit y Compartidos)
 Solo piezas realmente compartidas entre dominios. Una pieza propia de una feature debe permanecer en su feature.
+
+#### UI Kit base implementado (2026-09-30)
+`src/components/ui/` contiene las primitivas visuales iniciales derivadas de HF-01 y tokens actuales: MonoLabel, Badge, Button, IconButton, LinkText, StatusIndicator, PriceTag, Card, Input, Checkbox, Switch, NavLink, BrandLogo, ThemeToggle, SectionKicker, SignalMetric, Skeleton, EmptyState, Panel y Drawer. Se exportan desde `src/components/ui/index.js`. No añade dependencias.
+
+La Capa 0 se amplió con SectionBlock, SearchInput, Select, FileDropzone, ErrorState,
+Toast (alias Notification), LanguageToggle, RevealOnScroll, ProductCard,
+HelpDisclosure, CartItem, StepperBar, QuoteSummaryPanel y SinpePaymentBlock.
+Los paneles son no modales por defecto; Drawer usa dialog nativo modal, bloqueo
+del fondo, ciclo de foco, Escape y retorno al disparador. Las reglas monetarias,
+de archivos y elegibilidad de cotizaciones viven en utils. El límite de archivo
+y destino SINPE se reciben por props: no se inventan valores operativos.
+
+Tokens: geometría base 2/6/12 px; el radio de 28 px del workbench tiene su propio
+token para conservar la excepción visual de HF-01. Los controles usan al menos
+44 px, tamaños tipográficos relativos y movimiento completamente desactivable.
+Los estilos compartidos se importan también al consumir una primitiva individual.
+
+Verificación Capa 0: 21 pruebas Jest/Testing Library, lint y compilación Vite de
+todas las exportaciones; cobertura statements 79.64 %, branches 77.31 %,
+functions 83.51 %, lines 89.62 %. Dev sirve el barrel con HTTP 200.
+No hay navegador conectado: queda pendiente la inspección visual 375/768/1280
+y el contraste real de ambos temas. No equivale a certificación de accesibilidad.
+
+Para Capa 1 se añade react-router-dom, solicitado en el prompt maestro, para
+createBrowserRouter, layouts con Outlet y enlaces SPA. AuthProvider comienza
+sin sesión; el frontend académico no se presenta como autenticación de producción.
 Para optimizar el desarrollo y mantener coherencia global, esta capa incluye el **UI Kit (Primitivas)** extraído del mockup congelado HF-01 y de los contratos documentados en `docs/02–04`:
 
 #### Interacción y controles
