@@ -1,5 +1,9 @@
+import { TextDecoder, TextEncoder } from 'node:util';
 import '@testing-library/jest-dom';
 import { jest } from '@jest/globals';
+
+if (!globalThis.TextEncoder) Object.defineProperty(globalThis, 'TextEncoder', { value: TextEncoder });
+if (!globalThis.TextDecoder) Object.defineProperty(globalThis, 'TextDecoder', { value: TextDecoder });
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
