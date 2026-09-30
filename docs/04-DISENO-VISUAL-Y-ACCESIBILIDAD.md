@@ -410,6 +410,22 @@ La aplicación responde a los lineamientos del Anteproyecto de FWD Academy (Seba
 
 ---
 
+### Decisión vigente de accesibilidad para HF-01 / React — 2026-09-30
+
+La especificación expandida anterior de TP (90–130 %, modo dislexia, resaltado separado y contraste amarillo/negro) corresponde a una etapa previa de exploración y **no es el contrato visual actual de Home**.
+
+El HF-01 definitivo congelado establece para Home:
+
+- selector global de idioma ES/EN desde el navbar;
+- tema Dark/Light;
+- panel flotante de preferencias con tres escalas: **A / A+ / A++**;
+- **Más contraste** como refuerzo de texto, bordes y foco respetando Dark/Light;
+- **Menos movimiento**, compatible además con `prefers-reduced-motion`;
+- **Restablecer preferencias**;
+- persistencia global de estas preferencias en React.
+
+No añadir modo dislexia, resaltado independiente ni controles adicionales a Home sin nueva decisión del usuario. Esos conceptos pueden conservarse como antecedentes/futuras ampliaciones de accesibilidad, pero no deben interpretarse como pendientes obligatorios de Capa 2.
+
 ### 5. Dirección de Arte, Componentes y Telemetría Industrial (Ref: [Godly](https://godly.design/) + [React Bits](https://reactbits.dev/) + [Refero](https://styles.refero.design/))
 
 * **Visor Workbench de Doble Entrada:**
