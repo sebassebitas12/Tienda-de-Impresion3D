@@ -733,3 +733,19 @@ Para hamburger, menús, popovers, chat, accesibilidad, botones y cualquier otra 
 - **Scrolltide shaders / Magma Flow:** evaluado pero **no adoptado**. Vértice ya tiene Lava Orgánica mediante color, luz y materialidad; un shader GPU añadiría ruido, dependencia y protagonismo decorativo innecesario.
 
 No se agregaron dependencias. Todo el polish se implementó con React existente + CSS + IntersectionObserver.
+
+
+### Reauditoría de chrome / navbar — 2026-09-30
+
+Tras capturas reales del usuario se corrigió una deriva del shell React.
+
+Decisiones vigentes:
+- los botones flotantes de Chat/Accesibilidad **se retraen hacia la derecha durante scroll**, bajan opacidad y desactivan pointer-events; al detenerse el scroll reaparecen. Este comportamiento ya existía en HF-01;
+- el navbar no trata todos sus controles como la misma tarjeta genérica: búsqueda y tema usan controles técnicos compactos, idioma se lee como selector tipográfico y el CTA conserva jerarquía primaria;
+- hamburger permanece como marca funcional limpia, sin caja pesada;
+- Search y Mi Espacio tienen superficies independientes; no comparten accidentalmente padding/radio/composición;
+- las referencias externas pueden aportar principios de interacción, no identidad. Navbar Gallery refuerza el uso de dropdowns contenidos y escaneables; Motion Primitives sirve como referencia para feedback de selección/hover suave. No se añadió dependencia.
+
+Referencias aplicadas:
+- https://www.navbar.gallery/blog/best-dropdown-navigation-bar-designs
+- https://motion-primitives.com/docs/animated-background
