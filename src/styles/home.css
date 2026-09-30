@@ -701,6 +701,7 @@
   opacity:1;
   transform:none;
   transition:opacity .68s var(--ease-out),transform .68s var(--ease-out);
+  transition-delay:var(--reveal-delay,0ms);
 }
 @keyframes hero-copy-in{
   from{opacity:0;transform:translateX(-18px)}
