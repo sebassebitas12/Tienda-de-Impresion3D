@@ -653,3 +653,13 @@ Estos son **hallazgos estáticos confirmados por código**. No se declara todav�
 ### Próxima comprobación
 
 Revisar render real de Home en 1280 / 768 / 375, dark/light y paneles abiertos. Si aparecen defectos visuales adicionales, corregir antes de declarar Capa 2 cerrada.
+
+
+### Corrección adicional de Capa 2 — hamburger / lista plegable
+
+- **R-H12 — hamburger mal maquetado:** `IconButton` envuelve el contenido en un `span`, pero el CSS anterior trataba las tres barras como hijos directos del botón. Resultado: el icono no reproducía el hamburger aprobado. Corregido usando el wrapper real y posiciones absolutas de las tres barras.
+- **R-H13 — panel plegable demasiado genérico:** el menú React usaba el `Panel` genérico con cabecera y navegación duplicada en desktop. Se reconstruyó tomando como referencia `mockups/lista plegable.jpg` / Figura 11: popover oscuro compacto, filas icono+texto, divisores y jerarquía de cuenta.
+- **R-H14 — duplicación de navegación:** en anchos >820 px se oculta la navegación dentro del popover porque el navbar ya la presenta. Bajo 821 px, la lista principal reaparece dentro del desplegable.
+- No se trasladaron datos falsos del mockup Stitch; solo el patrón visual y de interacción.
+
+**Verificación pendiente:** render local del estado cerrado/abierto del hamburger en desktop, 768 y 375; foco/Escape siguen cubiertos por la primitiva `Panel` pero requieren evidencia visual antes de cierre.
