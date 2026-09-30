@@ -722,3 +722,14 @@ Para hamburger, menús, popovers, chat, accesibilidad, botones y cualquier otra 
 - primero se consulta HF-01 y su historial aprobado en docs/05;
 - después se adapta ese lenguaje a React y a la accesibilidad;
 - Stitch puede confirmar qué acciones/contenido deberían existir, pero no cómo deben verse.
+
+
+### Referencias aplicadas en la pasada React Home — 2026-09-30
+
+**Autoridad visual:** HF-01 congelado. Las fuentes externas solo se usaron para elevar motion/craft sin alterar composición, identidad ni stack.
+
+- **Codrops — Grid Item Reveal Animation on Hover / Animated Product Grid Preview:** patrón observado = movimiento de producto como respuesta secundaria al hover, no animación permanente. Adaptación Vértice = escala/rotación mínima de la imagen dentro de ProductCard, elevación corta de tarjeta y estado de foco/hover; sin GSAP ni preview fullscreen.
+- **Scrolltide — componentes/sections + Academy:** patrón observado = construir sección por sección, usar profundidad con una jerarquía clara y evitar que todos los elementos compitan por atención. Adaptación Vértice = Hero mantiene una sola experiencia fuerte (producto + parallax/scan), mientras cards/método/especificaciones reciben microinteracciones discretas.
+- **Scrolltide shaders / Magma Flow:** evaluado pero **no adoptado**. Vértice ya tiene Lava Orgánica mediante color, luz y materialidad; un shader GPU añadiría ruido, dependencia y protagonismo decorativo innecesario.
+
+No se agregaron dependencias. Todo el polish se implementó con React existente + CSS + IntersectionObserver.
