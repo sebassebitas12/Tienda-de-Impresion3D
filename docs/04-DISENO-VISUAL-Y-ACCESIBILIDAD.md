@@ -860,6 +860,23 @@ El patrón **no se replica automáticamente en todos los botones**. Se considera
 
 **Admin / primera expansión del sistema visual (2026-10-01):** se usa la identidad, tipografía, radios y estados del sistema, con jerarquía compacta de trabajo. [Motion Primitives — Animated Background](https://motion-primitives.com/docs/animated-background) aporta el patrón de una selección que orienta dentro de una lista; en Admin se conserva como feedback suave para navegación activa/foco, sin convertir filas estáticas en falsas acciones ni añadir librería. La tarjeta de sesión identifica al operador autenticado y la señal de color siempre acompaña texto.
 
+### Movimiento Admin de solicitudes — 2026-10-01
+
+La primera bandeja y su detalle extienden los tokens Vértice con jerarquía de
+operación, sin copiar el workbench de Home: indicador compartido que recorre la
+leyenda activa, anillo SVG proporcionado por estados oficiales, entradas breves
+escalonadas de resultados/pasos y acento lateral en la fila que abre detalle.
+
+- [Motion — Layout animations for React](https://motion.dev/docs/react-layout-animations): el elemento de selección acompaña la pestaña activa y el layout responde al cambio de filtro. Adaptación CSS con `transform`; no se incorporó Motion como dependencia.
+- [Apache ECharts — transitions](https://echarts.apache.org/handbook/en/how-to/animation/transition/) y [pie proportions](https://echarts.apache.org/handbook/en/how-to/chart-types/pie/basic-pie/): segmentos proporcionalmente ligados al dato, con actualización temporal breve. Adaptación como cuatro arcos SVG filtrables; ECharts no se instala por la pequeña visualización específica.
+- [Codrops — Hover Motion Intro](https://tympanus.net/codrops/2024/05/29/hover-motion-intro-animation/): el feedback de movimiento debe hacer perceptible la selección. Adaptación como rail, borde y desplazamiento ligero de la fila hacia su detalle; se descartan tilt, escala de imagen y GSAP por no servir a la revisión.
+
+Accesibilidad: grupos identificados y filtrables con botones de teclado,
+`aria-pressed`, estados de solicitud legibles sin depender de color, foco global
+visible y alternativa textual/cantidad junto al gráfico. Las entradas animadas y
+el indicador de selección se desactivan con `prefers-reduced-motion` y con el ajuste global. El
+alcance/datos y las limitaciones del slice están en `docs/08-METRICAS-ADMIN-E-IA.md`.
+
 **Actualización R-H41 — Home:** las tarjetas destacadas se leen como filas horizontales en dos columnas; la miniatura conserva completo el placeholder de catálogo (`object-fit: contain`) en lugar de recortar sus rótulos. Stock sigue fuera de las cards promocionales. La afirmación anterior sobre el punto terminal del líder quedó rechazada tras la inspección del usuario y se corrige en R-H42.
 
 **Actualización R-H42 — Home:** el líder se calcula con las dimensiones naturales de cada foto, sus paddings y su ajuste `contain`; ResizeObserver recalcula el endpoint al cambiar viewport, pieza o tamaño del rótulo. Así el punto terminal cae sobre las coordenadas elegidas para el objeto y la línea nace junto al rótulo. La etiqueta aclara «Filamento · PETG» (o el material de la pieza) y “lattice” se traduce como «estructura aligerada». Las destacadas omiten la pastilla flotante del material, conservada en contextos de catálogo donde sí aporta. La sección de precisión pasa de tres cajas con índice/título/descripción/chip repetitivos a tres columnas editoriales con un título y una descripción, separadas por líneas sobrias.

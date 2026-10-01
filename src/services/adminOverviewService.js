@@ -35,3 +35,18 @@ export async function getAdminOverviewData({ signal, fetchImpl = globalThis.fetc
     throw new AdminOverviewError('No pudimos leer los datos académicos de Admin.', error);
   }
 }
+
+export async function getAdminRequestsData({ signal, fetchImpl = globalThis.fetch, baseUrl = getBaseUrl() } = {}) {
+  if (typeof fetchImpl !== 'function') throw new AdminOverviewError('No hay una conexión disponible con JSON Server.');
+  try {
+    const [customPrintRequests, users] = await Promise.all([
+      readCollection('customPrintRequests', { signal, fetchImpl, baseUrl }),
+      readCollection('users', { signal, fetchImpl, baseUrl }),
+    ]);
+    return { customPrintRequests, users };
+  } catch (error) {
+    if (error?.name === 'AbortError') throw error;
+    if (error instanceof AdminOverviewError) throw error;
+    throw new AdminOverviewError('No pudimos leer las solicitudes de Admin.', error);
+  }
+}

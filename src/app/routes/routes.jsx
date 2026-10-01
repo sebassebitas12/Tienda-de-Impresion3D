@@ -7,6 +7,7 @@ import { Home } from '../../pages/Home.jsx';
 import { LoginPage } from '../../pages/LoginPage.jsx';
 import { RegisterPage } from '../../pages/RegisterPage.jsx';
 import { AdminDashboardPage } from '../../pages/AdminDashboardPage.jsx';
+import { AdminRequestDetailPage, AdminRequestsPage } from '../../features/admin/AdminRequests.jsx';
 import { NotFoundPage } from '../../pages/NotFoundPage.jsx';
 import { RouteErrorPage } from '../../pages/RouteErrorPage.jsx';
 import { adminPages, publicPages } from './manifest.js';
@@ -21,7 +22,10 @@ const protectedPublicPages = publicPages.filter(([path]) => protectedPublicPaths
 const openPublicPages = publicPages.filter(([path]) => path !== '/' && !protectedPublicPaths.has(path));
 const adminRoutePages = adminPages.map(([path, titleKey]) => ({
   path,
-  element: path === '/admin' ? <AdminDashboardPage /> : <ConstructionPage titleKey={titleKey} />,
+  element: path === '/admin' ? <AdminDashboardPage />
+    : path === '/admin/solicitudes' ? <AdminRequestsPage />
+      : path === '/admin/solicitudes/:id' ? <AdminRequestDetailPage />
+        : <ConstructionPage titleKey={titleKey} />,
 }));
 
 export const routes = [

@@ -48,3 +48,18 @@ API 404/500, API caída durante restore (sin autorizar la sesión no verificada 
 ## Salida
 
 Implementación + lint + build + tests relevantes + errores cubiertos + coverage >= 70%.
+
+## Admin — solicitudes (2026-10-01)
+
+La suite `tests/adminRequests.test.jsx` cubre agrupación/aislamiento de estados
+desconocidos, búsqueda, filtro accionado desde la leyenda, ausencia de precio en
+`PENDING_QUOTE` aunque exista un campo heredado y precio CRC de una solicitud
+cotizada. `tests/adminRequestsService.test.js` cubre lectura paralela de
+solicitudes/clientes y rechazo de una colección mal formada. Las pruebas usan
+datos/fetch simulados; la revisión manual en navegador con JSON Server real
+confirma el acceso KPI → fase del taller → lista → detalle. Estado final
+(2026-10-01): suite completa 7 suites / 60 tests aprobados; cobertura global
+statements 75.70%, branches 74.53%, functions 77.50%, lines 82.07%. También
+pasan lint, `check:ui`, build y `git diff --check`. El npm global del host no
+pudo iniciar por un `npm-cli.js` ausente; se ejecutaron Jest/ESLint/Vite con el
+Node empaquetado y binarios del proyecto.

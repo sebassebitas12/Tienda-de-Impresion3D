@@ -111,8 +111,45 @@ El shell Admin mantiene una navegación de tareas distinta al navbar comercial, 
 
 Desde el navbar público, «Mi cuenta» dirige a `/admin` para `role === admin` y a `/cuenta` para clientes; para invitados dirige a `/login`. Los guards conservan la ruta solicitada durante el login y la redirección por defecto usa el rol. Contrato de flujo completo en `docs/03-UX-Y-FLUJOS.md`.
 
-### Siguiente slice: solicitudes que ayudan a operar
+### Admin — bandeja y detalle de solicitudes React (2026-10-01)
 
-Antes de añadir controles, definir qué necesita resolver el admin al revisar una solicitud: identificar el caso y cliente, entender material/cantidad/archivo disponible, reconocer el estado vigente y llegar al siguiente paso permitido. La lista y el detalle deben mostrar únicamente datos respaldados por el contrato; no ofrecer descarga si no hay URL/archivo accesible, ni introducir una cotización hasta tener inputs y transición definidos. Mantener `SUBMITTED` separado del flujo oficial.
+La ruta `/admin/solicitudes` lee solicitudes y usuarios desde JSON Server. La
+bandeja agrupa el ciclo oficial en cuatro preguntas operativas: ¿requiere acción
+del taller? (`PENDING_QUOTE`, `IN_REVIEW`), ¿espera al cliente? (`QUOTED`,
+`AWAITING_APPROVAL`), ¿está aprobada/pagada? (`APPROVED`, `PAID`) o ¿cerró?
+(`REJECTED`, `EXPIRED`, `CANCELLED`). El filtro de cada etapa conserva su estado
+en `?fase=`; búsqueda por id, cliente, archivo, material y descripción refina el
+conjunto. `Todas` lista únicamente estados del flujo oficial; legacy se abre por
+separado y no altera el conteo de resultados del flujo. Desde el KPI del dashboard, `Solicitudes por revisar` abre la
+etapa del taller; filas abren `/admin/solicitudes/:id`.
 
-Las métricas de Admin se trabajarán junto con referencias especializadas de dashboards operativos. Investigar fuentes y patrones visuales en el bloque de diseño; documentar **fuente → patrón → adaptación → por qué ayuda al taller** antes de aplicarlos. Cada KPI debe contestar una pregunta operativa y llevar a sus registros fuente cuando haya una vista que los soporte. No incorporar conteos decorativos, inventario, pagos deducidos ni gráficas sin dato/decisión detrás. Respetar estados loading, empty, error y actualización/frescura del origen.
+El SVG circular resume proporciones de solicitudes reconocidas y su leyenda filtra
+la bandeja. No suma `SUBMITTED` ni otros estados desconocidos; estos se muestran
+aparte con su valor real. La gráfica no afirma tendencias ni volumen suficiente
+para proyecciones. Si el conjunto oficial está vacío, se omite el anillo. El
+detalle presenta cliente/origen/material/cantidad/fecha y progreso solo para el
+ciclo conocido; precio se muestra solo con `quotedPrice` CRC real y nunca para
+`PENDING_QUOTE`/`IN_REVIEW`. `fileName` es metadato, no enlace de descarga. Ver
+contrato de lectura y límites de escritura en `docs/07-DATOS-API-AUTH.md`.
+
+El bloque es de consulta: no cambia estados ni escribe `activityLog`. Aunque el
+flujo de negocio enumera estados, el repo aún no define una operación atómica que
+registre transición, operador y evento de auditoría; no ofrecer una falsa acción
+administrativa hasta cerrar ese contrato. La ruta Admin de actividad sigue
+pendiente porque su colección carece de eventos/shape usable.
+
+#### Referencias de movimiento y datos
+
+- **Motion — [Layout animations for React](https://motion.dev/docs/react-layout-animations):** transición compartida que sigue selección y cambios de distribución; adaptación: un indicador recorre la leyenda accionable hasta el grupo activo y la lista entra en una secuencia corta al filtrar. No se añadió Motion; CSS usa `transform`/`opacity` y respeta movimiento reducido.
+- **Apache ECharts — [Data Transition](https://echarts.apache.org/handbook/en/how-to/animation/transition/) y [Basic Pie Chart](https://echarts.apache.org/handbook/en/how-to/chart-types/pie/basic-pie/):** segmentos expresan proporción sobre un total y cambian cuando lo hacen los datos; adaptación: anillo SVG con cuatro grupos mutuamente excluyentes y leyenda accionable que filtra exactamente la bandeja. No se instaló ECharts porque el conjunto pequeño, estático y de cuatro valores no necesita una dependencia completa.
+- **Codrops — [Hover Motion Intro](https://tympanus.net/codrops/2024/05/29/hover-motion-intro-animation/):** el movimiento hace legible la selección de un elemento dentro de una composición; adaptación Admin: franja de selección, acento lateral y avance al detalle mediante hover/foco. Se descartaron GSAP, la inclinación de puntero y el zoom de imagen porque son efectos de showcase y no aportan lectura operativa.
+
+El anillo resume distribución del conjunto actual, no constituye una métrica temporal ni un pronóstico. Todos los grupos muestran cantidades además de color y tienen controles de filtro por teclado. `prefers-reduced-motion` y el ajuste global eliminan entradas/transiciones.
+
+### Siguiente slice: operación con auditoría
+
+Definir una acción administrativa transaccional para iniciar revisión/cotizar y
+el evento de `activityLog` que debe acompañarla. También concretar URL/almacenamiento
+del archivo antes de ofrecer apertura/descarga. Las siguientes métricas se añaden
+solo junto a fuente real, decisión que ayudan a tomar y destino funcional cuando
+exista; IA/N8N se mantiene después del flujo operativo.

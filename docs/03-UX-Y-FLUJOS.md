@@ -24,6 +24,14 @@ Solicitud → Ayuda de diseño → Descripción → Requisitos → Revisión →
 ### Admin
 Login → Dashboard → bandeja → detalle → acción → actividad.
 
+**Slice actual de solicitudes:** `/admin` ofrece acceso directo al KPI de
+solicitudes que requieren atención (`/admin/solicitudes?fase=workshop`). La
+bandeja admite filtros de etapa/búsqueda y cada fila lleva a
+`/admin/solicitudes/:id`. Este recorrido es de consulta y drill-down: detalle no
+transiciona datos porque la operación atómica con `activityLog` sigue pendiente;
+archivo visible es `fileName` y no descarga. El registro `SUBMITTED` y estados
+desconocidos se revisan en grupo aparte sin recodificarlos.
+
 ### Entrada a cuenta según rol
 
 - Invitado: `Navbar → Mi cuenta → /login`.

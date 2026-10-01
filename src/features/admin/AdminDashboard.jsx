@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { EmptyState, ErrorState, Skeleton } from '../../components/ui/index.js';
 import { formatCRC } from '../../utils/money.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
@@ -82,7 +83,10 @@ export function AdminDashboard() {
         <>
           <div className="admin-metrics">
             <Metric label={text.orders} value={data.activeOrders} note={text.ordersHint} />
-            <Metric label={text.requests} value={data.requestsToReview.length} note={text.requestsHint} emphasis />
+            <Link className="admin-metric-link" to="/admin/solicitudes?fase=workshop" aria-label={`${text.requests}: ${data.requestsToReview.length}`}>
+              <Metric label={text.requests} value={data.requestsToReview.length} note={text.requestsHint} emphasis />
+              <span className="admin-metric-link__arrow" aria-hidden="true">↗</span>
+            </Link>
             <Metric label={text.sales} value={text.noPayments} note={text.salesHint} />
           </div>
 
@@ -129,9 +133,11 @@ export function AdminDashboard() {
                 <ol className="admin-request-list">
                   {data.requestsToReview.map(request => (
                     <li key={request.id}>
+                      <Link className="admin-dashboard-request-link" to={`/admin/solicitudes/${encodeURIComponent(request.id)}`}>
                       <div className="admin-request-topline"><strong>{request.fileName || request.description || request.id}</strong><span className="admin-state" data-status={request.status}>{text.statuses[request.status]}</span></div>
                       <p>{request.id} · {text.material}: {request.material || '—'} · {text.quantity}: {request.quantity ?? '—'}</p>
                       <time dateTime={request.submittedAt}>{text.submitted}: {formatDate(request.submittedAt, language)}</time>
+                      </Link>
                     </li>
                   ))}
                 </ol>

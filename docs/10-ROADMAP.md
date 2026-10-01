@@ -107,7 +107,7 @@ Orden:
 **Estado actual:** `jsonServerAuthAdapter` consulta y crea usuarios en `db.json` a través de JSON Server, persiste la sesión en `localStorage` y emite un token `sim.v1` simulado con expiración, id y rol. La credencial `demoPassword` es explícitamente académica y no es un secreto ni seguridad de producción. Login/restore/logout también se probaron contra JSON Server real. Auth cuenta con base visual React. Tras el acuerdo del usuario de cerrar Home para avanzar, el siguiente bloque es Admin operativo protegido por rol.
 
 ### Capa 4 — Admin
-🟠 **EN IMPLEMENTACIÓN — slice 1: resumen operativo conectado a JSON Server.** Entra después de Auth porque depende de identidad/rol. Admin usa una composición operativa propia dentro de tokens Vértice; no debe replicar la Home.
+🟠 **EN IMPLEMENTACIÓN — slices 1–2.** Entra después de Auth porque depende de identidad/rol. Admin usa una composición operativa propia dentro de tokens Vértice; no debe replicar la Home.
 
 Prioridad:
 - guard `admin`;
@@ -122,7 +122,9 @@ Prioridad:
 
 El primer slice del dashboard muestra pedidos activos, solicitudes `PENDING_QUOTE`/`IN_REVIEW`, cinco pedidos activos recientes y registros que usan estados legados por separado. No informa ventas cobradas si no hay evidencia de pagos; el modelo actual no contiene `payments` ni `paidAt`. No usa `stock`/`minStock` para ninguna alerta.
 
-**Siguiente slice — solicitudes:** definir primero qué pregunta operativa contesta cada campo/filtro y qué tarea debe completar el Admin; construir lista y detalle desde los contratos de `02`/`07`; habilitar solo transiciones que el flujo permita. Investigar y documentar referencias especializadas para KPIs/tablas/bandejas antes de dar el acabado visual. Cada métrica debe tener fuente trazable y servir una decisión real; no se agregan gráficos ni conteos ornamentales.
+**Slice 2 — bandeja/detalle de solicitudes implementados en React:** `GET /customPrintRequests` + `GET /users`, búsqueda, filtros enlazables, anillo proporcional con grupos del flujo oficial y ruta de detalle con progresión de estados. El KPI del dashboard abre la bandeja filtrada; cada registro lleva a detalle. `SUBMITTED`/desconocidos quedan aparte, archivo es solo nombre, precio no aparece para `PENDING_QUOTE`/`IN_REVIEW`. Animación CSS/SVG sigue la selección/datos; no se agrega dependencia. No hay escritura ni transición hasta definir acción atómica y auditoría en `activityLog`.
+
+**Siguiente slice:** definir contrato transaccional de acción administrativa + `activityLog` para iniciar revisión/cotizar. Después continuar con pedidos, catálogo y clientes según prioridad; añadir métricas solo con fuente trazable y decisión que respondan. Ver `docs/08` para patrón visual, datos y tareas pendientes.
 
 ### Capa 5 — IA / N8N
 Entra después de que Auth + Admin tengan contratos y datos suficientes.

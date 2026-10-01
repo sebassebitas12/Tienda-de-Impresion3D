@@ -224,3 +224,24 @@ El almacenamiento/persistencia del token pertenece al adapter concreto; no queda
 El dataset conserva `customPrintRequests.status: "SUBMITTED"` (r5), valor ausente del ciclo oficial. La UI lo muestra aparte y no lo convierte silenciosamente en `PENDING_QUOTE`; resolverlo requiere corregir/migrar explícitamente el dato o acordar alias en el contrato.
 
 El modelo actual no tiene `payments`, `paidAt` ni otra evidencia normalizada de cobro. Por eso el dashboard no calcula ingresos desde `orders.total`. `activityLog` está vacío en el dataset; la ruta de actividad se difiere hasta definir el shape y las escrituras que generarán entradas.
+
+### Bandeja/detalle Admin de solicitudes (2026-10-01)
+
+`getAdminRequestsData()` lee en paralelo `GET /customPrintRequests` y `GET /users`.
+La UI enlaza `userId` al nombre del usuario por id. Los errores/abortos se
+normalizan en el service; la pantalla no hace HTTP directamente.
+
+Este slice es de lectura. El detalle solo presenta el nombre de archivo guardado
+en `fileName`: el dataset no incluye URL de almacenamiento ni bytes, por lo que
+no se ofrece descargar/abrir el archivo. En estados distintos de
+`PENDING_QUOTE`/`IN_REVIEW`, el precio solo se muestra si existen `quotedPrice`
+numérico y `currency: CRC`; la UI no crea ni completa una cotización. Los valores
+`SUBMITTED` y otros estados desconocidos quedan visibles en una sección separada,
+fuera de la distribución del flujo oficial.
+
+No se escribe el estado de solicitud ni `activityLog`: aún falta definir el
+contrato y la atomicidad de una acción administrativa con auditoría. Abrir el
+detalle/filtro no cambia datos. El siguiente paso transaccional debe establecer
+si una transición como `PENDING_QUOTE → IN_REVIEW` registra operador, fecha y
+evento de forma consistente; una mutación aislada desde el cliente no se debe
+presentar como operación auditada.
