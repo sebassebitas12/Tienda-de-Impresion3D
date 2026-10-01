@@ -44,7 +44,7 @@ describe('solicitudes administrativas', () => {
 
     expect(await screen.findByText('Pieza universitaria')).toBeInTheDocument();
     expect(screen.queryByText('soporte.stl')).not.toBeInTheDocument();
-    expect(screen.getByText(/1 Por aclarar/)).toBeInTheDocument();
+    expect(screen.getByText(/1 solicitud pendiente de incorporar/)).toBeInTheDocument();
   });
 
   it('no presenta un importe para PENDING_QUOTE aunque el dato contenga un campo heredado', async () => {

@@ -1,46 +1,58 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { EmptyState, ErrorState, Skeleton } from '../../components/ui/index.js';
+import { Button } from '../../components/ui/Button.jsx';
+import { useAuth } from '../../hooks/useAuth.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
 import { formatCRC } from '../../utils/money.js';
 import { filterAdminRequests, REQUEST_PHASES, summarizeRequestPhases } from '../../utils/adminRequests.js';
+import { startRequestReview } from '../../services/adminActionsService.js';
 import { useAdminRequests } from './useAdminRequests.js';
 import './admin.css';
+import { FilterChips } from '../../components/ui/FilterChips.jsx';
+import { toggleFacetParams } from '../../utils/facetFilters.js';
+import { RequestNextAction } from './RequestNextAction.jsx';
 
 const words = {
   es: {
     title: 'Solicitudes de fabricación', intro: 'Revisá cada encargo, su contexto y el paso en el que está.',
     source: 'Bandeja técnica · JSON Server', loading: 'Cargando solicitudes', retry: 'Reintentar',
     errorTitle: 'No pudimos cargar las solicitudes', errorText: 'Revisá que JSON Server esté activo y volvé a intentar.',
-    all: 'Todas', workshop: 'Acción del taller', customer: 'Espera del cliente', production: 'Aprobadas / pagadas', closed: 'Cerradas', legacy: 'Por aclarar',
+    all: 'Todas', workshop: 'Acción del taller', customer: 'Espera del cliente', production: 'Aprobadas / pagadas', closed: 'Cerradas', legacy: 'Estado no reconocido',
+    legacySummary: count => `${count} solicitud${count === 1 ? '' : 'es'} pendiente${count === 1 ? '' : 's'} de incorporar`, legacyView: 'Revisar e incorporar',
     distribution: 'Mapa de solicitudes', distributionHint: count => `${count} solicitudes reconocidas en el flujo actual`,
     searchLabel: 'Buscar solicitud', searchPlaceholder: 'ID, cliente, archivo o material', results: count => `${count} resultados`,
     empty: 'No hay solicitudes en este grupo.', noMatch: 'No encontramos coincidencias.', noRequest: 'No encontramos esta solicitud.', customerLabel: 'Cliente',
     customerUnknown: 'Cliente no asociado', request: 'Solicitud', received: 'Recibida', material: 'Material', quantity: 'Cantidad',
     sourceType: 'Origen', file: 'Archivo indicado', description: 'Descripción', quote: 'Cotización registrada', quoteDate: 'Cotizada', validUntil: 'Válida hasta',
     workflow: 'Flujo de cotización', current: 'Estado actual', details: 'Ficha técnica', back: 'Volver a solicitudes',
+    startReview: 'Iniciar revisión técnica', startingReview: 'Iniciando revisión…', reviewIntro: 'Al continuar, la solicitud queda en revisión y la acción se anota en su historial. ',
+    reviewStarted: 'Revisión iniciada y registrada.', reviewBy: 'Revisión iniciada por', viewActivity: 'Ver historial completo', reviewActionError: 'No pudimos iniciar la revisión. Volvé a cargar la solicitud e intentá de nuevo.',
     types: { FILE: 'Archivo 3D', DESIGN_HELP: 'Ayuda de diseño' },
     statuses: { PENDING_QUOTE: 'Pendiente de cotización', IN_REVIEW: 'En revisión', QUOTED: 'Cotizada', AWAITING_APPROVAL: 'Espera aprobación', APPROVED: 'Aprobada', PAID: 'Pagada', REJECTED: 'Rechazada', EXPIRED: 'Vencida', CANCELLED: 'Cancelada' },
-    waitingNote: 'El siguiente paso depende de revisar técnicamente la solicitud. No se genera precio desde esta pantalla.',
+    waitingNote: 'Después de la revisión, prepará la cotización en «Tu siguiente paso».',
     noQuote: 'Todavía no hay una cotización final registrada.', noQuoteForStatus: 'Este estado no muestra un precio de cotización.', legacyTitle: 'Registro fuera del flujo vigente',
-    legacyDescription: status => `El estado «${status}» no pertenece al ciclo oficial. Se conserva tal como viene del origen y no se mezcla con las métricas.`,
+    legacyDescription: status => status === 'SUBMITTED' ? 'Se recibió con una etiqueta antigua. Abrí la solicitud y registrala como pendiente para iniciar su revisión.' : `Este registro usa «${status}». Revisá su origen antes de asignarle una etapa.`,
     flowSteps: ['Pendiente', 'En revisión', 'Cotizada', 'Aprobación', 'Aprobada', 'Pagada'],
   },
   en: {
     title: 'Print requests', intro: 'Review each job, its context and current step.', source: 'Technical queue · JSON Server',
     loading: 'Loading requests', retry: 'Retry', errorTitle: 'Could not load requests', errorText: 'Check that JSON Server is running and try again.',
-    all: 'All', workshop: 'Workshop action', customer: 'Waiting on customer', production: 'Approved / paid', closed: 'Closed', legacy: 'Needs review',
+    all: 'All', workshop: 'Workshop action', customer: 'Waiting on customer', production: 'Approved / paid', closed: 'Closed', legacy: 'Unrecognized status',
+    legacySummary: count => `${count} request${count === 1 ? '' : 's'} with an unrecognized status`, legacyView: 'View these records',
     distribution: 'Request map', distributionHint: count => `${count} requests in the recognized workflow`,
     searchLabel: 'Search requests', searchPlaceholder: 'ID, customer, file or material', results: count => `${count} results`,
     empty: 'No requests in this group.', noMatch: 'No matching requests found.', noRequest: 'Request not found.', customerLabel: 'Customer',
     customerUnknown: 'No linked customer', request: 'Request', received: 'Received', material: 'Material', quantity: 'Quantity',
     sourceType: 'Source', file: 'File name', description: 'Description', quote: 'Recorded quote', quoteDate: 'Quoted', validUntil: 'Valid until',
     workflow: 'Quote workflow', current: 'Current state', details: 'Technical brief', back: 'Back to requests',
+    startReview: 'Start technical review', startingReview: 'Starting review…', reviewIntro: 'This moves the request into review and records the action in its history. ', viewActivity: 'View full history',
+    reviewStarted: 'Review started and recorded.', reviewBy: 'Review started by', reviewActionError: 'We could not start the review. Reload the request and try again.',
     types: { FILE: '3D file', DESIGN_HELP: 'Design help' },
     statuses: { PENDING_QUOTE: 'Pending quote', IN_REVIEW: 'Under review', QUOTED: 'Quoted', AWAITING_APPROVAL: 'Awaiting approval', APPROVED: 'Approved', PAID: 'Paid', REJECTED: 'Rejected', EXPIRED: 'Expired', CANCELLED: 'Cancelled' },
     waitingNote: 'The next step depends on a technical review. This screen does not generate a price.',
     noQuote: 'No final quote is recorded yet.', noQuoteForStatus: 'This status does not show a quote price.', legacyTitle: 'Record outside the current workflow',
-    legacyDescription: status => `The status “${status}” is outside the official cycle. It is kept as received and excluded from workflow metrics.`,
+    legacyDescription: status => `The record arrived as “${status}”, a status not covered by the current workflow. It is kept as received and separated from current stages and metrics.`,
     flowSteps: ['Pending', 'Review', 'Quoted', 'Approval', 'Approved', 'Paid'],
   },
 };
@@ -84,9 +96,9 @@ function RequestDistribution({ requests, phase, onPhaseChange, text }) {
             </svg>
             <div className="admin-donut__center" aria-hidden="true"><strong>{total}</strong><span>{text.request}</span></div>
           </div>
-          <div className="admin-request-map__legend" role="group" aria-label={text.distribution} style={{ '--legend-active-index': REQUEST_PHASES.indexOf(phase) }}>
-            {segments.map(segment => <button key={segment.key} type="button" className={`admin-legend-choice${phase === segment.key ? ' is-active' : ''}`}
-              aria-pressed={phase === segment.key} onClick={() => onPhaseChange(segment.key)}>
+          <div className="admin-request-map__legend" role="group" aria-label={text.distribution}>
+            {segments.map(segment => <button key={segment.key} type="button" className={`admin-legend-choice${phase.includes(segment.key) ? ' is-active' : ''}`}
+              aria-pressed={phase.includes(segment.key)} onClick={() => onPhaseChange(segment.key)}>
               <span className={`admin-legend-dot admin-legend-dot--${segment.key}`} aria-hidden="true" />
               <span>{phaseLabel(text, segment.key)}</span><strong>{segment.count}</strong>
             </button>)}
@@ -103,13 +115,14 @@ export function AdminRequestsPage() {
   const { status, requests, retry } = useAdminRequests();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
-  const phase = phaseKeys.includes(searchParams.get('fase')) ? (searchParams.get('fase') || 'all') : 'all';
+  const phases = searchParams.getAll('fase').filter(value => value !== 'all' && phaseKeys.includes(value));
+  const phase = phases.length === 1 ? phases[0] : 'all';
   const officialRequests = requests.filter(request => request.phase !== 'legacy');
   const legacyRequests = requests.filter(request => request.phase === 'legacy');
   const legacyCount = legacyRequests.length;
   const legacyStatuses = [...new Set(legacyRequests.map(request => request.status))].join(', ');
-  const filtered = filterAdminRequests(requests, phase, search);
-  const choosePhase = value => setSearchParams(value === 'all' ? {} : { fase: value }, { replace: true });
+  const filtered = filterAdminRequests(requests, phases, search);
+  const choosePhase = value => setSearchParams(toggleFacetParams(searchParams, 'fase', value));
 
   return (
     <section className="admin-requests-page" aria-labelledby="admin-requests-title" aria-busy={status === 'loading'}>
@@ -121,13 +134,14 @@ export function AdminRequestsPage() {
       {status === 'loading' && <div className="admin-request-loading" role="status" aria-label={text.loading}>{[1, 2].map(i => <Skeleton key={i} />)}</div>}
       {status === 'error' && <ErrorState title={text.errorTitle} description={text.errorText} onRetry={retry} retryLabel={text.retry} />}
       {status === 'success' && <>
-        <RequestDistribution requests={officialRequests} phase={phase} onPhaseChange={choosePhase} text={text} />
+        <RequestDistribution requests={officialRequests} phase={phases} onPhaseChange={choosePhase} text={text} />
+        <FilterChips label={text.searchLabel} selected={phases} onToggle={choosePhase} options={['all', 'legacy'].map(value => ({ value, label: phaseLabel(text, value) }))} />
         {legacyCount > 0 && <div className="admin-legacy-strip"><span className="admin-legacy-strip__mark" aria-hidden="true">!</span>
-          <p><strong>{legacyCount} {text.legacy}</strong><span> {text.legacyDescription(legacyStatuses)}</span></p>
-          <button type="button" onClick={() => choosePhase('legacy')} aria-pressed={phase === 'legacy'}>{phaseLabel(text, 'legacy')} →</button>
+          <p><strong>{text.legacySummary(legacyCount)}</strong><span> {text.legacyDescription(legacyStatuses)}</span></p>
+          <button type="button" onClick={() => choosePhase('legacy')} aria-pressed={phase === 'legacy'}>{text.legacyView} →</button>
         </div>}
         <section className="admin-request-inbox" aria-labelledby="admin-request-inbox-title">
-          <header className="admin-request-inbox__heading"><div><span className="admin-eyebrow">02 / {text.request}</span><h2 id="admin-request-inbox-title">{phaseLabel(text, phase)}</h2></div>
+          <header className="admin-request-inbox__heading"><div><span className="admin-eyebrow">02 / {text.request}</span><h2 id="admin-request-inbox-title">{phases.length > 1 ? phases.map(value => phaseLabel(text, value)).join(' + ') : phaseLabel(text, phase)}</h2></div>
             <label className="admin-request-search"><span>{text.searchLabel}</span><input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder={text.searchPlaceholder} /></label>
           </header>
           <p className="admin-request-results" role="status" aria-live="polite">{text.results(filtered.length)}</p>
@@ -153,14 +167,39 @@ export function AdminRequestsPage() {
 
 export function AdminRequestDetailPage() {
   const { language } = usePreferences();
+  const user = useAuth()?.user;
   const text = words[language];
   const { status, requests, retry } = useAdminRequests();
+  const [reviewAction, setReviewAction] = useState({ status: 'idle', message: '' });
   const { id } = useParams();
   const request = requests.find(item => String(item.id) === id);
   const activeIndex = request ? FLOW.indexOf(request.status) : -1;
   const showsQuote = request && QUOTED_STATES.has(request.status)
     && typeof request.quotedPrice === 'number' && request.currency === 'CRC';
   const phaseIsLegacy = request?.phase === 'legacy';
+
+  async function beginReview() {
+    if (!request || request.status !== 'PENDING_QUOTE' || user?.role !== 'admin' || reviewAction.status === 'loading') return;
+    setReviewAction({ status: 'loading', message: '' });
+    try {
+      await startRequestReview({ requestId: request.id, actorId: user.id });
+      setReviewAction({ status: 'success', message: text.reviewStarted });
+      retry();
+    } catch (error) {
+      const message = error.code === 'STATUS_CONFLICT'
+        ? (language === 'es' ? 'El estado cambió desde que abriste esta solicitud. Actualizá la vista.' : 'The request changed since you opened it. Refresh this view.')
+        : error.code === 'ADMIN_REQUIRED'
+          ? (language === 'es' ? 'Tu sesión no tiene permiso para iniciar la revisión.' : 'Your session cannot start this review.')
+          : error.code === 'REQUEST_NOT_FOUND'
+            ? (language === 'es' ? 'La solicitud ya no existe.' : 'This request no longer exists.')
+            : text.reviewActionError;
+      setReviewAction({ status: 'error', message });
+    }
+  }
+
+  const reviewStartedLabel = request?.reviewStartedAt
+    ? `${text.reviewBy} ${request.reviewStartedByName || text.customerUnknown} · ${new Intl.DateTimeFormat(language === 'es' ? 'es-CR' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(request.reviewStartedAt))}`
+    : null;
 
   return (
     <section className="admin-request-detail" aria-labelledby="admin-request-detail-title" aria-busy={status === 'loading'}>
@@ -169,12 +208,20 @@ export function AdminRequestDetailPage() {
       {status === 'error' && <ErrorState title={text.errorTitle} description={text.errorText} onRetry={retry} retryLabel={text.retry} />}
       {status === 'success' && !request && <EmptyState title={text.noRequest} />}
       {status === 'success' && request && <>
+        {reviewAction.status === 'success' && <p className="admin-action-feedback" role="status">{reviewAction.message}</p>}
+        {reviewAction.status === 'error' && <p className="admin-action-feedback" role="alert">{reviewAction.message}</p>}
         <header className="admin-request-detail__heading">
           <div><span className="admin-eyebrow">{text.request} / {request.id}</span><h1 id="admin-request-detail-title">{request.fileName || request.description || request.id}</h1>
             <p>{request.customerName || text.customerUnknown} <span aria-hidden="true">·</span> {formatDate(request.submittedAt, language)}</p></div>
           <span className="admin-state" data-status={request.status}>{text.statuses[request.status] || request.status}</span>
         </header>
+        {['SUBMITTED', 'IN_REVIEW', 'QUOTED', 'AWAITING_APPROVAL', 'APPROVED', 'PAID'].includes(request.status) && <RequestNextAction key={`${request.id}-${request.updatedAt || request.status}`} request={request} user={user} language={language} onSaved={retry} />}
         {phaseIsLegacy ? <aside className="admin-detail-legacy" role="status"><strong>{text.legacyTitle}</strong><p>{text.legacyDescription(request.status)}</p></aside> : (
+          <>
+          {request.status === 'PENDING_QUOTE' && user?.role === 'admin' && <div className="admin-review-action">
+            <p>{text.reviewIntro}<strong>{user.name}</strong></p>
+            <Button loading={reviewAction.status === 'loading'} loadingLabel={text.startingReview} onClick={beginReview}>{text.startReview}</Button>
+          </div>}
           <section className="admin-request-workflow" aria-labelledby="admin-workflow-title">
             <div className="admin-request-workflow__heading"><div><span className="admin-eyebrow">03 / {text.current}</span><h2 id="admin-workflow-title">{text.workflow}</h2></div>
               <span className="admin-state" data-status={request.status}>{text.statuses[request.status]}</span></div>
@@ -184,7 +231,9 @@ export function AdminRequestDetailPage() {
                 <span className="admin-workflow-steps__mark" aria-hidden="true">{index < activeIndex ? '✓' : String(index + 1).padStart(2, '0')}</span><span>{text.flowSteps[index]}</span>
               </li>)}
             </ol> : <p className="admin-request-workflow__terminal">{text.statuses[request.status] || request.status}</p>}
+            {reviewStartedLabel && <p className="admin-review-activity">{reviewStartedLabel} · <Link to={`/admin/actividad?solicitud=${encodeURIComponent(request.id)}`}>{text.viewActivity}</Link></p>}
           </section>
+          </>
         )}
         <div className="admin-request-detail__grid">
           <section className="admin-detail-panel" aria-labelledby="admin-detail-brief-title"><span className="admin-eyebrow">04 / {text.details}</span><h2 id="admin-detail-brief-title">{text.details}</h2>

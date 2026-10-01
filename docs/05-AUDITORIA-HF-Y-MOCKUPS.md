@@ -967,3 +967,151 @@ En `/login`, el rótulo quedaba cerca del borde superior mientras el mensaje pri
 **Referencia → patrón → adaptación → razón:** Framer Marketplace — Spotlight Collage: medios editoriales elevados al interactuar; se conserva su selección con CSS propio y se añade orientación antes/después de la interacción para evitar una leyenda de producto arbitraria. Motion Primitives — Animated Background: feedback de selección que ubica en una lista; se mantiene en navegación Admin, sin hacer que filas estáticas parezcan enlaces. Ambas referencias ya formaban parte del banco de `docs/04`; no se añadieron dependencias.
 
 **Auditoría de recorrido:** invitado → login; cliente autenticado → `/cuenta`; admin autenticado → `/admin`; acceso directo a ruta protegida → login → retorno a ruta solicitada; logout Admin → Home. En navegador local se completó login Admin → tienda → menú → `/admin`; el render del collage idle confirma que no se presenta ficha de pieza. A 724 px se inspeccionó el flujo refluido; la aprobación visual humana y revisión de Light/otros tamaños quedan pendientes. Pasan 54 tests, lint, `check:ui`, build y `git diff --check`.
+
+### R-H48 — Home: catálogo editorial, controles flotantes y restitución de R-H45 — 2026-10-01
+
+**Corrección del usuario:** el ajuste R-H46 se había motivado por una captura visualizada con zoom del navegador al 75%; solicita volver al primer incremento R-H45. También pide que el título del catálogo abarque selección en tendencia (no solo piezas funcionales) y que los controles de asistencia se perciban mejor en Brave.
+
+**Cambio:** navbar restaurado a 14 px escritorio / 13 px tramo 821–1120 px, CTA 13/12 px e idioma 12 px; footer a 14 px de lectura y 12 px títulos/cierre. La navegación vuelve a plegarse a 820 px. Los dos controles flotantes pasan a 56×56 px; los paneles móviles se separan por encima de su columna. El catálogo ahora dice «Lo que está en tendencia» / “What's in the spotlight”, como curaduría editorial y sin claims de pedidos, ventas ni popularidad medida.
+
+**Criterio visual:** se conserva HF-01 y la escala tipográfica R-H45, y se da al control flotante más área perceptible/táctil sin cambiar su forma ni lenguaje. El título permite convivir a piezas funcionales, mecánicas, artísticas y de colección. No se agregan datos, dependencias ni cambios al mockup congelado.
+
+**Verificación:** lint pasa; suite 7/7 y 60/60; `check:ui` transforma 48 módulos; build Vite transforma 107 módulos; `git diff --check` pasa. La pestaña local recargada expone en el árbol accesible el nuevo título, contenido de Home, navegación/footer y ambos botones de herramientas. No se modificó el zoom del navegador. No se obtuvo screenshot para comparar visualmente la escala de los botones ni navbar/footer; esa inspección visual queda pendiente. Aprobación visual final pendiente del usuario.
+
+### R-H49 — Admin: señal KPI abierta y transición auditada — 2026-10-01
+
+**Hallazgo del usuario:** los KPIs de pedidos/solicitudes/cobros son rectángulos del mismo tamaño y superficie, reconocibles como dashboard genérico de Stitch. La solicitud pendiente de revisión debe convertirse en trabajo real del taller, con actor e historial, y el archivo no debe mostrar una descarga ficticia.
+
+**Cambio visual:** KPIs pasan de tarjetas enmarcadas a un carril de tres señales tipográficas abiertas con reglas de separación. Solo «Solicitudes por revisar» es un enlace real y recibe la línea Lava que crece con hover/foco; pedidos y cobros no aparentan ser interactivos. «Sin datos de cobros» conserva el límite del modelo. No se añaden gauges ni barras con máximos inventados.
+
+**Operación:** Admin puede iniciar revisión desde `PENDING_QUOTE`. El nuevo endpoint académico valida rol Admin activo y estado esperado; serializa acciones concurrentes en proceso y persiste `status: IN_REVIEW`, `reviewStartedAt`, `reviewStartedBy`, `updatedAt` y `REQUEST_REVIEW_STARTED` en `activityLog` mediante un reemplazo atómico del archivo JSON. Conflictos devuelven estado 409; errores/éxito se anuncian; el detalle muestra actor y hora. `npm run api` usa el bootstrap local `scripts/api-server.js`, que conserva el CRUD de JSON Server.
+
+**Archivos:** definido en `docs/07` el contrato de `fileStorageService`, metadatos opacos y descarga temporal autorizada. Proveedor/credenciales no están definidos y por eso no hay acción de descarga en UI. JSON Server/token académico no se presentan como seguridad real ni como transacción de producción.
+
+**Verificación:** ESLint, `check:ui` (48 módulos) y build Vite (108 módulos) pasan. Pruebas automatizadas y smoke de API no ejecutados. El endpoint se coloca antes del middleware comodín de JSON Server para que la ruta anidada no termine en 404. Los datos actuales no incluyen solicitudes `PENDING_QUOTE`, por lo que la acción no se pudo recorrer sin alterar fixtures. El servidor local anterior puede requerir reinicio con `npm run api`. La inspección visual del KPI en 719/768/1280 px y tema Light queda pendiente; no declarar la apariencia aprobada.
+
+### R-H50 — Admin: tablero de flujo de taller, no plantilla de tarjetas — 2026-10-01
+
+**Hallazgo del usuario:** quitar las cajas a los KPI no cambió suficientemente la sensación Stitch del dashboard: seguían la composición espejo de paneles rectangulares, encabezados dentro de cajas, tabla enmarcada y solicitudes como tarjeta secundaria. El usuario pide una auditoría y un rediseño completo del dashboard; Home sigue cerrada.
+
+**Auditoría estática del estado anterior:** KPI iguales por columna; `.admin-queue` dibujaba superficies idénticas; la tabla añadía otro rectángulo en el interior; avisos legacy replicaban el mismo patrón; los estados eran pastillas con borde en cada fila. No había una vista de distribución de pedidos por etapa en `/admin` aunque el dataset sí tenía estados para calcularla.
+
+**Cambio:** `/admin` ahora presenta KPIs como carril abierto; agrega una visualización SVG circular con distribución proporcional de pedidos activos por `PENDING`, `CONFIRMED`, `IN_PRODUCTION`, `READY` y `SHIPPED`; ofrece leyenda con cantidades legibles; trata la tabla como registro sin panel contenedor, la cola de solicitudes como vía de acción y el estado legacy como nota abierta. Los estados de pedido se distinguen por texto y punto semántico, las filas enlazadas reciben movimiento/acentuación en hover/foco. No se presentan periodos, metas, ventas, inventario ni previsiones que no estén en los datos. No se añaden dependencias. Home y el mockup HF-01 permanecen sin cambios.
+
+**Referencias → patrón → adaptación → razón:** [Impeccable](https://github.com/pbakaus/impeccable) → evitar tarjetas repetidas/anidadas → variar densidad según tarea → que gráfica, registro y cola se lean como herramientas distintas. [taste-skill](https://github.com/senlindesign/taste-skill) → explicar el trade-off detrás de cada token → Lava solo destaca la ruta accionable y el resto usa estado semántico → mantener carácter sin saturar. [Emil Kowalski / skills](https://github.com/emilkowalski/skills) → escoger movimiento y curva por intención → entrada breve del anillo y de las filas, retirada para `prefers-reduced-motion`/preferencia global → orientar sin animación de showcase. Se estudiaron repos de Claude como fuentes de criterio; no se copiaron interfaces/código, ejecutaron comandos de Claude ni instalaron librerías.
+
+**Verificación:** el browser local a `/admin` actualizó el árbol accesible e incluye flujo por las cinco etapas, cuentas reales, tabla/solicitudes. ESLint, 7 suites/60 tests, `check:ui` (48 módulos), build Vite (108 módulos) pasan. No se obtuvo captura para inspección de composición; por eso la auditoría visual de pantalla no se da por aprobada. Responsive de 1280/768/375 y tema Light quedan pendientes de comparación visual.
+
+### R-H51 — Admin: navegación accesible y actividad trazable — 2026-10-01
+
+**Hallazgo:** el usuario reportó que el panel izquierdo no llegaba hasta las opciones inferiores. El render de `/admin/actividad` también mostraba “Página en construcción”, aunque iniciar revisión ya persiste `REQUEST_REVIEW_STARTED`.
+
+**Cambio:** el sidebar de escritorio conserva su posición y obtiene scroll vertical interno si el contenido supera el alto disponible; el scroll de página no deja enlaces/logout fuera de alcance. En móvil sigue en flujo normal con lista horizontal. `/admin/actividad` consulta `activityLog`, ordena eventos por fecha reciente, muestra actor, cambio de etapa y un enlace al detalle de la solicitud. El detalle permite abrir el historial ya filtrado por solicitud. Estados loading/error/empty son explícitos; el log demo está vacío, por lo que no se inventan eventos. No se agregaron dependencias.
+
+**Referencia → patrón → adaptación → razón:** capturas de Admin provistas por el usuario → actividad secuencial y panel lateral completo → timeline vertical y navegación con scroll propio si hace falta → identificar quién hizo qué y asegurar que cada ruta/acción siga accesible. El dashboard sigue usando la identidad Vértice; los mocks aportan contenido funcional, no paleta/estilo. El siguiente bloque es Admin de pedidos.
+
+**Verificación:** navegador local en `/admin/actividad` confirma el shell protegido, los siete enlaces, el mensaje vacío y la explicación sin actividad inventada. El viewport conectado esta vez usa el layout estrecho; no se ha capturado el modo desktop con sidebar interno desplazado, así que ese punto queda cubierto por la regla CSS, aún pendiente de verificación renderizada. Responsive 375/768 y tema Light completos siguen pendientes. Pasaron 9 suites / 66 tests, ESLint, `check:ui` (48 módulos), build Vite (110 módulos) y `git diff --check`. Se ejecutaron binarios locales del proyecto con Node empaquetado porque el `npm` global del host apunta a un `npm-cli.js` que no existe.
+
+### R-H52 — Admin: superficie orgánica y flujo de pedidos — 2026-10-01
+
+**Feedback:** el usuario está satisfecho con funciones/fluidez, pero el dashboard todavía se siente cuadrado. Se acerca una exposición el martes; avanzar por slices funcionales verificables es prioritario.
+
+**Cambio visual:** los tres KPI se reúnen en una superficie cálida con radio workbench; el panel circular usa radio asimétrico de token Vértice; la leyenda de etapas queda abierta y no se subdivide en cinco cajas. Solo las superficies principales toman forma. Conteos y funciones previas se preservan.
+
+**Pedidos:** `/admin/pedidos` muestra los ocho registros actuales con búsqueda por ID/cliente/correo/pieza/material y filtros Todos, En producción, Entregados, Cerrados y Por aclarar. Los IDs del dashboard enlazan al detalle. `/admin/pedidos/:id` asocia cliente, productos, líneas, flujo, fechas y desglose de montos del origen. Estados no reconocidos se explican sin recodificarlos. Es de solo lectura; no ofrece cambio de etapa ni confirma pagos. Transiciones condicionadas a definir actor, conflicto y evento auditado.
+
+**Fuente → patrón → adaptación → razón:** capturas funcionales de Admin suministradas por el usuario → resumen/etapa/registro y tarea identificable → contenido aprovechado sin copiar estética; radios existentes `--radius-workbench` y `--radius-panel` → más personalidad sin poner cada sección en su propia caja. No se añadieron dependencias.
+
+**Verificación:** el navegador conectado recorrió Admin → Pedidos → pedido o8; confirmó los ocho renglones, relación con Engranaje funcional 60T/PETG, etapa “Listo”, ₡6 800 registrado y la nota de que el dato no confirma pago. No se obtuvo screenshot; composición visual desktop/Light y scroll interno del sidebar en viewport desktop bajo siguen pendientes. Pasaron 11 suites / 73 tests, ESLint, `check:ui` (48 módulos), build Vite (114 módulos) y `git diff --check`.
+
+### R-H53 — Admin: bandeja y ficha de catálogo — 2026-10-01
+
+**Necesidad de operación:** localizar el modelo que pregunta una persona y comprobar sus datos de catálogo sin confundirlos con piezas físicas disponibles.
+
+**Cambio:** `/admin/catalogo` lee `products`/`categories`, busca por texto y filtra por los valores de estado/material presentes. Cada modelo abre `/admin/catalogo/:id`, con categoría, precio publicado, colores, dimensiones, peso y duración estimada. Se conserva “ACTIVE” como valor literal del origen y no hay botón de cambio, alta o edición. `stock`/`minStock` no entran a la UI. Los datos actuales contienen `PLA Silk`, ajeno a la capacidad acordada de ASA/PLA/PETG/ABS/TPU; se presenta como revisión pendiente y no se corrige en silencio. La ficha explica producción bajo pedido.
+
+**Decisión visual:** usar filas de densidad editorial, acento de foco lateral y superficies asimétricas con radios existentes para suavizar el panel cuadrado que incomodaba al usuario. La referencia son los tokens Vértice y el feedback del usuario, no una plantilla Stitch.
+
+**Límite y siguiente decisión:** las rutas actuales de alta/edición siguen cerradas. Falta acordar transición/publicación de producto y carga/gestión de fotos antes de escribir `products` o tocar `images`.
+
+**Verificación:** Jest de la bandeja, filtros, categoría, material fuera de capacidad e inventario excluido, además del servicio de lectura. Inspección en navegador estrecho detectó que los paths demo `/products/*.jpg` no existen en `public`; el componente ahora sustituye fotos que fallan por “Sin foto”. La bandeja y ficha se volvieron a inspeccionar en el navegador estrecho después del fallback. No se declara aprobación visual general; faltan escritorio, tema Light y otros breakpoints.
+
+### R-H54 — Admin: radios efectivos en dashboard móvil — 2026-10-01
+
+**Hallazgo visual:** el usuario seguía viendo superficies cuadradas. La inspección del viewport estrecho confirmó que la regla móvil asignaba `--radius-card` (6px) al carril KPI. Además, el valor `--radius-panel` (cuatro valores) estaba compuesto como si fuera un único valor de esquina dentro del shorthand `border-radius`; el navegador descartaba toda la declaración de `/admin` y fichas de Admin afectadas.
+
+**Cambio:** carril KPI móvil usa `--radius-workbench`; distribución por etapa, pedido y superficies grandes de catálogo usan longhand por esquina con `--radius-workbench` + `--radius-control`. Esto aplica radios válidos en Dark/Light y todos los breakpoints. Los separadores de datos permanecen abiertos.
+
+**Verificación:** captura conectada de `/admin` a viewport estrecho Dark después del cambio muestra curva amplia en el carril KPI y panel de etapas; la captura de ficha Catálogo también confirma la superficie de fallback y especificaciones. Falta revisión en 375/768/1280, tema Light y aprobación humana. Sin dependencias.
+
+### R-H55 — Atmósfera del dashboard Admin — 2026-10-01
+
+**Feedback:** el usuario aprobó el diseño general del resumen y pidió dejar de repetir fondos secos y sin vida.
+
+**Cambio:** sin tocar la distribución ni las métricas, el lienzo del dashboard incorpora veladuras cálidas y una retícula amplia de baja intensidad; el título tiene luz localizada, el carril KPI gana variación tonal y el panel de etapas una geometría circular grabada detrás de los datos. La cola de solicitudes recibe una luz tenue localizada. Contraste alto apaga las texturas; no hay animación ni dependencia.
+
+**Fuente → patrón → adaptación → razón:** [Codrops — background-blend-mode](https://tympanus.net/codrops/css_reference/background-blend-mode/) → profundidad por composición de capas → gradientes y trazos generados en CSS con tokens de Vértice, variando escala e intensidad por tarea → crear una atmósfera de banco de trabajo y dejar la información legible. No se usa Stitch como dirección visual ni se copia su estética.
+
+**Verificación:** navegador conectado `/admin`, viewport estrecho Dark: el lienzo y el panel de distribución muestran capas visibles; las métricas y el orden de lectura permanecen intactos en el árbol accesible. Pendiente: Light, 375/768/1280 y revisión visual humana.
+
+### R-H56 — Extensión de identidad Admin y estados comprensibles — 2026-10-01
+
+**Feedback auditado:** la atmósfera de R-H55 quedó confinada al resumen; en
+Pedidos la barra de grupos parecía una hilera recortada de tabs; en Solicitudes
+el panel volvió a sentirse cuadrado y el rótulo “Por aclarar” no explicaba el
+contenido. El usuario aclara que su feedback se debe propagar a elementos
+equivalentes de las otras pantallas.
+
+**Cambio:** se extiende la luz ambiental al canvas compartido Admin y se matiza el
+sidebar. Pedidos mantiene la función de filtro pero sus controles ahora tienen
+forma de cápsula, conteos contenidos y estado seleccionado cálido; se envuelven
+en el ancho estrecho y reservan scroll horizontal a móvil. Solicitudes recibe
+tratamiento tonal de mapa/bandeja, radios asimétricos y anillos técnicos detrás
+del contenido. “Por aclarar” pasa a “Estado no reconocido” en Pedidos,
+Solicitudes y el resumen. La explicación dice que el valor recibido no pertenece
+a las etapas configuradas y se conserva separado, sin modificar métricas.
+
+**Verificación:** navegador conectado a 818 px Dark mostró la nueva barra de
+Pedidos en dos filas, los conteos y estado activo visibles; la bandeja de
+Solicitudes mostró superficies con radios amplios y explicación legible del
+estado `SUBMITTED`. El árbol accesible mantiene los filtros y registros. Build,
+lint, `check:ui` (48 módulos) y `git diff --check` pasan. No se ejecutó la suite
+de tests. Light y 375/768/1280 siguen pendientes.
+
+### R-H57 — Ambiente transversal y cierre de brecha CRUD — 2026-10-01
+
+**Feedback:** el usuario describe la cualidad que busca como «la atmósfera, el
+ambiente» y no quiere rutas secas o vacías. También encontró CRUDs esenciales
+ausentes aunque figuren en el alcance Must.
+
+**Criterio transversal:** `docs/04` formaliza ambiente con intención en todas las
+rutas: canvas/capas, superficies y foco local con tratamiento distinto por tarea;
+no repetir una misma retícula/halo en todas las páginas. Se audita la página
+completa y sus estados y breakpoints, conservando contraste y movimiento reducido.
+
+**Causa del CRUD faltante:** `01` declaraba «CRUD principal», `ANTEPROYECTO_FINAL`
+concretaba productos/categorías, pero `06/07/10` detenían ambas escrituras junto
+con upload de fotos y transiciones de pedidos. El acoplamiento trasladó una
+dependencia de medios a funciones de catálogo que sí podían realizarse con el
+modelo y JSON Server disponibles. `01/02/03/06/07/10` separan ahora CRUD de
+productos/categorías, archivo histórico de pedidos, datos personales y storage.
+
+**Implementación:** rutas declaradas `/admin/catalogo/nuevo`,
+`/admin/catalogo/:id/editar` y `/admin/catalogo/categorias` dejan de caer en
+construcción. Productos se crean/editan con campos del contrato, categorías se
+crean/editan/eliminan si no están en uso, y un producto se oculta cuando conserva
+referencias en pedidos. Las mutaciones viven en el servicio. Las imágenes
+existentes se preservan, las nuevas quedan vacías, y nunca se serializa stock.
+
+La auditoría transversal también detectó que `CartItem` limitaba cantidad y
+deshabilitaba la compra a partir de `product.stock`, y `ProductCard` podía inferir
+“En stock/Sin stock”. Se retiró esa inferencia: el carrito valida cantidad mínima
+y el catálogo solo puede comunicar `Bajo pedido`; estado `ACTIVE` es publicación.
+
+**Verificación:** ESLint, 13 suites / 83 tests, `check:ui` (48 módulos), build
+(119 módulos) y `git diff --check` pasan mediante binarios locales, porque el
+launcher npm global del host sigue apuntando a un `npm-cli.js` inexistente. La
+suite cubre REST de alta/edición/baja y protege la lista contra los nuevos
+enlaces de gestión. Falta recorrer create/edit/category/remove en navegador,
+probar el bloqueo real con referencias, y revisar Responsive/Light; no se declara
+aprobación visual.

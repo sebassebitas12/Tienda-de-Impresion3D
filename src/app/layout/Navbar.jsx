@@ -4,6 +4,7 @@ import { BrandLogo, IconButton, Input, LanguageToggle, NavLink, Panel, ThemeTogg
 import { useTheme } from '../../hooks/useTheme.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
 import { useAuth } from '../../hooks/useAuth.js';
+import { useCart } from '../../hooks/useCart.js';
 
 
 function AccountMenuIcon({ type }) {
@@ -40,6 +41,7 @@ function AccountMenuIcon({ type }) {
 export function Navbar({ onReading }) {
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, copy } = usePreferences();
+  const { count } = useCart();
   const { user, logout, isPending, hasPersistedSession } = useAuth();
   const accountPath = user?.role === 'admin' ? '/admin' : user ? '/cuenta' : '/login';
   const accountLabel = user?.role === 'admin' ? copy.adminDashboard : user ? copy.account : copy.login;
@@ -99,6 +101,10 @@ export function Navbar({ onReading }) {
           </Link>
 
           <LanguageToggle className="header-language" language={language} onChange={setLanguage} />
+          <Link className="header-cart" to="/carrito" aria-label={`${copy.cart}${count ? `: ${count}` : ''}`} aria-current={location.pathname === '/carrito' ? 'page' : undefined} onClick={closePanel}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M3 3h2l2.5 12h11l2-8H6" /><circle cx="9" cy="20" r="1" /><circle cx="18" cy="20" r="1" /></svg>
+            {count > 0 && <span className="header-cart__count" aria-hidden="true">{count > 99 ? '99+' : count}</span>}
+          </Link>
           <ThemeToggle className="header-theme" theme={theme} onToggle={setTheme} label={theme === 'dark' ? copy.light : copy.dark} />
 
           <IconButton

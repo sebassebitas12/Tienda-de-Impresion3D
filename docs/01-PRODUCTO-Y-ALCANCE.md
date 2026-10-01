@@ -48,6 +48,8 @@ Dashboard operativo, productos, categorías, pedidos y su producción, solicitud
 ### Must
 Autenticación, roles, catálogo, productos, carrito, pedidos, solicitudes, cotización, CRUD, dashboard, métricas, API externa, IA, N8N, responsive, accesibilidad y testing.
 
+**Alcance operativo del requisito CRUD (aclaración 2026-10-01):** CRUD completo en Admin para `products` y `categories`. Productos permiten alta, lectura, edición, publicación/ocultamiento y baja definitiva solo sin referencias históricas; si ya forman parte de un pedido, se ocultan para conservar el registro. Categorías permiten alta, lectura, edición y baja solo sin productos asociados. Ninguna de estas operaciones administra inventario ni carga de medios. Pedidos son registros históricos: su creación ocurre en el flujo de compra y la edición de etapa será una operación de dominio auditada, nunca CRUD genérico ni borrado. Las solicitudes se crean en el flujo del cliente y usan el ciclo de cotización de `02`; usuarios se registran desde Auth y no se crean/eliminan desde Admin. No interpretar “CRUD” como permiso para modificar/borrar indiscriminadamente todas las entidades.
+
 ### Should
 Reseñas, cupones, ajuste de texto y WhatsApp.
 

@@ -5,9 +5,9 @@
 .v-section-kicker { display: block; margin-bottom: .75rem; }
 .v-badge { display: inline-flex; align-items: center; gap: .375rem; padding: .3125rem .5rem; border: 1px solid var(--line-strong); border-radius: var(--radius-sharp); font: calc(.625rem * var(--a11y-font-scale))/1.5 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--paper); overflow-wrap: anywhere; }
 .v-badge--material-tag { color: var(--lava-light); background: var(--ink); }
-.v-badge--stock-tag[data-status="in-stock"], .v-badge--request:is([data-status="APPROVED"],[data-status="PAID"]) { color: var(--green); border-color: color-mix(in srgb,var(--green) 40%,var(--line)); background: color-mix(in srgb,var(--green) 8%,var(--ink)); }
-.v-badge--stock-tag[data-status="order"] { color: var(--warning); border-color: color-mix(in srgb,var(--warning) 40%,var(--line)); background: color-mix(in srgb,var(--warning) 8%,var(--ink)); }
-.v-badge--stock-tag[data-status="out"], .v-badge--request { color: var(--muted); background: var(--ink); }
+.v-badge--production-tag { color: var(--warning); border-color: color-mix(in srgb,var(--warning) 40%,var(--line)); background: color-mix(in srgb,var(--warning) 8%,var(--ink)); }
+.v-badge--request:is([data-status="APPROVED"],[data-status="PAID"]) { color: var(--green); border-color: color-mix(in srgb,var(--green) 40%,var(--line)); background: color-mix(in srgb,var(--green) 8%,var(--ink)); }
+.v-badge--request { color: var(--muted); background: var(--ink); }
 .v-badge--request:is([data-status="REJECTED"],[data-status="EXPIRED"],[data-status="CANCELLED"]) { color: var(--error); }
 .v-badge--spec-chip { color: var(--paper); border-color: transparent; }
 .v-button { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: .5625rem; min-width: 44px; min-height: 44px; padding: .625rem 1.125rem; border: 1px solid transparent; border-radius: var(--radius-control); font: 700 calc(.75rem * var(--a11y-font-scale))/1.5 var(--display); letter-spacing: .04em; transition: transform var(--motion-micro),background var(--motion-ui),border-color var(--motion-ui),color var(--motion-ui); }
@@ -37,7 +37,7 @@
 .v-icon-button > span { display: grid; place-items: center; }
 .v-icon-button svg { width: 18px; height: 18px; }
 .v-icon-button--round,.v-icon-button--floating-button { border-radius: 50%; }
-.v-icon-button--floating-button { width: 50px; height: 50px; background: var(--panel); box-shadow: 0 16px 34px var(--shadow-color); }
+.v-icon-button--floating-button { width: 56px; height: 56px; background: var(--panel); box-shadow: 0 16px 34px var(--shadow-color); }
 .v-icon-button:hover:not(:disabled),
 .v-icon-button:focus-visible:not(:disabled) {
   transform: translateY(-2px);

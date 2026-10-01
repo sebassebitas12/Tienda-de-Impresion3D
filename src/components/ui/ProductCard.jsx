@@ -11,26 +11,23 @@ export function ProductCard({
   href,
   to,
   layout = 'standard',
-  showAvailability = false,
+  showMadeToOrder = false,
   showPrice = false,
   viewLabel = 'Ver ficha',
   imageUnavailableLabel = 'Imagen no disponible',
 }) {
   const [failedSource, setFailedSource] = useState(null);
   const src = product.images?.[0];
-  const inferredAvailable = product.stock > 0 && product.status === 'ACTIVE';
-  const stockStatus = product.stockStatus ?? (inferredAvailable ? 'in-stock' : 'out');
-  const stockLabel = product.stockLabel ?? (inferredAvailable ? 'En stock (' + product.stock + ')' : 'Sin stock');
-  const unavailable = showAvailability && (product.status !== 'ACTIVE' || stockStatus === 'out');
+  const unpublished = String(product.status || 'ACTIVE').toUpperCase() !== 'ACTIVE';
   const imageAlt = product.imageAlt || (product.name + ' en ' + product.material);
   const featured = layout === 'featured';
 
   return (
-    <Card hover className={'v-product-card' + (featured ? ' v-product-card--featured' : '')} data-unavailable={unavailable}>
+    <Card hover className={'v-product-card' + (featured ? ' v-product-card--featured' : '')} data-unavailable={unpublished}>
       <div className="v-product-image">
         <div className="v-product-meta">
           {!featured && <Badge variant="material-tag">{product.material}</Badge>}
-          {showAvailability && <Badge variant="stock-tag" status={stockStatus}>{stockLabel}</Badge>}
+          {showMadeToOrder && <Badge variant="production-tag">Bajo pedido</Badge>}
         </div>
         {src && failedSource !== src ?
           <img src={src} alt={imageAlt} loading="lazy" decoding="async" onError={() => setFailedSource(src)} /> :

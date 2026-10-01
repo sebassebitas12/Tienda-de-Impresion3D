@@ -20,8 +20,8 @@ export function CartItem({ kind = 'catalog', product, request, quantity = 1, onQ
   return (
     <article className="v-cart-item" aria-busy={processing}>
       <div><h3>{product.name}</h3><p>{product.material}</p><PriceTag amount={product.price} /></div>
-      <Input label={'Cantidad de ' + product.name} type="number" min="1" max={product.stock} step="1"
-        value={quantity} disabled={processing || product.stock < 1} error={error}
+      <Input label={'Cantidad de ' + product.name} type="number" min="1" step="1"
+        value={quantity} disabled={processing} error={error}
         onChange={event => onQuantityChange?.(event.target.value === '' ? '' : Number(event.target.value))} />
       <div><span>Subtotal</span><PriceTag amount={subtotal} /></div>
       {onRemove && <Button variant="ghost" disabled={processing} onClick={onRemove}>Quitar producto</Button>}

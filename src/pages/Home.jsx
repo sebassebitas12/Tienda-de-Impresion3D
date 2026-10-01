@@ -4,14 +4,19 @@ import {
   Button,
   RevealOnScroll,
   ProductCard,
-  SectionBlock
+  SectionBlock,
+  ErrorState,
+  Skeleton
 } from '../components/ui/index.js';
 import { usePreferences } from '../hooks/usePreferences.js';
-import { FEATURED_PRODUCTS, HERO_PIECES, getHomeContent } from './homeContent.js';
+import { HERO_PIECES, getHomeContent } from './homeContent.js';
+import { useCatalog } from '../hooks/useCatalog.js';
+import { isOrderableProduct } from '../utils/cart.js';
 import '../styles/home.css';
 
 export function Home() {
   const { language } = usePreferences();
+  const { products, status: catalogStatus, retry: retryCatalog } = useCatalog();
   const content = getHomeContent(language);
   const [activePiece, setActivePiece] = useState(0);
   const [leader, setLeader] = useState(null);
@@ -24,8 +29,9 @@ export function Home() {
   );
 
   const featuredProducts = useMemo(
-    () => FEATURED_PRODUCTS.map(product => ({ ...product, ...content.products[product.id] })),
-    [content],
+    () => products.filter(isOrderableProduct).slice(0, 6).map(product => ({ ...product, categoryName: product.category?.name,
+      images: product.images?.length ? product.images : ['/images/producto-temporal.png'] })),
+    [products],
   );
 
   const piece = heroPieces[activePiece] ?? heroPieces[0];
@@ -217,13 +223,15 @@ export function Home() {
         kicker={content.catalogKicker}
         subtitle={content.catalogIntro}
       >
+        {catalogStatus === 'loading' && <div role="status" aria-label={language === 'es' ? 'Cargando modelos' : 'Loading models'}><Skeleton height="220px" /></div>}
+        {catalogStatus === 'error' && <ErrorState title={language === 'es' ? 'No pudimos cargar los modelos' : 'Could not load models'} onRetry={retryCatalog} retryLabel={language === 'es' ? 'Reintentar' : 'Retry'} />}
+        {catalogStatus === 'success' && featuredProducts.length === 0 && <p>{language === 'es' ? 'Estamos preparando nuevos modelos para el catálogo.' : 'We are preparing new catalog models.'}</p>}
         <div className="catalog-grid">
           {featuredProducts.map(product => (
             <RevealOnScroll key={product.id}>
               <ProductCard
                 product={product}
                 layout="featured"
-                showAvailability={false}
                 linkAs={Link}
                 to={`/producto/${product.id}`}
                 viewLabel={content.viewProduct}

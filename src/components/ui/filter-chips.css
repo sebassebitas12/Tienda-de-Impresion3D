@@ -1,0 +1,6 @@
+.v-filter-chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:20px}
+.v-filter-chips button{display:flex;align-items:center;gap:10px;min-height:46px;padding:8px 14px;border:1px solid var(--line-strong);border-radius:var(--pill);color:var(--muted);background:var(--panel);font:inherit;cursor:pointer}
+.v-filter-chips button[aria-pressed="true"]{color:var(--paper);border-color:var(--lava);background:color-mix(in srgb,var(--lava) 8%,var(--panel))}
+.v-filter-chips button:hover{color:var(--paper);border-color:var(--lava)}.v-filter-chips button:focus-visible{outline:2px solid var(--lava);outline-offset:3px}
+.v-filter-check{display:grid;place-items:center;width:18px;height:18px;border:1px solid var(--line-strong);border-radius:5px;font-size:12px}
+.v-filter-chips button[aria-pressed="true"] .v-filter-check{background:var(--lava);border-color:var(--lava);color:var(--ink)}

@@ -19,6 +19,7 @@ Salidas: REJECTED, EXPIRED, CANCELLED.
 
 Reglas:
 - PENDING_QUOTE no tiene precio final.
+- Solo `role: admin` puede iniciar `PENDING_QUOTE → IN_REVIEW`; el cambio y el evento con actor/fecha se registran juntos en `activityLog`.
 - El rango de IA es orientativo.
 - Solo el admin emite la cotización final.
 - Solo una cotización aprobada puede pagarse.
@@ -37,6 +38,21 @@ Campos mínimos: id, name, slug, description, categoryId, images, price, currenc
 - No mostrar en el storefront etiquetas ni cantidades que indiquen existencias, disponibilidad inmediata o falta de existencias.
 - `status` controla la publicación del producto en el catálogo; no representa disponibilidad física.
 - Los campos heredados `stock` y `minStock` que aún aparezcan en datos demo no son fuente válida de disponibilidad y no deben determinar visibilidad, compra ni mensajes al cliente. Su eliminación del contrato/dataset requiere una migración explícita.
+
+La bandeja Admin del catálogo consulta modelos y categorías y permite buscar y
+filtrar por los valores de publicación/material presentes en el origen. CRUD de
+catálogo: Admin puede crear/editar productos y categorías; los productos usan
+`ACTIVE` (publicado) y `INACTIVE` (oculto) como estados de publicación, nunca
+disponibilidad. PATCH modifica solo campos autorizados y no escribe campos de
+inventario heredados. `images` existentes se conservan al editar y producto
+nuevo inicia con `images: []`; carga/cambio de imágenes queda fuera hasta definir
+almacenamiento. Una categoría no se elimina si tiene modelos asociados. Un
+producto no se elimina definitivamente si aparece en `orderItems`; en ese caso
+se oculta para conservar el historial. No se aplica cascada.
+
+La capacidad vigente admite FDM con ASA, PLA, PETG, ABS y TPU. Si un registro
+existente tiene otro material, Admin lo señala para revisión sin cambiarlo ni
+ocultarlo silenciosamente.
 
 Reglas:
 - price >= 0.
@@ -68,6 +84,11 @@ PENDING → CONFIRMED → IN_PRODUCTION → READY → SHIPPED → DELIVERED
 ~~~
 
 Alternativos: CANCELLED, REJECTED.
+
+La pantalla Admin de pedidos actual es de lectura. Presenta los estados, líneas
+de `orderItems`, datos de cliente y montos registrados sin convertir `total` en
+prueba de pago. No ofrecer cambios de estado hasta acordar los permisos,
+transiciones terminales/alternativas y su escritura auditada.
 
 ## Cotización
 

@@ -101,9 +101,32 @@ El chatbot general puede usar el mismo patrón con `mode: "chat"`; ambos casos s
 
 El dashboard inicial lee `orders`, `customPrintRequests` y `users` mediante un service de solo lectura contra JSON Server. Muestra pedidos activos usando los estados no terminales conocidos; cuenta para revisión únicamente solicitudes `PENDING_QUOTE`/`IN_REVIEW`; el estado legacy `SUBMITTED` se reporta como dato fuera del flujo y queda excluido hasta una decisión/migración explícita.
 
-El conjunto demo actual no incluye entidad `payments`, `paidAt` ni comprobantes de cobro que permitan demostrar pago. La métrica de ventas cobradas debe mostrar “Sin datos de cobros”, nunca sumar automáticamente los totales de pedidos como ingreso efectivo. `activityLog` existe vacío y su contrato de eventos está pendiente; no se inventa una actividad reciente.
+El conjunto demo actual no incluye entidad `payments`, `paidAt` ni comprobantes de cobro que permitan demostrar pago. La métrica de ventas cobradas debe mostrar “Sin datos de cobros”, nunca sumar automáticamente los totales de pedidos como ingreso efectivo. `activityLog` inicia vacío; el evento de inicio de revisión tiene contrato en `docs/07`. `/admin/actividad` presenta eventos existentes o un estado vacío, nunca actividad de ejemplo. Desde el detalle se puede consultar el historial filtrado por solicitud.
 
-El `activityLog` actual está vacío; el slice no genera eventos ni los presenta como recientes. No usar `stock`/`minStock` en el dashboard ni inferir disponibilidad material de piezas: el catálogo se fabrica bajo pedido. Admin puede gestionar catálogo/publicación cuando ese slice se implemente, pero las cifras heredadas de inventario no son señal operativa vigente.
+El `activityLog` del dataset inicia vacío; las acciones administrativas pueden
+añadir eventos con fuente y actor identificables. La pantalla los muestra en
+orden cronológico inverso y permite filtrar por solicitud; el vacío indica que
+todavía no hay acciones guardadas. No usar `stock`/`minStock` en el dashboard ni
+inferir disponibilidad material de piezas: el catálogo se fabrica bajo pedido.
+
+### Referencia de contenido para el tablero
+
+Las capturas aportadas por el usuario (2026-10-01) muestran tipos útiles de
+contenido para un dashboard: resumen de etapas, registros recientes y actividad.
+Se adapta esa jerarquía a los datos del taller: pedidos por estado, solicitudes
+que requieren atención y un historial trazable. No se incorporan visitas,
+ingresos ni tendencias porque el modelo no tiene esas fuentes. La dirección de
+color, tipografía y superficies sigue siendo la de Vértice, no la plantilla
+mostrada en las capturas.
+
+### Historial de actividad Admin
+
+La ruta `/admin/actividad` consulta exclusivamente `activityLog`, ordena por
+`occurredAt` descendente y reconoce la acción `REQUEST_REVIEW_STARTED`. El evento
+abre el detalle de solicitud relacionado. Desde el detalle se ofrece
+`/admin/actividad?solicitud=<id>`; el filtro se aplica sobre los eventos ya
+leídos, acorde con el JSON Server académico actual. `db.json` todavía no contiene
+eventos, por lo que la UI expone un estado vacío en vez de poblar actividad falsa.
 
 ### Identidad y entrada al dashboard
 
@@ -132,11 +155,30 @@ ciclo conocido; precio se muestra solo con `quotedPrice` CRC real y nunca para
 `PENDING_QUOTE`/`IN_REVIEW`. `fileName` es metadato, no enlace de descarga. Ver
 contrato de lectura y límites de escritura en `docs/07-DATOS-API-AUTH.md`.
 
-El bloque es de consulta: no cambia estados ni escribe `activityLog`. Aunque el
-flujo de negocio enumera estados, el repo aún no define una operación atómica que
-registre transición, operador y evento de auditoría; no ofrecer una falsa acción
-administrativa hasta cerrar ese contrato. La ruta Admin de actividad sigue
-pendiente porque su colección carece de eventos/shape usable.
+El resumen Admin conserva sus métricas como señales abiertas, sin contenedores
+gemelos; ahora se agrupan sobre una única superficie cálida con radio amplio del
+token Vértice, mientras cada cifra conserva jerarquía abierta. El anillo y su
+lista se separan por aire en vez de encerrar cada etapa en una mini tarjeta. Sus
+cifras principales tienen escala moderada. El anillo solo muestra la distribución
+actual observada, no una tendencia.
+
+### Admin de pedidos
+
+El registro cuenta los datos presentes, agrupa `PENDING` a `SHIPPED` como en
+proceso, `DELIVERED` como entregado y `CANCELLED`/`REJECTED` como cierres. Otros
+estados se conservan y aíslan bajo “Estado no reconocido”, con una explicación
+de que el valor recibido no coincide con las etapas configuradas. Búsqueda abarca ID, nombre/correo
+de cliente y nombre/material de pieza. El detalle muestra solo datos enlazados
+desde `orders`, `orderItems`, `products` y `users`; los montos son registrados,
+no indicadores de pago. No se añadió una acción de cambio de etapa porque falta
+un contrato de transición y auditabilidad.
+
+La ficha permite iniciar revisión únicamente desde `PENDING_QUOTE`. La acción
+valida estado esperado y actor Admin, transiciona a `IN_REVIEW` y agrega el evento
+en una sola escritura del API académico. El resultado y los errores se anuncian;
+la ficha actualiza el estado y muestra quién inició la revisión. No cotiza ni
+modifica precio. La ruta global de actividad muestra estos eventos desde
+`activityLog` y permite filtrarlos por solicitud, descrito en este mismo documento.
 
 #### Referencias de movimiento y datos
 
@@ -146,10 +188,58 @@ pendiente porque su colección carece de eventos/shape usable.
 
 El anillo resume distribución del conjunto actual, no constituye una métrica temporal ni un pronóstico. Todos los grupos muestran cantidades además de color y tienen controles de filtro por teclado. `prefers-reduced-motion` y el ajuste global eliminan entradas/transiciones.
 
-### Siguiente slice: operación con auditoría
+### Contrato de operación y archivo (2026-10-01)
 
-Definir una acción administrativa transaccional para iniciar revisión/cotizar y
-el evento de `activityLog` que debe acompañarla. También concretar URL/almacenamiento
-del archivo antes de ofrecer apertura/descarga. Las siguientes métricas se añaden
-solo junto a fuente real, decisión que ayudan a tomar y destino funcional cuando
-exista; IA/N8N se mantiene después del flujo operativo.
+Las métricas KPI del dashboard dejan de ser tres tarjetas idénticas: presentan
+un carril abierto de señales. La cifra de solicitudes conserva enlace real a la
+bandeja; solo esa columna lleva regla de acento y respuesta en hover/foco. Los
+pedidos activos y cobros sin datos no adquieren affordance engañosa. El patrón
+usa tipografía de señal y reglas del sistema Vértice; no clona Stitch ni suma una
+gráfica a datos que no la justifican.
+
+La transición `PENDING_QUOTE → IN_REVIEW` y el evento
+`REQUEST_REVIEW_STARTED` se guardan juntos por el endpoint académico definido
+en `docs/07`. El contrato de almacenamiento conserva metadatos opacos y requiere
+descarga temporal autorizada, pero el proveedor de archivos sigue pendiente;
+`fileName` no da acceso a bytes. La ruta global de actividad, otras transiciones
+y cotización siguen como siguientes slices.
+
+### Replanteamiento visual del dashboard — R-H50 (2026-10-01)
+
+La primera corrección del usuario indicó que el dashboard seguía pareciendo una
+plantilla Stitch incluso después de quitar el marco a los KPIs. La causa estaba
+en el resto de la composición: paneles simétricos con borde/fondo, encabezados
+enmarcados, tabla dentro de tarjeta y tarjeta de solicitudes del mismo peso.
+
+`/admin` ahora se compone como tablero de flujo del taller: franja de KPI abierta;
+anillo SVG con proporciones calculadas sobre todos los pedidos activos por etapa;
+leyenda textual con cantidad, registro reciente semántico y una cola de
+solicitudes con hover/foco que conduce al detalle real. El aviso de estados
+legacy es una nota editorial abierta. Sin pagos se conserva “Sin datos de
+cobros”. No se usan inventarios, máximos, periodo ni pronósticos.
+
+**Fuente → patrón → adaptación → razón:** [Impeccable](https://github.com/pbakaus/impeccable): evitar cajas idénticas/anidadas → composiciones de distinta densidad → cada región responde a una tarea concreta. [taste-skill](https://github.com/senlindesign/taste-skill): expresar trade-offs de tokens → Lava reservado al enlace accionable y etapas con señal semántica → identidad sin colorear todo. [Emil Kowalski / skills](https://github.com/emilkowalski/skills): movimiento según intención y física adecuada → entrada corta del anillo/filas, anulada por movimiento reducido → feedback sin showcase. No se copiaron interfaces ni código y no se instaló nada específico de Claude o dependencias.
+
+El conjunto completo del dashboard se revisa en `docs/05`, R-H50. Home y
+`mockups/hf-01-home-definitivo.html` no se modifican.
+
+### Fondo y orientación visual del dashboard — R-H55
+
+El resumen conserva sus métricas y distribución. El lienzo usa capas ambientales
+de token y una retícula técnica tenue; la sección de etapas recibe una
+geometría grabada propia y la cola de solicitudes un resplandor localizado. La
+textura no representa mediciones, máximos ni valores adicionales. Contraste
+alto la retira. Detalle de referencia y auditoría visual en `docs/04` R-H55 y
+`docs/05` R-H55.
+
+### Bandeja operativa de catálogo — 2026-10-01
+
+El catálogo Admin prioriza la tarea de localizar una pieza: búsqueda por texto,
+filtros derivados de los estados/materiales que realmente llegan de JSON Server,
+y ficha con categoría, precio publicado y especificaciones de origen. Filas con
+imagen ayudan a reconocer el modelo, y el patrón abierto comparte tokens/radios
+Vértice sin convertir cada dato en una tarjeta. La ficha recuerda que se produce
+bajo pedido. No se muestran cifras de inventario, no se cambia publicación y no
+se habilita edición hasta que existan reglas, endpoint transaccional y storage.
+Los registros con un material no admitido por la capacidad actual se hacen
+visibles para revisión, en lugar de borrarlos u ocultarlos.

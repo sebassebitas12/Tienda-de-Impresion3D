@@ -31,12 +31,11 @@ export function AdminLayout() {
       <aside className="admin-sidebar">
         <BrandLogo as={Link} to="/" />
         <p>{copy.admin}</p>
-        <div className="admin-session-card" aria-label={copy.adminSession}>
-          <span className="admin-session-mark" aria-hidden="true" />
-          <div><strong>{user?.name || copy.admin}</strong><span>{copy.adminSession}</span></div>
-        </div>
-        <nav aria-label={copy.admin}>{links.map(([to, label]) => <NavLink key={to} to={to} end>{copy[label]}</NavLink>)}</nav>
+        <nav aria-label={copy.admin}>{links.map(([to, label]) => <NavLink key={to} to={to}
+          end={to === '/admin' || to === '/admin/actividad' || to === '/admin/catalogo/categorias' || (to === '/admin/catalogo' && location.pathname === '/admin/catalogo/categorias')}>
+          {copy[label]}</NavLink>)}</nav>
         <Link className="v-link-text" to="/">{copy.publicSite}</Link>
+        <div className="admin-session-inline" aria-label={copy.adminSession}><span>{copy.admin}</span><strong>{user?.name || copy.admin}</strong></div>
         <button className="v-button v-button--ghost" type="button" onClick={handleLogout} disabled={isPending}>{copy.logout}</button>
         {logoutError && <p role="alert">{copy.authGenericError}</p>}
       </aside>

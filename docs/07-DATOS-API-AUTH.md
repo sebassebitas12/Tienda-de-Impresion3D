@@ -58,7 +58,24 @@ N8N no es fuente de verdad del negocio.
 
 MVP: STL y OBJ, validación de extensión/tamaño y estados de upload.
 
-El almacenamiento definitivo se decide antes de implementación.
+### Contrato de metadatos y acceso
+
+La solicitud conserva `fileName` por compatibilidad, pero ese texto no es una
+ubicación ni habilita abrir/descargar. Cuando exista almacenamiento, la solicitud
+referenciará un objeto `file` con `storageKey` opaco, `originalName`,
+`mediaType`, `sizeBytes`, `checksumSha256` y `uploadedAt`. Los bytes no se
+guardan en `db.json` ni se exponen bajo una ruta pública.
+
+El puerto previsto de `fileStorageService` es `storeRequestFile(file,
+{requestId, ownerId}) → metadata` y `createAuthorizedDownload(requestId,
+{actorId}) → {url, expiresAt, fileName}`. La descarga requiere autorización en
+servidor y una URL de vida limitada; nunca se construye desde `fileName` ni desde
+una URL enviada por el cliente. La validación de STL/OBJ y el límite de tamaño
+se aplican en servidor además del feedback del navegador.
+
+**Pendiente de decisión de proveedor/credenciales:** no hay URL/base path de
+storage en Markdown ni servicio configurado en el repo. Por eso este contrato no
+activa todavía una descarga ni inventa un proveedor.
 
 ## IA
 
@@ -223,7 +240,7 @@ El almacenamiento/persistencia del token pertenece al adapter concreto; no queda
 
 El dataset conserva `customPrintRequests.status: "SUBMITTED"` (r5), valor ausente del ciclo oficial. La UI lo muestra aparte y no lo convierte silenciosamente en `PENDING_QUOTE`; resolverlo requiere corregir/migrar explícitamente el dato o acordar alias en el contrato.
 
-El modelo actual no tiene `payments`, `paidAt` ni otra evidencia normalizada de cobro. Por eso el dashboard no calcula ingresos desde `orders.total`. `activityLog` está vacío en el dataset; la ruta de actividad se difiere hasta definir el shape y las escrituras que generarán entradas.
+El modelo actual no tiene `payments`, `paidAt` ni otra evidencia normalizada de cobro. Por eso el dashboard no calcula ingresos desde `orders.total`. `activityLog` inicia vacío en el dataset; el evento `REQUEST_REVIEW_STARTED` ya define el shape de escritura y la vista Admin lee esos eventos sin inventar muestras.
 
 ### Bandeja/detalle Admin de solicitudes (2026-10-01)
 
@@ -239,9 +256,78 @@ numérico y `currency: CRC`; la UI no crea ni completa una cotización. Los valo
 `SUBMITTED` y otros estados desconocidos quedan visibles en una sección separada,
 fuera de la distribución del flujo oficial.
 
-No se escribe el estado de solicitud ni `activityLog`: aún falta definir el
-contrato y la atomicidad de una acción administrativa con auditoría. Abrir el
-detalle/filtro no cambia datos. El siguiente paso transaccional debe establecer
-si una transición como `PENDING_QUOTE → IN_REVIEW` registra operador, fecha y
-evento de forma consistente; una mutación aislada desde el cliente no se debe
-presentar como operación auditada.
+### Operación académica: iniciar revisión
+
+`POST /admin/actions/start-review` recibe `{requestId, actorId,
+expectedStatus: "PENDING_QUOTE"}`. El servidor comprueba que el actor exista,
+esté `ACTIVE` y tenga `role: admin`; vuelve a comprobar el estado esperado para
+rechazar cambios obsoletos (`409 STATUS_CONFLICT`). Un único comando modifica la
+solicitud a `IN_REVIEW` (`reviewStartedAt`, `reviewStartedBy`, `updatedAt`) y
+añade el evento:
+
+~~~json
+{
+  "entity": "customPrintRequest",
+  "entityId": "r…",
+  "action": "REQUEST_REVIEW_STARTED",
+  "fromStatus": "PENDING_QUOTE",
+  "toStatus": "IN_REVIEW",
+  "actorId": "u…",
+  "actorName": "…",
+  "occurredAt": "ISO-8601"
+}
+~~~
+
+Los dos cambios se serializan en una cola por proceso y se persisten en un único
+reemplazo atómico del archivo JSON. El componente no hace una mutación separada ni añade
+precio. Esta protección sirve para la práctica local; JSON Server y el token
+académico no ofrecen seguridad real frente a clientes manipulados o varios
+procesos.
+
+### Consulta del historial Admin
+
+`getAdminActivity()` consulta `GET /activityLog`, valida que la respuesta sea una lista y ordena por `occurredAt` descendente. `/admin/actividad` representa los eventos persistidos; si el log está vacío muestra un estado vacío, no filas de ejemplo. `?solicitud=<id>` limita la vista al evento de esa solicitud y el detalle enlaza a dicho historial. El evento conocido `REQUEST_REVIEW_STARTED` enlaza a `/admin/solicitudes/:id`; eventos sin destino documentado se muestran sin fabricar navegación.
+
+### Lectura de pedidos Admin
+
+`getAdminOrdersData()` lee en paralelo `GET /orders`, `/orderItems`, `/products`
+y `/users`. `buildAdminOrders()` une cada pedido con el cliente y sus líneas con
+el nombre/material de catálogo; la función de filtro y los conteos de etapas son
+puros. `/admin/pedidos` lista todos los pedidos por `createdAt` más reciente,
+con búsqueda por ID/cliente/pieza y filtros de estados reconocidos o por
+aclarar. `/admin/pedidos/:id` expone el flujo/importe registrado y no muta datos.
+
+No hay contrato de cambios de estado ni auditoría de esas transiciones. No se
+deben ofrecer botones para actualizar hasta definir estados permitidos, actor,
+conflictos y evento de `activityLog`. El total del pedido describe el campo de
+origen y no demuestra cobro; el proyecto aún no tiene `payments`/`paidAt`.
+
+### Lectura del catálogo Admin
+
+`getAdminCatalogData()` consulta `GET /products` y `GET /categories` en paralelo,
+valida ambas listas y devuelve datos de origen. `buildAdminCatalog()` asocia la
+categoría por ID; búsqueda, filtros por los valores presentes y conteos se
+resuelven con funciones puras. `/admin/catalogo` lista modelos y
+`/admin/catalogo/:id` muestra la ficha registrada. CRUD de esta entrega usa el
+REST académico de JSON Server: POST/PATCH/DELETE sobre `products` y `categories`.
+Los formularios permiten editar datos técnicos vigentes y estados de publicación
+`ACTIVE`/`INACTIVE`; serializan solo campos permitidos, nunca `stock`/`minStock`.
+Crear modelo envía `images: []`; editar preserva `images` ya registradas. No hay
+subida/cambio de imagen hasta elegir almacenamiento.
+
+Antes de borrar una categoría, la UI comprueba que ningún producto la use; antes
+de borrar un producto, consulta `orderItems` y bloquea la baja si hay una
+referencia histórica, ofreciendo ocultarlo (`INACTIVE`) como alternativa. No hay
+cascadas. JSON Server no ofrece aquí una transacción que elimine la carrera entre
+la comprobación y el borrado; esta protección sirve para la entrega académica de
+un solo operador. En un backend real la regla debe imponerse con FK/transaction
+en el servidor. El CRUD no muta etapas de pedidos ni solicitudes.
+
+Un material fuera de ASA/PLA/PETG/ABS/TPU se destaca para revisión; al guardar
+un producto se requiere seleccionar una capacidad vigente, sin corregir registros
+antiguos en silencio.
+
+Las rutas de foto del dataset actual usan `/products/*.jpg`, pero los assets del
+proyecto viven bajo `/images/` y no se corresponden todos por nombre. Admin no
+adivina una asociación; cuando la URL registrada no carga, muestra el fallback
+«Sin foto». La corrección masiva requiere relacionar cada producto con su asset.

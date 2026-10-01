@@ -195,12 +195,18 @@ describe('Separación de catálogo y cotización', () => {
     expect(screen.queryByText('Pago confirmado.')).not.toBeInTheDocument();
   });
 
-  test('ProductCard omite disponibilidad por defecto y conserva el estado de imagen', () => {
+  test('ProductCard ignora stock heredado y conserva el estado de imagen', () => {
     render(<UI.ProductCard product={{ ...product, stock: 0 }} href="/producto/test-only" showPrice />);
     expect(screen.queryByText('Sin stock')).not.toBeInTheDocument();
     expect(screen.queryByText('En stock (5)')).not.toBeInTheDocument();
     expect(screen.getByText('Imagen no disponible')).toBeVisible();
     expect(screen.getByRole('link')).toHaveAttribute('href', '/producto/test-only');
+  });
+
+  test('CartItem permite pedir una cantidad sin consultar stock del dataset', () => {
+    render(<UI.CartItem product={{ ...product, stock: 0 }} quantity={1} />);
+    expect(screen.getByRole('spinbutton', { name: /Cantidad de/ })).toBeEnabled();
+    expect(screen.getByRole('spinbutton', { name: /Cantidad de/ })).not.toHaveAttribute('max');
   });
 
   test('subtotal y elegibilidad rechazan datos incompletos', () => {

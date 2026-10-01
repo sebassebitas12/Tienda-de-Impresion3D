@@ -10,6 +10,18 @@ Obsidian define estructura, precisión, superficies y lenguaje industrial. Lava 
 
 Evitar estética gamer, cyberpunk, exceso de glow, lava literal y UI genérica de IA.
 
+### Atmósfera transversal — ambiente con intención
+
+Cada ruta debe sentirse como un espacio propio de Vértice, no como contenido colocado sobre un canvas oscuro vacío. La atmósfera es parte de la experiencia: compone profundidad, materialidad y orientación antes de añadir decoración. Se resuelve con capas de superficie, luz cálida, retícula/trazos o movimiento sutil elegidos según la tarea; no es obligatorio usar todos esos recursos en cada pantalla.
+
+- Definir para cada página un fondo/campo ambiental, una superficie de contenido y un foco local que ayude a entender dónde mirar o actuar. Las áreas largas pueden cambiar de tratamiento por sección para conservar ritmo.
+- No repetir el mismo gradiente radial, retícula o halo en todas las páginas; variar ubicación, densidad, geometría y temperatura con una razón funcional/editorial. Una pantalla puede ser calmada, pero no debe quedar seca por defecto.
+- Las superficies operativas conservan lectura y densidad: la atmósfera acompaña el flujo, no compite con datos, formularios ni acciones.
+- Mantener tokens y mezcla de color existentes; asegurar contraste en Light/ Dark y alto contraste. Quitar capas decorativas en alto contraste y respetar `prefers-reduced-motion`/preferencia de movimiento.
+- Antes de cerrar un slice, revisar la página completa y sus superficies secundarias a 375/768/1280 px: canvas, encabezado, filtros, listas, formularios, vacíos y detalle. Corregir patrones repetidos en toda la ruta, no solo en el elemento señalado.
+
+Fuente → patrón observado: HF-01 compone el taller mediante retícula, luz Lava, planos desplazados y foco sobre la pieza. Adaptación → cada módulo React toma ese lenguaje y lo traduce a su propio propósito y densidad. Razón → dar continuidad emocional al producto sin convertir Admin en una copia del hero.
+
 ## Contrato de identidad para todas las interfaces — obligatorio también en React
 
 La paleta por sí sola no hace que un componente pertenezca a Vértice. Cada pantalla y superficie interactiva debe heredar de forma reconocible el sistema completo: isotipo/logotipo oficial, tipografías, geometría, composición editorial, retícula y lenguaje técnico de interfaz, además de colores y estados. Antes de crear un logo, monograma, avatar de marca o símbolo, buscar y reutilizar el recurso aprobado; no sustituir el isotipo por una letra estilizada ni inventar una identidad auxiliar.
@@ -139,6 +151,12 @@ Reglas de aplicación Light:
 
 HF-01 puede usar radios mayores o asimétricos en composiciones facetadas del workbench, chatbot y superficies destacadas cuando la geometría aporte identidad. Estas variantes **no se convierten en tokens globales de React hasta que el usuario apruebe HF-01**. La auditoría debe distinguir entre una excepción intencional de composición y un radio heredado de una iteración anterior.
 
+### Aplicación al dashboard Admin — R-H50
+
+Admin comparte el lenguaje Vértice, pero organiza el trabajo como un registro de taller: métricas abiertas, etapas legibles, tablas sin paneles anidados y solicitudes como una cola accionable. Evitar la cuadrícula de tarjetas KPI gemelas y los contenedores con el mismo peso. Añadir una gráfica solo si deriva de los datos disponibles y ayuda a identificar la distribución operativa; declarar su conjunto en texto y no implicar periodo, meta o pronóstico ausente. Reservar Lava para la tarea que conduce a una acción real; mantener las etapas diferenciables por texto y forma además de color. La animación de entrada debe guiar la lectura, ser breve y desaparecer con `prefers-reduced-motion` y el ajuste de movimiento del sitio.
+
+**Referencias → patrón → adaptación → razón:** [Impeccable](https://github.com/pbakaus/impeccable) identifica las tarjetas repetidas/anidadas como cliché y recomienda variar jerarquía; Admin reemplaza paneles gemelos por un anillo de distribución real, una tabla y una cola abierta para que cada bloque tenga peso según su tarea. [taste-skill](https://github.com/senlindesign/taste-skill) documenta el porqué y el trade-off de cada token; aquí Lava es solo la llamada accionable y no pinta todas las etapas. [Emil Kowalski / skills](https://github.com/emilkowalski/skills) enseña a escoger duración, curva y propiedades según intención; el anillo y las filas entran con movimiento corto, sin física decorativa y con reduced-motion. Solo se adoptan criterios; no se copia código, no se ejecuta una instalación específica de Claude y no se añade dependencia.
+
 
 ## Accesibilidad — reglas concretas
 
@@ -170,7 +188,7 @@ Objetivo: WCAG 2.2 AA como mínimo. AAA en texto de cuerpo cuando sea posible.
 - Errores: icono + texto de error junto al campo. Nunca solo borde rojo.
 - Éxito: icono + texto. Nunca solo borde verde.
 - Estado de solicitud: badge con texto del estado (`PENDIENTE DE COTIZACIÓN`, `APROBADO`, etc.) y opcionalmente icono. Nunca solo color del badge.
-- Disponibilidad: texto (`Disponible` / `Sin stock`) + badge. Nunca solo color.
+- Fabricación: cuando sea relevante, comunicar `Bajo pedido` con texto claro. No crear estados de disponibilidad ni referirse a stock; los datos demo no representan la operación.
 
 ### Resize de texto
 - La UI debe funcionar correctamente con texto al 200% sin pérdida de funcionalidad ni truncamiento de información crítica.
@@ -270,12 +288,14 @@ El footer de marca funciona como componente de contexto público. No debe forzar
 
 La reutilización visual se logra mediante tokens y componentes compartidos, no mediante copiar literalmente toda la estructura de una página a otra.
 
+En Home, la lista destacada puede ser una selección editorial «en tendencia», siempre que no se presente como popularidad medida, ranking de ventas ni dato analítico sin fuente. Los controles flotantes de asistencia deben conservar un blanco táctil visible; en React se usa diámetro de 56 px y sus paneles móviles se sitúan por encima de la columna de controles.
+
 ## Home React — scanner y tarjetas destacadas (2026-10-01)
 
 - El haz de escaneo del Hero debe atravesar el área visible de la pieza activa, no recorrer franjas vacías de la fotografía. La zona se calibra por imagen en metadatos del Hero; al reemplazar/agregar una foto se debe actualizar su encuadre de escaneo. No se presenta como detección automática por IA/visión.
-- Las tarjetas destacadas de Home priorizan fotografía, categoría, nombre, material y acceso a la ficha. No muestran conteos ni badges de stock. La disponibilidad se comunica en ficha/checkout cuando los datos de inventario estén disponibles y vigentes.
+- Las tarjetas destacadas de Home priorizan fotografía, categoría, nombre, material y acceso a la ficha. No muestran conteos ni badges de existencias. El catálogo se fabrica bajo pedido; no hay promesa de entrega inmediata ni consulta de cantidades para la tienda.
 - La tarjeta puede usar un único badge de material; evitar repetir proceso/material y disponibilidad en varias etiquetas.
-- Aplica a promoción y Admin. Los campos heredados `stock`/`minStock` de `db.json` no representan inventario real ni se muestran como datos operativos hasta acordar un contrato válido.
+- Aplica a tienda, carrito y Admin. Los campos heredados `stock`/`minStock` de `db.json` no representan una condición operativa: no se muestran, no limitan cantidades y no determinan publicación, compra o mensajes.
 
 
 ## Sistema de Criterios, Repositorios de Referencia y Benchmark Técnico
@@ -405,9 +425,9 @@ La aplicación toma como objetivo los lineamientos del Anteproyecto de FWD Acade
   1. **Control de Tema Claro/Oscuro:** Alternancia accesible entre Dark Mode (Obsidian) y Light Mode (marfil industrial `#F5F3F0`) asegurando ratios de contraste ≥ 4.5:1 en textos normales y ≥ 3:1 en componentes UI.
   2. **Tipografía Escalable en Unidades Relativas:** Todos los tamaños definidos con escala relativa (`rem` / `em`) y controlados mediante la variable global `--a11y-font-scale` (ajustable de 90% a 130% desde el panel TP) sin romper la retícula ni truncar contenedores.
   3. **Semántica HTML y Soporte Completo para Lectores de Pantalla:** Estructura semántica nativa (`<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<footer>`) con atributos ARIA enriquecidos (`role="tablist"`, `role="tab"`, `role="dialog"`, `aria-expanded`, `aria-label`, `aria-live="polite"` en el carrito y mensajes de chat).
-  4. **Diferenciación de Estados Independiente del Color:** Cada estado de inventario o cotización combina texto explícito, color semántico e iconografía SVG diferenciada:
-     * *En Stock:* Verde + Texto "EN STOCK (N)" + Checkmark.
-     * *Bajo Pedido:* Ámbar + Texto "BAJO PEDIDO" + Ícono de reloj/engranaje.
+  4. **Diferenciación de Estados Independiente del Color:** Cada estado de publicación o cotización combina texto explícito, color semántico e iconografía SVG diferenciada:
+     * *Publicado/Oculto:* se presenta como acción/estado editorial en Admin; no implica unidades listas.
+     * *Bajo Pedido:* texto claro que describe cuándo inicia la fabricación, sin conteo de unidades.
      * *Pendiente de Cotización:* Gris neutro + Texto "PENDIENTE DE COTIZACIÓN · SIN COBRO PREVIO" + Ícono de reloj de arena.
 
 * **Panel Especial de Accesibilidad Universal TP (Dock Flotante):**
@@ -665,7 +685,7 @@ Se cruzó el mockup actual con:
 
 **1. El hero todavía concentra demasiadas señales simultáneas.** Scan line, estado, coordenadas, nota técnica, línea de líder, meta inferior, riel y parallax son buenos ingredientes individualmente. Juntos, existe riesgo de que el usuario mire primero la interfaz y después el producto. La dirección correcta es que el producto gane la batalla visual y que la instrumentación aparezca como evidencia secundaria. Codrops muestra ejemplos recientes donde la interactividad 3D y los efectos se usan para profundizar la percepción del objeto, no para competir con él. citeturn360901search1turn360901search2
 
-**2. El catálogo aún se siente algo panel de piezas y no suficiente tienda.** Los códigos REF, tolerancias, tags, stock y categorías construyen credibilidad técnica, pero la presentación debe hacer que uno quiera tocar/comprar/abrir la ficha. Una mejora futura para React es reforzar la relación **imagen → nombre → beneficio/uso → acción**, dejando los metadatos técnicos como segunda capa.
+**2. El catálogo aún se siente algo panel de piezas y no suficiente tienda.** Los códigos REF, tolerancias, etiquetas de material y categorías construyen credibilidad técnica, pero la presentación debe hacer que uno quiera tocar/comprar/abrir la ficha. Una mejora futura para React es reforzar la relación **imagen → nombre → beneficio/uso → acción**, dejando los metadatos técnicos como segunda capa.
 
 **3. El sexto producto con `placeholder-product.jpg` y `FALLBACK DEMO` es un bug visual del mockup, aunque no sea un bug de producción.** Al verse dentro del mismo grid, rompe la ilusión de catálogo final. Para una maqueta que debe representar el futuro sitio, este estado debe desaparecer o ser convertido en un estado deliberadamente diseñado como “próximamente”, no como fallback técnico.
 
@@ -860,6 +880,30 @@ El patrón **no se replica automáticamente en todos los botones**. Se considera
 
 **Admin / primera expansión del sistema visual (2026-10-01):** se usa la identidad, tipografía, radios y estados del sistema, con jerarquía compacta de trabajo. [Motion Primitives — Animated Background](https://motion-primitives.com/docs/animated-background) aporta el patrón de una selección que orienta dentro de una lista; en Admin se conserva como feedback suave para navegación activa/foco, sin convertir filas estáticas en falsas acciones ni añadir librería. La tarjeta de sesión identifica al operador autenticado y la señal de color siempre acompaña texto.
 
+**KPIs Admin / evolución desde el feedback del usuario:** no resolver las señales operativas como tres tarjetas rectangulares idénticas. Disponerlas en un carril tipográfico abierto, separado por reglas finas; solo una cifra con destino de navegación real recibe regla Lava animada en hover/foco. No animar barras que sugieran un máximo o proporción sin una base de datos válida. Referencia interna → las líneas técnicas y jerarquía de HF-01; adaptación → ritmo abierto y una única señal interactiva; razón → concentrar al operador en la cola accionable sin copiar Stitch ni decorar cifras.
+
+**Navegación e historial Admin — R-H51:** cuando la barra lateral fija exceda el alto del viewport, se desplaza su contenido internamente para mantener accesibles las siete rutas, “Ver tienda” y “Cerrar sesión”. El foco de teclado también desplaza su contenedor. En móvil la barra vuelve al flujo normal de página y sus rutas mantienen scroll horizontal. La actividad usa una línea de tiempo vertical de eventos persistidos, con actor, acción, hora y enlace al registro relacionado; el vacío es un estado explicado y nunca se rellena con ejemplos ficticios.
+
+**Referencia aportada → patrón → adaptación → razón:** las capturas del usuario (2026-10-01) muestran un menú lateral continuo y una línea de tiempo de eventos; se adapta el acceso al menú en ventanas bajas y el orden cronológico inverso para Admin. Se conserva el sistema Vértice y se limita el contenido a eventos presentes en `activityLog`; no se replican paletas de plantillas ni datos demostrativos.
+
+### Dashboard y pedidos menos rígidos — R-H52
+
+El feedback vigente dice que el dashboard funciona, pero se siente cuadrado. La
+respuesta aplica geometría existente en tokens, no un set nuevo: la franja KPI
+se lee como una sola superficie cálida de radio workbench, el panel de flujo
+usa la esquina asimétrica `--radius-panel`, y la leyenda deja de parecer una
+fila de cinco celdas. Solo las capas principales reciben superficie;
+registro/solicitudes permanecen abiertos. Hover/foco del ID de pedido comunica
+la navegación al detalle con un indicador discreto.
+
+**Referencia → patrón → adaptación → razón:** capturas de Admin del usuario →
+jerarquía de etapas, registro y detalle → tomar el contenido sin su estética;
+los radios `--radius-workbench` y `--radius-panel` del sistema de Vértice suavizan
+la silueta sin encerrar cada sección en una tarjeta. Los filtros de pedidos usan
+tabs redondeadas con estado de foco/pulsación; la ficha conserva lectura y no
+ofrece mutaciones cuyo contrato de negocio aún no existe. Se respeta movimiento
+reducido.
+
 ### Movimiento Admin de solicitudes — 2026-10-01
 
 La primera bandeja y su detalle extienden los tokens Vértice con jerarquía de
@@ -900,7 +944,49 @@ Cambio aplicado a `src/styles/shell.css`: navbar 14 px escritorio / 13 px tablet
 
 Contraste calculado para texto sobre `--ink`: `--dim` da aproximadamente 2.92:1 Dark / 3.02:1 Light y no debe usarse en texto pequeño esencial; `--muted` da 6.20:1 Dark / 4.97:1 Light. Valores de tokens base, no auditoría de cada superficie/overlay ni certificación general. Reservar `--dim` para decoración o metadata prescindible; preferir `--muted` o `--paper` para copy que el cliente necesite leer.
 
+### Geometría Admin — corrección R-H54 (2026-10-01)
+
+La expansión de HF-01 al dashboard conserva un lenguaje de superficies más
+orgánico: usar `--radius-workbench` en superficies largas de resumen/flujo y
+radios de esquina derivados de `--radius-control` donde se quiera variar el
+ritmo. `--radius-panel` es un token de cuatro esquinas; no se puede insertar
+como valor de una esquina dentro del shorthand `border-radius`. El navegador
+descarta la declaración completa y el componente queda cuadrado. Para geometría
+asimétrica combinar las propiedades longhand (`border-top-left-radius`, etc.)
+con tokens de valor único. La curva no debe volverse decoración: contenedor
+principal, flujo y medios; los registros internos conservan divisores abiertos.
+
 Referencia → patrón → adaptación → razón: [W3C WCAG 2.2, contraste mínimo](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html) fija 4.5:1 para texto normal y 3:1 para texto grande; [W3C, ampliar texto a 200%](https://www.w3.org/WAI/WCAG22/Techniques/general/G178.html) sirve como técnica para verificar reflow/legibilidad. Aplicación: no depender solo de ampliar la preferencia global; el tamaño base del chrome debe ser legible. La comprobación de tokens solo cubre los colores nombrados y no certifica WCAG de toda la interfaz.
+
+### Atmósfera del dashboard Admin — R-H55 (2026-10-01)
+
+El usuario aprobó la composición del resumen, pero señaló que los fondos del Admin seguían planos y repetidos. El lienzo del resumen mezcla dos veladuras cálidas con una retícula técnica amplia; el encabezado recibe luz propia; la franja KPI tiene un sustrato tonal; y el panel de distribución suma arcos grabados de baja intensidad detrás de la leyenda. Las zonas de tareas conservan aire y un resplandor local para orientar hacia solicitudes.
+
+**Fuente → patrón → adaptación → razón:** [Codrops — background-blend-mode](https://tympanus.net/codrops/css_reference/background-blend-mode/) → componer fondos por capas en vez de repetir una textura única → gradientes y geometría CSS tintados con tokens Vértice, con intensidades y escalas distintas por función → dar profundidad de taller y guiar la lectura sin competir con los datos. No se copió una interfaz ni código, ni se añadieron dependencias o movimiento. En contraste alto se retiran las texturas ornamentales.
+
+La captura conectada de `/admin` en viewport estrecho Dark confirma el lienzo y los arcos detrás de los datos, con el árbol accesible sin cambios. Falta inspección visual en Light y en anchos desktop/tablet antes de declarar cerrada la revisión visual.
+
+### Extensión visual Admin y claridad de estados — R-H56 (2026-10-01)
+
+La observación del usuario abarca todas las vistas Admin, no solo el resumen.
+El fondo ambiental común se extiende al lienzo y al sidebar; cada ruta mantiene
+su firma de superficie: el resumen, su retícula amplia; Pedidos, una luz
+editorial en el encabezado y filtros-cápsula con conteos; Solicitudes, superficies
+de trabajo cálidas con esquinas asimétricas y un trazado circular propio. Los
+filtros de Pedidos se envuelven en tablet/escritorio estrecho y se desplazan como
+una fila táctil únicamente en móvil.
+
+**Lenguaje de estados:** se sustituye “Por aclarar” por **“Estado no reconocido”**.
+El resumen, la bandeja y la ficha explican que el valor original no coincide con
+las etapas actuales, se conserva sin recodificar y no se incluye en sus métricas.
+Los grupos y conteos no cambian.
+
+**Fuente → patrón → adaptación → razón:** HF-01 (capas de retícula y luz en el
+workbench) + tokens de superficie/radio existentes → atmósfera compartida pero
+capas particulares según tarea → extender la marca por Admin sin repetir un
+fondo idéntico en todos los paneles; mantener la cifra/contexto pegados a cada
+filtro para que la barra se lea como navegación operativa. No se incorporan
+dependencias ni datos nuevos.
 
 ### Customer journey de compra — criterio incorporado
 

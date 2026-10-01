@@ -8,7 +8,7 @@
 
 ## Rutas administrativas
 
-/admin, /admin/pedidos, /admin/pedidos/:id, /admin/solicitudes, /admin/solicitudes/:id, /admin/catalogo, /admin/catalogo/nuevo, /admin/catalogo/:id/editar, /admin/catalogo/categorias, /admin/clientes, /admin/clientes/:id, /admin/actividad.
+/admin, /admin/pedidos, /admin/pedidos/:id, /admin/solicitudes, /admin/solicitudes/:id, /admin/catalogo, /admin/catalogo/:id, /admin/catalogo/nuevo, /admin/catalogo/:id/editar, /admin/catalogo/categorias, /admin/clientes, /admin/clientes/:id, /admin/actividad.
 
 ## Flujos
 
@@ -24,13 +24,34 @@ Solicitud → Ayuda de diseño → Descripción → Requisitos → Revisión →
 ### Admin
 Login → Dashboard → bandeja → detalle → acción → actividad.
 
+**Pedidos:** Dashboard → `/admin/pedidos` → filtro por grupo/etapa o búsqueda →
+`/admin/pedidos/:id`. La ficha relaciona cliente, piezas (`orderItems`), estado,
+fechas y montos de origen. En este slice es de consulta: no permite mutar el
+estado ni marca pagos. Las etapas futuras requieren confirmar la transición y
+actor antes de sumar acciones.
+
+**Actividad:** `/admin/actividad` muestra eventos guardados en `activityLog`; el
+detalle de solicitud puede abrir el historial filtrado con `?solicitud=<id>`.
+
+**Catálogo:** `/admin/catalogo` lista modelos de `products` enriquecidos con la
+categoría, con búsqueda y filtros por publicación/material. Cada fila abre
+`/admin/catalogo/:id`, desde donde se edita el modelo. `/admin/catalogo/nuevo`
+crea, `/admin/catalogo/:id/editar` actualiza y `/admin/catalogo/categorias`
+gestiona las categorías. `ACTIVE` publica y `INACTIVE` oculta; un modelo ligado
+a pedido se oculta, no se borra. No se edita la imagen ni inventario. El material
+fuera de ASA/PLA/PETG/ABS/TPU se señala para revisión.
+
 **Slice actual de solicitudes:** `/admin` ofrece acceso directo al KPI de
 solicitudes que requieren atención (`/admin/solicitudes?fase=workshop`). La
 bandeja admite filtros de etapa/búsqueda y cada fila lleva a
-`/admin/solicitudes/:id`. Este recorrido es de consulta y drill-down: detalle no
-transiciona datos porque la operación atómica con `activityLog` sigue pendiente;
-archivo visible es `fileName` y no descarga. El registro `SUBMITTED` y estados
-desconocidos se revisan en grupo aparte sin recodificarlos.
+`/admin/solicitudes/:id`. En una solicitud `PENDING_QUOTE`, Admin puede iniciar
+revisión técnica; el mismo comando cambia a `IN_REVIEW` y registra actor/fecha en
+`activityLog`. Estado desactualizado o rol inválido se rechazan. Archivo visible
+es solo `fileName` y no descarga hasta conectar almacenamiento privado. El
+registro `SUBMITTED` y estados desconocidos se revisan aparte sin recodificarlos.
+En la interfaz se identifican como **Estado no reconocido**; la explicación
+indica que el origen lo conserva, que no pertenece a las etapas vigentes y que
+queda separado de sus métricas.
 
 ### Entrada a cuenta según rol
 
@@ -170,7 +191,7 @@ Mantener el navbar público derivado de HF-01 con ajustes mínimos. En checkout 
 
 ### Hallazgo de estado actual
 
-La Home separa modelos de catálogo fabricados bajo pedido de piezas propias que requieren revisión y cotización. Sin embargo, el recorrido de compra aún no se puede completar: en `src/app/routes/routes.jsx`, catálogo, detalle, solicitud, carrito, checkout, cuenta/pedidos y rutas Admin se enrutan temporalmente a `ConstructionPage` (login y registro sí tienen pantallas propias). Es una brecha funcional confirmada por código, no un fallo visual de checkout implementado.
+La Home separa modelos de catálogo fabricados bajo pedido de piezas propias que requieren revisión y cotización. El recorrido de compra aún no se puede completar: catálogo público, detalle, solicitud, carrito, checkout, cuenta y pedidos del cliente siguen en `ConstructionPage`. En Admin están implementados dashboard, solicitudes, actividad, lectura de pedidos, catálogo, formularios de producto y CRUD de categorías. Clientes conserva pantallas de construcción. Login y registro sí tienen pantallas propias. Es una brecha funcional confirmada por código, no un fallo visual de checkout implementado.
 
 ### Recorrido recomendado
 
@@ -187,4 +208,4 @@ La incertidumbre se resuelve con estados vacíos, errores y una explicación cla
 
 La auditoría del instructor encontró textos ilegibles por defecto, en especial navbar y footer. El shell React sube navegación pública a 14 px en escritorio y 13 px en tablet; copy/enlaces del footer a 14 px y títulos/metadata secundaria a 12 px. Revisar a escala 100% y 150/200%, además de conservar las explicaciones en lenguaje natural y no reemplazarlas por etiquetas técnicas pequeñas.
 
-**Actualización R-H46 (2026-10-01):** tras comprobar que el primer incremento aún se veía pequeño en la captura del usuario, navbar/CTA suben a 16 px en escritorio ancho y 15 px en la franja compacta, idioma a 14 px, enlaces/copy del footer a 16 px y títulos/cierre a 14 px; menú compacto a 16 px. La navegación horizontal colapsa al menú hasta 1000 px para mantener los labels legibles sin apretarlos. El nuevo render local de escritorio muestra la escala mayor. La revisión en 768/375 px queda pendiente y no bloquea Admin.
+**Actualización R-H46 (2026-10-01; supersedida en R-H48):** navbar/CTA a 16/15 px, footer a 16 px y colapso de navegación a 1000 px se revirtieron cuando el usuario aclaró que la captura se observó con zoom al 75%. Se restaura la primera iteración R-H45: navbar 14/13 px, CTA 13/12 px, idioma 12 px, footer 14 px con secundarios a 12 px y menú a partir de 820 px. La revisión de otros breakpoints y escalas sigue pendiente.

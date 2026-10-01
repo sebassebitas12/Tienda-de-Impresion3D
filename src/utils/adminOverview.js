@@ -1,6 +1,7 @@
 const ACTIVE_ORDER_STATUSES = new Set(['PENDING', 'CONFIRMED', 'IN_PRODUCTION', 'READY', 'SHIPPED']);
 const TERMINAL_ORDER_STATUSES = new Set(['DELIVERED', 'CANCELLED', 'REJECTED']);
 const REQUESTS_REQUIRING_REVIEW = new Set(['PENDING_QUOTE', 'IN_REVIEW']);
+const ORDER_FLOW_STAGES = ['PENDING', 'CONFIRMED', 'IN_PRODUCTION', 'READY', 'SHIPPED'];
 const KNOWN_REQUEST_STATUSES = new Set([
   'PENDING_QUOTE', 'IN_REVIEW', 'QUOTED', 'AWAITING_APPROVAL', 'APPROVED', 'PAID',
   'REJECTED', 'EXPIRED', 'CANCELLED',
@@ -32,6 +33,10 @@ export function calculateAdminOverview(data) {
 
   return {
     activeOrders: orders.filter(order => ACTIVE_ORDER_STATUSES.has(order?.status)).length,
+    activeOrdersByStatus: Object.fromEntries(ORDER_FLOW_STAGES.map(status => [
+      status,
+      orders.filter(order => order?.status === status).length,
+    ])),
     unrecognizedOrderStatuses: orders.filter(order => !ACTIVE_ORDER_STATUSES.has(order?.status) && !TERMINAL_ORDER_STATUSES.has(order?.status)).length,
     requestsToReview,
     legacyRequests: requests.filter(request => request?.status && !KNOWN_REQUEST_STATUSES.has(request.status)),

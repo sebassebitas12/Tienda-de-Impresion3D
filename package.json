@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "api": "json-server db.json --port 3000",
+    "api": "node scripts/api-server.js",
     "build": "vite build",
     "lint": "eslint .",
     "test": "jest --runInBand",

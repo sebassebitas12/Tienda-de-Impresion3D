@@ -64,8 +64,31 @@ Hooks reutilizables de interacción/estado. No esconder reglas complejas de domi
 ### `src/services/`
 Acceso a JSON Server, API externa, auth, IA y N8N. Cada servicio normaliza respuestas hacia modelos utilizables por la UI.
 
+### Operaciones académicas con escritura coordinada
+
+`npm run api` inicia `scripts/api-server.js`: conserva las rutas REST de JSON
+Server y añade `POST /admin/actions/start-review`. Este comando valida el estado
+esperado y el rol académico, y escribe juntos el cambio de solicitud y su evento
+de `activityLog` mediante un único reemplazo atómico del archivo JSON, protegido por cola
+secuencial dentro del proceso. No se usa una secuencia de dos llamadas desde el
+navegador. La API sigue siendo una simulación académica local y no es una frontera
+de seguridad de producción; una implementación real debe aplicar autorización y
+transacción en el servidor de negocio.
+
 ### `src/utils/`
 Funciones puras, validaciones y cálculos sin efectos secundarios.
+
+### Catálogo Admin de consulta
+`features/admin/AdminCatalog.jsx` consume `useAdminCatalog`, que delega lectura
+de `products` y `categories` a `adminCatalogService` y relación/filtros a
+`utils/adminCatalog.js`. `features/admin/AdminCatalogManagement.jsx` gestiona el
+formulario de alta/edición de producto y el CRUD de categorías. Las mutaciones
+REST se centralizan en `adminCatalogService`; nunca se escriben desde el JSX.
+`ACTIVE`/`INACTIVE` representan publicación/ocultamiento. El alta crea `images`
+vacío y la edición preserva imágenes registradas; upload/cambio espera contrato
+de storage. La baja de producto consulta `orderItems` y se bloquea si existe una
+referencia; la baja de categoría se bloquea si productos la usan. Los campos
+heredados `stock`/`minStock` no entran al modelo de pantalla ni a payloads.
 
 ### `src/components/` (UI Kit y Compartidos)
 Solo piezas realmente compartidas entre dominios. Una pieza propia de una feature debe permanecer en su feature.
@@ -104,7 +127,7 @@ Para optimizar el desarrollo y mantener coherencia global, esta capa incluye el 
 - `LinkText` — Enlace con affordance de flecha (“Ver ficha ↗”, `.text-link`). Variantes: inline y standalone.
 
 #### Datos y estado
-- `Badge` — Etiquetas de material (`.material-tag`), chips de especificación (`.spec-chip`) y estados de solicitud (`PENDIENTE DE COTIZACIÓN`, `APROBADO`, etc.). No mostrar indicadores de existencias o disponibilidad inmediata en el storefront: el catálogo se fabrica después del pedido.
+- `Badge` — Etiquetas de material (`.material-tag`), chips de especificación (`.spec-chip`), modo de producción opcional `Bajo pedido` (`.production-tag`) y estados de solicitud (`PENDIENTE DE COTIZACIÓN`, `APROBADO`, etc.). No representar inventario ni disponibilidad inmediata: el catálogo se fabrica después de recibir el pedido.
 - `StatusIndicator` — Punto vivo con pulso (`.chat-status i`, `.visual-status i`) para estados en línea y alarmas.
 - `PriceTag` — Precio en CRC con moneda y formato mono. Nunca se usa para solicitudes PENDING_QUOTE.
 - `MonoLabel` — Texto técnico pequeño en JetBrains Mono (`.mono-label`, coordenadas, índices, referencias PRT).
@@ -139,7 +162,7 @@ Para optimizar el desarrollo y mantener coherencia global, esta capa incluye el 
 - `RevealOnScroll` — Wrapper con `IntersectionObserver` para entrada animada (`.reveal`).
 
 #### Comercio (componentes compartidos entre features)
-- `ProductCard` — Compone `Card` + imagen + nombre + descripción + acceso a ficha; el badge de material es opcional por contexto. No presenta etiquetas de existencias ni disponibilidad inmediata: los productos se fabrican después del pedido. Referencias y conteos no deben ser datos ficticios.
+- `ProductCard` — Compone `Card` + imagen + nombre + descripción + acceso a ficha; el badge de material es opcional por contexto y `Bajo pedido` solo aparece si el contexto lo solicita. No lee `stock` para visibilidad, cantidad o disponibilidad. Referencias y conteos no deben ser datos ficticios.
 - `HelpDisclosure` — Inline disclosure con trigger `?` y `aria-expanded`. Definido en `docs/04`.
 - `QuoteSummaryPanel` — Resumen lateral de cotización con monto, vigencia y CTA.
 - `CartItem` — Base para item de carrito (variantes: catálogo y solicitud personalizada).

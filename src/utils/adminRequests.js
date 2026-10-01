@@ -1,3 +1,5 @@
+import { matchesFacet, selectedValues } from './facetFilters.js';
+
 const PHASES = {
   workshop: new Set(['PENDING_QUOTE', 'IN_REVIEW']),
   customer: new Set(['QUOTED', 'AWAITING_APPROVAL']),
@@ -22,6 +24,7 @@ export function buildAdminRequests({ customPrintRequests = [], users = [] } = {}
       ...request,
       phase: getRequestPhase(request.status),
       customerName: usersById.get(String(request.userId))?.name || null,
+      reviewStartedByName: usersById.get(String(request.reviewStartedBy))?.name || null,
     }))
     .sort((a, b) => submittedDate(b.submittedAt) - submittedDate(a.submittedAt));
 }
@@ -36,7 +39,7 @@ export function summarizeRequestPhases(requests = []) {
 export function filterAdminRequests(requests = [], phase = 'all', search = '') {
   const query = search.trim().toLocaleLowerCase();
   return requests.filter(request => {
-    const phaseMatches = phase === 'all' ? request.phase !== 'legacy' : request.phase === phase;
+    const phaseMatches = selectedValues(phase).length === 0 ? request.phase !== 'legacy' : matchesFacet(request.phase, phase);
     const searchable = [request.id, request.customerName, request.fileName, request.description, request.material, request.status]
       .filter(Boolean).join(' ').toLocaleLowerCase();
     return phaseMatches && (!query || searchable.includes(query));
