@@ -94,14 +94,14 @@ export function Home() {
                   {content.hasFile} <span aria-hidden="true">↗</span>
                 </Button>
               </div>
-              <div className="hero-signals" aria-label={content.capabilities}>
+              <div className="hero-signals" role="group" aria-label={content.capabilities}>
                 <div><span className="signal-value">±0.05 mm</span><span className="signal-text">{content.tolerance}</span></div>
                 <div><span className="signal-value">FDM / SLA</span><span className="signal-text">{content.processes}</span></div>
                 <div><span className="signal-value">{content.stagedValue}</span><span className="signal-text">{content.stagedReview}</span></div>
               </div>
             </div>
 
-            <div className="hero-visual" ref={visualRef} aria-label={content.featuredPieces}>
+            <div className="hero-visual" ref={visualRef}>
               <span className="visual-coordinate">{content.workbench}</span>
               <div className="hero-photo-wrap" ref={photoWrapRef}>
                 <img
@@ -134,14 +134,13 @@ export function Home() {
 
               <div className="thumb-rail">
                 <button className="rail-arrow" type="button" aria-label={content.previousPiece} onClick={() => selectRelativePiece(-1)}>↑</button>
-                <div className="thumb-list" role="tablist" aria-label={content.featuredPieces}>
+                <div className="thumb-list" role="group" aria-label={content.featuredPieces}>
                   {heroPieces.map((item, index) => (
                     <button
                       key={item.id}
                       className={`thumb${index === activePiece ? ' is-active' : ''}`}
                       type="button"
-                      role="tab"
-                      aria-selected={index === activePiece}
+                      aria-pressed={index === activePiece}
                       aria-label={item.label}
                       onClick={() => setActivePiece(index)}
                     >

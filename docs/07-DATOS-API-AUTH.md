@@ -1,6 +1,6 @@
 # Vértice CR — Datos, API externa, JWT y N8N
 
-> Última actualización: **2026-09-24**.
+> Última actualización: **2026-09-30**.
 
 ## Propósito
 
@@ -29,19 +29,17 @@ Antes de implementar debe quedar definido:
 
 No inventar endpoint ni poner secretos en Git.
 
-## JWT
+## Auth académico vigente
 
-Flujo objetivo:
-login → backend/auth → JWT → cliente → rutas protegidas → rol.
-
-Debe existir:
-- autenticación;
-- expiración/invalidación;
-- autorización por rol;
-- guard de rutas;
-- sesión inválida.
-
-El frontend ocultando botones no equivale a autorización.
+No se construye un backend real de autenticación para esta entrega. El flujo
+implementado es `Login/Register → AuthProvider → authService →
+jsonServerAuthAdapter → JSON Server/users`; el adapter compara credenciales demo,
+valida `status`, persiste la sesión y genera un token `sim.v1` en frontend. El
+token permite demostrar expiración, restore y guards, pero no tiene firma
+criptográfica ni es seguridad de producción. Restore vuelve a consultar el
+usuario en JSON Server para validar existencia, estado y rol actual. N8N se
+reserva para IA/automatizaciones y no participa en login. El frontend ocultando
+botones no sustituye los guards de rutas.
 
 ## N8N
 
@@ -130,38 +128,72 @@ Prioridad académica actual: **Autenticación → Admin → IA**.
 - `AuthProvider` y `useAuth`;
 - `AuthLayout`;
 - rutas `/login` y `/registro`;
-- usuarios con `id`, `name`, `email`, `role`, `status` en `db.json`.
+- guards de autenticación y rol para `/cuenta`, `/pedidos/:id` y `/admin/*`;
+- `src/services/jsonServerAuthAdapter.js` conectado por defecto al `AuthProvider`;
+- usuarios con `id`, `name`, `email`, `role`, `status` y `demoPassword` explícito en `db.json`.
 
-### Lo que NO existe todavía
-- endpoint/backend concreto de login;
-- credenciales/passwords en el modelo actual;
-- emisión/refresh/invalidación real de JWT;
-- persistencia real de sesión;
-- guards de autenticación/rol;
-- formularios Login/Registro funcionales.
+### Contrato académico vigente
+
+JSON Server es el backend local de la práctica y su URL se configura mediante
+`VITE_JSON_SERVER_URL` en el build de Vite; si no se define, el adapter usa
+`http://localhost:3000`. El adapter consulta `/users?email=...`, valida
+`demoPassword` y `status === ACTIVE`, y crea usuarios nuevos con `role: customer`
+y `status: ACTIVE` mediante `POST /users`.
+
+JSON Server está instalado como dependencia de desarrollo. Para desarrollo
+local: `npm run api` levanta `db.json` en el puerto 3000 y `npm run dev` levanta
+Vite. No se debe exponer este servidor como backend de producción.
+
+Las contraseñas de `db.json` son credenciales **demo**, no secretos. En este
+snapshot se usan `demo-admin-2026` para `sebas@example.com` y
+`demo-customer-2026` para los clientes de prueba.
+
+El token `sim.v1` es un JWT **simulado**, sin firma criptográfica y solo para
+demostrar sesión, expiración, rol y guards. Su payload contiene `sub`, `role`,
+`iat` y `exp`; no representa autenticación segura de producción.
+
+La sesión normalizada se persiste en `localStorage` bajo
+`vertice.auth.session`. `restoreSession` valida formato y expiración, vuelve a
+consultar `/users/:id`, invalida si el usuario no existe, está inactivo o cambió
+de rol, y limpia el almacenamiento. `logout` también limpia el almacenamiento.
+Si JSON Server no responde durante restore, la sesión guardada queda **sin
+verificar** y no autoriza rutas; el menú permite borrarla localmente con
+`Cerrar sesión` sin requerir conexión.
 
 ### Regla de implementación
-No crear un JWT firmado en React, no considerar buscar usuario por email como autenticación y no inventar contraseñas para los usuarios actuales.
-
-Antes de conectar Login debe resolverse el **contrato concreto de autenticación académica** (backend/proveedor/endpoint). Mientras ese contrato se cierra sí se puede construir la capa UI, service interface, provider state, guards y tests mediante adapters/mocks.
-
-Auth debe cerrarse antes del Admin funcional; Admin debe validar rol y no depender de ocultar botones como mecanismo de autorización.
+No presentar el token simulado como seguridad empresarial. Admin debe validar rol
+mediante guard y no depender de ocultar botones como mecanismo de autorización.
 
 
 ### Base React de Auth implementada — 2026-09-30
 
-Se implementó la parte de Auth que no depende de inventar backend:
+Se implementó el slice académico de Auth contra JSON Server, sin presentarlo
+como autenticación segura de producción:
 
 - `src/services/authService.js`: contrato adapter-based; normaliza sesiones y rechaza respuestas incompletas;
+- `src/services/jsonServerAuthAdapter.js`: login, registro, restore, logout, persistencia e invalidación contra JSON Server;
 - `AuthProvider`: restore/login/register/logout, pending/error, rol y estado autenticado;
+- el menú público muestra `Cerrar sesión` con sesión activa o guardada sin verificar; el sidebar Admin también ofrece salida; ambos limpian la sesión y vuelven a Inicio;
 - `RequireAuth` y `RequireRole`;
 - Login y Registro reales en React;
 - `/cuenta` y `/pedidos/:id` protegidos;
 - `/admin/*` protegido por rol `admin`;
 - AuthLayout visual derivado de HF-01;
-- tests de service/provider/restore/login/logout/guards/rol.
+- tests de service/provider/restore/login/logout/guards/rol, salida del menú público, recuperación offline y salida del sidebar Admin.
 
-El adapter por defecto devuelve `AUTH_NOT_CONFIGURED` para login/registro. Esto es intencional: el frontend no fabrica JWT ni contraseñas mientras no exista el contrato concreto del backend.
+El adapter académico se inyecta desde `src/app/App.jsx` en `AppProviders`. Si
+JSON Server no está disponible, la UI muestra el error de conexión y no fabrica
+una sesión local.
+
+Verificación local del slice (2026-09-30): `npm ci`, lint, 41 tests, `check:ui`,
+build y `git diff --check` pasan. Se probó login/restore/logout contra JSON Server
+local real. En navegador desktop se completó login y logout como cliente y admin;
+el flujo Admin requiere navegación sincronizada para que el guard no intercepte la
+salida. La auditoría responsive efectiva a 768 px confirmó que el layout cambia
+a una columna sin desbordamiento horizontal. También se detectó que el enlace
+«Volver al taller» ocultaba su texto bajo 560 px; se corrigió para mantener una
+etiqueta legible junto a la flecha y se comprobó en render a 374 px sin scroll
+horizontal. CI no se ejecutó porque no hubo commit/push.
 
 #### Contrato esperado del adapter
 

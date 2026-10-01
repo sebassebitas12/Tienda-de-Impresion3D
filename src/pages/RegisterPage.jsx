@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Input, MonoLabel } from '../components/ui/index.js';
+import { Button, Input } from '../components/ui/index.js';
 import { useAuth } from '../hooks/useAuth.js';
 import { usePreferences } from '../hooks/usePreferences.js';
 
@@ -8,6 +8,8 @@ function messageFor(error, copy) {
   if (!error) return '';
   if (error.code === 'AUTH_NOT_CONFIGURED') return copy.authNotConfigured;
   if (error.code === 'INVALID_REGISTER_INPUT') return copy.authRequired;
+  if (error.code === 'AUTH_EMAIL_TAKEN') return copy.authEmailTaken;
+  if (error.code === 'AUTH_NETWORK') return copy.authNetwork;
   if (error.code === 'INVALID_SESSION') return copy.authInvalidSession;
   return copy.authGenericError;
 }
@@ -43,7 +45,6 @@ export function RegisterPage() {
   return (
     <div className="auth-card">
       <div className="auth-card-head">
-        <MonoLabel>{copy.authRegisterKicker}</MonoLabel>
         <h1>{copy.authRegisterTitle}</h1>
         <p>{copy.authRegisterIntro}</p>
       </div>

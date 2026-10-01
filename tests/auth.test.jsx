@@ -2,8 +2,11 @@ import { useEffect } from 'react';
 import { describe, expect, jest, test } from '@jest/globals';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider } from '../src/app/providers/AuthProvider.jsx';
+import { AppProviders } from '../src/app/providers/AppProviders.jsx';
+import { Navbar } from '../src/app/layout/Navbar.jsx';
+import { AdminLayout } from '../src/app/layout/AdminLayout.jsx';
 import { RequireAuth, RequireRole } from '../src/app/routes/AuthGuards.jsx';
 import { useAuth } from '../src/hooks/useAuth.js';
 import { AuthServiceError, createAuthService } from '../src/services/authService.js';
@@ -95,6 +98,82 @@ describe('AuthProvider', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Logout' }));
     await waitFor(() => expect(screen.getByText('guest')).toBeVisible());
     expect(logout).toHaveBeenCalled();
+  });
+});
+
+describe('Navbar account session actions', () => {
+  test('muestra cerrar sesión para usuario autenticado y vuelve al inicio al salir', async () => {
+    const logout = jest.fn().mockResolvedValue(undefined);
+    function CurrentPath() {
+      return <output aria-label="Ruta actual">{useLocation().pathname}</output>;
+    }
+
+    render(
+      <MemoryRouter initialEntries={['/cuenta']}>
+        <AppProviders authAdapter={{ restoreSession: async () => customerSession, logout }}>
+          <Navbar onReading={jest.fn()} />
+          <CurrentPath />
+        </AppProviders>
+      </MemoryRouter>
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir menú de cuenta' }));
+    expect(await screen.findByText('Cliente')).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: 'Cerrar sesión' }));
+
+    await waitFor(() => expect(screen.getByLabelText('Ruta actual')).toHaveTextContent(/^\/$/u));
+    expect(logout).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText('Cliente')).not.toBeInTheDocument();
+  });
+
+  test('permite borrar una sesión guardada cuando falla la restauración del servidor', async () => {
+    const logout = jest.fn().mockResolvedValue(undefined);
+    const adapter = {
+      restoreSession: jest.fn().mockRejectedValue(Object.assign(new Error('offline'), { code: 'AUTH_NETWORK' })),
+      hasPersistedSession: jest.fn(() => true),
+      logout,
+    };
+
+    render(
+      <MemoryRouter initialEntries={['/cuenta']}>
+        <AppProviders authAdapter={adapter}>
+          <Navbar onReading={jest.fn()} />
+        </AppProviders>
+      </MemoryRouter>
+    );
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Abrir menú de cuenta' }));
+    expect(await screen.findByText('Sesión guardada · sin verificar')).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: 'Cerrar sesión' }));
+
+    await waitFor(() => expect(logout).toHaveBeenCalledTimes(1));
+    expect(screen.queryByRole('button', { name: 'Cerrar sesión' })).not.toBeInTheDocument();
+  });
+
+  test('permite al admin cerrar sesión desde su layout separado', async () => {
+    const logout = jest.fn().mockResolvedValue(undefined);
+    function CurrentPath() {
+      return <output aria-label="Ruta actual">{useLocation().pathname}</output>;
+    }
+
+    render(
+      <MemoryRouter initialEntries={['/admin']}>
+        <AppProviders authAdapter={{ restoreSession: async () => adminSession, logout }}>
+          <Routes>
+            <Route path="/admin" element={<RequireRole role="admin"><AdminLayout /></RequireRole>}>
+              <Route index element={<div>Dashboard</div>} />
+            </Route>
+            <Route path="/" element={<div>Inicio público</div>} />
+          </Routes>
+          <CurrentPath />
+        </AppProviders>
+      </MemoryRouter>
+    );
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Cerrar sesión' }));
+    await waitFor(() => expect(screen.getByLabelText('Ruta actual')).toHaveTextContent(/^\/$/u));
+    expect(logout).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Inicio público')).toBeVisible();
   });
 });
 

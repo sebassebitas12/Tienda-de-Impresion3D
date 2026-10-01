@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "api": "json-server db.json --port 3000",
     "build": "vite build",
     "lint": "eslint .",
     "test": "jest --runInBand",
@@ -35,6 +36,7 @@
     "globals": "^17.11.0",
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
+    "json-server": "^1.0.0-beta.15",
     "vite": "^8.2.2"
   }
 }

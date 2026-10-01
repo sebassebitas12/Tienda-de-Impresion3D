@@ -29,6 +29,10 @@ function AccountMenuIcon({ type }) {
     return <svg {...common}><circle cx="12" cy="12" r="10" /><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3" /><path d="M12 17h.01" /></svg>;
   }
 
+  if (type === 'logout') {
+    return <svg {...common}><path d="M10 17l5-5-5-5M15 12H3" /><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" /></svg>;
+  }
+
   return <svg {...common}><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" /></svg>;
 }
 
@@ -36,17 +40,28 @@ function AccountMenuIcon({ type }) {
 export function Navbar({ onReading }) {
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, copy } = usePreferences();
-  const { user } = useAuth();
+  const { user, logout, isPending, hasPersistedSession } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [panel, setPanel] = useState(null);
   const [query, setQuery] = useState('');
+  const [logoutError, setLogoutError] = useState(false);
   const searchTrigger = useRef(null);
   const menuTrigger = useRef(null);
   const searchField = useRef(null);
   const links = [['/', 'home'], ['/catalogo', 'shop'], ['/nosotros', 'about'], ['/contacto', 'contact']];
   const toggle = name => setPanel(current => current === name ? null : name);
   const closePanel = () => setPanel(null);
+  const handleLogout = async () => {
+    setLogoutError(false);
+    try {
+      await logout();
+      closePanel();
+      navigate('/', { replace: true });
+    } catch {
+      setLogoutError(true);
+    }
+  };
 
   return (
     <header className="site-header">
@@ -164,7 +179,7 @@ export function Navbar({ onReading }) {
           >
             <div className="account-dropdown-head">
               <strong>{copy.space}</strong>
-              <span>{user?.name || copy.guest}</span>
+              <span>{user?.name || (hasPersistedSession ? copy.authSessionUnverified : copy.guest)}</span>
             </div>
 
             <nav className="mobile-menu-nav" aria-label={copy.navigation}>
@@ -202,6 +217,16 @@ export function Navbar({ onReading }) {
                 <AccountMenuIcon type="settings" />
                 <span>{copy.settings}</span>
               </button>
+              {(user || hasPersistedSession) && (
+                <>
+                  <div className="account-dropdown-divider" />
+                  <button type="button" className="account-dropdown-link account-dropdown-logout" onClick={handleLogout} disabled={isPending}>
+                    <AccountMenuIcon type="logout" />
+                    <span>{copy.logout}</span>
+                  </button>
+                </>
+              )}
+              {logoutError && <p className="auth-error" role="alert">{copy.authGenericError}</p>}
             </div>
           </Panel>
         </div>

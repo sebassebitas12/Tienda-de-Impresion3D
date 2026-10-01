@@ -93,8 +93,9 @@ No hay navegador conectado: queda pendiente la inspección visual 375/768/1280
 y el contraste real de ambos temas. No equivale a certificación de accesibilidad.
 
 Para Capa 1 se añade react-router-dom, solicitado en el prompt maestro, para
-createBrowserRouter, layouts con Outlet y enlaces SPA. AuthProvider comienza
-sin sesión; el frontend académico no se presenta como autenticación de producción.
+createBrowserRouter, layouts con Outlet y enlaces SPA. `AuthProvider` restaura
+la sesión académica mediante el adapter de JSON Server; el frontend no se presenta
+como autenticación de producción.
 Para optimizar el desarrollo y mantener coherencia global, esta capa incluye el **UI Kit (Primitivas)** extraído del mockup congelado HF-01 y de los contratos documentados en `docs/02–04`:
 
 #### Interacción y controles
@@ -178,7 +179,12 @@ Nunca números operativos escritos directamente en un componente de dashboard.
 
 ## Seguridad académica
 
-JSON Server + frontend no equivalen a seguridad empresarial. JWT se incorporará como requisito académico de autenticación/autorización, con responsabilidades separadas.
+JSON Server + frontend no equivalen a seguridad empresarial. El requisito académico
+se implementa con el token `sim.v1` generado en frontend: es una simulación para
+demostrar expiración, sesión y guards, no una firma criptográfica ni seguridad de
+producción. `jsonServerAuthAdapter` consulta/crea usuarios en JSON Server; el rol
+actual se revalida contra los datos locales. N8N no participa en Auth. Contrato y
+estado detallado: `docs/07-DATOS-API-AUTH.md`.
 
 ## Gate — SUPERADO ✅ (2026-09-30)
 

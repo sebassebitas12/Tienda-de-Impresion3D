@@ -1,6 +1,6 @@
 # AGENTS.md — Vértice CR
 
-> **Última actualización:** 2026-09-29  
+> **Última actualización:** 2026-09-30
 > **Estado:** ACTIVO  
 > **Propósito:** instrucciones operativas para cualquier agente que trabaje en este repositorio.
 
@@ -253,4 +253,5 @@ Si existen varias rutas posibles, explica brevemente sus diferencias; no avances
 - HF-01: **CONGELADO** (aprobación del usuario, 2026-09-30).
 - React Gate: **ABIERTO** (todos los requisitos del gate superados).
 - Mockup de referencia visual: `mockups/hf-01-home-definitivo.html` (congelado, no se edita).
-- Siguiente bloque: conectar Auth React al adapter académico JSON Server + JWT simulado; después Admin → IA.
+- Auth académico ya está implementado y probado localmente; no reiniciar su implementación.
+- Siguiente bloque: cerrar revisión visual de Home en Light y con Chat/Accesibilidad abiertos; después iniciar Admin operativo protegido por rol y, más adelante, IA/N8N.

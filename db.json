@@ -4,6 +4,7 @@
       "id": "u1",
       "name": "Sebastián Flores",
       "email": "sebas@example.com",
+      "demoPassword": "demo-admin-2026",
       "role": "admin",
       "status": "ACTIVE",
       "createdAt": "2026-08-01T10:00:00Z"
@@ -12,6 +13,7 @@
       "id": "u2",
       "name": "Ana Rodríguez",
       "email": "ana@example.com",
+      "demoPassword": "demo-customer-2026",
       "role": "customer",
       "status": "ACTIVE",
       "createdAt": "2026-08-05T14:30:00Z"
@@ -20,6 +22,7 @@
       "id": "u3",
       "name": "Carlos Mora",
       "email": "carlos@example.com",
+      "demoPassword": "demo-customer-2026",
       "role": "customer",
       "status": "ACTIVE",
       "createdAt": "2026-08-11T09:15:00Z"
@@ -28,6 +31,7 @@
       "id": "u4",
       "name": "María Vargas",
       "email": "maria@example.com",
+      "demoPassword": "demo-customer-2026",
       "role": "customer",
       "status": "ACTIVE",
       "createdAt": "2026-08-20T16:00:00Z"
@@ -36,6 +40,7 @@
       "id": "u5",
       "name": "Diego Solano",
       "email": "diego@example.com",
+      "demoPassword": "demo-customer-2026",
       "role": "customer",
       "status": "ACTIVE",
       "createdAt": "2026-09-02T11:45:00Z"

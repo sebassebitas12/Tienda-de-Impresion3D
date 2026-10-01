@@ -1,23 +1,74 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button, IconButton, Panel, Switch } from '../../components/ui/index.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
 
-const ArrowUpRight = () => (
-  <svg className="chat-row-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.35" aria-hidden="true">
-    <path d="M4 12 12 4M6 4h6v6" />
-  </svg>
-);
-
 export function FloatingTools({ active, onActiveChange }) {
+  const location = useLocation();
   const preferences = usePreferences();
   const { copy } = preferences;
   const [message, setMessage] = useState('');
   const [chatFeedback, setChatFeedback] = useState(null);
   const [scrolling, setScrolling] = useState(false);
+  const [speechStatus, setSpeechStatus] = useState('idle');
+  const speechRun = useRef(0);
   const chatTrigger = useRef(null);
   const readingTrigger = useRef(null);
   const messageField = useRef(null);
+
+  useEffect(() => {
+    const resetStatus = window.setTimeout(() => setSpeechStatus('idle'), 0);
+    return () => {
+      window.clearTimeout(resetStatus);
+      speechRun.current += 1;
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    };
+  }, [location.pathname]);
+
+  const stopPageSpeech = () => {
+    speechRun.current += 1;
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    setSpeechStatus('idle');
+  };
+
+  const speakText = text => {
+    if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
+      setSpeechStatus('unavailable');
+      return;
+    }
+    const normalizedText = text?.replace(/\s+/g, ' ').trim();
+    if (!normalizedText) {
+      setSpeechStatus('empty');
+      return;
+    }
+
+    const run = ++speechRun.current;
+    window.speechSynthesis.cancel();
+    const utterance = new window.SpeechSynthesisUtterance(normalizedText);
+    utterance.lang = preferences.language === 'en' ? 'en-US' : 'es-CR';
+    utterance.onend = () => { if (speechRun.current === run) setSpeechStatus('finished'); };
+    utterance.onerror = event => {
+      if (speechRun.current === run && event.error !== 'canceled' && event.error !== 'interrupted') setSpeechStatus('error');
+    };
+    setSpeechStatus('speaking');
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const readPageAloud = () => {
+    const main = document.querySelector('#main-content');
+    const readablePage = main?.cloneNode(true);
+    readablePage?.querySelectorAll('[hidden], [aria-hidden="true"], script, style').forEach(node => node.remove());
+    speakText(readablePage?.innerText || readablePage?.textContent || '');
+  };
+
+  const readSelectionAloud = () => {
+    const selectedText = window.getSelection()?.toString() || '';
+    if (!selectedText.trim()) {
+      setSpeechStatus('selectionRequired');
+      return;
+    }
+    speakText(selectedText);
+  };
 
   useEffect(() => {
     let timer;
@@ -32,7 +83,7 @@ export function FloatingTools({ active, onActiveChange }) {
 
   return (
     <>
-      <div className="floating-tools" aria-label={copy.tools} data-scrolling={scrolling && !active} data-panel-open={Boolean(active)}>
+      <div className="floating-tools" role="group" aria-label={copy.tools} data-scrolling={scrolling && !active} data-panel-open={Boolean(active)}>
         <IconButton
           ref={chatTrigger}
           className="chat-trigger"
@@ -56,22 +107,26 @@ export function FloatingTools({ active, onActiveChange }) {
         id="chat-panel"
         className="chat-panel"
         open={active === 'chat'}
-        title={<span className="chat-panel-title"><img src="/favicon-32.png" alt="" />{copy.chat}</span>}
+        title={<span className="chat-panel-title"><img src="/favicon-32.png" alt="" /><span><strong>{copy.chat}</strong><small>{copy.chatSubtitle}</small></span></span>}
         closeLabel={copy.close}
         onClose={() => onActiveChange(null)}
         triggerRef={chatTrigger}
         initialFocusRef={messageField}
       >
         <div className="chat-thread">
-          <div className="chat-message">
-            <span className="chat-message-mark" aria-hidden="true"><img src="/favicon-32.png" alt="" /></span>
-            <div className="chat-bubble">
-              <p className="chat-intro">{copy.chatIntro}</p>
-              <p>{copy.chatContext}</p>
-            </div>
+          <div className="chat-welcome">
+            <span className="chat-eyebrow">{copy.chatLabel}</span>
+            <h3>{copy.chatIntro}</h3>
+            <p>{copy.chatContext}</p>
           </div>
 
+          {!chatFeedback && <div className="chat-demo-note">
+            <p>{copy.chatDemo}</p>
+            <Link to="/solicitud" onClick={() => onActiveChange(null)}>{copy.quoteFile}<span aria-hidden="true"> ↗</span></Link>
+          </div>}
+
           <div className="chat-suggestions" role="group" aria-label={copy.topics}>
+            <span className="chat-suggestions-label">{copy.chatStartWith}</span>
             {['chooseMaterial', 'reviewFiles', 'process'].map(key => (
               <button
                 type="button"
@@ -82,7 +137,7 @@ export function FloatingTools({ active, onActiveChange }) {
                   messageField.current?.focus();
                 }}
               >
-                <span>{copy[key]}</span><ArrowUpRight />
+                {copy[key]}
               </button>
             ))}
           </div>
@@ -109,7 +164,7 @@ export function FloatingTools({ active, onActiveChange }) {
             />
             <IconButton type="submit" label={copy.send}>↑</IconButton>
           </div>
-          <small>{copy.advisory}</small>
+          <small>{copy.chatInputHint}</small>
         </form>
       </Panel>
 
@@ -124,17 +179,36 @@ export function FloatingTools({ active, onActiveChange }) {
       >
         <p className="a11y-intro">{copy.readingIntro}</p>
 
+        <div className="a11y-speech" role="group" aria-label={copy.pageSpeech}>
+          <Button variant="secondary" onClick={readSelectionAloud}>{copy.readSelection}</Button>
+          <Button variant="ghost" onClick={readPageAloud}>{copy.readPage}</Button>
+          {speechStatus === 'speaking' && <Button variant="ghost" onClick={stopPageSpeech}>{copy.stopReading}</Button>}
+          <p className="a11y-speech-note">{copy.selectionHint}</p>
+          <p className="a11y-speech-note">{copy.screenReaderNote}</p>
+          <p className="a11y-speech-status" role="status" aria-live="polite">
+            {speechStatus === 'speaking' ? copy.readingStarted
+              : speechStatus === 'finished' ? copy.readingFinished
+                : speechStatus === 'unavailable' ? copy.readingUnavailable
+                    : speechStatus === 'empty' ? copy.readingEmpty
+                      : speechStatus === 'selectionRequired' ? copy.selectionRequired
+                    : speechStatus === 'error' ? copy.readingError : ''}
+          </p>
+        </div>
+
         <div className="a11y-size">
           <h3>{copy.textSize}</h3>
           <div className="a11y-control-buttons" role="group" aria-label={copy.textSize}>
-            {[[1, 'normal', 'A'], [1.125, 'large', 'A+'], [1.25, 'xlarge', 'A++']].map(([scale, key, text]) => (
+            {[[1, 'normal', 'A'], [1.5, 'large', 'A+'], [2, 'xlarge', 'A++']].map(([scale, key, text]) => (
               <button
                 type="button"
                 key={scale}
                 aria-label={copy[key]}
                 aria-pressed={preferences.textScale === scale}
                 onClick={() => preferences.setTextScale(scale)}
-              >{text}</button>
+              >
+                <span>{text}</span>
+                <small>{scale * 100}%</small>
+              </button>
             ))}
           </div>
         </div>

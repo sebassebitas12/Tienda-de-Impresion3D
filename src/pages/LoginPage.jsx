@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Input, MonoLabel } from '../components/ui/index.js';
+import { Button, Input } from '../components/ui/index.js';
 import { useAuth } from '../hooks/useAuth.js';
 import { usePreferences } from '../hooks/usePreferences.js';
 
@@ -8,6 +8,9 @@ function messageFor(error, copy) {
   if (!error) return '';
   if (error.code === 'AUTH_NOT_CONFIGURED') return copy.authNotConfigured;
   if (error.code === 'INVALID_CREDENTIALS_INPUT') return copy.authRequired;
+  if (error.code === 'AUTH_INVALID_CREDENTIALS') return copy.authInvalidCredentials;
+  if (error.code === 'AUTH_INACTIVE_USER') return copy.authInactive;
+  if (error.code === 'AUTH_NETWORK') return copy.authNetwork;
   if (error.code === 'INVALID_SESSION') return copy.authInvalidSession;
   return copy.authGenericError;
 }
@@ -33,7 +36,6 @@ export function LoginPage() {
   return (
     <div className="auth-card">
       <div className="auth-card-head">
-        <MonoLabel>{copy.authAccessKicker}</MonoLabel>
         <h1>{copy.authLoginTitle}</h1>
         <p>{copy.authLoginIntro}</p>
       </div>

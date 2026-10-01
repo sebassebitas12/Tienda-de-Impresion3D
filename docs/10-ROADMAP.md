@@ -74,26 +74,30 @@ Layouts, routing, providers y navegación base.
 - Hero/workbench, catálogo destacado, shell y preferencias globales ya están implementados.
 - CI obligatorio activo y verde antes de cada entrega.
 - El usuario continúa auditando visualmente Home.
+- R-H26 corregido: rail de piezas pasa a horizontal en tablet/móvil para no cruzarse con controles flotantes; render Dark revisado a 1280/768/374 px.
+- Preferencias de lectura ampliadas a 100/150/200% global; Home refluye y navbar se pliega a 200%. Aún faltan esos tamaños en tablet/móvil/rutas secundarias y tecnología de asistencia real.
+- R-H34: corregida y comprobada en captura local; en Light la foto de catálogo ya no hereda la máscara radial de Dark y Dark quedó intacto.
 - Los defectos visuales nuevos se corrigen, pero **Home ya no bloquea iniciar Auth**.
 - HF-01 sigue siendo el sistema visual que se expande a todos los módulos.
+- Por prioridad del usuario, tras cerrar Auth se completa una revisión visual enfocada de Home antes de abrir Admin: revisar breakpoints/temas/escala de texto restantes y validar teclado + tecnología asistiva real. Luego Admin → IA. Esto no implica rediseñar HF-01 ni rehacer Home completa.
 
-### Capa 3 — Autenticación 🟠 EN CURSO
+### Capa 3 — Autenticación ✅ SLICE ACADÉMICO IMPLEMENTADO
 Objetivo: tener una autenticación académica real y verificable antes de construir Admin.
 
 Orden:
-1. cerrar contrato concreto de backend/JWT sin inventar endpoint; 🔴 pendiente
+1. cerrar contrato académico JSON Server + token simulado; ✅
 2. implementar `authService`/adapter separado de UI; ✅
 3. convertir `AuthProvider` de guest fijo a sesión real; ✅
 4. Login con loading/error/invalid session; ✅ base React
 5. Registro según contrato disponible; ✅ base React
-6. persistencia/restauración de sesión; 🟠 interfaz lista, depende del adapter real
+6. persistencia/restauración de sesión; ✅
 7. logout; ✅ interfaz/provider
 8. guards de rutas autenticadas; ✅
 9. guard de rol admin; ✅
-10. tests de login, logout, sesión inválida y permisos; ✅
+10. tests de login, registro duplicado, logout, sesión expirada/inválida y permisos; ✅
 11. aplicar lenguaje HF-01 al AuthLayout sin crear una estética paralela. ✅ base visual
 
-**Estado detectado:** existen `AuthProvider`, `useAuth`, `AuthLayout`, rutas `/login` y `/registro`, pero actualmente son scaffolding. `db.json.users` contiene identidad/rol/estado, no credenciales. No simular seguridad empresarial ni fabricar JWT en frontend.
+**Estado actual:** `jsonServerAuthAdapter` consulta y crea usuarios en `db.json` a través de JSON Server, persiste la sesión en `localStorage` y emite un token `sim.v1` simulado con expiración, id y rol. La credencial `demoPassword` es explícitamente académica y no es un secreto ni seguridad de producción. La suite local actual pasa 54 tests, lint, `check:ui` y build; login/restore/logout también se probaron contra JSON Server real. Login y registro se inspeccionaron en Dark/Light en 1920, 1280, 768 y 374 px CSS, sin overflow horizontal; la galería muestra cuatro productos existentes y ya no conserva el chrome ficticio. GitHub Actions debe validar el commit antes de recomendar pull. Próximo bloque: completar revisión visual Home Dark/Light y estados abiertos; después Admin operativo con datos reales.
 
 ### Capa 4 — Admin
 Entra inmediatamente después de Auth porque depende de identidad/rol.

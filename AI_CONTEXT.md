@@ -1,6 +1,6 @@
 # AI_CONTEXT.md — Vértice CR
 
-> **Última actualización:** 2026-09-30  
+> **Última actualización:** 2026-10-01
 > **Estado:** SNAPSHOT ACTIVO  
 > **Rama:** `Pruebas`  
 > **No es un diario:** este archivo resume el presente. El historial detallado vive en los documentos de dominio.
@@ -199,16 +199,20 @@ Antes de editar:
 6. verifica;
 7. documenta.
 
-**Punto actual:** HF-01 **CONGELADO** y React Gate **ABIERTO**.
+**Punto actual:** HF-01 **CONGELADO**, React Gate **ABIERTO**; Auth académico implementado y verificado localmente.
 
-**Prioridad académica nueva:** por indicación del profesor, el orden operativo es **Autenticación → Admin → IA**. Se trabaja por slices funcionales con estética HF-01 integrada; no se espera a completar todas las páginas visualmente antes de funciones. 
+**Prioridad académica nueva:** por indicación del profesor, el orden operativo es **Autenticación → Admin → IA**. Se trabaja por slices funcionales con estética HF-01 integrada; no se espera a completar todas las páginas visualmente antes de funciones.
+- **Auth académico implementado:** login/registro/restore/logout contra JSON Server. Sesión guardada sin verificar por fallo de red no autentica rutas, pero se puede borrar localmente. Cliente y Admin probados manualmente en desktop; salida existe en navbar público y sidebar Admin. Token `sim.v1` es académico, no seguridad de producción. `/login` presenta una galería automática de cuatro piezas existentes; ya no muestra rótulos ni chrome ficticio inspirado en Stitch. Tiene controles manuales, pausa por foco/hover, textos alternativos localizados y respeta movimiento reducido. Capturas Dark/Light inspeccionadas en 1920, 1280, 768 y 374 CSS px sin overflow horizontal. La suite integrada tiene 54 tests; lint, build y check UI deben pasar, y GitHub Actions debe quedar verde en el commit de entrega antes de recomendar pull.
 - **Capa 0 (UI Kit):** Completada y testeada (100%).
 - **Capa 1 (App Shell):** Completada (100%). Layouts (`PublicLayout`, `AdminLayout`, `AuthLayout`), Routing (`react-router-dom`), Providers y estilos base (`shell.css`) implementados. El error de NPM (`brace-expansion`) fue parcheado y el servidor levanta en `localhost:5173`.
-- **Capa 2 (Home - En proceso):** Hero workbench de HF-01 reconstruido en React con assets publicados en `public/images/`, riel de miniaturas, escáner, anotación SVG, telemetría y parallax/tilt con respeto a reduced motion. V-02 se aborda reordenando el Hero en móvil para que el producto aparezca dentro del primer viewport.
+- **Capa 2 (Home - revisión visual en curso):** Hero workbench de HF-01 reconstruido en React con assets publicados en `public/images/`, riel de miniaturas, escáner, anotación SVG, telemetría y parallax/tilt con respeto a reduced motion. En render Dark a 374 px el producto aparece en el primer viewport; se corrigió R-H26 pasando el selector de piezas a fila horizontal ≤820 px. R-H32 adapta a Light las superficies, viñetas, sombras de miniaturas/tarjetas y píldora «REVISIÓN ACTIVA» sin editar las fotografías. R-H34 elimina en Light la máscara radial que deslavaba las imágenes de catálogo; captura local confirma contraste opaco en la tarjeta señalada y Dark permanece intacto. La tipografía escala responsivamente en viewport ancho (1.0–1.12 desde 1440 CSS px) y admite preferencias 100/150/200%. El panel permite «Leer selección» y «Leer página completa» bajo demanda con SpeechSynthesis; es ayuda opcional, no lector de pantalla ni reemplazo de tecnología asistiva. Recorrido manual con Tab/Espacio confirmó los CTA y cambio de pieza en el workbench; falta validación con lector de pantalla real. Suite actual: 54 tests; lint, `check:ui` y build pasan localmente. Aún falta revisión global de Home en viewport del usuario y tablet/móvil.
+- **Marco global responsive:** tokens `--page-gutter`, `--page-gutter-compact`, `--layout-max-wide` (1680px) y `--layout-max-content` (1520px) centralizados en `src/index.css`; Home/navbar comparten el ancho amplio y las secciones el ancho de lectura. R-H28 documenta el aumento tras el reporte de encogimiento en 1920×1080. Render de escritorio ancho confirmado por screenshot; tablet/móvil y ultrawide continúan pendientes.
+- **Alcance de preferencias:** tema, idioma seleccionado, escala tipográfica, contraste y movimiento son preferencias compartidas por providers y persistidas en localStorage; paneles abiertos, query/conversación y pieza seleccionada son estados locales. La traducción integral de todas las rutas aún no se declara completa. Contrato en `docs/04`.
+- **Iteración visual React (2026-10-01):** Acceso/Login ahora rota cuatro fotos existentes, con título y controles accesibles, sin rótulos falsos ni vestigios visuales de Stitch; el flujo de Auth no cambió. La rotación se detiene al recibir foco, al pasar el puntero y con movimiento reducido. Asistencia se reorganizó como bienvenida + temas rápidos + compositor; se informa explícitamente que la respuesta automática no está conectada y se ofrece `/solicitud`. Referencias W3C y criterio visual en `docs/04`; hallazgos R-H35–R-H37 y capturas en `docs/05`. Falta aprobación visual del usuario y prueba con tecnología asistiva real. Siguiente orden confirmado por el usuario: cerrar revisión enfocada de Home → Admin con alcance y controles cuidadosos → IA/N8N.
 - **Catálogo destacado:** las seis referencias visuales de HF-01 están cargadas con sus badges Material/Stock. Como todavía no existen fotografías reales de catálogo, todas usan temporalmente `/images/producto-temporal.png`; este asset es explícitamente provisional y no representa un producto real.
 - **Assets del mockup publicados:** `hero-soporte.jpg`, `producto-engranaje.jpg`, `producto-dragon.jpg`, `producto-drone.jpg` y `producto-maqueta.jpg` fueron reutilizados desde `mockups/images/` en `public/images/` sin alterar el mockup congelado.
 
-**Siguiente bloque exacto:** Auth ya está **EN CURSO**: service adapter-based, AuthProvider con sesión/pending/error, Login, Registro, restore/logout, RequireAuth, RequireRole, protección de `/cuenta`, `/pedidos/:id` y `/admin/*`, AuthLayout HF-01 y tests están implementados. Falta únicamente cerrar el **contrato concreto del backend/JWT** para conectar el adapter real; no inventar endpoint ni credenciales. Después de Auth: Admin → IA.
+**Siguiente bloque exacto:** cerrar revisión enfocada de Home en 1280/820/768/560/375 px, Dark/Light, hover/foco y 150/200%. Completar recorrido de teclado y prueba manual con tecnología asistiva real antes de declarar cerrada accesibilidad. Luego abrir Admin operativo protegido por rol; IA/N8N queda después de Admin. No rediseñar ni rehacer HF-01 completo.
 
 **Skills de proyecto activas:** `.agents/skills/vertice-continuity/SKILL.md` y `.agents/skills/vertice-visual-audit/SKILL.md`. Nuevas skills/referencias aportadas por el usuario se evalúan por utilidad real; no se incorporan automáticamente.
 
@@ -217,5 +221,6 @@ Antes de editar:
 **Contexto confirmado por el usuario:** entrega académica frontend, con visión
 de migrar a servicios reales. Pagos/facturación reales fuera del alcance actual.
 El usuario aportará la rúbrica para definir las simulaciones posteriores.
-`docs/07` aún no detalla auth/almacenamiento/SINPE; `db.json` tiene un estado
-histórico SUBMITTED que debe resolverse explícitamente antes de conectar solicitudes.
+`docs/07` ya detalla Auth y almacenamiento académico. SINPE continúa pendiente de
+contrato; `db.json` conserva un estado histórico `SUBMITTED` que debe resolverse
+explícitamente antes de conectar solicitudes.

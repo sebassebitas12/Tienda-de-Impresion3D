@@ -1,6 +1,6 @@
 # Vértice CR — Auditoría HF y mockups
 
-> Última actualización: **2026-09-30**.
+> Última actualización: **2026-10-01**.
 
 ## Estado oficial
 
@@ -750,3 +750,116 @@ Regla durable: no solicitar `git pull` para cambios de código hasta tener el co
 
 
 - **R-H25 — control de tema perdió el carácter del HF-01:** React había convertido el selector de tema en un icon button genérico. Se restauró el lenguaje del control aprobado: 42×42, borde lava fino, fondo oscuro técnico, icono exclusivo sol/luna y microinteracción de rotación/escala/press. Se mantiene accesibilidad y reduced-motion global.
+
+### Auditoría responsive de Auth React — 2026-09-30
+
+En la ruta `/login`, la revisión visual efectiva a 768 px confirmó que el panel editorial y el formulario se apilan según el breakpoint, sin desbordamiento horizontal. La navegación por teclado alcanzó los campos y mostró foco visible. En el breakpoint móvil (`max-width:560px`) el CSS ocultaba el texto de `.auth-back-link` con `font-size:0`, dejando únicamente la flecha; se cambió a una etiqueta compacta visible con flecha separada. Render posterior a 374 px confirmó el texto completo visible y ausencia de desbordamiento horizontal. No se probó con lector de pantalla real.
+
+### R-H26 — rail de piezas se cruzaba con herramientas flotantes en tablet/móvil
+
+**Evidencia:** render real de Home a 768 px y 374 px CSS, tema oscuro. En 768 px, los botones fijos de Chat/Accesibilidad se superponían al rail vertical al llegar al workbench; a 374 px tapaban miniaturas y parte de la ficha del producto. En 374 px, el producto principal ya aparece dentro del primer viewport (imagen termina en y≈753 de 812 px).
+
+**Corrección:** en anchos ≤820 px el rail pasa a una fila horizontal de miniaturas. En tablet se conservan flechas anterior/siguiente; en móvil se priorizan las cuatro miniaturas táctiles (48×48 px) y queda un margen lateral reservado para los flotantes. Escritorio mantiene el rail vertical. No se movieron ni ocultaron Chat/Accesibilidad.
+
+**Verificación:** a 374 px las cuatro miniaturas quedan separadas de los botones flotantes, la ficha no queda cubierta y el producto sigue visible en el primer viewport; a 768 px rail horizontal y flotantes tienen zonas distintas; en 1280 px se había confirmado rail vertical y separación. Solo se revisó Dark; Light, estados abiertos de panel y lector de pantalla real continúan pendientes. El HTML congelado no se modificó.
+
+### Revisión visual Home React — Light y paneles — 2026-09-30
+
+**Evidencia:** render real en navegador local, tema Light, viewport reportado por el navegador de 2560×1254. La jerarquía del Hero y el producto se mantienen legibles sobre la superficie clara; las miniaturas y flechas conservan contraste. El panel de Chat abre anclado abajo a la derecha, con su entrada y acciones visibles; el panel de Accesibilidad usa la misma ancla y mantiene separados encabezado, opciones y botón de reinicio.
+
+**Comprobación funcional/visual:** los controles de tamaño aparecen como opciones seleccionables; al elegir «Texto grande», el título y el contenido de Home aumentan visiblemente y refluye la composición sin clipping observable. «Tamaño normal» revierte el cambio. El árbol de accesibilidad expone títulos, nombres de botones, campo de texto, opciones y switches. No se probó con lector de pantalla real ni se recorrió el panel con teclado completo. No se identificó un defecto que justifique alterar estilos en esta pasada.
+
+**Límites:** esta inspección cierra únicamente la comprobación de Light y paneles en escritorio ancho. No equivale a aprobación visual del usuario ni cierra Capa 2: falta validar ambos paneles en viewport móvil/tablet y realizar la revisión con tecnología de asistencia real. No se modificó el HTML congelado.
+
+### R-H27 — aumento de texto apenas perceptible y parcial
+
+**Causa confirmada:** el control ofrecía solo 112,5% y 125%, mientras numerosos tamaños `px` en Home, shell, UI Kit y Auth no dependían de `--a11y-font-scale`. El resultado agrandaba principalmente títulos basados en `rem`; no era útil como ayuda de lectura transversal. El usuario reportó que una persona mayor no podía leerlo adecuadamente.
+
+**Corrección:** escala explícita 100/150/200%; porcentajes visibles y nombres accesibles con el valor; preferencias persisten en el dispositivo. Se conectaron tamaños `font-size` y shorthand `font` de las hojas CSS de la app al factor global. Para 200%, Home apila Hero-copy y workbench; el navbar oculta los enlaces horizontales y los conserva en el menú plegable.
+
+**Verificación:** pruebas nuevas confirman que las tres opciones aplican y persisten; suite completa: 44 tests, lint, `check:ui`, build y `git diff --check` pasan. En render real de Home a escala 200%, el texto de párrafo sube de 16 a 32 px y el heading de 94 a 188 px; el workbench queda debajo del texto, sin solaparse, y el documento no crea overflow horizontal en el escritorio probado. **No afirmar cierre WCAG:** falta probar 150/200% en 375/768 px, rutas secundarias, teclado/lector de pantalla y validación con personas usuarias. WCAG 2.2 1.4.4 requiere que el texto pueda ampliarse hasta 200% sin pérdida de contenido o funcionalidad.
+
+La pasada anterior había tratado el cambio visual del título como evidencia suficiente; eso fue incorrecto. No se rediseñó ni modificó el HTML HF-01 congelado. Los detalles Light que el usuario anticipó permanecen pendientes de inspección/corrección.
+
+### R-H28 — Home y chrome demasiado contenidos en monitor ancho — 2026-09-30
+
+**Hallazgo:** comparación del screenshot del usuario (1920×1080) y CSS confirmó máximos independientes y estrechos: Hero 1440 px, navbar 1480 px y secciones 1320 px. En el monitor ancho la pieza y la composición quedaban demasiado centradas/pequeñas respecto al área disponible. No era un fallo de resolución ni debía resolverse estirando todos los textos.
+
+**Corrección:** tokens compartidos en `src/index.css` (`--page-gutter`, `--page-gutter-compact`, `--layout-max-wide`, `--layout-max-content`). Hero/navbar comparten marco de hasta 1680 px; secciones de Home/footer hasta 1520 px; gutters fluidos se reutilizan también en shell y layouts compactos. Se conservan máximos menores para páginas de lectura/formularios y paneles. No se modificó el HTML HF-01 congelado ni el flujo React.
+
+**Verificación:** HMR en navegador local a viewport de escritorio ancho mostró el Hero ampliado, producto más dominante y sección destacada extendida, sin pérdida de márgenes ni cambio de identidad. No se pudo obtener una medición numérica fiable del viewport mediante la API de evaluación del navegador; el screenshot aportado por el usuario es 1920×1080. Pendiente revisión real en 1280, 820/768, 560/375 px, resolución ultrawide, Light y escalas 150/200%; no se declara ausencia universal de overflow.
+
+**Unificación de preferencias:** doc 04 ahora distingue preferencias compartidas/persistidas (tema, idioma, escala, contraste, movimiento) de estados locales/transitorios (paneles, búsqueda, chat y selección de pieza). La cobertura de traducción completa sigue pendiente y no se declara terminada por existir un provider global.
+
+### R-H29 — tipografía general se percibía de tamaño laptop en monitor ancho — 2026-09-30
+
+**Hallazgo:** la ampliación anterior cambió marcos de contenido, pero muchos textos, botones y señales aún usaban escalas base/caps fijos. El usuario confirmó que la página seguía sintiéndose pequeña en su monitor, aunque se veía adecuada en laptop.
+
+**Corrección:** `PreferencesProvider` calcula un factor fluido entre 1.0 y 1.12 a partir del viewport CSS (inicia desde 1440 px), actualiza el factor en resize y lo multiplica por la preferencia elegida de 100/150/200%. Como el factor alimenta las declaraciones tipográficas existentes, amplía de forma coordinada titulares, cuerpo, controles y metadatos sin cambiar el espaciado geométrico por separado.
+
+**Pruebas:** se añadió test para escala 1.1 a 1920 CSS px; en esta iteración la suite completa pasa con 48 tests. Aún falta verificar visualmente en el monitor real, laptop, 1280/768/375 y con las tres preferencias; el límite no declara que cada resolución física se haya probado.
+
+### R-H30 — faltaba una acción explícita de lectura en voz alta
+
+El control ♿ abría ajustes de lectura (tamaño, contraste, movimiento), pero no pronunciaba el contenido. Se añadieron en ese panel «Leer selección», «Leer página completa» y, durante la reproducción, «Detener lectura», con voz/idioma del navegador según idioma activo, estado accesible y manejo de falta/error de soporte. La selección se lee solo cuando la persona activa el botón; no se dispara al pasar el cursor ni por seleccionar. Fuente: SpeechSynthesis API documentada por MDN; no se instala dependencia ni se envía texto fuera del dispositivo.
+
+**Alcance importante:** esto no es un lector de pantalla, no navega por controles ni reemplaza NVDA/VoiceOver/TalkBack del sistema. La compatibilidad semántica con esas tecnologías sigue siendo un requisito separado; no se declara probada con lector real. Los tests automatizados comprueban contenido, idioma, estado y detener lectura; escuchar y revisar el panel en navegador real queda pendiente.
+
+### R-H31 — lectura de selección y correcciones semánticas — 2026-09-30
+
+Se incorporó «Leer selección» para escuchar solo el texto marcado mediante selección normal de ratón o teclado, bajo demanda; «Leer página completa» queda separado. Si no hay selección, el estado explica cómo continuar. No se usa hover ni se intenta capturar una pulsación prolongada, comportamiento poco fiable y excluyente para usuarios de teclado/movilidad. La lectura cancela cualquier voz anterior y se detiene al cambiar de ruta o al solicitarlo.
+
+Durante la auditoría se encontró que el selector de piezas usaba `tablist`/`tab` sin el patrón de teclado/`tabpanel` correspondiente; se cambió a grupo de botones con `aria-pressed`, operable con Tab y Enter/Espacio. También se retiró `aria-label` de un `div` visual sin rol y se hizo explícito el grupo semántico de herramientas/señales. Tests cubren lectura de selección y ausencia de selección; no equivalen a una prueba con lector de pantalla. La prueba manual de teclado se registra debajo; queda pendiente validación con tecnología asistiva real y revisar el panel en los dispositivos/escalas indicados en el punto actual.
+
+**Prueba manual posterior en navegador (2026-09-30):** Tab alcanzó los CTA y miniaturas; Espacio activó la segunda pieza, actualizó imagen, título, metadatos y estado seleccionado en el árbol de accesibilidad. La sesión no contó con un lector de pantalla del sistema, así que no se declara validación con tecnología asistiva real.
+
+### R-H32 — superficies de workbench seguían negras en tema Light — 2026-09-30
+
+**Hallazgo visual:** en el render Light de Home el panel exterior de la fotografía conservaba fondo `#15120f`; encima, viñetas, degradado inferior, sombras de miniaturas/tarjetas y la píldora «REVISIÓN ACTIVA» usaban negros fijos. La captura hacía que partes de la interfaz parecieran placas oscuras pegadas sobre la superficie clara.
+
+**Corrección:** en Light el soporte usa la superficie cálida de imagen, se reducen las viñetas oscuras y el degradado inferior, se cambian las sombras de miniaturas/tarjetas por tonos cálidos y se levanta levemente la luz de la foto. La píldora «REVISIÓN ACTIVA» usa tokens claros del tema. No se cambiaron las imágenes ni sus contenidos. El fondo oscuro que aún se ve dentro de la fotografía es parte de los píxeles del JPG, no una superficie del tema; se conserva para no falsear el aspecto de la pieza ni alterar archivos originales.
+
+**Verificación:** render local en navegador en tema Light, escritorio ancho, después de HMR. El workbench cambió a marco cálido claro y mantuvo la imagen distinguible; Home conserva texto y controles legibles. Debe revisarse el resultado en el viewport del usuario y validar los estados de hover/foco y tamaños menores antes de dar por cerrado Light. No se tocó Auth ni se modificaron datos/archivos de imagen.
+
+### R-H33 — composición editorial de Acceso demasiado vacía en su parte superior
+
+En `/login`, el rótulo quedaba cerca del borde superior mientras el mensaje principal se anclaba abajo, dejando un vacío excesivo. Se cambió la distribución a un bloque editorial verticalmente centrado y con separación controlada; en tablet/móvil la separación se reduce. La inspección visual local en Light confirmó el rótulo y titular con jerarquía y sin solapamiento. No se modificó el formulario ni el flujo de autenticación.
+
+### R-H34 — fotografía de catálogo parecía deslavada en Light — 2026-10-01
+
+**Causa confirmada:** la imagen mantiene una máscara radial aprobada para fundirse con el fondo oscuro de Dark. En Light, sus píxeles gradualmente transparentes dejan ver la superficie clara y hacen que la foto parezca tener opacidad reducida. No era el estado `data-unavailable`: la tarjeta mostrada tenía stock y estado activo; tampoco era el reveal de scroll.
+
+**Corrección:** las imágenes de las tarjetas de catálogo dejan de usar la máscara radial en Light. Dark conserva la máscara y las reglas semánticas de disponibilidad siguen intactas. No se cambió ni reemplazó ningún archivo de imagen.
+
+**Verificación:** captura local en Light de las tarjetas de catálogo posterior a HMR confirma que la imagen vuelve a verse nítida y con contraste, mientras la superficie de la tarjeta sigue clara. Dark quedó sin cambios por especificidad de tema; tests, lint, `check:ui` y build pasan. Hover a distintas resoluciones queda dentro de la revisión Home pendiente.
+### R-H35 — asistencia se leía como listado decorativo, no como interfaz conversacional — 2026-10-01
+
+**Hallazgo:** en Home React, las tres acciones de ayuda eran filas de navegación bajo un globo genérico. La superficie no establecía el estado demo al abrirse y el campo no se percibía como compositor persistente.
+
+**Cambio:** bienvenida editorial breve, aviso visible de que la respuesta automática no está conectada, enlace directo a `/solicitud`, temas de inicio como controles agrupados y compositor separado/anclado. Se amplió la superficie y se retiró la retícula de fondo que competía con Home. El aviso aparece al abrir y después del intento; nunca se fabrican respuestas.
+
+**Referencia → patrón → adaptación → razón:** Vercel AI Elements Message/Conversation separa conversación, mensajes y entrada. Solo se adaptó esa jerarquía al stack existente; no se importó su stack (Next.js/AI SDK/shadcn/Tailwind) ni dependencias. Pageflows/Refero se usaron para la tarea única y claridad de etiquetas del acceso, según el registro de `docs/04`.
+
+**Verificación:** tests nuevos cubren aviso demo, destinos de solicitud, relleno del campo desde tema y estado al enviar. Render local verificado en Dark escritorio, Light escritorio y Light móvil; en móvil las tres opciones quedan visibles sin scroll interno del hilo. La prueba no verifica tecnologías asistivas reales.
+
+### R-H36 — acceso necesitaba producto y eliminar el vacío editorial — 2026-10-01
+
+**Hallazgo:** el login se apoyaba en un gran campo vacío y un lema desplazado, por lo que la composición parecía incompleta y no evidenciaba el uso de referencias externas solicitado.
+
+**Cambio:** se rehízo el panel editorial con `hero-soporte.jpg`, retícula, marcas de pieza y especificaciones ya documentadas; el formulario queda como tarea central en una superficie clara y delimitada. Se conserva login email/contraseña, registro, errores, estado de carga, rutas y adapter académicos; AuthLayout compartido aplica el mismo panel también a registro.
+
+**Referencia → patrón → adaptación → razón:** Pageflows Canva sign-in inspira la jerarquía de una sola tarea, no su acceso por código; Refero Login UI Guide informa etiquetas convencionales siempre visibles. Esto se ajusta al contrato académico de Vértice, con pasos y credenciales existentes, sin agregar OAuth o funciones no definidas.
+
+**Verificación:** render local de `/login` en Dark escritorio y Light móvil, sin desbordamiento horizontal observado en el viewport probado. Falta revisión del usuario y prueba con lector de pantalla real. No se tocó el HTML HF-01 congelado.
+
+**Corrección de criterio:** el usuario rechazó el resultado por su retícula, elipse y exceso de rótulos técnico-editoriales, correctamente señalados como una desviación hacia Stitch. Esa composición no debe considerarse aprobada; queda reemplazada por R-H37.
+
+### R-H37 — acceso: galería de producto sin chrome inventado — 2026-10-01
+
+**Hallazgo:** el panel de R-H36 vistió las fotografías como una consola ficticia: `VÉRTICE / ACCESO`, ubicación, estado, material, referencia, lema, procesos, retícula y elipse. No era contenido requerido ni un patrón visual autorizado por HF-01; imitaba el chrome de Stitch pese a la regla explícita de que Stitch solo informa alcance/estructura.
+
+**Cambio:** se eliminaron esos rótulos y adornos, también el overline redundante del formulario. El acceso ahora muestra una galería automática de cuatro fotos de producto ya usadas por Home, el nombre real localizado y controles anterior/siguiente/pausa. La autenticación, el formulario y el HTML HF-01 congelado no cambiaron.
+
+**Referencia → patrón → adaptación → razón:** [W3C APG Carousel](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) aporta control de rotación, pausa al recibir foco y hover, y región viva solo cuando no rota; [W3C WAI Images Tutorial](https://www.w3.org/WAI/tutorials/images/) sustenta textos alternativos informativos. Se adaptan a React/CSS existente, sin instalar dependencias ni trasladar estética de referencias. Reduced Motion desactiva la rotación automática y mantiene el cambio manual.
+
+**Verificación:** cuatro tests cubren nombres alternativos, navegación, rotación, pausa por foco/puntero y movimiento reducido. Capturas reales: 1920×1080 Dark; 1280×800, 768×900 y 374×812 en ambos temas. Sin desbordamiento horizontal en las medidas inspeccionadas; a 768/374 el formulario queda debajo de la galería y requiere desplazamiento vertical normal. El tema Light conserva las fotos sin máscaras, mezcla ni opacidad añadida; los fondos oscuros dentro de las fotos son parte de los JPG. No se declara prueba con lector de pantalla real ni aprobación visual del usuario. Admin permanece para después del cierre de Home.

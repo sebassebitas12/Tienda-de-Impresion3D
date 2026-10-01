@@ -30,6 +30,11 @@
   --mask-opaque: #000;
   --motion-micro: 150ms ease;
   --motion-ui: 220ms var(--ease-ui);
+  /* Shared responsive frame: fluid gutters and controlled content widths. */
+  --page-gutter: clamp(20px, 4vw, 72px);
+  --page-gutter-compact: clamp(16px, 3vw, 32px);
+  --layout-max-wide: 1680px;
+  --layout-max-content: 1520px;
   --a11y-font-scale: 1;
 }
 
@@ -59,7 +64,7 @@
 
 html {
   scroll-behavior: smooth;
-  font-size: calc(100% * var(--a11y-font-scale));
+  font-size: 100%;
   color-scheme: dark;
 }
 
@@ -69,6 +74,7 @@ body {
   margin: 0;
   background: var(--ink);
   color: var(--paper);
+  font-size: calc(16px * var(--a11y-font-scale));
   font-family: var(--display);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;

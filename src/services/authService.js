@@ -16,6 +16,7 @@ const notConfigured = async () => {
 
 export const unconfiguredAuthAdapter = Object.freeze({
   restoreSession: async () => null,
+  hasPersistedSession: () => false,
   login: notConfigured,
   register: notConfigured,
   logout: async () => undefined,
@@ -50,6 +51,10 @@ export function createAuthService(adapter = unconfiguredAuthAdapter) {
     async restoreSession() {
       const session = await current.restoreSession();
       return session ? normalizeAuthSession(session) : null;
+    },
+
+    hasPersistedSession() {
+      return Boolean(current.hasPersistedSession?.());
     },
 
     async login(credentials) {

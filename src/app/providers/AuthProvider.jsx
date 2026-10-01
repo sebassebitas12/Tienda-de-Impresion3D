@@ -5,6 +5,7 @@ import { AuthContext } from './contexts.js';
 export function AuthProvider({ children, adapter }) {
   const service = useMemo(() => createAuthService(adapter), [adapter]);
   const [session, setSession] = useState(null);
+  const [hasPersistedSession, setHasPersistedSession] = useState(false);
   const [isRestoring, setIsRestoring] = useState(true);
   const [pendingAction, setPendingAction] = useState(null);
   const [error, setError] = useState(null);
@@ -14,10 +15,16 @@ export function AuthProvider({ children, adapter }) {
 
     service.restoreSession()
       .then(restored => {
-        if (!cancelled) setSession(restored);
+        if (!cancelled) {
+          setSession(restored);
+          setHasPersistedSession(Boolean(restored));
+        }
       })
       .catch(restorationError => {
-        if (!cancelled) setError(restorationError);
+        if (!cancelled) {
+          setError(restorationError);
+          setHasPersistedSession(service.hasPersistedSession());
+        }
       })
       .finally(() => {
         if (!cancelled) setIsRestoring(false);
@@ -35,6 +42,7 @@ export function AuthProvider({ children, adapter }) {
     try {
       const nextSession = await task();
       setSession(nextSession);
+      setHasPersistedSession(Boolean(nextSession));
       return nextSession.user;
     } catch (nextError) {
       setError(nextError);
@@ -61,6 +69,7 @@ export function AuthProvider({ children, adapter }) {
     try {
       await service.logout(session);
       setSession(null);
+      setHasPersistedSession(false);
     } catch (nextError) {
       setError(nextError);
       throw nextError;
@@ -73,6 +82,7 @@ export function AuthProvider({ children, adapter }) {
     user: session?.user || null,
     token: session?.token || null,
     isAuthenticated: Boolean(session?.user),
+    hasPersistedSession,
     isRestoring,
     isPending: Boolean(pendingAction),
     pendingAction,
@@ -82,7 +92,7 @@ export function AuthProvider({ children, adapter }) {
     logout,
     clearError: () => setError(null),
     hasRole: role => session?.user?.role === role,
-  }), [error, isRestoring, login, logout, pendingAction, register, session]);
+  }), [error, hasPersistedSession, isRestoring, login, logout, pendingAction, register, session]);
 
   return <AuthContext value={value}>{children}</AuthContext>;
 }

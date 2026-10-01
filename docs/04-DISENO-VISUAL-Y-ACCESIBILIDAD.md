@@ -1,6 +1,6 @@
 # Vértice CR — Diseño visual, temas y accesibilidad
 
-> Última actualización: **2026-09-30**.
+> Última actualización: **2026-10-01**.
 
 ## Dirección vigente
 
@@ -390,7 +390,7 @@ Para evitar que la plataforma caiga en la estética genérica de "plantilla de I
 
 ### 4. Accesibilidad Universal TP (Todo Público) — Estándares [WCAG 2.2 AA](https://www.w3.org/WAI/ARIA/apg/) y Rúbrica FWD Academy
 
-La aplicación responde a los lineamientos del Anteproyecto de FWD Academy (Sebastián Flores Miranda), garantizando inclusión universal para personas con discapacidad visual, motora y dificultades de lectura:
+La aplicación toma como objetivo los lineamientos del Anteproyecto de FWD Academy (Sebastián Flores Miranda), con requisitos para personas con discapacidad visual, motora y dificultades de lectura. Esta intención no constituye por sí sola una garantía de conformidad ni reemplaza pruebas con tecnologías asistivas y personas usuarias:
 
 * **Las 4 Prácticas Obligatorias de Accesibilidad del Anteproyecto:**
   1. **Control de Tema Claro/Oscuro:** Alternancia accesible entre Dark Mode (Obsidian) y Light Mode (marfil industrial `#F5F3F0`) asegurando ratios de contraste ≥ 4.5:1 en textos normales y ≥ 3:1 en componentes UI.
@@ -599,6 +599,34 @@ El panel de asistencia y el de accesibilidad comparten la misma animación de en
 
 En HF-01, idioma y tamaño de texto son interacciones de demostración limitadas a esta página y no representan una infraestructura global. Requisito para React: idioma debe localizar consistentemente toda la interfaz (incluidos etiquetas, estados, errores y accesibilidad), y escala tipográfica debe aplicarse transversalmente con tokens/unidades relativos sin romper componentes, persistiendo la preferencia según la arquitectura aprobada. No declarar estas funciones globales hasta verificar navegación entre rutas y controles dinámicos. Los switches del mockup usan `role="switch"` con `aria-checked` como única fuente semántica de estado; el valor activo debe diferenciarse visualmente, además de anunciarse.
 
+#### Escala de lectura React — mínimo de accesibilidad
+
+Un ajuste que solo agranda títulos no es suficiente para personas mayores o con baja visión. La escala debe alcanzar **todo el texto visible**, incluidos párrafos, etiquetas, botones, campos y ayudas, y poder llegar al 200% sin pérdida de contenido o función, conforme a [WCAG 2.2, criterio 1.4.4](https://www.w3.org/TR/WCAG22/#resize-text). La interfaz ofrece 100%, 150% y 200%, comunica esos valores y conserva la elección al navegar. En Home, el modo 200% apila el workbench debajo del texto para evitar que ambos bloques se monten; el navbar pasa a su navegación plegable para conservar espacio.
+
+La implementación escala los tamaños declarados en las hojas CSS de la aplicación, incluidos valores absolutos y fluidos. **Verificación realizada 2026-09-30:** el navegador mostró párrafo de 16→32 px y heading de 94→188 px a escala 200%; en Home escritorio se confirmó que copy y workbench no se solapan, los controles muestran los porcentajes y la selección se guarda. Hay pruebas automáticas para persistencia/estado de las tres opciones, además de lint, tests, `check:ui` y build. **Pendiente:** inspección de 150%/200% en tablet y móvil, revisión de rutas secundarias a 200% y prueba con personas usuarias/tecnología asistiva. No declarar conformidad WCAG por esta verificación parcial.
+
+#### Escala tipográfica de viewport amplio y lectura en voz alta — React
+
+El marco de escritorio no solo amplía columnas: desde 1440 CSS px la tipografía completa crece gradualmente hasta un factor máximo de 1.12 en el viewport ancho. El control accesible 100/150/200% multiplica ese tamaño base y conserva su significado relativo al viewport; ninguna preferencia debe perderse en resize o navegación. Los metadatos técnicos pueden seguir siendo visualmente secundarios, pero nunca bajar de un tamaño legible ni ser el único medio para entender una acción.
+
+La ayuda de lectura ofrece dos acciones explícitas: pronunciar el fragmento que la persona selecciona con ratón o teclado, o leer el contenido de `main`; también permite detener la voz, usa el idioma activo y comunica estados/fallos. No lee automáticamente al pasar el cursor ni al seleccionar: la persona inicia la acción desde el panel. Es una ayuda opcional de escucha y **no es un lector de pantalla ni lo sustituye**: semántica, nombres accesibles, teclado y compatibilidad con tecnologías asistivas siguen siendo requisitos independientes que deben probarse aparte. Si el navegador no expone síntesis de voz, se informa sin bloquear la página. Fuente técnica → [SpeechSynthesisUtterance / MDN](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisUtterance), [SpeechSynthesis.speak / MDN](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis/speak), [SpeechSynthesis.cancel / MDN](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis/cancel); patrón adaptado → síntesis nativa del navegador, sin servicio externo ni dependencia, por soporte y control del usuario.
+
+#### Preferencias globales y estado local en React
+
+`AppProviders` envuelve el router con providers compartidos. Por tanto, el contrato global de preferencias es: tema Dark/Light, idioma seleccionado, escala de texto 100/150/200%, alto contraste y movimiento reducido. Se persisten en el dispositivo con claves `vertice-theme`, `vertice-language`, `vertice-text-scale`, `vertice-high-contrast` y `vertice-no-motion`; al cambiar de ruta deben conservarse. La persistencia de idioma no implica que todos los textos de todas las rutas estén traducidos: cobertura incompleta se considera deuda, no una función terminada.
+
+Son estados locales/transitorios: apertura de menú, buscador, panel de accesibilidad/chat; término de búsqueda; conversación en curso; pieza seleccionada en el visor y acordeones/disclosures de una página. No se persisten ni se convierten en preferencia global salvo decisión expresa.
+
+#### Marco responsive compartido React — 2026-09-30
+
+La geometría global se concentra en `src/index.css`: `--page-gutter` y `--page-gutter-compact` controlan márgenes fluidos; `--layout-max-wide` limita el chrome y las composiciones amplias; `--layout-max-content` limita secciones editoriales. Home y navbar reutilizan esos tokens para crecer en monitores grandes, conservar márgenes cómodos y no estirar párrafos indefinidamente. Formularios y paneles mantienen máximos propios cuando la lectura o el flujo requieren una columna estrecha. Breakpoints actuales (820/560 px para composición Home y shell; 1120 px para la grilla del Hero/navbar) son puntos de reorganización, no tamaños de dispositivo garantizados. Validar en anchos reales e intermedios, zoom y escala de texto; “adaptable a cualquier resolución” significa fluido, sin desbordamiento y con jerarquía preservada, no ocupar cada pixel a la fuerza.
+
+#### Tratamiento de fotografías del workbench en Light — React
+
+En tema Light, las superficies que pertenecen a la interfaz (marco, viñetas, degradado inferior, sombra y soporte de miniaturas) deben pasar a tonos cálidos claros y sombras suaves. No se deben trasladar al tema claro las sombras/degradados negros fijos de Dark. La fotografía del objeto conserva sus colores y fondo capturados; ese fondo oscuro no es un panel de interfaz y no se blanquea mediante filtros agresivos que alteren la lectura de la geometría o el material. Si se decide usar fotografía alternativa para Light, debe representar el mismo producto sin inventar detalles y registrarse como asset aparte. La primera adaptación React se documenta en R-H32 de `docs/05`.
+
+En imágenes del catálogo sobre fondos claros, una máscara radial que funde bordes con la superficie oscura de Dark puede parecer opacidad accidental. Para Light se retira esa máscara; la transparencia u opacidad de estados semánticos (por ejemplo, un producto realmente no disponible) se conserva por separado y solo cuando el estado de negocio lo indique.
+
 ---
 
 ## Auditoría visual orientada a fidelidad HF-01 → React — 2026-09-29
@@ -672,6 +700,7 @@ Reglas duraderas que salen de los hallazgos V-01 a V-09 de `docs/05`. Aplican al
 
 - **Los controles flotantes no pueden tapar contenido** en ningún ancho, ni en reposo ni durante el scroll. En HF-01 se resuelve ocultándolos parcialmente hacia el borde mientras hay scroll; no se reubican los botones ni los paneles que abren junto a ellos.
 - **Móvil es reinterpretación:** en React, el producto debe verse en la primera pantalla de 375 px; no basta con apilar la columna de texto y dejar el producto debajo.
+- **Excepción responsive React del rail de Home:** si el rail vertical coincide con los botones flotantes en tablet/móvil, puede convertirse en fila horizontal con targets táctiles de al menos 44×44 px, dejando un margen libre para Chat/Accesibilidad. El cambio afecta solo al selector, no mueve ni oculta las herramientas flotantes.
 - **Catálogo real en React:** no se replica el placeholder ni la etiqueta de fallback del mockup; un producto sin foto es un estado diseñado, no un fallback técnico.
 - **Las fotos deben integrarse a la superficie** (fundido o encuadre intencional); un rectángulo visible pegado dentro de la tarjeta se considera defecto.
 - **Popovers y menús sobre el hero son casi opacos** (95 % o más) con desenfoque de fondo fuerte: nada del fondo debe leerse detrás de texto interactivo.
@@ -806,3 +835,19 @@ Referencias externas usadas solo para comportamiento:
 - Codrops / Subtle Click Feedback Effects: feedback táctil corto para controles de icono.
 
 El patrón **no se replica automáticamente en todos los botones**. Se considera una familia de utility controls para acciones compactas donde el icono es el protagonista.
+### Referencias aplicadas al rediseño de Acceso y Asistencia React — 2026-10-01
+
+**Acceso / login**
+
+- [Pageflows — Canva, Logging in (Web)](https://pageflows.com/post/desktop-web/logging-in/canva/): el recorrido observado pone el acceso como tarea principal y presenta sus pasos de forma secuencial. Se adapta como una sola tarjeta de formulario centrada, con email y contraseña en orden conocido; **no** se copia la autenticación de Canva por código ni se agregan proveedores sociales, porque el contrato académico de Vértice exige credenciales demo contra JSON Server.
+- [Refero — Login UI Design Guide](https://refero.design/blog/login-ui-design-guide-creating-an-intuitive-user-experience/): patrón consultado = etiquetas reconocibles y campos previsibles, sin depender de placeholders. Se mantiene el formulario etiquetado de Vértice dentro de una superficie delimitada y se conserva intacta su lógica de login.
+- Adaptación visual propia: se muestra una galería limpia con fotografías de piezas reales ya presentes en Home; solo conserva el nombre de la pieza y controles funcionales, sin retícula, llamadas técnicas, etiquetas inventadas ni datos ornamentales. El formulario sigue siendo la tarea principal y mantiene etiquetas visibles y su flujo académico intacto.
+- [W3C APG — Carousel Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/): se aplica el patrón de control de rotación, botones anterior/siguiente, pausa al recibir foco, pausa temporal al pasar el puntero y anuncios de cambio solo cuando la rotación automática se detiene. La rotación automática no inicia si el sistema o la preferencia local reduce movimiento.
+- [W3C WAI — Images Tutorial](https://www.w3.org/WAI/tutorials/images/): las fotos son informativas en este contexto, por eso usan textos alternativos localizados que identifican cada pieza en vez de quedar ocultas como decoración.
+
+**Asistencia / chat**
+
+- [Vercel AI Elements — Message](https://github.com/vercel/ai-elements/blob/main/skills/ai-elements/references/message.md) y [Conversation](https://github.com/vercel/chatbot/blob/main/components/ai-elements/conversation.tsx): separación observada entre hilo conversacional y compositor, estados del mensaje y área de conversación con desplazamiento propio. Se adapta a la bienvenida, nota honesta de demo, temas rápidos y campo fijo abajo; el chat conserva foco, etiqueta de campo, grupo accesible y respuesta de error local.
+- No se instala AI Elements ni su stack: el repositorio exige Next.js, AI SDK, shadcn/ui y Tailwind, que no corresponden al scaffold Vite/CSS actual. Tampoco se añade streaming o respuestas simuladas. La interfaz informa que la respuesta automática aún no está conectada y enlaza al flujo real `/solicitud`.
+
+La referencia externa influye en jerarquía y separación de tareas, no reemplaza la autoridad visual HF-01. Estas pantallas React siguen sujetas a revisión del usuario; la inspección con NVDA/VoiceOver/TalkBack continúa pendiente y no se declara conformidad WCAG por este rediseño.

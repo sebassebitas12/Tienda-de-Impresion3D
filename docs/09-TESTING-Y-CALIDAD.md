@@ -35,7 +35,7 @@ No documentar comandos como ejecutables hasta que existan en `package.json`. Ant
 
 ## Casos críticos
 
-API 404/500, API caída, catálogo vacío, stock insuficiente, archivo inválido/grande, formulario incompleto, doble envío, permisos, pedido inexistente, solicitud inexistente, cotización pendiente/aprobada, métricas sin datos, Dark/Light y foco/teclado.
+API 404/500, API caída durante restore (sin autorizar la sesión no verificada y permitiendo borrarla localmente), catálogo vacío, stock insuficiente, archivo inválido/grande, formulario incompleto, doble envío, permisos, pedido inexistente, solicitud inexistente, cotización pendiente/aprobada, métricas sin datos, Dark/Light y foco/teclado.
 
 ## Nunca
 
