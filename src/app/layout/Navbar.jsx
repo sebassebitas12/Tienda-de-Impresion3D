@@ -41,6 +41,8 @@ export function Navbar({ onReading }) {
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, copy } = usePreferences();
   const { user, logout, isPending, hasPersistedSession } = useAuth();
+  const accountPath = user?.role === 'admin' ? '/admin' : user ? '/cuenta' : '/login';
+  const accountLabel = user?.role === 'admin' ? copy.adminDashboard : user ? copy.account : copy.login;
   const location = useLocation();
   const navigate = useNavigate();
   const [panel, setPanel] = useState(null);
@@ -194,9 +196,9 @@ export function Navbar({ onReading }) {
             </nav>
 
             <div className="account-dropdown-results">
-              <Link className="account-dropdown-link account-dropdown-primary" to={user ? '/cuenta' : '/login'} onClick={closePanel}>
+              <Link className="account-dropdown-link account-dropdown-primary" to={accountPath} onClick={closePanel}>
                 <AccountMenuIcon type="login" />
-                <span>{user ? copy.account : copy.login}</span>
+                <span>{accountLabel}</span>
               </Link>
 
               {!user && (

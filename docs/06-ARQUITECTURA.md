@@ -1,6 +1,6 @@
 # Vértice CR — Arquitectura
 
-> Última actualización: **2026-09-30**.
+> Última actualización: **2026-10-01**.
 
 ## Principio
 
@@ -104,7 +104,7 @@ Para optimizar el desarrollo y mantener coherencia global, esta capa incluye el 
 - `LinkText` — Enlace con affordance de flecha (“Ver ficha ↗”, `.text-link`). Variantes: inline y standalone.
 
 #### Datos y estado
-- `Badge` — Etiquetas de material (`.material-tag`), stock (`.stock-tag` con variantes `in-stock`, `order`, `out`), chips de especificación (`.spec-chip`) y estados de solicitud (`PENDIENTE DE COTIZACIÓN`, `APROBADO`, etc.).
+- `Badge` — Etiquetas de material (`.material-tag`), chips de especificación (`.spec-chip`) y estados de solicitud (`PENDIENTE DE COTIZACIÓN`, `APROBADO`, etc.). No mostrar indicadores de existencias o disponibilidad inmediata en el storefront: el catálogo se fabrica después del pedido.
 - `StatusIndicator` — Punto vivo con pulso (`.chat-status i`, `.visual-status i`) para estados en línea y alarmas.
 - `PriceTag` — Precio en CRC con moneda y formato mono. Nunca se usa para solicitudes PENDING_QUOTE.
 - `MonoLabel` — Texto técnico pequeño en JetBrains Mono (`.mono-label`, coordenadas, índices, referencias PRT).
@@ -139,7 +139,7 @@ Para optimizar el desarrollo y mantener coherencia global, esta capa incluye el 
 - `RevealOnScroll` — Wrapper con `IntersectionObserver` para entrada animada (`.reveal`).
 
 #### Comercio (componentes compartidos entre features)
-- `ProductCard` — Compone `Card` + imagen + `Badge` (material, stock) + ref mono + nombre + descripción + footer (categoría + `LinkText`).
+- `ProductCard` — Compone `Card` + imagen + nombre + descripción + acceso a ficha; el badge de material es opcional por contexto. No presenta etiquetas de existencias ni disponibilidad inmediata: los productos se fabrican después del pedido. Referencias y conteos no deben ser datos ficticios.
 - `HelpDisclosure` — Inline disclosure con trigger `?` y `aria-expanded`. Definido en `docs/04`.
 - `QuoteSummaryPanel` — Resumen lateral de cotización con monto, vigencia y CTA.
 - `CartItem` — Base para item de carrito (variantes: catálogo y solicitud personalizada).

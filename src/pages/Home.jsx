@@ -14,6 +14,7 @@ export function Home() {
   const { language } = usePreferences();
   const content = getHomeContent(language);
   const [activePiece, setActivePiece] = useState(0);
+  const [leader, setLeader] = useState(null);
   const visualRef = useRef(null);
   const photoWrapRef = useRef(null);
 
@@ -30,6 +31,60 @@ export function Home() {
   const piece = heroPieces[activePiece] ?? heroPieces[0];
 
   useEffect(() => {
+    const wrap = photoWrapRef.current;
+    const image = wrap?.querySelector('.hero-photo');
+    const note = wrap?.querySelector('.visual-note');
+    if (!wrap || !image || !note) return undefined;
+
+    const updateLeader = () => {
+      if (!image.complete || !image.naturalWidth || !image.naturalHeight) return;
+      const wrapRect = wrap.getBoundingClientRect();
+      const imageRect = image.getBoundingClientRect();
+      const noteRect = note.getBoundingClientRect();
+      const imageStyle = window.getComputedStyle(image);
+      const paddingLeft = parseFloat(imageStyle.paddingLeft) || 0;
+      const paddingRight = parseFloat(imageStyle.paddingRight) || 0;
+      const paddingTop = parseFloat(imageStyle.paddingTop) || 0;
+      const paddingBottom = parseFloat(imageStyle.paddingBottom) || 0;
+      const contentWidth = imageRect.width - paddingLeft - paddingRight;
+      const contentHeight = imageRect.height - paddingTop - paddingBottom;
+      const fit = Math.min(contentWidth / image.naturalWidth, contentHeight / image.naturalHeight);
+      const renderedWidth = image.naturalWidth * fit;
+      const renderedHeight = image.naturalHeight * fit;
+      const imageLeft = imageRect.left + paddingLeft + (contentWidth - renderedWidth) / 2;
+      const imageTop = imageRect.top + paddingTop + (contentHeight - renderedHeight) / 2;
+      const [targetX, targetY] = piece.target;
+      const x = imageLeft - wrapRect.left + targetX * fit;
+      const y = imageTop - wrapRect.top + targetY * fit;
+      const startX = noteRect.left - wrapRect.left;
+      const noteTopY = noteRect.top - wrapRect.top;
+      const startY = noteRect.bottom - wrapRect.top;
+      const elbowY = startY + 10;
+      const elbowX = startX + 26;
+
+      setLeader({
+        viewBox: `0 0 ${wrapRect.width} ${wrapRect.height}`,
+        path: `M ${startX} ${noteTopY} L ${startX} ${elbowY} L ${elbowX} ${elbowY} L ${x} ${y}`,
+        x,
+        y,
+      });
+    };
+
+    const observer = new ResizeObserver(updateLeader);
+    observer.observe(wrap);
+    observer.observe(image);
+    observer.observe(note);
+    image.addEventListener('load', updateLeader);
+    const frame = requestAnimationFrame(updateLeader);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      image.removeEventListener('load', updateLeader);
+    };
+  }, [piece.image, piece.target, content.filamentLabel]);
+
+  useEffect(() => {
     const visual = visualRef.current;
     const photoWrap = photoWrapRef.current;
     if (!visual || !photoWrap) return undefined;
@@ -41,8 +96,6 @@ export function Home() {
     const resetMotion = () => {
       visual.style.setProperty('--pointer-x', '50%');
       visual.style.setProperty('--pointer-y', '50%');
-      visual.style.setProperty('--note-x', '0px');
-      visual.style.setProperty('--note-y', '0px');
       photoWrap.style.setProperty('--tilt-x', '0deg');
       photoWrap.style.setProperty('--tilt-y', '0deg');
       photoWrap.style.setProperty('--parallax-x', '0px');
@@ -56,8 +109,6 @@ export function Home() {
 
       visual.style.setProperty('--pointer-x', `${((x + 0.5) * 100).toFixed(1)}%`);
       visual.style.setProperty('--pointer-y', `${((y + 0.5) * 100).toFixed(1)}%`);
-      visual.style.setProperty('--note-x', `${(x * -5).toFixed(2)}px`);
-      visual.style.setProperty('--note-y', `${(y * -5).toFixed(2)}px`);
       photoWrap.style.setProperty('--tilt-x', `${(y * -2).toFixed(2)}deg`);
       photoWrap.style.setProperty('--tilt-y', `${(x * 2).toFixed(2)}deg`);
       photoWrap.style.setProperty('--parallax-x', `${(x * 8).toFixed(2)}px`);
@@ -95,9 +146,14 @@ export function Home() {
                 </Button>
               </div>
               <div className="hero-signals" role="group" aria-label={content.capabilities}>
-                <div><span className="signal-value">±0.05 mm</span><span className="signal-text">{content.tolerance}</span></div>
-                <div><span className="signal-value">FDM / SLA</span><span className="signal-text">{content.processes}</span></div>
-                <div><span className="signal-value">{content.stagedValue}</span><span className="signal-text">{content.stagedReview}</span></div>
+                <div className="hero-signal">
+                  <span className="signal-value">{content.orderValue}</span>
+                  <span className="signal-text">{content.orderDetail}</span>
+                </div>
+                <div className="hero-signal">
+                  <span className="signal-value">FDM</span>
+                  <span className="signal-text">{content.materialList}</span>
+                </div>
               </div>
             </div>
 
@@ -116,19 +172,18 @@ export function Home() {
                 <div className="scan-line" aria-hidden="true" />
                 <div className="visual-status" aria-hidden="true"><i /> {content.activeReview}</div>
                 <div className="visual-note" aria-hidden="true">
-                  <strong>{piece.material}</strong>
+                  <strong>{content.filamentLabel} · {piece.material}</strong>
                   <span>{piece.process}</span>
                 </div>
-                <svg className="visual-note-line" viewBox="0 0 185 130" aria-hidden="true">
-                  <path d={piece.target} />
-                  <circle cx={piece.dot[0]} cy={piece.dot[1]} r="3" />
+                <svg className="visual-note-line" viewBox={leader?.viewBox ?? '0 0 1 1'} aria-hidden="true">
+                  <path d={leader?.path ?? ''} />
+                  {leader && <circle cx={leader.x} cy={leader.y} r="3" />}
                 </svg>
                 <div className="visual-meta">
                   <div>
                     <h2>{piece.title}</h2>
                     <p>{piece.description}</p>
                   </div>
-                  <div className="visual-ref">{piece.ref}<br />{piece.tolerance}</div>
                 </div>
               </div>
 
@@ -167,6 +222,8 @@ export function Home() {
             <RevealOnScroll key={product.id}>
               <ProductCard
                 product={product}
+                layout="featured"
+                showAvailability={false}
                 linkAs={Link}
                 to={`/producto/${product.id}`}
                 viewLabel={content.viewProduct}
@@ -205,12 +262,10 @@ export function Home() {
             <p>{content.precisionIntro}</p>
           </RevealOnScroll>
           <div className="spec-grid">
-            {content.specs.map(([index, title, description, chip], position) => (
-              <RevealOnScroll key={index} className="spec-card" delay={position * 100}>
-                <span className="spec-index">{index}</span>
+            {content.specs.map(([title, description], position) => (
+              <RevealOnScroll key={title} className="spec-card" delay={position * 100}>
                 <h3>{title}</h3>
                 <p>{description}</p>
-                <span className="spec-chip">{chip}</span>
               </RevealOnScroll>
             ))}
           </div>

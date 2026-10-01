@@ -195,9 +195,10 @@ describe('Separación de catálogo y cotización', () => {
     expect(screen.queryByText('Pago confirmado.')).not.toBeInTheDocument();
   });
 
-  test('ProductCard sin stock conserva texto explícito y estado de imagen', () => {
+  test('ProductCard omite disponibilidad por defecto y conserva el estado de imagen', () => {
     render(<UI.ProductCard product={{ ...product, stock: 0 }} href="/producto/test-only" showPrice />);
-    expect(screen.getByText('Sin stock')).toBeVisible();
+    expect(screen.queryByText('Sin stock')).not.toBeInTheDocument();
+    expect(screen.queryByText('En stock (5)')).not.toBeInTheDocument();
     expect(screen.getByText('Imagen no disponible')).toBeVisible();
     expect(screen.getByRole('link')).toHaveAttribute('href', '/producto/test-only');
   });

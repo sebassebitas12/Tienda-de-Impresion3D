@@ -9,7 +9,7 @@
 
 Vértice CR es una tienda costarricense de impresión 3D con dos líneas:
 
-1. productos terminados de catálogo;
+1. modelos de catálogo que se fabrican después de recibir el pedido, sin promesa de entrega inmediata;
 2. impresión personalizada con revisión y cotización antes de producción/pago.
 
 Stack objetivo: React + Vite + JavaScript/JSX, con las integraciones definidas en `06` y `07`.
@@ -22,6 +22,7 @@ Stack objetivo: React + Vite + JavaScript/JSX, con las integraciones definidas e
 - Dark/Light: definidos.
 - Identidad: **Obsidian Precision Forge + Lava Orgánica**.
 - El objetivo visual no es “más efectos”; es una Home con identidad fuerte que venda por producto, composición y percepción.
+- Capacidad confirmada por el usuario: impresión FDM únicamente, con filamentos ASA, PLA, PETG, ABS y TPU.
 
 ## 3. Autoridad
 
@@ -117,35 +118,17 @@ La UI no contiene reglas de negocio complejas ni accede directamente a JSON Serv
 
 Referencia: `docs/07`.
 
-Definidos y cerrados para el gate:
-- modelo normalizado;
-- estados de solicitudes;
-- contratos API;
-- JWT/auth;
-- integración N8N;
-- archivos 3D;
-- servicio de IA.
-
-No inventar proveedores o endpoints.
+Contratos académicos base cerrados para abrir el gate: modelo/estados y auth simulado contra JSON Server. La implementación continúa por slices. El proveedor y contrato de API externa siguen pendientes en `docs/07`; N8N/IA tienen patrón conceptual, pero faltan endpoints/workflows reales. No inventar proveedores o URLs.
 
 ## 11. Calidad
 
 Referencia: `docs/09`.
 
-Objetivo de coverage y orden de pruebas se define allí. Al empezar React, primero deben existir scripts reales en `package.json`; no documentar comandos inexistentes como si ya fueran ejecutables.
+Objetivo de coverage y orden de pruebas se definen en `docs/09`. Los scripts actuales viven en `package.json`; verificar los resultados de la rama antes de reportarlos.
 
-## 12. Gate de React
+## 12. Gate de React — SUPERADO (2026-09-30)
 
-No iniciar implementación completa hasta tener:
-
-1. negocio estable;
-2. flujos/rutas estables;
-3. HF-01 aprobado;
-4. diseño Dark/Light + accesibilidad definidos;
-5. arquitectura cerrada;
-6. contratos de datos/API/auth;
-7. modelo normalizado;
-8. testing preparado.
+El gate está abierto y React está en curso. Las listas de preflight describen los criterios que se cerraron, no una prohibición actual. Las integraciones que aún no tienen proveedor/URL deben concretarse antes de su slice correspondiente.
 
 ## 13. Orden de arranque de React
 
@@ -201,18 +184,21 @@ Antes de editar:
 
 **Punto actual:** HF-01 **CONGELADO**, React Gate **ABIERTO**; Auth académico implementado y verificado localmente.
 
-**Prioridad académica nueva:** por indicación del profesor, el orden operativo es **Autenticación → Admin → IA**. Se trabaja por slices funcionales con estética HF-01 integrada; no se espera a completar todas las páginas visualmente antes de funciones.
-- **Auth académico implementado:** login/registro/restore/logout contra JSON Server. Sesión guardada sin verificar por fallo de red no autentica rutas, pero se puede borrar localmente. Cliente y Admin probados manualmente en desktop; salida existe en navbar público y sidebar Admin. Token `sim.v1` es académico, no seguridad de producción. `/login` presenta una galería automática de cuatro piezas existentes; ya no muestra rótulos ni chrome ficticio inspirado en Stitch. Tiene controles manuales, pausa por foco/hover, textos alternativos localizados y respeta movimiento reducido. Capturas Dark/Light inspeccionadas en 1920, 1280, 768 y 374 CSS px sin overflow horizontal. La suite integrada tiene 54 tests; lint, build y check UI deben pasar, y GitHub Actions debe quedar verde en el commit de entrega antes de recomendar pull.
+**Prioridad académica nueva:** por indicación del profesor, el orden operativo es **Autenticación → Admin → IA**. Se trabaja por slices funcionales con identidad/tokens vigentes; Admin no debe copiar la composición Home.
+- **Auth académico implementado:** login/registro/restore/logout contra JSON Server. Sesión guardada sin verificar por fallo de red no autentica rutas, pero se puede borrar localmente. Cliente y Admin probados manualmente en desktop; salida existe en navbar público y sidebar Admin. Token `sim.v1` es académico, no seguridad de producción. AuthLayout muestra seis fotos como collage superpuesto; hover, foco y tap elevan/agrandan una pieza y su leyenda. Fondo con retícula y luz cálida de baja intensidad. Tests cubren nombres, selección y teclado. Dark/Light en más breakpoints y aprobación visual pendientes. GitHub Actions debe quedar verde en el commit de entrega antes de recomendar pull.
 - **Capa 0 (UI Kit):** Completada y testeada (100%).
 - **Capa 1 (App Shell):** Completada (100%). Layouts (`PublicLayout`, `AdminLayout`, `AuthLayout`), Routing (`react-router-dom`), Providers y estilos base (`shell.css`) implementados. El error de NPM (`brace-expansion`) fue parcheado y el servidor levanta en `localhost:5173`.
-- **Capa 2 (Home - revisión visual en curso):** Hero workbench de HF-01 reconstruido en React con assets publicados en `public/images/`, riel de miniaturas, escáner, anotación SVG, telemetría y parallax/tilt con respeto a reduced motion. En render Dark a 374 px el producto aparece en el primer viewport; se corrigió R-H26 pasando el selector de piezas a fila horizontal ≤820 px. R-H32 adapta a Light las superficies, viñetas, sombras de miniaturas/tarjetas y píldora «REVISIÓN ACTIVA» sin editar las fotografías. R-H34 elimina en Light la máscara radial que deslavaba las imágenes de catálogo; captura local confirma contraste opaco en la tarjeta señalada y Dark permanece intacto. La tipografía escala responsivamente en viewport ancho (1.0–1.12 desde 1440 CSS px) y admite preferencias 100/150/200%. El panel permite «Leer selección» y «Leer página completa» bajo demanda con SpeechSynthesis; es ayuda opcional, no lector de pantalla ni reemplazo de tecnología asistiva. Recorrido manual con Tab/Espacio confirmó los CTA y cambio de pieza en el workbench; falta validación con lector de pantalla real. Suite actual: 54 tests; lint, `check:ui` y build pasan localmente. Aún falta revisión global de Home en viewport del usuario y tablet/móvil.
+- **Capa 2 (Home — cerrada para avanzar, 2026-10-01):** Hero/workbench, scanner, tarjetas, bloque «Bajo pedido»/FDM y contenido actual están implementados. A petición del usuario se posponen las iteraciones restantes; HF-01 ya no bloquea Admin. No significa cambiar ni editar el HTML congelado.
 - **Marco global responsive:** tokens `--page-gutter`, `--page-gutter-compact`, `--layout-max-wide` (1680px) y `--layout-max-content` (1520px) centralizados en `src/index.css`; Home/navbar comparten el ancho amplio y las secciones el ancho de lectura. R-H28 documenta el aumento tras el reporte de encogimiento en 1920×1080. Render de escritorio ancho confirmado por screenshot; tablet/móvil y ultrawide continúan pendientes.
 - **Alcance de preferencias:** tema, idioma seleccionado, escala tipográfica, contraste y movimiento son preferencias compartidas por providers y persistidas en localStorage; paneles abiertos, query/conversación y pieza seleccionada son estados locales. La traducción integral de todas las rutas aún no se declara completa. Contrato en `docs/04`.
-- **Iteración visual React (2026-10-01):** Acceso/Login ahora rota cuatro fotos existentes, con título y controles accesibles, sin rótulos falsos ni vestigios visuales de Stitch; el flujo de Auth no cambió. La rotación se detiene al recibir foco, al pasar el puntero y con movimiento reducido. Asistencia se reorganizó como bienvenida + temas rápidos + compositor; se informa explícitamente que la respuesta automática no está conectada y se ofrece `/solicitud`. Referencias W3C y criterio visual en `docs/04`; hallazgos R-H35–R-H37 y capturas en `docs/05`. Falta aprobación visual del usuario y prueba con tecnología asistiva real. Siguiente orden confirmado por el usuario: cerrar revisión enfocada de Home → Admin con alcance y controles cuidadosos → IA/N8N.
-- **Catálogo destacado:** las seis referencias visuales de HF-01 están cargadas con sus badges Material/Stock. Como todavía no existen fotografías reales de catálogo, todas usan temporalmente `/images/producto-temporal.png`; este asset es explícitamente provisional y no representa un producto real.
+- **Iteración visual React (2026-10-01):** Acceso cambió de carrusel rechazado a collage según R-H39/R-H41. Asistencia se reorganizó como bienvenida + temas rápidos + compositor; se informa que la respuesta automática no está conectada y se ofrece `/solicitud`. Referencias y criterio en `docs/04`, auditoría en `docs/05`. Aprobación visual de Acceso/Asistencia y prueba con tecnología asistiva real pendientes. Home se cierra para avance; el siguiente orden es Admin → IA/N8N.
+- **Legibilidad / R-H46:** por el feedback nuevo, el navbar pasa a 16 px en escritorio ancho / 15 px en el tramo horizontal compacto; CTA 16/15 px, idioma 14 px, footer copy/enlaces 16 px, títulos/cierre 14 px y menú compacto 16 px. El navbar colapsa a menú hasta 1000 px para conservar espacio. Screenshot local confirma navbar y footer a 1280×720 Dark; Home se considera cerrada para avance. Revisión 768/375 y Light pospuesta, no bloquea Admin.
+- **Admin slice 1:** `/admin` protegido por rol ahora carga resumen de JSON Server a través de service; función pura calcula pedidos activos, solicitudes en revisión y distingue el registro legacy `SUBMITTED`. Datos actuales dan 5 pedidos activos, 1 solicitud oficial en revisión y 1 solicitud fuera del contrato. Ventas muestra sin datos porque no existe evidencia de pagos; no se usa `stock`/`minStock`. Login admin y render local a 1280×720 inspeccionados. Lint, `check:ui`, build y `git diff --check` pasan; no se ejecutaron pruebas automatizadas en este bloque. Las demás páginas Admin aún son placeholders.
+- **R-H47 — Acceso/Admin:** collage conserva seis fotos, pero en estado idle ya no atribuye el nombre/material de la primera pieza; ofrece guía y contextualización, y la leyenda de producto aparece tras hover/foco/selección. «Mi cuenta» diferencia invitado, cliente y admin; admin abre `/admin`. El shell identifica la sesión Admin. Navegador local confirmó login admin → tienda → menú «Panel de administración» → `/admin`; a 724 px se observó el reflujo responsive. Pasan 54 tests, lint, `check:ui`, build y `git diff --check`. Sin aprobación visual humana ni cobertura de todos los breakpoints/tema Light. Detalle en `docs/05`.
+- **R-H41/R-H42 Home:** R-H41 afirmaba que el líder acababa sobre las cuatro piezas; el usuario comprobó en el render que seguía en el fondo. R-H42 calcula el endpoint midiendo el `object-fit: contain`, paddings y dimensiones naturales del asset; recalcula al redimensionar o cambiar la pieza y conecta desde el rótulo. Inspección local confirma el líder sobre las cuatro piezas a 1280×800 y sobre soporte a 375×812. «Filamento · PETG» contextualiza el material; lattice pasa a «estructura aligerada» también en la tarjeta del soporte. La ProductCard destacada omite su badge flotante; las columnas de precisión pierden índice/chip redundante. Pasaron lint, 53 tests, `check:ui` (48 módulos), build y `git diff --check`; faltan tamaños/temas restantes.
 - **Assets del mockup publicados:** `hero-soporte.jpg`, `producto-engranaje.jpg`, `producto-dragon.jpg`, `producto-drone.jpg` y `producto-maqueta.jpg` fueron reutilizados desde `mockups/images/` en `public/images/` sin alterar el mockup congelado.
 
-**Siguiente bloque exacto:** cerrar revisión enfocada de Home en 1280/820/768/560/375 px, Dark/Light, hover/foco y 150/200%. Completar recorrido de teclado y prueba manual con tecnología asistiva real antes de declarar cerrada accesibilidad. Luego abrir Admin operativo protegido por rol; IA/N8N queda después de Admin. No rediseñar ni rehacer HF-01 completo.
+**Siguiente bloque exacto:** continuar Admin con la cola de solicitudes/cotización: primero determinar las preguntas y tareas del admin, después lista y detalle respaldados por `docs/02`/`07`; no añadir acciones de transición, descarga ni cotización sin contrato y datos suficientes. Investigar referencias sólidas para dashboards de operación/métricas y documentar su patrón y adaptación antes de diseñar los KPI. Cada métrica debe servir a una decisión real, tener fuente y enlazar a los registros cuando haya destino funcional; no stock ni pagos inferidos. IA/N8N queda después de flujos operativos. Iteraciones de Home quedan diferidas. El storefront aún está pendiente según `docs/03`.
 
 **Skills de proyecto activas:** `.agents/skills/vertice-continuity/SKILL.md` y `.agents/skills/vertice-visual-audit/SKILL.md`. Nuevas skills/referencias aportadas por el usuario se evalúan por utilidad real; no se incorporan automáticamente.
 
@@ -220,7 +206,21 @@ Antes de editar:
 
 **Contexto confirmado por el usuario:** entrega académica frontend, con visión
 de migrar a servicios reales. Pagos/facturación reales fuera del alcance actual.
-El usuario aportará la rúbrica para definir las simulaciones posteriores.
+La rúbrica académica ya se compartió; sus requisitos se implementan según los
+contratos existentes en Markdown. Pagos reales y facturación fiscal real quedan
+fuera de esta entrega.
 `docs/07` ya detalla Auth y almacenamiento académico. SINPE continúa pendiente de
 contrato; `db.json` conserva un estado histórico `SUBMITTED` que debe resolverse
 explícitamente antes de conectar solicitudes.
+
+**Fabricación:** FDM únicamente; filamentos ASA, PLA, PETG, ABS y TPU. Home no
+debe afirmar SLA, resina o nylon como capacidades disponibles.
+
+**Modelo del catálogo:** los modelos se imprimen bajo pedido y no hay productos
+para entrega inmediata. Ninguna ficha, tarjeta, Admin o métrica debe inferir
+disponibilidad de los campos demo `stock`/`minStock`. Admin va antes de IA/N8N;
+este orden se conserva en `docs/10`.
+
+**Claims aún no confirmados:** la tolerancia `±0.05 mm` de HF-01 y los plazos/
+cobertura logística no son compromisos operativos. React los omite hasta que se
+definan con datos reales.

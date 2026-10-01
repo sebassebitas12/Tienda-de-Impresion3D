@@ -863,3 +863,107 @@ En `/login`, el rótulo quedaba cerca del borde superior mientras el mensaje pri
 **Referencia → patrón → adaptación → razón:** [W3C APG Carousel](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) aporta control de rotación, pausa al recibir foco y hover, y región viva solo cuando no rota; [W3C WAI Images Tutorial](https://www.w3.org/WAI/tutorials/images/) sustenta textos alternativos informativos. Se adaptan a React/CSS existente, sin instalar dependencias ni trasladar estética de referencias. Reduced Motion desactiva la rotación automática y mantiene el cambio manual.
 
 **Verificación:** cuatro tests cubren nombres alternativos, navegación, rotación, pausa por foco/puntero y movimiento reducido. Capturas reales: 1920×1080 Dark; 1280×800, 768×900 y 374×812 en ambos temas. Sin desbordamiento horizontal en las medidas inspeccionadas; a 768/374 el formulario queda debajo de la galería y requiere desplazamiento vertical normal. El tema Light conserva las fotos sin máscaras, mezcla ni opacidad añadida; los fondos oscuros dentro de las fotos son parte de los JPG. No se declara prueba con lector de pantalla real ni aprobación visual del usuario. Admin permanece para después del cierre de Home.
+
+### R-H38 — scanner del Hero y tarjetas destacadas — 2026-10-01
+
+**Solicitud del usuario:** mantener el scanner, pero colocar su línea sobre la pieza activa para cualquiera de las imágenes del carrusel; rediseñar las tarjetas de Home y reevaluar el badge/conteo de stock. La captura del usuario muestra la línea de referencia pasando bajo el soporte, por fuera del objeto.
+
+**Criterio aplicado en esta iteración:** cada fotografía Hero lleva una región de escaneo calibrada en sus metadatos. El barrido se limita a esa región; esto es ajuste explícito por asset, no detección automática por visión. Una imagen nueva debe incluir calibración. Las tarjetas destacadas no muestran stock ni disponibilidad sin fuente vigente; la ficha/checkout conserva disponibilidad que afecte la compra.
+
+**Implementación React:** scanner con área/barrido calibrado por las cuatro imágenes actuales; tarjeta destacada de Home con material, categoría, nombre, descripción y acceso a ficha, sin referencias/cantidades/estado de stock. Se mantiene `stock` como dato de inventario y Admin. Se corrigieron claims previos de SLA/resina/nylon al alcance confirmado de FDM y filamentos ASA, PLA, PETG, ABS y TPU. Se retiró de React la tolerancia `±0.05 mm` y logística no confirmada; esos textos aún visibles en HF-01 quedan como contenido de mockup y no como promesas operativas. HF-01 congelado no se editó.
+
+**Verificación local:** lint, Jest (54 tests), check UI (48 módulos), build y `git diff --check` pasan. **Pendiente:** inspección del render React en 1280/768/375 px, Dark/Light y selección de las cuatro piezas, además de aprobación visual del usuario. No se declara fidelidad visual verificada sin esa inspección.
+
+### R-H39 — Acceso: collage interactivo de piezas — 2026-10-01
+
+**Nueva dirección del usuario:** la galería lineal del login no comunicaba el collage deseado. El fondo sólido también se sentía demasiado plano. La imagen compartida sirve como referencia estructural de marcos fotográficos superpuestos; las fotos de producto pueden seguir siendo provisionales.
+
+**Cambio:** `/login` y `/registro` comparten un collage de cuatro fotos existentes, con variación leve de giro y superposición. Bajo el puntero cada marco se eleva y amplía; el foco/selección de teclado refleja el mismo énfasis y se actualiza la leyenda de pieza/material. Se conserva acceso a todas las piezas como botones nombrados, sin rotación automática ni controles de carrusel redundantes. El fondo gana una retícula muy baja y luz cálida discreta a partir de tokens; Dark y Light conservan formulario legible. No cambian Auth, rutas ni HF-01.
+
+**Referencia → patrón → adaptación → razón:** [Framer Marketplace — Spotlight Collage](https://www.framer.com/marketplace/components/spotlight-collage/) muestra medios superpuestos que suben y escalan bajo hover/tap. Se lleva esa respuesta al collage propio con CSS y z-index, sin Framer ni dependencia; la composición del usuario aporta el solapamiento editorial. El panel de acceso mantiene la jerarquía de una tarea del contrato de Pageflows/Refero en docs/04.
+
+**Verificación visual local:** capturas en navegador a 1366×768 Dark y 390×844 Dark/Light; el dragón seleccionado sube sobre las otras fotos. Sin overflow horizontal en las vistas capturadas. Tests cubren cantidad/nombres, hover, selección y foco con teclado; lint y build pasan localmente junto con 53 tests y check UI. No hubo lector de pantalla real ni aprobación visual final.
+
+### R-H40 — Home: segunda pasada visual de scanner y tarjetas — 2026-10-01
+
+**Corrección de auditoría:** el usuario rechazó R-H38 con razón: la primera pasada cambió metadatos del scanner, pero la línea seguía casi imperceptible y cerca del borde/base; las tarjetas agrandaban seis veces la misma imagen «producto próximamente». La revisión real del navegador confirmó esas dos causas.
+
+**Cambio:** la línea usa 2 px, Lava más luminoso y mayor presencia, con calibración vertical alta y por asset en las cuatro imágenes. Featured ProductCard vuelve a imagen panorámica de 170–200 px, elimina máscara radial/filtro que oscurecían el placeholder y conserva cuerpo compacto con categoría, nombre, descripción y ficha. No se sustituyeron las fotos ni se editó HF-01 congelado.
+
+**Verificación visual local:** capturas Dark a 1366×768 muestran el barrido sobre soporte, engranaje, dragón y brazo; Home se revisó también con la sección de tarjetas en vista. Login recibió pasada Dark/Light escritorio/móvil. Los 53 tests, lint, check UI y build pasan. Aprobación visual del usuario y pruebas de tecnologías asistivas quedan pendientes.
+
+### R-H41 — corrección de objetivo visual: anotación Hero, collage y cards — 2026-10-01
+
+**Aclaración del usuario:** el problema del Hero no era el scanner horizontal. La referencia compartida señala la anotación que identifica el material (rótulo PETG, líder naranja y punto terminal); se restaura el barrido original y se recalibra el endpoint para que el líder toque la pieza. También se precisó que el collage de acceso debía tener seis fotos, no cuatro, y que la anterior composición de tarjetas todavía se percibía igual.
+
+**Cambio:** el scanner se restaura al comportamiento original de HF-01/React, sin stage ni recorrido/calibración por imagen. Los endpoints de la anotación de material se ajustan por pieza. Acceso incorpora seis assets distintos del repositorio: soporte, engranaje, dragón, drone, maqueta y el placeholder permitido. Home cambia de tarjetas verticales en tres columnas a piezas horizontales en dos columnas, con imagen reducida a miniatura, material/categoría/título/descripción y enlace; conserva sin stock promocional y no sustituye datos provisionales por productos inventados.
+
+**Verificación local:** en navegador se inspeccionaron los cuatro estados del Hero; los puntos terminales del líder quedaron sobre la superficie de cada pieza y el scanner horizontal conserva el recorrido original. En Home se revisaron las filas horizontales de producto con el placeholder completo; en Acceso se inspeccionó el collage con las seis fotos. Pasaron lint, 53 tests, `check:ui` (48 módulos), build y `git diff --check`. Mantener separado: imágenes disponibles para el collage ≠ fotos reales del catálogo; las seis cards de Home siguen usando el mismo placeholder autorizado. Aprobación visual del usuario y revisión en breakpoints/temas adicionales quedan pendientes.
+
+### R-H42 — Home: corregir líder de material y retirar rótulos redundantes — 2026-10-01
+
+**Hallazgo del usuario:** en el render real el punto de la línea naranja terminaba en el fondo y no sobre el objeto. PETG aparecía como sigla sin contexto; “lattice” tampoco se entendía. Las destacadas aún tenían una insignia diminuta arriba a la izquierda. En las tres columnas de precisión se repetía el mismo concepto en índice, titular, descripción y chip.
+
+**Causa:** el líder R-H41 conservaba un SVG fijo (185×130) desacoplado del área de imagen, aunque la foto cambia de proporción según el viewport. La separación de coordenadas no podía mantener el punto terminal en el mismo lugar de la pieza. El badge era general al componente ProductCard y las columnas conservaban cuatro niveles de texto.
+
+**Cambio:** ResizeObserver mide foto, paddings, `object-fit: contain` y rótulo; el SVG del marco recalcula en cada tamaño/selección y traza desde el rótulo al punto de imagen guardado para cada pieza. Es calibración por asset, no detección automática. La etiqueta dice «Filamento · PETG/PLA/ASA» y el descriptor del soporte dice «estructura aligerada». ProductCard mantiene material en usos estándar y lo omite en las promocionales. Precisión queda en tres columnas sin índices ni chips, cada una con título informativo y una descripción breve.
+
+**Verificación:** inspección local del navegador confirma la línea conectada desde el rótulo y su punto sobre soporte, engranaje, dragón y drone a 1280×800; soporte revisado también a 375×812. Las tarjetas destacadas no muestran insignia y las tres columnas de precisión conservan un título y una explicación sin índices/chips. Pasaron lint, 53 tests, `check:ui` (48 módulos), build y `git diff --check`. HF-01 permanece congelado e intacto. Falta revisar el resto de breakpoints, Light y la aprobación del usuario.
+
+### R-H43 — Home: llamada corta del Hero, métrica veraz y hover de precisión — 2026-10-01
+
+**Hallazgo del usuario:** la línea de R-H42 aún parecía cruzar todo el producto en lugar de señalar un detalle. «5 filamentos disponibles» sugería inventario actual no confirmado. Las tarjetas de precisión necesitaban respuesta al pasar el cursor.
+
+**Cambio:** se mantienen el cálculo del endpoint desde el lienzo real de la foto y el scanner horizontal independiente, pero cada endpoint se acerca al borde superior/izquierdo del detalle seleccionado: soporte (truss), engranaje (diente/placa), dragón (cabeza) y drone (viga). El trazo termina ahí sin recorrer el objeto entero. El rótulo del Hero queda «5 materiales definidos», que comunica el conjunto confirmado sin hablar de stock. Las tarjetas de precisión responden con acento Lava en el título, un desplazamiento leve y una regla que se despliega bajo esa columna; `prefers-reduced-motion`/preferencia local anula transiciones.
+
+**Referencia → patrón → adaptación → razón:** Codrops, Grid Item Reveal, recomienda que la interacción de una grilla se active solo en el ítem bajo el cursor y destaque su contenido. Sin imagen de producto en estas tarjetas, Vértice adapta la respuesta a la regla inferior y el titular; así hay feedback local visible sin elevar una superficie completa ni sumar datos decorativos. Sin dependencias nuevas.
+
+**Verificación:** render local a 1024×780 confirma los cuatro endpoints directamente sobre los detalles señalados; captura Dark con hover confirma la regla y el cambio del titular. A 375×812 se revisó el Hero con el punto sobre el soporte y la métrica «5 materiales definidos» (sin afirmar inventario disponible). Pasaron lint, 53 tests, `check:ui` (48 módulos), build y `git diff --check`. HF-01 sigue congelado; aprobación visual final y revisión restante de breakpoints/temas siguen pendientes.
+
+### R-H44 — Home: reemplazo de señales genéricas y líder continuo — 2026-10-01
+
+**Hallazgo del usuario:** el cambio anterior solo ajustó una frase y dejó visualmente igual el bloque inferior izquierdo; la línea del rótulo aún mostraba un corte antes de continuar en horizontal/diagonal.
+
+**Cambio:** se quita el conteo y el texto repetitivo «Por etapas». El bloque ahora comunica «Bajo pedido» con su explicación y «FDM» junto a la lista ASA · PLA · PETG · ABS · TPU, en dos columnas separadas. El indicador vertical del rótulo y su línea hacia el objeto son una sola trayectoria SVG continua, con joins redondeados; se elimina el borde CSS independiente que daba lectura de segmentos separados. HF-01 permanece congelado.
+
+**Referencia → patrón → adaptación → razón:** se usa HF-01 como autoridad del trazo técnico y `docs/04` como criterio para que cada microetiqueta responda a una pregunta real. La información del bloque aclara el modelo de producción y proceso/materiales sin sugerir disponibilidad inmediata; no se añade referencia externa porque la composición es una continuidad del lenguaje ya aprobado.
+
+**Verificación:** render local inspeccionado a 1280×720 y 375×812; el bloque aparece como dos señales claras y el líder queda visualmente unido desde el marcador hasta el objeto. Pasaron lint, 53 tests, `check:ui` (48 módulos), build y `git diff --check`. HF-01 intacto. Pendientes la aprobación visual del usuario y revisión general de Home en otros temas/escala/breakpoints.
+
+### R-H45 — legibilidad del chrome y brechas del recorrido de compra — 2026-10-01
+
+**Hallazgo del usuario/instructor:** el tamaño por defecto de varios textos era demasiado pequeño para leer, en especial navbar y footer. También se solicita revisión del recorrido de compra completo.
+
+**Hallazgos estáticos confirmados:** `shell.css` tenía navegación de 10–11 px, idioma de 9 px y enlaces/copy del footer de 12 px. Las rutas registradas de catálogo, detalle, solicitud, carrito, checkout, cuenta/pedido, soporte y Admin apuntan a `ConstructionPage`; solo Home, login y registro tienen pantallas específicas. Por lo tanto, la Home presenta dos entradas distintas (catálogo bajo pedido vs. archivo para cotización), pero hoy el frontend no permite completar los recorridos de venta.
+
+**Cambio implementado:** navbar pasa a 14 px en escritorio y 13 px entre 821–1120 px; idioma a 12 px; CTA a 13/12 px; cuerpo y enlaces del footer a 14 px; títulos/metadata de footer a 12 px. El hover de enlaces usa color de texto principal con subrayado Lava. `homeContent.js` distingue que cada modelo se fabrica por encargo de la revisión/cotización de piezas propias. No se menciona stock.
+
+**Auditoría customer journey:** `docs/03` describe Home → catálogo → ficha → carrito/checkout → postcompra y el flujo separado de solicitud personalizada; identifica transparencia de costos/envíos únicamente cuando se confirmen y soporte postventa. En checkout se aplica el principio de [Baymard](https://baymard.com/research-articles/show-shipping-costs-on-product-pages): explicitar temprano costos que cambian el total; no se agrega ninguna estimación al sitio. `docs/04` fija criterio de legibilidad y referencias W3C para contraste/aumento de texto.
+
+**Inspección disponible:** el árbol accesible local a 1280×720 confirma labels del navbar y contenido de Home; screenshot Dark escritorio muestra los tamaños mayores del navbar. CSS confirma los tamaños del footer, pero no se obtuvo inspección renderizada del footer, ni de viewport 768/375, tema Light o escalas 150/200% en esta pasada. Lector de pantalla real y aprobación visual siguen pendientes. No afirmar conformidad WCAG global.
+
+**Criterio y siguiente paso:** conservar Space Grotesk para lectura y reservar JetBrains Mono compacto para datos técnicos secundarios; jerarquizar producto, uso, material, precio respaldado y fabricación bajo pedido; no sugerir inventario ni entrega inmediata. El siguiente bloque funcional es Admin operativo protegido por rol y luego IA/N8N. Home aún requiere revisión visual pendiente.
+
+### R-H46 — Home cerrada para avance, segundo aumento de tipografía y dashboard Admin — 2026-10-01
+
+**Decisión del usuario:** Home se considera suficientemente completa. HF-01 deja de ser requisito para permanecer iterando la Home o bloquear la siguiente área; cualquier ajuste posterior será puntual. Admin empieza ahora. Esto no cambia el estado congelado del HTML HF-01 y no significa que se edite.
+
+**Tipografía:** la captura aportada confirmó que 14 px en navbar y footer aún se leían pequeños a tamaño por defecto. En `shell.css` se aumenta navbar a 16 px desktop / 15 px en el tramo compacto, menú a 16 px, idioma a 14 px, CTA a 16/15 px; footer copy/enlaces a 16 px, títulos y cierre a 14 px; links de footer ganan mayor área vertical. El CTA lleva `white-space: nowrap` para mantener su etiqueta íntegra al crecer. La navegación colapsa al menú compacto hasta 1000 px para que los labels grandes mantengan espacio. El tamaño sigue sumando la preferencia global 100/150/200%.
+
+**Render observado:** 1280×720 Dark en browser local: navbar (incluido CTA sin salto de línea) y footer muestran la nueva escala. La sección del footer se inspeccionó desplazando hasta el final de Home. Home no se sometió otra vez a revisión completa; el usuario la da por cerrada para avanzar.
+
+**Primer slice Admin:** `/admin` ahora presenta resumen operativo protegido por el guard existente. Su service lee de JSON Server pedidos, solicitudes y usuarios; el dashboard muestra 5 pedidos activos y 1 solicitud en revisión según el contrato actual, pedidos recientes con totales registrados y un aviso aparte para la solicitud legacy `SUBMITTED`. No trata ese estado como `PENDING_QUOTE`, no usa `stock`/`minStock` y muestra ventas cobradas como sin datos porque el modelo no aporta evidencia de pagos. `activityLog` está vacío y no se consulta ni se completa con eventos ficticios. Los demás destinos de navegación Admin permanecen pendientes.
+
+**Identidad Admin:** se adopta una composición de trabajo propia, legible y densa, basada en tokens Vértice. No replica el workbench de Home ni toma la estética de Stitch. Sin nuevas dependencias.
+
+**Verificación:** login admin académico y conexión real local a JSON Server observados en browser a 1280×720; árbol accesible incluyó métricas, filas de pedidos, cola de solicitudes y advertencia de dato legado. Lint, `check:ui`, build y `git diff --check` pasan. No se ejecutaron pruebas automatizadas en este bloque. Responsivo 768/375, Light, cobertura de acciones Admin y aprobación visual continúan pendientes.
+
+### R-H47 — login sin ficha fantasma y continuidad Admin — 2026-10-01
+
+**Hallazgos confirmados:** aunque los seis marcos del collage tenían `aria-pressed="false"` al cargar, la leyenda usaba el primer producto como respaldo y mostraba nombre/material sin selección. La composición dejaba espacio visual sin una explicación del collage. En navegación, Navbar apuntaba a `/cuenta` para cualquier usuario autenticado; por eso una sesión Admin que volvía a la tienda no tenía acceso directo al dashboard desde «Mi cuenta». El login ya conservaba en `location.state.from` la ruta protegida solicitada.
+
+**Cambios:** estado idle con instrucción neutral; título editorial breve para contextualizar las seis imágenes; nombre/material solo con hover, foco o selección. El menú público ahora muestra «Panel de administración» y va a `/admin` para admin, conserva «Mi cuenta» → `/cuenta` para cliente y «Iniciar sesión» → `/login` para invitado. El shell Admin identifica al operador en la barra lateral. No se altera HF-01 ni se crean acciones para registros que no las tienen.
+
+**Referencia → patrón → adaptación → razón:** Framer Marketplace — Spotlight Collage: medios editoriales elevados al interactuar; se conserva su selección con CSS propio y se añade orientación antes/después de la interacción para evitar una leyenda de producto arbitraria. Motion Primitives — Animated Background: feedback de selección que ubica en una lista; se mantiene en navegación Admin, sin hacer que filas estáticas parezcan enlaces. Ambas referencias ya formaban parte del banco de `docs/04`; no se añadieron dependencias.
+
+**Auditoría de recorrido:** invitado → login; cliente autenticado → `/cuenta`; admin autenticado → `/admin`; acceso directo a ruta protegida → login → retorno a ruta solicitada; logout Admin → Home. En navegador local se completó login Admin → tienda → menú → `/admin`; el render del collage idle confirma que no se presenta ficha de pieza. A 724 px se inspeccionó el flujo refluido; la aprobación visual humana y revisión de Light/otros tamaños quedan pendientes. Pasan 54 tests, lint, `check:ui`, build y `git diff --check`.

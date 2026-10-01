@@ -1,6 +1,6 @@
 # Vértice CR — UX, navegación y estados
 
-> Última actualización: **2026-09-24**.
+> Última actualización: **2026-10-01**.
 
 ## Rutas públicas
 
@@ -23,6 +23,14 @@ Solicitud → Ayuda de diseño → Descripción → Requisitos → Revisión →
 
 ### Admin
 Login → Dashboard → bandeja → detalle → acción → actividad.
+
+### Entrada a cuenta según rol
+
+- Invitado: `Navbar → Mi cuenta → /login`.
+- Cliente autenticado: `Navbar → Mi cuenta → /cuenta`.
+- Admin autenticado: `Navbar → Panel de administración → /admin`.
+- Si un visitante llega a una ruta protegida, el guard conserva la ruta de origen en el estado de navegación; tras el login vuelve a esa ruta. Sin ruta de origen, el admin entra a `/admin` y el cliente a `/cuenta`.
+- Logout del menú público o del shell Admin limpia la sesión y devuelve a Home. La ruta `/admin/*` sigue protegida por rol.
 
 ## Estados globales
 
@@ -72,7 +80,7 @@ La interfaz nunca representa una capacidad técnica que backend/datos no puedan 
 
 ### Navbar público
 
-El navbar visual de Stitch se conserva como **referencia base oficial de la navegación pública**. No se reemplaza por otro concepto visual durante esta fase. Solo se permiten ajustes de:
+HF-01 congelado define el lenguaje visual del navbar público. Stitch informa únicamente el inventario funcional, rutas y contenido; no define estilo, geometría ni chrome. No se reemplaza por otro concepto visual durante esta fase. Solo se permiten ajustes de:
 - labels y rutas reales;
 - estado autenticado/no autenticado;
 - acceso a cuenta/carrito;
@@ -130,7 +138,7 @@ Los dos recorridos pueden compartir componentes de checkout (stepper, datos de f
 
 ### Navbar/footer
 
-Mantener el navbar público de Stitch/Vértice con ajustes mínimos. En checkout puede simplificarse únicamente si mejora el foco sin perder navegación, identidad o accesibilidad. Footer comercial completo no es necesario; puede usarse uno técnico compacto.
+Mantener el navbar público derivado de HF-01 con ajustes mínimos. En checkout puede simplificarse únicamente si mejora el foco sin perder navegación, identidad o accesibilidad. Footer comercial completo no es necesario; puede usarse uno técnico compacto. Stitch solo orienta estructura y contenido.
 
 ### Estados de pago
 
@@ -149,3 +157,26 @@ Mantener el navbar público de Stitch/Vértice con ajustes mínimos. En checkout
 375px: bloques del checkout en secuencia vertical, resumen colapsable/sticky y CTA accesible.
 
 768px: una columna principal con resumen debajo o panel colapsable.
+
+## Auditoría de experiencia de compra — 2026-10-01
+
+### Hallazgo de estado actual
+
+La Home separa modelos de catálogo fabricados bajo pedido de piezas propias que requieren revisión y cotización. Sin embargo, el recorrido de compra aún no se puede completar: en `src/app/routes/routes.jsx`, catálogo, detalle, solicitud, carrito, checkout, cuenta/pedidos y rutas Admin se enrutan temporalmente a `ConstructionPage` (login y registro sí tienen pantallas propias). Es una brecha funcional confirmada por código, no un fallo visual de checkout implementado.
+
+### Recorrido recomendado
+
+1. **Home:** ofrecer dos decisiones inequívocas: explorar modelos fabricados bajo pedido o enviar un archivo propio para revisión. Explicar que los modelos no son de entrega inmediata.
+2. **Catálogo:** permitir explorar por uso/tipo de pieza y filtrar por materiales confirmados —ASA, PLA, PETG, ABS y TPU— y FDM. No mostrar inventario, “disponible” ni entrega inmediata.
+3. **Ficha:** priorizar fotos reales cuando existan, uso previsto, material y variantes confirmadas; mostrar precio de catálogo solo si el contrato de datos lo respalda. La ruta personalizada explica revisión y cotización, sin presentar precio final.
+4. **Carrito y checkout de catálogo:** conservar producto/cantidad y resumen editable. Informar costo total y condiciones de entrega antes del pago, cuando existan datos confirmados. No inventar costos ni fechas estimadas.
+5. **Solicitud personalizada:** explicar requisitos antes de cargar; dar feedback de formato/progreso/error y permitir revisar lo enviado. Confirmar recepción y siguiente paso. `PENDING_QUOTE` no muestra precio final ni CTA de pago.
+6. **Después del envío/compra:** confirmar qué ocurrió y cuál es el paso siguiente; dar acceso al estado del pedido/cotización y ayuda humana.
+
+La incertidumbre se resuelve con estados vacíos, errores y una explicación clara, no con información ficticia. Fuente de checkout: [Baymard, costos de envío en páginas de producto](https://baymard.com/research-articles/show-shipping-costs-on-product-pages). Patrón: aclarar temprano los costos que determinan el total; adaptación: Vértice los mostrará antes del checkout solo cuando tenga condiciones confirmadas.
+
+### Tipografía de chrome global
+
+La auditoría del instructor encontró textos ilegibles por defecto, en especial navbar y footer. El shell React sube navegación pública a 14 px en escritorio y 13 px en tablet; copy/enlaces del footer a 14 px y títulos/metadata secundaria a 12 px. Revisar a escala 100% y 150/200%, además de conservar las explicaciones en lenguaje natural y no reemplazarlas por etiquetas técnicas pequeñas.
+
+**Actualización R-H46 (2026-10-01):** tras comprobar que el primer incremento aún se veía pequeño en la captura del usuario, navbar/CTA suben a 16 px en escritorio ancho y 15 px en la franja compacta, idioma a 14 px, enlaces/copy del footer a 16 px y títulos/cierre a 14 px; menú compacto a 16 px. La navegación horizontal colapsa al menú hasta 1000 px para mantener los labels legibles sin apretarlos. El nuevo render local de escritorio muestra la escala mayor. La revisión en 768/375 px queda pendiente y no bloquea Admin.

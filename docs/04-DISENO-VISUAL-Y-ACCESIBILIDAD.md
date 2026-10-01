@@ -23,7 +23,9 @@ React Gate está abierto (2026-09-30). Esta regla define cómo preservar la iden
 
 ## Contrato de fidelidad visual HF-01 → React y documentación continua
 
-HF-01 no es únicamente una referencia de inspiración ni una muestra de colores: una vez que el usuario apruebe sus decisiones, será la especificación visual de máxima fidelidad para construir la página y sus componentes en React. La continuidad abarca composición y jerarquía, navbar y navegación, botones y controles, ventanas/paneles/overlays, tipografía, geometría, escala y espaciado, iconografía y assets de marca, estados, interacciones, responsive y accesibilidad. No basta con conservar la paleta ni se deben sustituir sus patrones por UI genérica. Los componentes compartidos de React deben derivarse de las decisiones visuales y funcionales aprobadas en HF-01 y validarse dentro de la página completa.
+HF-01 define la especificación visual de máxima fidelidad para Home, ahora implementada en React. Su identidad y principios siguen informando el producto, pero los demás módulos no deben replicar literalmente su composición workbench. Admin y futuras áreas usan los tokens, tipografía, geometría y principios de marca de este documento, con estructura y densidad propias de tareas operativas.
+
+**Cambio de prioridad aprobado por el usuario (2026-10-01):** Home queda suficientemente completa para avanzar a Admin; las correcciones visuales futuras se atenderán puntualmente después. No se requiere otra revisión integral de Home para iniciar Admin. Esto no altera el estado congelado del archivo `mockups/hf-01-home-definitivo.html` ni autoriza editarlo.
 
 La aprobación es por evidencia: lo que el usuario aún itera (incluidos los paneles no aprobados) se registra como propuesta/pendiente y no se convierte en contrato cerrado para React. Las referencias externas orientan criterios y decisiones; no reemplazan el mockup ni autorizan copiar diseños sin adaptación.
 
@@ -268,6 +270,13 @@ El footer de marca funciona como componente de contexto público. No debe forzar
 
 La reutilización visual se logra mediante tokens y componentes compartidos, no mediante copiar literalmente toda la estructura de una página a otra.
 
+## Home React — scanner y tarjetas destacadas (2026-10-01)
+
+- El haz de escaneo del Hero debe atravesar el área visible de la pieza activa, no recorrer franjas vacías de la fotografía. La zona se calibra por imagen en metadatos del Hero; al reemplazar/agregar una foto se debe actualizar su encuadre de escaneo. No se presenta como detección automática por IA/visión.
+- Las tarjetas destacadas de Home priorizan fotografía, categoría, nombre, material y acceso a la ficha. No muestran conteos ni badges de stock. La disponibilidad se comunica en ficha/checkout cuando los datos de inventario estén disponibles y vigentes.
+- La tarjeta puede usar un único badge de material; evitar repetir proceso/material y disponibilidad en varias etiquetas.
+- Aplica a promoción y Admin. Los campos heredados `stock`/`minStock` de `db.json` no representan inventario real ni se muestran como datos operativos hasta acordar un contrato válido.
+
 
 ## Sistema de Criterios, Repositorios de Referencia y Benchmark Técnico
 
@@ -360,7 +369,7 @@ Para evitar que la plataforma caiga en la estética genérica de "plantilla de I
   * ❌ Prohibidos los gradientes morados/azul neón genéricos ("AI purple").
   * ❌ Prohibidos los blobs o esferas flotantes decorativas sin función física.
   * ❌ Prohibidas las tarjetas con sombras desmedidas que no correspondan a una superficie industrial real.
-  * ❌ Prohibidos textos de relleno abstractos ("innovación sin límites", "revolucionando el futuro"). Toda descripción debe indicar material técnico, tolerancias dimensionales, tecnología (FDM/SLA) o destino logístico.
+  * ❌ Prohibidos textos de relleno abstractos ("innovación sin límites", "revolucionando el futuro"). Toda descripción debe indicar datos de la pieza respaldados por el catálogo, material disponible, proceso FDM o destino logístico; no inventar tolerancias.
 
 * **Principios de Craft Editorial:**
   * **Narrativa técnica numerada:** Las secciones principales se organizan con indexación metrológica clara (`01 / SELECCIÓN DE TALLER`, `02 / EL MÉTODO`, `03 / SEÑALES DE PRECISIÓN`).
@@ -433,7 +442,7 @@ No añadir modo dislexia, resaltado independiente ni controles adicionales a Hom
   * Auto-ciclo temporal suave (6.5 segundos) con pausa automática al posicionar el cursor sobre el visor (`mouseenter`) o enfocarlo por teclado.
 
 * **Cinta Ticker de Telemetría Técnica AM (Running Marquee):**
-  * Banda continua animada a 60 fps que recorre el ancho completo de la pantalla con especificaciones operativas reales: tolerancia ±0.05 mm, temperatura de cama 110°C, materiales PA12-CF/PETG/Resina 8K, despacho a las 7 provincias de Costa Rica y verificación metrológica ISO 9001.
+  * Si se usa una banda de telemetría, debe comunicar solo especificaciones respaldadas por producto y operación vigentes. No publicar tolerancias, temperaturas de cama, certificaciones ISO, tiempos de entrega ni materiales (por ejemplo, PA12-CF o resina) sin una fuente aprobada. La oferta de fabricación vigente se limita a FDM y ASA/PLA/PETG/ABS/TPU.
   * Desvanecimiento perimetral en los extremos mediante degradados laterales y pausa táctil al interactuar (`hover`).
 
 * **Dock Flotante de Doble Bolita Vertical:**
@@ -457,7 +466,7 @@ No añadir modo dislexia, resaltado independiente ni controles adicionales a Hom
 
 | Empresa | Enlace | Brecha Detectada | Diferenciación de Vértice CR |
 |---|---|---|---|
-| **DGtalic** | [dgtalic.com](https://dgtalic.com/) | Visualmente plana, sin especificaciones de tolerancia ni modo accesible. | Enfoque de ingeniería con tolerancias garantizadas (±0.05 mm), estética workbench y panel TP. |
+| **DGtalic** | [dgtalic.com](https://dgtalic.com/) | Visualmente plana, sin especificaciones de tolerancia ni modo accesible. | Enfoque de ingeniería con estética workbench y panel TP; no anunciar tolerancias garantizadas sin datos operativos confirmados. |
 | **3DCR** | [impresion3dcr.com](https://www.impresion3dcr.com/) | Flujo de cotización opaco, sin trazabilidad de estados. | Pipeline formal documentado (`PENDING_QUOTE → IN_REVIEW → QUOTED → AWAITING_APPROVAL → APPROVED → PAID`). |
 | **3D-ego** | [3degocr.com](https://www.3degocr.com/) | Sin diferenciación entre producto físico y manufactura técnica bajo demanda. | Separación estricta: Catálogo de piezas funcionales vs. Solicitud técnica personalizada sin cobro previo. |
 | **Acro 3D Print** | [acro3dprint.com](https://acro3dprint.com/) | Falta de interactividad, sin soporte de previsualización técnica. | Visor interactivo con líder dinámico (Leader Lines SVG), especificaciones de capa y telemetría en vivo. |
@@ -548,7 +557,7 @@ La investigación amplía el banco anterior y separa las fuentes según el probl
 | Revisión asistida por IA y frontend React | [Vercel Agent Skills](https://github.com/vercel-labs/agent-skills), [Vercel Web Interface Guidelines](https://github.com/vercel-labs/web-interface-guidelines), [Anthropic frontend-design](https://github.com/anthropics/skills/tree/main/skills/frontend-design) | Considerar sus listas y métodos al auditar o construir; leer el contenido y licencia vigentes y reconciliarlo con `AGENTS.md`, el sistema visual y JavaScript/JSX del proyecto. No instalar skills automáticamente. |
 | Interfaces conversacionales con IA | [Vercel AI Elements](https://github.com/vercel/ai-elements) | Referencia futura para estados de conversación y controles. Su stack Next.js + Vercel AI SDK + shadcn/ui + Tailwind no se debe introducir al mockup ni al proyecto sin aprobación arquitectónica. |
 
-**Protocolo para usar estas fuentes:** partir de una necesidad observada en HF-01; comparar al menos una referencia de sitio/pantalla completa y otra de patrón o implementación; anotar componente exacto, evidencia (captura o demo), adaptación a la marca, teclado/móvil/movimiento reducido, licencia y dependencias. Una fuente no obliga a copiar el patrón ni a animar cada control. Mantener los tokens, geometría, assets y decisiones aprobadas de Vértice como autoridad; respetar las restricciones de `AGENTS.md` (React bloqueado, JavaScript/JSX, sin dependencias nuevas no aprobadas). No se instaló ni integró código, paquete o skill durante esta investigación.
+**Protocolo para usar estas fuentes:** partir de una necesidad observada en HF-01; comparar al menos una referencia de sitio/pantalla completa y otra de patrón o implementación; anotar componente exacto, evidencia (captura o demo), adaptación a la marca, teclado/móvil/movimiento reducido, licencia y dependencias. Una fuente no obliga a copiar el patrón ni a animar cada control. Mantener los tokens, geometría, assets y decisiones aprobadas de Vértice como autoridad; respetar `AGENTS.md` (React Gate abierto, JavaScript/JSX, sin dependencias nuevas no aprobadas). No se instaló ni integró código, paquete o skill durante esta investigación.
 
 ### Búsqueda de catálogo: descubrimiento rápido sin tapar la página — 2026-09-29
 
@@ -842,12 +851,40 @@ El patrón **no se replica automáticamente en todos los botones**. Se considera
 - [Pageflows — Canva, Logging in (Web)](https://pageflows.com/post/desktop-web/logging-in/canva/): el recorrido observado pone el acceso como tarea principal y presenta sus pasos de forma secuencial. Se adapta como una sola tarjeta de formulario centrada, con email y contraseña en orden conocido; **no** se copia la autenticación de Canva por código ni se agregan proveedores sociales, porque el contrato académico de Vértice exige credenciales demo contra JSON Server.
 - [Refero — Login UI Design Guide](https://refero.design/blog/login-ui-design-guide-creating-an-intuitive-user-experience/): patrón consultado = etiquetas reconocibles y campos previsibles, sin depender de placeholders. Se mantiene el formulario etiquetado de Vértice dentro de una superficie delimitada y se conserva intacta su lógica de login.
 - Adaptación visual propia: se muestra una galería limpia con fotografías de piezas reales ya presentes en Home; solo conserva el nombre de la pieza y controles funcionales, sin retícula, llamadas técnicas, etiquetas inventadas ni datos ornamentales. El formulario sigue siendo la tarea principal y mantiene etiquetas visibles y su flujo académico intacto.
-- [W3C APG — Carousel Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/): se aplica el patrón de control de rotación, botones anterior/siguiente, pausa al recibir foco, pausa temporal al pasar el puntero y anuncios de cambio solo cuando la rotación automática se detiene. La rotación automática no inicia si el sistema o la preferencia local reduce movimiento.
-- [W3C WAI — Images Tutorial](https://www.w3.org/WAI/tutorials/images/): las fotos son informativas en este contexto, por eso usan textos alternativos localizados que identifican cada pieza en vez de quedar ocultas como decoración.
+- **Actualización R-H39:** a petición del usuario, esa galería lineal se reemplaza por un collage de cuatro piezas en marcos editoriales superpuestos. El elemento bajo el puntero sube de capa y escala; foco/selección de teclado da el mismo realce y en touch se puede elegir. La leyenda identifica pieza/material solo tras interacción; el estado inicial guía la exploración sin adjudicar una pieza no seleccionada. El collage guía estructura y solapamiento, no su marca de agua/bordes blancos; se adapta a Obsidian + Lava, con una retícula ambiental muy tenue tomada del lenguaje industrial HF-01. El formulario no cambia.
+- **Actualización R-H41:** el collage contiene seis fotografías disponibles, incluida la maqueta y el visual «producto próximamente»; conserva el mismo realce interactivo.
+- **Actualización R-H47:** sobre el collage se incorpora un encabezado editorial breve y debajo una instrucción de interacción. La leyenda idle deja de mostrar por defecto el nombre/material del primer elemento; la ficha solo aparece con hover, foco o selección. Se mantiene la composición existente de seis marcos, sin sumar tags decorativos ni claims de catálogo.
+- [Framer Marketplace — Spotlight Collage](https://www.framer.com/marketplace/components/spotlight-collage/): patrón observado = pieza multimedia bajo hover sube/escala para aislarse; interacción disponible también por tap. Adaptación = elevar z-index, enderezar y ampliar el marco con CSS; no se instala su componente ni Framer.
+- Accesibilidad de la interacción: cada imagen es un botón con nombre localizado y estado `aria-pressed`; el foco visible comparte el énfasis visual y movimiento respeta `prefers-reduced-motion` y la preferencia local.
+- Fondo de Acceso: se añade luz cálida de muy baja intensidad y retícula fina usando tokens del tema. La variación rompe la planicie del fondo sin competir con las piezas ni alterar la tarjeta del formulario; ambos temas deben conservar legibilidad.
+
+**Admin / primera expansión del sistema visual (2026-10-01):** se usa la identidad, tipografía, radios y estados del sistema, con jerarquía compacta de trabajo. [Motion Primitives — Animated Background](https://motion-primitives.com/docs/animated-background) aporta el patrón de una selección que orienta dentro de una lista; en Admin se conserva como feedback suave para navegación activa/foco, sin convertir filas estáticas en falsas acciones ni añadir librería. La tarjeta de sesión identifica al operador autenticado y la señal de color siempre acompaña texto.
+
+**Actualización R-H41 — Home:** las tarjetas destacadas se leen como filas horizontales en dos columnas; la miniatura conserva completo el placeholder de catálogo (`object-fit: contain`) en lugar de recortar sus rótulos. Stock sigue fuera de las cards promocionales. La afirmación anterior sobre el punto terminal del líder quedó rechazada tras la inspección del usuario y se corrige en R-H42.
+
+**Actualización R-H42 — Home:** el líder se calcula con las dimensiones naturales de cada foto, sus paddings y su ajuste `contain`; ResizeObserver recalcula el endpoint al cambiar viewport, pieza o tamaño del rótulo. Así el punto terminal cae sobre las coordenadas elegidas para el objeto y la línea nace junto al rótulo. La etiqueta aclara «Filamento · PETG» (o el material de la pieza) y “lattice” se traduce como «estructura aligerada». Las destacadas omiten la pastilla flotante del material, conservada en contextos de catálogo donde sí aporta. La sección de precisión pasa de tres cajas con índice/título/descripción/chip repetitivos a tres columnas editoriales con un título y una descripción, separadas por líneas sobrias.
+
+**Actualización R-H43 — Hero y hover de precisión:** la línea mantiene el ajuste dinámico de R-H42, pero el extremo se calibra a un detalle cercano al borde del objeto para que el trazo sea una llamada corta, no una diagonal que lo atraviesa. La métrica de materiales dice «5 materiales definidos»; describe el alcance FDM confirmado, no existencias. Para las tres tarjetas planas, se aplica el movimiento selectivo de [Codrops — Grid Item Reveal](https://tympanus.net/codrops/2020/03/31/grid-item-reveal-animation-on-hover/): una línea Lava crece en el borde bajo y el titular toma acento/desplazamiento corto al hover. La adaptación evita desplazar una imagen inexistente y conserva el contenido quieto; focus-within comparte feedback y reduced-motion elimina transiciones.
+
+**Actualización R-H44 — señales de Hero y conector continuo:** el usuario detectó que cambiar solo el texto dejó intacto el bloque de métricas. Se reemplaza el conteo por dos señales de servicio: fabricación bajo pedido y FDM con ASA/PLA/PETG/ABS/TPU; se retiran la cifra aislada y la frase redundante «Por etapas». El acento vertical junto al rótulo y el líder pasan a un mismo trazo SVG, con uniones redondeadas, para eliminar el corte visual antes del codo. La jerarquía sigue el principio de HF-01: etiqueta técnica secundaria, dato útil primero; sin claims de disponibilidad. Render React comprobado a 1280×720 y 375×812.
 
 **Asistencia / chat**
 
 - [Vercel AI Elements — Message](https://github.com/vercel/ai-elements/blob/main/skills/ai-elements/references/message.md) y [Conversation](https://github.com/vercel/chatbot/blob/main/components/ai-elements/conversation.tsx): separación observada entre hilo conversacional y compositor, estados del mensaje y área de conversación con desplazamiento propio. Se adapta a la bienvenida, nota honesta de demo, temas rápidos y campo fijo abajo; el chat conserva foco, etiqueta de campo, grupo accesible y respuesta de error local.
 - No se instala AI Elements ni su stack: el repositorio exige Next.js, AI SDK, shadcn/ui y Tailwind, que no corresponden al scaffold Vite/CSS actual. Tampoco se añade streaming o respuestas simuladas. La interfaz informa que la respuesta automática aún no está conectada y enlaza al flujo real `/solicitud`.
 
-La referencia externa influye en jerarquía y separación de tareas, no reemplaza la autoridad visual HF-01. Estas pantallas React siguen sujetas a revisión del usuario; la inspección con NVDA/VoiceOver/TalkBack continúa pendiente y no se declara conformidad WCAG por este rediseño.
+La referencia externa influye en jerarquía y respuesta de interacción, no reemplaza la autoridad visual HF-01. Estas pantallas React siguen sujetas a revisión del usuario; la inspección con NVDA/VoiceOver/TalkBack continúa pendiente y no se declara conformidad WCAG por este rediseño.
+
+### Auditoría de legibilidad global — 2026-10-01
+
+El usuario informó que al instructor le costaba leer los textos pequeños por defecto, especialmente navbar y footer. Regla de implementación React: reservar JetBrains Mono y tamaños compactos para metadata verdaderamente secundaria; navegación pública y texto de lectura no deben caer por debajo de 14 px al tamaño base. El shell puede usar 13 px en navegación tablet por limitación de ancho, con controles táctiles conservados; labels secundarios pueden ser 12 px, nunca copy principal.
+
+Cambio aplicado a `src/styles/shell.css`: navbar 14 px escritorio / 13 px tablet; CTA 13/12 px; footer cuerpo y enlaces 14 px, títulos y metadata 12 px; idioma 12 px; enlaces de footer con altura mínima 24 px. Los tamaños escalan con `--a11y-font-scale`. Se sustituyó el estado hover naranja de texto por texto de superficie más subrayado Lava para mantener legibilidad del enlace en ambos temas. Esto corrige valores de CSS detectados; requiere completar inspección visual en 768/375 px, Light y escalas 150/200%, y prueba con tecnología asistiva.
+
+Contraste calculado para texto sobre `--ink`: `--dim` da aproximadamente 2.92:1 Dark / 3.02:1 Light y no debe usarse en texto pequeño esencial; `--muted` da 6.20:1 Dark / 4.97:1 Light. Valores de tokens base, no auditoría de cada superficie/overlay ni certificación general. Reservar `--dim` para decoración o metadata prescindible; preferir `--muted` o `--paper` para copy que el cliente necesite leer.
+
+Referencia → patrón → adaptación → razón: [W3C WCAG 2.2, contraste mínimo](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html) fija 4.5:1 para texto normal y 3:1 para texto grande; [W3C, ampliar texto a 200%](https://www.w3.org/WAI/WCAG22/Techniques/general/G178.html) sirve como técnica para verificar reflow/legibilidad. Aplicación: no depender solo de ampliar la preferencia global; el tamaño base del chrome debe ser legible. La comprobación de tokens solo cubre los colores nombrados y no certifica WCAG de toda la interfaz.
+
+### Customer journey de compra — criterio incorporado
+
+En checkout, [Baymard](https://baymard.com/research-articles/show-shipping-costs-on-product-pages) observa la necesidad de conocer costos de envío que afectan el total antes de llegar al final de compra. Vértice debe hacer visibles costo total y condiciones de entrega antes del pago cuando esos datos estén definidos; no se deben inventar montos ni plazos. El recorrido catálogo (producto con precio definido) permanece separado de solicitud `PENDING_QUOTE` (sin precio final ni pago hasta cotizar). Contrato UX completo y estado de implementación: `docs/03-UX-Y-FLUJOS.md`.

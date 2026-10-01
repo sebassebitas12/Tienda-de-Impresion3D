@@ -1,6 +1,6 @@
 # Vértice CR — Negocio, entidades y estados
 
-> Última actualización: **2026-09-24**.
+> Última actualización: **2026-10-01**.
 
 ## Entidades
 
@@ -27,13 +27,20 @@ Reglas:
 
 ## Producto
 
-Campos mínimos: id, name, slug, description, categoryId, images, price, currency, material, availableColors, dimensions, weightGrams, stock, minStock, estimatedProductionHours, status, featured, createdAt, updatedAt.
+Campos mínimos: id, name, slug, description, categoryId, images, price, currency, material, availableColors, dimensions, weightGrams, estimatedProductionHours, status, featured, createdAt, updatedAt.
+
+### Fabricación de catálogo
+
+- `material` usa uno de los filamentos disponibles: `ASA`, `PLA`, `PETG`, `ABS`, `TPU`.
+- El proceso de producción vigente es `FDM`; no anunciar ni asignar `SLA` en fichas o UI.
+- Los productos del catálogo se fabrican después de recibir el pedido; no se ofrecen como productos de entrega inmediata.
+- No mostrar en el storefront etiquetas ni cantidades que indiquen existencias, disponibilidad inmediata o falta de existencias.
+- `status` controla la publicación del producto en el catálogo; no representa disponibilidad física.
+- Los campos heredados `stock` y `minStock` que aún aparezcan en datos demo no son fuente válida de disponibilidad y no deben determinar visibilidad, compra ni mensajes al cliente. Su eliminación del contrato/dataset requiere una migración explícita.
 
 Reglas:
 - price >= 0.
-- stock >= 0.
-- minStock define alerta.
-- Sin stock puede seguir visible, pero no se vende.
+- el precio publicado corresponde al modelo de catálogo y no implica existencia física previa al pedido.
 
 ## Carrito híbrido
 

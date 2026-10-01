@@ -1,6 +1,6 @@
-import { act, render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { jest, afterEach, describe, expect, test } from '@jest/globals';
+import { afterEach, describe, expect, test } from '@jest/globals';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { AppProviders } from '../src/app/providers/AppProviders.jsx';
 import { AuthLayout } from '../src/app/layout/AuthLayout.jsx';
@@ -21,63 +21,48 @@ function renderLogin() {
 }
 
 afterEach(() => {
-  jest.useRealTimers();
+  cleanup();
   localStorage.clear();
 });
 
-describe('galería de producto en autenticación', () => {
-  test('muestra piezas reales con texto alternativo y navegación manual', async () => {
-    const user = userEvent.setup();
+describe('collage de producto en autenticación', () => {
+  test('presenta las seis piezas en controles accesibles', () => {
     renderLogin();
 
     expect(screen.getByRole('region', { name: 'Productos impresos' })).toBeVisible();
-    expect(screen.getByRole('img', { name: 'Soporte modular de carga en PETG' })).toBeVisible();
-    expect(screen.getByText('Soporte Modular de Carga')).toBeVisible();
-
-    await user.click(screen.getByRole('button', { name: 'Mostrar producto siguiente' }));
-    expect(screen.getByRole('img', { name: 'Engranaje helicoidal de precisión en nylon' })).toBeVisible();
-    expect(screen.getByRole('group', { name: 'Pieza 2 de 4' })).toBeVisible();
-
-    await user.click(screen.getByRole('button', { name: 'Mostrar producto anterior' }));
-    expect(screen.getByRole('img', { name: 'Soporte modular de carga en PETG' })).toBeVisible();
+    expect(screen.getAllByRole('button', { name: /Soporte Modular|Engranaje Helicoidal|Dragón de Colección|Brazo de Chasis|Maqueta Arquitectónica|Pieza Flexible/ })).toHaveLength(6);
+    expect(screen.getByRole('button', { name: /Soporte Modular de Carga/ })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByText('Pasá el cursor, enfocá o seleccioná una pieza para ver su material.')).toBeVisible();
+    expect(screen.queryByText('Soporte Modular de Carga', { selector: '.auth-collage-caption span' })).not.toBeInTheDocument();
   });
 
-  test('rota automáticamente y se detiene al recibir foco de teclado', async () => {
-    jest.useFakeTimers();
+  test('al pasar el puntero y elegir una pieza, la destaca y actualiza su leyenda', async () => {
+    const user = userEvent.setup();
     renderLogin();
 
-    await act(async () => { jest.advanceTimersByTime(6400); });
-    expect(screen.getByRole('img', { name: 'Engranaje helicoidal de precisión en nylon' })).toBeVisible();
+    const dragon = screen.getByRole('button', { name: /Dragón de Colección/ });
+    await user.hover(dragon);
+    expect(dragon).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByText('Dragón de Colección')).toBeVisible();
+    await user.unhover(dragon);
+    expect(screen.getByText(/Pasá el cursor/)).toBeVisible();
 
-    act(() => { screen.getByRole('button', { name: 'Pausar cambio automático' }).focus(); });
-    expect(screen.getByRole('button', { name: 'Reanudar cambio automático' })).toHaveFocus();
-
-    await act(async () => { jest.advanceTimersByTime(12800); });
-    expect(screen.getByRole('img', { name: 'Engranaje helicoidal de precisión en nylon' })).toBeVisible();
+    await user.click(dragon);
+    expect(dragon).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('Dragón de Colección')).toBeVisible();
   });
 
-  test('el control detiene la rotación al activarlo con puntero', async () => {
-    jest.useFakeTimers();
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+  test('las piezas se pueden destacar recorriendo con teclado', async () => {
+    const user = userEvent.setup();
     renderLogin();
 
-    await user.click(screen.getByRole('button', { name: 'Pausar cambio automático' }));
-    expect(screen.getByRole('button', { name: 'Reanudar cambio automático' })).toBeVisible();
-    await act(async () => { jest.advanceTimersByTime(12800); });
-    expect(screen.getByRole('img', { name: 'Soporte modular de carga en PETG' })).toBeVisible();
-  });
-
-  test('respeta la preferencia local de movimiento reducido y deja navegación manual', async () => {
-    jest.useFakeTimers();
-    localStorage.setItem('vertice-no-motion', 'true');
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
-    renderLogin();
-
-    expect(screen.queryByRole('button', { name: 'Pausar cambio automático' })).not.toBeInTheDocument();
-    await act(async () => { jest.advanceTimersByTime(12800); });
-    expect(screen.getByRole('img', { name: 'Soporte modular de carga en PETG' })).toBeVisible();
-
-    await user.click(screen.getByRole('button', { name: 'Mostrar producto siguiente' }));
-    expect(screen.getByRole('img', { name: 'Engranaje helicoidal de precisión en nylon' })).toBeVisible();
+    await user.tab();
+    await user.tab();
+    await user.tab();
+    await user.tab();
+    const gear = screen.getByRole('button', { name: /Engranaje Helicoidal/ });
+    expect(gear).toHaveFocus();
+    expect(gear).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('Engranaje Helicoidal 60T')).toBeVisible();
   });
 });

@@ -1,6 +1,6 @@
 # Vértice CR — Datos, API externa, JWT y N8N
 
-> Última actualización: **2026-09-30**.
+> Última actualización: **2026-10-01**.
 
 ## Propósito
 
@@ -216,3 +216,11 @@ horizontal. CI no se ejecutó porque no hubo commit/push.
 `logout(session)` invalida/cierra la sesión según el backend elegido.
 
 El almacenamiento/persistencia del token pertenece al adapter concreto; no queda hardcodeado en la UI ni en el Provider.
+
+## Lectura Admin — dashboard inicial (2026-10-01)
+
+`src/services/adminOverviewService.js` consume en paralelo `GET /orders`, `/customPrintRequests` y `/users` desde JSON Server, con base URL compartida por `globalThis.__VERTICE_JSON_SERVER_URL__` (fallback local `http://localhost:3000`). La vista no solicita escrituras; filtros y métricas se derivan de las respuestas en funciones puras.
+
+El dataset conserva `customPrintRequests.status: "SUBMITTED"` (r5), valor ausente del ciclo oficial. La UI lo muestra aparte y no lo convierte silenciosamente en `PENDING_QUOTE`; resolverlo requiere corregir/migrar explícitamente el dato o acordar alias en el contrato.
+
+El modelo actual no tiene `payments`, `paidAt` ni otra evidencia normalizada de cobro. Por eso el dashboard no calcula ingresos desde `orders.total`. `activityLog` está vacío en el dataset; la ruta de actividad se difiere hasta definir el shape y las escrituras que generarán entradas.

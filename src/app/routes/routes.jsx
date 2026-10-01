@@ -6,6 +6,7 @@ import { ConstructionPage } from '../../pages/ConstructionPage.jsx';
 import { Home } from '../../pages/Home.jsx';
 import { LoginPage } from '../../pages/LoginPage.jsx';
 import { RegisterPage } from '../../pages/RegisterPage.jsx';
+import { AdminDashboardPage } from '../../pages/AdminDashboardPage.jsx';
 import { NotFoundPage } from '../../pages/NotFoundPage.jsx';
 import { RouteErrorPage } from '../../pages/RouteErrorPage.jsx';
 import { adminPages, publicPages } from './manifest.js';
@@ -18,6 +19,10 @@ const pages = manifest => manifest.map(([path, titleKey]) => ({
 const protectedPublicPaths = new Set(['/cuenta', '/pedidos/:id']);
 const protectedPublicPages = publicPages.filter(([path]) => protectedPublicPaths.has(path));
 const openPublicPages = publicPages.filter(([path]) => path !== '/' && !protectedPublicPaths.has(path));
+const adminRoutePages = adminPages.map(([path, titleKey]) => ({
+  path,
+  element: path === '/admin' ? <AdminDashboardPage /> : <ConstructionPage titleKey={titleKey} />,
+}));
 
 export const routes = [
   {
@@ -44,6 +49,6 @@ export const routes = [
   {
     element: <RequireRole role="admin"><AdminLayout /></RequireRole>,
     errorElement: <RouteErrorPage />,
-    children: pages(adminPages),
+    children: adminRoutePages,
   },
 ];

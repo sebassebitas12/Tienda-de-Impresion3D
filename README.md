@@ -6,11 +6,11 @@ Frontend escalable para una tienda costarricense de impresión 3D. Combina produ
 
 **Rama de trabajo:** `Pruebas`.
 
-**Estado actual:** Fase 3 — cierre visual/UX de HF-01. React bloqueado.
+**Estado actual:** Fase 4 — Fundaciones React. React Gate abierto; HF-01 congelado.
 
-**Scaffold actual:** React 19 + Vite 8 + JavaScript/JSX + ESLint. El scaffold todavía no contiene router, JSON Server, Recharts, Jest ni Testing Library; esas piezas pertenecen al stack objetivo y se incorporarán durante el preflight/gate de React.
+**Implementación presente:** React 19 + Vite 8 + JavaScript/JSX, React Router DOM, JSON Server, Jest + Testing Library, UI Kit, App Shell, Home HF-01 y slice académico de autenticación. Home sigue en estabilización visual; Admin e IA/N8N están pendientes.
 
-**Stack objetivo documentado:** React 19 + Vite 8 + JavaScript/JSX + React Router DOM + JSON Server + Jest + Testing Library + Recharts + N8N + API externa + servicio de IA.
+**Stack del proyecto:** React 19 + Vite 8 + JavaScript/JSX + React Router DOM + JSON Server + Jest + Testing Library. Recharts, API externa, N8N y servicio de IA se incorporan cuando se implementen sus respectivos contratos.
 
 ## Documentación
 
@@ -37,18 +37,19 @@ Frontend escalable para una tienda costarricense de impresión 3D. Combina produ
 - Métricas derivadas de datos reales.
 - Servicios centralizan APIs.
 - Sin secretos en Git.
-- No implementar React hasta superar el gate documentado.
+- React Gate abierto; seguir el estado y el siguiente bloque de `AI_CONTEXT.md` y `docs/10-ROADMAP.md`.
 - HF-01 es el mockup de máxima fidelidad de la Home.
 
 ## Desarrollo actual
 
 ```bash
-npm install
+npm ci
 npm run dev
+npm run api
 npm run lint
+npm test
+npm run check:ui
 npm run build
 ```
 
-## Testing
-
-Los scripts de testing se incorporarán durante el preflight de React según `docs/09-TESTING-Y-CALIDAD.md`. **No ejecutar `npm run test` hasta que el script exista en `package.json`.**
+Ejecuta `npm run dev` y `npm run api` en terminales separadas para iniciar la interfaz y JSON Server.

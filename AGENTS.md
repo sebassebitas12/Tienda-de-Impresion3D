@@ -1,6 +1,6 @@
 # AGENTS.md — Vértice CR
 
-> **Última actualización:** 2026-09-30
+> **Última actualización:** 2026-10-01
 > **Estado:** ACTIVO  
 > **Propósito:** instrucciones operativas para cualquier agente que trabaje en este repositorio.
 
@@ -124,8 +124,9 @@ Las skills del proyecto viven preferentemente en `.agents/skills/<nombre>/SKILL.
 
 ## 7.2 Autoridad visual: HF-01 vs Stitch
 
-**HF-01 congelado define el lenguaje visual del producto completo, no solo Home.**
-Su identidad, geometría, superficies, tipografía, motion, densidad, iconografía y relación producto/interfaz deben expandirse de forma coherente a Tienda, Producto, Solicitud, Carrito, Checkout, Cuenta y Admin.
+**HF-01 congelado es la referencia visual aprobada de Home.** Sus principios de identidad siguen informando el producto, pero las demás áreas no tienen que reproducir la composición workbench de Home. Cada área debe usar los tokens y la dirección de marca vigentes en `docs/04` y resolver su contexto operativo con densidad y navegación apropiadas.
+
+Por indicación explícita del usuario (2026-10-01), Home se considera suficientemente completa para avanzar a Admin. Las iteraciones visuales de Home se retoman como cambios puntuales posteriores; no bloquearán slices funcionales nuevos ni exigen otra auditoría integral antes de Admin.
 
 Los mockups de **Stitch/UXMagic** del repositorio se usan únicamente como referencia de:
 - inventario de pantallas/rutas;
@@ -138,7 +139,7 @@ Los mockups de **Stitch/UXMagic** del repositorio se usan únicamente como refer
 Orden para decisiones visuales:
 1. instrucción explícita actual del usuario;
 2. decisiones visuales aprobadas registradas en docs/04 y docs/05;
-3. HF-01 congelado como fuente visual primaria y sistema a expandir;
+3. HF-01 para decisiones específicas de Home; `docs/04` y el sistema de tokens para coherencia visual entre las demás áreas;
 4. referencias externas aprobadas solo como apoyo técnico/inspiración puntual;
 5. Stitch/UXMagic únicamente para alcance funcional/estructural, nunca como dirección estética.
 
@@ -254,4 +255,4 @@ Si existen varias rutas posibles, explica brevemente sus diferencias; no avances
 - React Gate: **ABIERTO** (todos los requisitos del gate superados).
 - Mockup de referencia visual: `mockups/hf-01-home-definitivo.html` (congelado, no se edita).
 - Auth académico ya está implementado y probado localmente; no reiniciar su implementación.
-- Siguiente bloque: cerrar revisión visual de Home en Light y con Chat/Accesibilidad abiertos; después iniciar Admin operativo protegido por rol y, más adelante, IA/N8N.
+- Siguiente bloque: continuar Admin operativo protegido por rol. Home se considera suficientemente completa para avanzar por instrucción del usuario (2026-10-01); iteraciones futuras serán puntuales. IA/N8N sigue después de Admin.

@@ -10,6 +10,8 @@ export function ProductCard({
   linkAs,
   href,
   to,
+  layout = 'standard',
+  showAvailability = false,
   showPrice = false,
   viewLabel = 'Ver ficha',
   imageUnavailableLabel = 'Imagen no disponible',
@@ -19,27 +21,29 @@ export function ProductCard({
   const inferredAvailable = product.stock > 0 && product.status === 'ACTIVE';
   const stockStatus = product.stockStatus ?? (inferredAvailable ? 'in-stock' : 'out');
   const stockLabel = product.stockLabel ?? (inferredAvailable ? 'En stock (' + product.stock + ')' : 'Sin stock');
-  const unavailable = product.status !== 'ACTIVE' || stockStatus === 'out';
+  const unavailable = showAvailability && (product.status !== 'ACTIVE' || stockStatus === 'out');
   const imageAlt = product.imageAlt || (product.name + ' en ' + product.material);
+  const featured = layout === 'featured';
 
   return (
-    <Card hover className="v-product-card" data-unavailable={unavailable}>
+    <Card hover className={'v-product-card' + (featured ? ' v-product-card--featured' : '')} data-unavailable={unavailable}>
       <div className="v-product-image">
         <div className="v-product-meta">
-          <Badge variant="material-tag">{product.material}</Badge>
-          <Badge variant="stock-tag" status={stockStatus}>{stockLabel}</Badge>
+          {!featured && <Badge variant="material-tag">{product.material}</Badge>}
+          {showAvailability && <Badge variant="stock-tag" status={stockStatus}>{stockLabel}</Badge>}
         </div>
         {src && failedSource !== src ?
           <img src={src} alt={imageAlt} loading="lazy" decoding="async" onError={() => setFailedSource(src)} /> :
           <span className="v-image-empty">{imageUnavailableLabel}</span>}
       </div>
       <div className="v-product-body">
-        {product.reference && <MonoLabel>{product.reference}</MonoLabel>}
+        {featured && product.categoryName && <MonoLabel>{product.categoryName}</MonoLabel>}
+        {!featured && product.reference && <MonoLabel>{product.reference}</MonoLabel>}
         <h3>{product.name}</h3>
         <p>{product.description}</p>
         {showPrice && <PriceTag amount={product.price} />}
         <div className="v-product-footer">
-          <span>{product.categoryName}</span>
+          {!featured && <span>{product.categoryName}</span>}
           <LinkText as={linkAs} href={href} to={to} aria-label={viewLabel + ': ' + product.name}>{viewLabel}</LinkText>
         </div>
       </div>

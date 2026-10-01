@@ -1,6 +1,6 @@
 # Vértice CR — Roadmap
 
-> **Última actualización:** 2026-09-30  
+> **Última actualización:** 2026-10-01
 > **Estado:** ACTIVO  
 > **Fase actual:** 4 — Fundaciones React.  
 > **React:** DESBLOQUEADO (Gate abierto 2026-09-30).
@@ -70,16 +70,23 @@ Primitivas, estados base y componentes compartidos.
 ### Capa 1 — App Shell ✅
 Layouts, routing, providers y navegación base.
 
-### Capa 2 — Home HF-01 🟠 ESTABILIZACIÓN VISUAL
+### Capa 2 — Home HF-01 ✅ CERRADA PARA AVANZAR
 - Hero/workbench, catálogo destacado, shell y preferencias globales ya están implementados.
 - CI obligatorio activo y verde antes de cada entrega.
-- El usuario continúa auditando visualmente Home.
+- El usuario considera Home suficientemente completa (2026-10-01) y pidió mover el foco a Admin. Iteraciones futuras se atenderán como correcciones puntuales, no como requisito para avanzar.
 - R-H26 corregido: rail de piezas pasa a horizontal en tablet/móvil para no cruzarse con controles flotantes; render Dark revisado a 1280/768/374 px.
 - Preferencias de lectura ampliadas a 100/150/200% global; Home refluye y navbar se pliega a 200%. Aún faltan esos tamaños en tablet/móvil/rutas secundarias y tecnología de asistencia real.
 - R-H34: corregida y comprobada en captura local; en Light la foto de catálogo ya no hereda la máscara radial de Dark y Dark quedó intacto.
 - Los defectos visuales nuevos se corrigen, pero **Home ya no bloquea iniciar Auth**.
-- HF-01 sigue siendo el sistema visual que se expande a todos los módulos.
-- Por prioridad del usuario, tras cerrar Auth se completa una revisión visual enfocada de Home antes de abrir Admin: revisar breakpoints/temas/escala de texto restantes y validar teclado + tecnología asistiva real. Luego Admin → IA. Esto no implica rediseñar HF-01 ni rehacer Home completa.
+- HF-01 conserva autoridad visual específica sobre Home; Admin usa los tokens/principios globales de `docs/04` con composición de trabajo propia y sin copiar el workbench.
+- La revisión adicional de Home (Light, tamaños menores, escala y tecnología asistiva) se difiere y no bloquea Admin. Prioridad vigente: Admin → IA.
+- R-H41 corrige el objetivo visual de Home: se mantiene el scanner horizontal original de HF-01; el líder del material se calibra para acabar sobre la pieza activa. Cards de Home pasan de tarjetas verticales a filas horizontales en dos columnas, sin stock promocional, con imagen provisional completa y ficha enlazada. Navegador local revisó los cuatro endpoints, tarjetas y collage de seis fotos. Pasaron lint, 53 tests, `check:ui` (48 módulos), build y `git diff --check`. Otros breakpoints/temas y aprobación visual todavía pendientes.
+- **Corrección posterior R-H42:** la revisión del usuario mostró que los cuatro endpoints R-H41 seguían cayendo en el fondo; no considerar resuelta la anotación. El líder se calcula midiendo el `object-fit: contain` y el tamaño real del objeto por asset al cambiar el viewport o la pieza. La Home aclara «Filamento · PETG», elimina la pastilla material de las destacadas y reduce las columnas de precisión a título + explicación. Render inspeccionado a 1280×800 para las cuatro piezas, y soporte a 375×812; lint, 53 tests, `check:ui` (48 módulos), build y `git diff --check` pasan. Pendiente aprobación visual del usuario y restantes breakpoints/temas.
+- **R-H43 a petición del usuario:** el líder del Hero ahora termina en una pieza cercana a la etiqueta para no atravesar el objeto; se mantiene cálculo responsive y scanner horizontal. «5 filamentos disponibles» cambia a «5 materiales definidos». Columnas de precisión ganan línea Lava + desplazamiento breve al hover, con reduced-motion. `docs/04` registra el uso puntual de Codrops Grid Item Reveal. Inspección local: cuatro detalles a 1024×780, Hero/métrica a 375×812 y hover en Dark. Pasaron lint, 53 tests, `check:ui` (48 módulos), build y `git diff --check`; aprobación del usuario y revisión restante de breakpoints/temas pendientes.
+- **R-H44 a petición del usuario:** se rediseña el bloque inferior del Hero en dos señales claras («Bajo pedido» y «FDM» + filamentos confirmados), sin el conteo anterior ni el mensaje redundante «Por etapas». El marcador vertical y líder al producto comparten un solo trazo, sin corte en el codo. Render React inspeccionado a 1280×720 y 375×812; pasaron lint, 53 tests, `check:ui` (48 módulos), build y `git diff --check`; falta aprobación del usuario.
+- Capacidad confirmada por el usuario: FDM únicamente, filamentos ASA, PLA, PETG, ABS y TPU. Home/DB/UI no deben seguir anunciando SLA, resina o nylon.
+- **R-H45 — legibilidad y customer journey:** navbar/footer recibieron un primer aumento de tamaño y el copy de Home distingue catálogo bajo pedido de la solicitud personalizada. `routes.jsx` confirmó placeholders en el resto del storefront. `docs/03–05` mantienen el análisis y la secuencia de compra recomendada.
+- **R-H46 — prioridad nueva del usuario:** Home queda cerrada para avance; no requiere pasada global ni aprobación adicional antes de Admin. Ante el reporte de que el primer aumento seguía pequeño, el navbar es 16 px en escritorio ancho / 15 px en la franja compacta, y colapsa al menú hasta 1000 px; el footer usa 16 px de lectura / 14 px secundario. Render observado a 1280×720 Dark. Detalles en `docs/05`.
 
 ### Capa 3 — Autenticación ✅ SLICE ACADÉMICO IMPLEMENTADO
 Objetivo: tener una autenticación académica real y verificable antes de construir Admin.
@@ -97,10 +104,10 @@ Orden:
 10. tests de login, registro duplicado, logout, sesión expirada/inválida y permisos; ✅
 11. aplicar lenguaje HF-01 al AuthLayout sin crear una estética paralela. ✅ base visual
 
-**Estado actual:** `jsonServerAuthAdapter` consulta y crea usuarios en `db.json` a través de JSON Server, persiste la sesión en `localStorage` y emite un token `sim.v1` simulado con expiración, id y rol. La credencial `demoPassword` es explícitamente académica y no es un secreto ni seguridad de producción. La suite local actual pasa 54 tests, lint, `check:ui` y build; login/restore/logout también se probaron contra JSON Server real. Login y registro se inspeccionaron en Dark/Light en 1920, 1280, 768 y 374 px CSS, sin overflow horizontal; la galería muestra cuatro productos existentes y ya no conserva el chrome ficticio. GitHub Actions debe validar el commit antes de recomendar pull. Próximo bloque: completar revisión visual Home Dark/Light y estados abiertos; después Admin operativo con datos reales.
+**Estado actual:** `jsonServerAuthAdapter` consulta y crea usuarios en `db.json` a través de JSON Server, persiste la sesión en `localStorage` y emite un token `sim.v1` simulado con expiración, id y rol. La credencial `demoPassword` es explícitamente académica y no es un secreto ni seguridad de producción. Login/restore/logout también se probaron contra JSON Server real. Auth cuenta con base visual React. Tras el acuerdo del usuario de cerrar Home para avanzar, el siguiente bloque es Admin operativo protegido por rol.
 
 ### Capa 4 — Admin
-Entra inmediatamente después de Auth porque depende de identidad/rol.
+🟠 **EN IMPLEMENTACIÓN — slice 1: resumen operativo conectado a JSON Server.** Entra después de Auth porque depende de identidad/rol. Admin usa una composición operativa propia dentro de tokens Vértice; no debe replicar la Home.
 
 Prioridad:
 - guard `admin`;
@@ -111,7 +118,11 @@ Prioridad:
 - clientes;
 - métricas desde datos reales del repo;
 - loading/empty/error/permisos;
-- diseño derivado de HF-01, no dashboard genérico.
+- diseño operativo propio con tokens y principios de Vértice (`docs/04`), sin clonar la composición de Home ni usar un dashboard genérico.
+
+El primer slice del dashboard muestra pedidos activos, solicitudes `PENDING_QUOTE`/`IN_REVIEW`, cinco pedidos activos recientes y registros que usan estados legados por separado. No informa ventas cobradas si no hay evidencia de pagos; el modelo actual no contiene `payments` ni `paidAt`. No usa `stock`/`minStock` para ninguna alerta.
+
+**Siguiente slice — solicitudes:** definir primero qué pregunta operativa contesta cada campo/filtro y qué tarea debe completar el Admin; construir lista y detalle desde los contratos de `02`/`07`; habilitar solo transiciones que el flujo permita. Investigar y documentar referencias especializadas para KPIs/tablas/bandejas antes de dar el acabado visual. Cada métrica debe tener fuente trazable y servir una decisión real; no se agregan gráficos ni conteos ornamentales.
 
 ### Capa 5 — IA / N8N
 Entra después de que Auth + Admin tengan contratos y datos suficientes.

@@ -7,7 +7,7 @@ import { RouteFocus } from './RouteFocus.jsx';
 
 export function AdminLayout() {
   const { copy } = usePreferences();
-  const { logout, isPending } = useAuth();
+  const { user, logout, isPending } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [logoutError, setLogoutError] = useState(false);
@@ -31,6 +31,10 @@ export function AdminLayout() {
       <aside className="admin-sidebar">
         <BrandLogo as={Link} to="/" />
         <p>{copy.admin}</p>
+        <div className="admin-session-card" aria-label={copy.adminSession}>
+          <span className="admin-session-mark" aria-hidden="true" />
+          <div><strong>{user?.name || copy.admin}</strong><span>{copy.adminSession}</span></div>
+        </div>
         <nav aria-label={copy.admin}>{links.map(([to, label]) => <NavLink key={to} to={to} end>{copy[label]}</NavLink>)}</nav>
         <Link className="v-link-text" to="/">{copy.publicSite}</Link>
         <button className="v-button v-button--ghost" type="button" onClick={handleLogout} disabled={isPending}>{copy.logout}</button>

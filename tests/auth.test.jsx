@@ -102,6 +102,27 @@ describe('AuthProvider', () => {
 });
 
 describe('Navbar account session actions', () => {
+  test('envía al admin al dashboard desde el menú Mi cuenta', async () => {
+    function CurrentPath() {
+      return <output aria-label="Ruta actual">{useLocation().pathname}</output>;
+    }
+
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <AppProviders authAdapter={{ restoreSession: async () => adminSession }}>
+          <Navbar onReading={jest.fn()} />
+          <CurrentPath />
+        </AppProviders>
+      </MemoryRouter>
+    );
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Abrir menú de cuenta' }));
+    const accountLink = await screen.findByRole('link', { name: 'Panel de administración' });
+    expect(accountLink).toHaveAttribute('href', '/admin');
+    await userEvent.click(accountLink);
+    await waitFor(() => expect(screen.getByLabelText('Ruta actual')).toHaveTextContent(/^\/admin$/u));
+  });
+
   test('muestra cerrar sesión para usuario autenticado y vuelve al inicio al salir', async () => {
     const logout = jest.fn().mockResolvedValue(undefined);
     function CurrentPath() {

@@ -8,7 +8,9 @@
 * **Fecha de entrega:** 21 de septiembre de 2026  
 * **Tecnología base:** React 19 + React Router DOM + Vite  
 * **Backend simulado:** JSON Server (`db.json`)  
-* **Modalidad:** Individual  
+* **Modalidad:** Individual
+
+> **Nota de continuidad (2026-10-01):** este anteproyecto conserva el alcance y mockups presentados académicamente; no es el estado operativo del repo. Para decisiones vigentes de producto, materiales/proceso, contratos y avance, consultar `docs/01–10` y `AI_CONTEXT.md`. Los anexos de catálogo pueden mostrar conceptos antiguos (SLA/resina/Flex) que no forman parte de la oferta actual.
 
 ---
 
@@ -37,7 +39,7 @@ Diseñar e implementar el frontend interactivo, escalable y accesible de la plat
 3. **Diseño adaptativo y accesibilidad:** Construir una interfaz 100% responsive apta para móvil (~375px), tablet (~768px) y escritorio (~1280px+), cumpliendo con las 4 prácticas de accesibilidad: modo claro/oscuro, texto escalable en unidades relativas, soporte ARIA con semántica HTML, y diferenciación visual de estados independiente del color.
 4. **Autenticación y roles:** Implementar un sistema de autenticación (Login/Registro) con persistencia de sesión en cliente y control de acceso basado en roles (`admin` y `customer`), protegiendo módulos administrativos de visualización y edición.
 5. **Panel administrativo y analítica:** Desarrollar un dashboard de administración con indicadores clave de rendimiento (KPIs) calculados desde datos reales y visualización gráfica interactiva con Recharts.
-6. **Integración de Inteligencia Artificial:** Incorporar un asistente inteligente de cotización técnica que oriente al cliente en lenguaje natural respecto a la elección de materiales (PLA, PETG, Resina, Flex), dimensiones, resistencia mecánica y costo estimado.
+6. **Integración de Inteligencia Artificial:** Incorporar un asistente inteligente de cotización técnica que oriente al cliente en lenguaje natural respecto a los filamentos vigentes (ASA, PLA, PETG, ABS y TPU), dimensiones, resistencia mecánica y rango indicativo sujeto a revisión humana.
 7. **Automatización con N8N:** Configurar dos flujos de trabajo automatizados para la gestión de nuevas cotizaciones y la notificación de aprobación a clientes.
 8. **Aseguramiento de calidad:** Validar componentes críticos y lógica de negocio mediante pruebas unitarias con Jest y React Testing Library, persiguiendo un mínimo de 70% de cobertura.
 
@@ -112,7 +114,7 @@ El diseño se implementa con CSS puro modular mediante diseño fluido (*fluid de
 El panel de administración contiene interfaces completas de gestión para:
 * **Productos:** Crear nuevo ítem (nombre, material, precio, stock, imagen), Listar en tabla con paginación, Editar especificaciones y Eliminar producto.
 * **Categorías:** Gestión completa de taxonomía de la tienda.
-* **Solicitudes de impresión:** Lectura de requerimientos del cliente, cálculo del costo de resina/filamento, actualización del estado a `QUOTED` / `APPROVED` e ingreso del precio final.
+* **Solicitudes de impresión:** Lectura de requerimientos del cliente, análisis de uso del filamento FDM, actualización del estado a `QUOTED` / `APPROVED` e ingreso del precio final por el administrador. No se calcula precio final automáticamente.
 * **Usuarios:** Alta y modificación de permisos de acceso.
 
 ### 4.6 Panel de Administración: Métricas y Visualización
@@ -123,7 +125,7 @@ El dashboard administrativo (`/admin/dashboard`) calcula métricas en tiempo rea
 3. **Solicitudes pendientes de cotización:** Alertas de cotizaciones esperando respuesta del administrador.
 4. **Alertas de inventario crítico:** Productos con existencias menores al umbral de seguridad.
 5. **Visualización Gráfica:** Gráficos dinámicos con **Recharts**:
-   * Gráfico de barras: Distribución de demanda por material de impresión (PLA vs. PETG vs. Resina vs. TPU).
+   * Gráfico de barras: Distribución de demanda por filamento FDM (ASA, PLA, PETG, ABS y TPU), solo si hay datos válidos.
    * Gráfico de líneas: Evolución mensual de pedidos y cotizaciones.
 
 ### 4.7 Pruebas Unitarias con Jest
@@ -139,7 +141,7 @@ Se estructuran pruebas unitarias con **Jest** y **React Testing Library** cubrie
 En la vista de solicitud personalizada (`/cotizar`) se integra el **Asistente de Cotización 3D Vértice**, consumido a través de `src/services/aiService.js`:
 * **Mecanismo:** El usuario ingresa la descripción funcional de lo que desea imprimir (ej. *"Necesito un engranaje resistente al calor para un motor eléctrico"*).
 * **Respuesta inteligente:** El servicio analiza los requerimientos y sugiere:
-  1. Material idóneo recomendado (ej. PETG o Nylon por resistencia térmica y fatiga).
+  1. Filamento potencialmente adecuado entre ASA, PLA, PETG, ABS y TPU, sujeto a revisión del material, geometría y uso indicado.
   2. Resolución de capa y porcentaje de relleno (*infill*) sugerido.
   3. Estimación preliminar de tiempo de impresión.
   4. Rango de costo aproximado orientativo.
@@ -207,7 +209,7 @@ Los mockups desarrollados representan la guía visual y de interacción definiti
 
 ### Anexo B: Vista Tienda / Catálogo Desktop (`tienda.jpg`)
 * **Archivo:** `mockups/tienda.jpg`
-* **Descripción:** Interfaz de comercio electrónico con panel lateral izquierdo de filtros avanzados (Búsqueda por categoría, deslizador de rango de precio de $0 a $150, selector de materiales PLA/PETG/Resina/Flex, conmutador de estado En Stock/Bajo Pedido, y tipo de tecnología FDM/SLA). Cuadrícula de productos con fotografía en alta resolución, etiqueta técnica, precio y botón de acción directa.
+* **Descripción del mockup histórico:** la captura muestra filtros y materiales preliminares (incluye resina/Flex y FDM/SLA), y valores de precio de ejemplo. No refleja la oferta vigente. La implementación actual debe usar solo FDM y los filamentos ASA, PLA, PETG, ABS y TPU; las imágenes del anexo se conservan como evidencia del anteproyecto presentado.
 
 ![Anexo B — Vista Tienda Catálogo](file:///c:/Documentos/proyecto%20react%20impresion3D/Tienda-de-Impresion3D/Tienda/mockups/tienda.jpg)
 
