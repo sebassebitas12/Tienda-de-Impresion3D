@@ -26,7 +26,15 @@ db.write = () => {
     const temporaryPath = `${databasePath}.${process.pid}.${randomUUID()}.tmp`;
     try {
       await writeFile(temporaryPath, snapshot, { flag: 'wx' });
-      await rename(temporaryPath, databasePath);
+      for (let attempt = 0; ; attempt += 1) {
+        try {
+          await rename(temporaryPath, databasePath);
+          break;
+        } catch (error) {
+          if (!['EPERM', 'EACCES', 'EBUSY'].includes(error.code) || attempt >= 5) throw error;
+          await new Promise(resolve => setTimeout(resolve, 20 * (attempt + 1)));
+        }
+      }
     } catch (error) {
       await unlink(temporaryPath).catch(() => undefined);
       throw error;

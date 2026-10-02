@@ -59,7 +59,8 @@ try {
   }
   await post('/quotes/create', {}, undefined, 403);
   await post('/assistants/chat', { mode: 'admin', message: 'Resumen' }, 'customer-test', 403);
-  await post('/assistants/chat', { mode: 'quote', message: 'Ayuda' }, undefined, 403);
+  const publicQuoteChat = await post('/assistants/chat', { mode: 'quote', message: 'Ayuda', history: [] }, undefined);
+  assert.equal(publicQuoteChat.source, 'DEEPSEEK'); assertions++;
   for (const [mode, id] of [['general', undefined], ['admin', 'admin-test'], ['quote', 'customer-test']]) {
     const chat = await post('/assistants/chat', { mode, message: 'Ayuda', history: [] }, id);
     assert.equal(chat.source, 'DEEPSEEK'); assert.ok(chat.reply.includes('consultada')); assertions += 2;
@@ -105,6 +106,8 @@ try {
     }
   }
   const unified = JSON.parse(await readFile('automation/n8n/vertice-cr-unificado.json', 'utf8'));
+  const importable = JSON.parse(await readFile('automation/vertice-n8n-import/n8n/vertice-cr-unificado.json', 'utf8'));
+  assert.deepEqual(importable, unified); assertions++;
   const unifiedNames = new Set(unified.nodes.map(node => node.name));
   const unifiedIds = unified.nodes.map(node => node.id);
   assert.equal(unified.active, false); assert.equal(new Set(unifiedIds).size, unifiedIds.length); assertions += 2;

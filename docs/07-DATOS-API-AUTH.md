@@ -626,6 +626,15 @@ comerciales/técnicos no respaldados quedan vacíos en borrador, nunca inventado
 
 ## Automatización n8n con AI Agent y herramientas acotadas — R-H71 (2026-10-02)
 
+El workflow importable es único y tiene ramas completas independientes:
+`general → AI Agent público`, `admin → AI Agent Admin` y
+`quote → AI Agent de cotización`. Comparten únicamente la conexión
+`DeepSeek Chat Model`; cada Agent conserva su contexto, prompt, allowlist y HTTP
+Tool con `mode` fijo. El generador `scripts/build-n8n-unified.mjs` también
+sincroniza la copia directa para importar en
+`automation/vertice-n8n-import/n8n/vertice-cr-unificado.json`. Tasas y correo
+son ramas deterministas separadas de los Agents.
+
 ### Cotizador: dos intenciones y capacidades pendientes (2026-10-02)
 
 La UX acordada tiene dos rutas: (a) cliente con pieza/archivo, que necesita
@@ -655,8 +664,10 @@ estimaciones como DEMO, sin afirmar que el flujo real se ejecutó.
 La definición de prompts, tools, roles y esquemas vive en
 `src/utils/assistantPolicies.js`; `scripts/assistant-runtime.js` limita datos,
 valida argumentos y ejecuta consultas/cálculos con el actor autenticado.
-`/assistants/chat` permite general público, Admin solo `admin`, y quote solo
-cliente autenticado. El workflow usa el **AI Agent nativo de n8n** conectado a
+`/assistants/chat` permite general y quote de orientación pública; la ruta quote
+solo expone perfiles DEMO, cálculo DEMO y guías, sin acceder a solicitudes. Admin
+requiere `admin`; detalle de solicitud se limita al dueño o Admin en el runtime.
+Guardar una solicitud sigue requiriendo cliente autenticado. El workflow usa el **AI Agent nativo de n8n** conectado a
 **DeepSeek Chat Model**. Un HTTP Request Tool dedicado ofrece un dispatcher; el
 backend conserva la allowlist efectiva por rol y valida cada llamada.
 
@@ -677,6 +688,13 @@ propios. Los tres comparten únicamente el nodo/credencial de DeepSeek Chat Mode
 no comparten agente ni contexto de conversación. El webhook y el `mode` se
 validan tanto en frontend/backend como en la preparación fija de cada rama. Un
 test de integración local comprueba el mapeo de panel → URL → modo.
+
+La UI React ya separa la ruta de archivo de la ayuda para crear una pieza. El
+Agent quote corresponde solo a esta segunda ruta; no procesa archivos ni
+guarda/enviar solicitudes. La primera explica que upload privado está pendiente.
+Al completar ambos recorridos, el destino lógico será una solicitud para Admin;
+el taller define el precio final y envía la oferta desde Admin al cliente. Así
+una respuesta de DeepSeek o un cálculo DEMO no se convierte en precio comercial.
 
 El Agent usa el historial acotado que entrega la app y no añade memoria n8n. El
 límite de cada Agent es de 4 iteraciones; la capacidad limita hasta 3 llamadas

@@ -70,7 +70,9 @@ Acceso a JSON Server, API externa, auth, IA y N8N. Cada servicio normaliza respu
 Server y añade `POST /admin/actions/start-review`. Este comando valida el estado
 esperado y el rol académico, y escribe juntos el cambio de solicitud y su evento
 de `activityLog` mediante un único reemplazo atómico del archivo JSON, protegido por cola
-secuencial dentro del proceso. No se usa una secuencia de dos llamadas desde el
+secuencial dentro del proceso. El reemplazo reintenta errores transitorios de
+lock (`EPERM`, `EACCES`, `EBUSY`) en Windows sin escribir el JSON destino a
+medias. No se usa una secuencia de dos llamadas desde el
 navegador. La API sigue siendo una simulación académica local y no es una frontera
 de seguridad de producción; una implementación real debe aplicar autorización y
 transacción en el servidor de negocio.

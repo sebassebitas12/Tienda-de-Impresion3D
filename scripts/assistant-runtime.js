@@ -49,7 +49,7 @@ export function validateToolArguments(name, args) {
 }
 
 export async function executeAssistantTool(name, args, { mode, actor, data, getRates }) {
-  if (!ROLE_TOOLS[mode]?.includes(name) || (mode === 'admin' && actor?.role !== 'admin') || (mode === 'quote' && !actor)) return { error: 'TOOL_FORBIDDEN' };
+  if (!ROLE_TOOLS[mode]?.includes(name) || (mode === 'admin' && actor?.role !== 'admin') || (name === 'request_details' && !actor)) return { error: 'TOOL_FORBIDDEN' };
   if (!validateToolArguments(name, args)) return { error: 'TOOL_ARGUMENTS_INVALID' };
   if (name === 'search_catalog') {
     const query = String(args.query || '').toLowerCase();
@@ -69,6 +69,7 @@ export async function executeAssistantTool(name, args, { mode, actor, data, getR
   if (name === 'list_orders') return (data.orders || []).filter(o => !args.status || o.status === args.status).slice(0, 12).map(({ id, status, total }) => ({ id, status, totalRecorded: total, path: `/admin/pedidos/${id}` }));
   if (name === 'catalog_quality') return (data.products || []).filter(p => p.status === 'DRAFT' || !FDM_MATERIALS.includes(p.material) || !Number.isFinite(p.price)).map(({ id, name: label, status, material, price }) => ({ id, name: label, status, missing: [!material && 'material', !Number.isFinite(price) && 'price'].filter(Boolean), unsupportedMaterial: Boolean(material && !FDM_MATERIALS.includes(material)), path: `/admin/catalogo/${id}/editar` }));
   if (name === 'request_details') {
+    if (!actor) return { error: 'TOOL_FORBIDDEN' };
     const request = data.customPrintRequests?.find(r => String(r.id) === args.requestId && (actor?.role === 'admin' || String(r.userId) === String(actor?.id)));
     if (!request) return { error: 'REQUEST_NOT_FOUND' };
     const { id, status, description, material, quantity, quotedPrice, quoteValidUntil, quoteNotes, quotePricing } = request;
@@ -85,7 +86,7 @@ function safeLinks(links, mode) {
 
 export async function runAssistant({ mode, message, history = [], language = 'es' }, context, { fetchImpl = globalThis.fetch, env = {} } = {}) {
   if (!ROLE_TOOLS[mode] || typeof message !== 'string' || !message.trim() || message.length > 2000 || !Array.isArray(history) || history.length > 12) return { error: 'INVALID_CHAT' };
-  if ((mode === 'admin' && context.actor?.role !== 'admin') || (mode === 'quote' && !context.actor)) return { error: 'ROLE_REQUIRED' };
+  if (mode === 'admin' && context.actor?.role !== 'admin') return { error: 'ROLE_REQUIRED' };
   const messages = [
     { role: 'system', content: `${ASSISTANT_PROMPTS[mode]}\n${ASSISTANT_COMMON_PROMPT}\nIdioma: ${language === 'en' ? 'English' : 'español'}.` },
     ...history.filter(item => ['user', 'assistant'].includes(item?.role) && typeof item.content === 'string').slice(-10).map(({ role, content }) => ({ role, content: content.slice(0, 3000) })),
@@ -110,7 +111,7 @@ export async function runAssistant({ mode, message, history = [], language = 'es
       const overview = await executeAssistantTool('admin_overview', {}, { ...context, mode });
       return { source: 'DEMO_RULES', reply: language === 'en' ? `There are ${overview.activeOrders} active orders and ${overview.workshopRequests} requests to review. Open Requests to calculate a demo quote. Catalog manages published models and drafts. Choose a section below.` : `Hay ${overview.activeOrders} pedidos activos y ${overview.workshopRequests} solicitudes por revisar. Abrí Solicitudes para calcular una cotización demo; Catálogo organiza publicación y borradores. Elegí una sección abajo para recorrerla.`, links: ADMIN_GUIDE.map(({ label, path }) => ({ label, path })) };
     }
-    if (mode === 'quote') return { source: 'DEMO_RULES', reply: language === 'en' ? 'Choose a reference model, material and quantity. Calculation uses an analogue with demo costs and an itemized breakdown. Saving creates a request in Admin; a photograph is not a measurement.' : 'Elegí el tipo de pieza, material y cantidad en el formulario. Calcular simulación usa un perfil análogo con costos demo y muestra el desglose. Guardar la solicitud la incorpora a Admin; la fotografía no se toma como una medición.', links: [{ label: language === 'en' ? 'Get a quote' : 'Cotizar una pieza', path: '/solicitud' }] };
+    if (mode === 'quote') return { source: 'DEMO_RULES', reply: language === 'en' ? 'I can help clarify the intended use, approximate dimensions, material and quantity. This local guide cannot measure a file, save a request or issue an official price; the workshop must review and confirm the quote.' : 'Puedo ayudarte a definir el uso, las dimensiones aproximadas, el material y la cantidad. Esta guía local no mide archivos, no guarda solicitudes ni emite un precio oficial; el taller debe revisar y confirmar la cotización.', links: [{ label: language === 'en' ? 'Quote options' : 'Ver opciones de cotización', path: '/solicitud' }] };
     const rows = await executeAssistantTool('search_catalog', { query: message.length < 80 ? message : '' }, { ...context, mode });
     return { source: 'DEMO_RULES', reply: language === 'en' ? (rows.length ? `I found ${rows.length} published model(s). They are made to order. You can calculate a demo estimate for a custom piece.` : 'We offer made-to-order FDM with PLA, PETG, ASA, ABS and TPU. Compare materials or use the quote page to try an analogue profile and see its demo breakdown.') : (rows.length ? `Encontré ${rows.length} modelo(s) publicados que coinciden. Se fabrican bajo pedido. Para un encargo propio podés calcular una simulación en Cotizar.` : 'Trabajamos FDM bajo pedido con PLA, PETG, ASA, ABS y TPU. Para decoración interior suele servir PLA; para un soporte general podés comparar PETG. En Cotizar podés probar un perfil de pieza y ver su cálculo demo.'), links: rows.slice(0, 3).map(({ name, path }) => ({ label: name, path })).concat({ label: language === 'en' ? 'Get a quote' : 'Cotizar', path: '/solicitud' }) };
   } finally {

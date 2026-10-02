@@ -247,3 +247,25 @@ pendiente que el operador lo importe, asigne credenciales y publique para la
 prueba real DeepSeek/Gmail. Los valores del motor continúan DEMO hasta calibrar
 los costos físicos del taller. Activity es el siguiente módulo que el usuario
 reservó para después. No se bloquea el uso local esperando la integración real.
+
+### Bloque reabierto por el usuario — cotizador / asistentes (2026-10-02)
+
+React ya diferencia “Ya tengo la pieza” de “Quiero ayuda para crearla” y el
+estimador se identifica como DEMO. El JSON de importación ahora se genera junto
+al workflow canónico e incluye tres AI Agent nativos separados para público,
+Admin y cotización. Verificación local: 121 tests, lint, `check:ui`, build y 194
+checks de automatización pasan; la inspección del navegador confirma los estados
+de entrada de cotizador. Build conserva el warning de chunk mayor de 500 kB.
+
+**Para cerrar realmente el flujo antes de pedir credenciales al usuario:**
+1. Implementar la solicitud transaccional desde el bot de diseño y confirmar el
+   envío de aviso al taller; no guardar nada solo en historial conversacional.
+2. Implementar upload privado STL/OBJ, lectura autorizada desde Admin y retención
+   del archivo. No hay laminado/medición ni costos calibrados, así que el Admin
+   conserva el precio final; no prometer cotizador automático por geometría.
+3. Mantener correo comercial solo después de guardar una cotización de Admin;
+   correo al cliente con copia oculta al taller, confirmación idempotente y
+   aprobación explícita del cliente. Checkout/pago real sigue pendiente.
+4. Importar el workflow en una instancia n8n real, asignar DeepSeek API, Gmail
+   OAuth2 y Header Auth, y verificar URLs/callback. CI remoto de este bloque queda
+   pendiente después de commit.

@@ -30,7 +30,7 @@ export function AssistantPanel({ mode = 'general', open, onClose, triggerRef, id
   const [error, setError] = useState('');
   useEffect(() => () => abort.current?.abort(), []);
   useEffect(() => { if (log.current) log.current.scrollTop = log.current.scrollHeight; }, [thread, busy]);
-  const allowed = mode === 'general' || (mode === 'admin' ? auth?.user?.role === 'admin' : Boolean(auth?.user));
+  const allowed = mode === 'general' || mode === 'quote' || auth?.user?.role === 'admin';
   const title = mode === 'admin' ? (es ? 'Copiloto del taller' : 'Workshop copilot')
     : mode === 'quote' ? (es ? 'Asistente de cotización' : 'Quote assistant') : (es ? 'Asistente Vértice' : 'Vértice assistant');
 

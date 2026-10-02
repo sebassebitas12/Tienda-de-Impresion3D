@@ -1,9 +1,10 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ASSISTANT_COMMON_PROMPT, ASSISTANT_PROMPTS, ROLE_TOOLS } from '../src/utils/assistantPolicies.js';
 
 const directory = fileURLToPath(new URL('../automation/n8n/', import.meta.url));
+const importDirectory = fileURLToPath(new URL('../automation/vertice-n8n-import/n8n/', import.meta.url));
 const load = async (file) => JSON.parse(await readFile(resolve(directory, file), 'utf8'));
 const assistantModes = ['general', 'admin', 'quote'];
 const assistants = await Promise.all(assistantModes.map((mode) => load(`vertice-assistant-${mode}.json`)));
@@ -127,4 +128,7 @@ const ids = nodes.map((node) => node.id);
 const names = nodes.map((node) => node.name);
 if (new Set(ids).size !== ids.length || new Set(names).size !== names.length) throw new Error('El workflow debe tener IDs y nombres únicos.');
 await writeFile(resolve(directory, 'vertice-cr-unificado.json'), `${JSON.stringify(unified, null, 2)}\n`);
+await mkdir(importDirectory, { recursive: true });
+await writeFile(resolve(importDirectory, 'vertice-cr-unificado.json'), `${JSON.stringify(unified, null, 2)}\n`);
+await writeFile(resolve(importDirectory, 'README.md'), await readFile(resolve(directory, 'README.md')));
 console.log(`Generado workflow n8n unificado: ${nodes.length} nodos, Agent nativo, DeepSeek, dispatcher seguro y 5 entradas.`);

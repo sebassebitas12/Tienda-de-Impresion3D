@@ -74,7 +74,7 @@ describe('roles, herramientas y recorridos', () => {
   test('bloquea herramientas de otro rol y parámetros inesperados', async () => {
     expect(validateToolArguments('estimate_quote', { profileId: 'organizador', material: 'PETG', quantity: 2, writeDb: true })).toBe(false);
     expect(await executeAssistantTool('admin_overview', {}, { mode: 'general', data, getRates: rates })).toEqual({ error: 'TOOL_FORBIDDEN' });
-    expect(await executeAssistantTool('request_details', { requestId: 'q1' }, { mode: 'quote', actor: { id: 'other' }, data, getRates: rates })).toEqual({ error: 'REQUEST_NOT_FOUND' });
+    expect(await executeAssistantTool('request_details', { requestId: 'q1' }, { mode: 'quote', actor: { id: 'other' }, data, getRates: rates })).toEqual({ error: 'TOOL_FORBIDDEN' });
   });
   test('limita capacidades efímeras por rol y número de invocaciones', async () => {
     const capability = issueAssistantToolCapability({ mode: 'admin', actor, data, getRates: rates }, 1000);
@@ -112,6 +112,14 @@ describe('roles, herramientas y recorridos', () => {
       });
       expect(result.reply).toBe(`Agente ${mode}`);
     }
+  });
+  test('permite orientación quote sin sesión y usa respuesta honesta si n8n no está conectado', async () => {
+    const result = await runAssistant({ mode: 'quote', message: 'Quiero una pieza para guardar herramientas' }, { actor: null, data, getRates: rates }, {
+      fetchImpl: async () => { throw new Error('n8n no conectado'); },
+    });
+    expect(result.source).toBe('DEMO_RULES');
+    expect(result.reply).toMatch(/no guarda solicitudes ni emite un precio oficial/i);
+    expect(result.links).toEqual([{ label: 'Ver opciones de cotización', path: '/solicitud' }]);
   });
   test('no deja saltar etapas de pedidos y exige motivo al cancelar', () => {
     const order = { status: 'PENDING' };

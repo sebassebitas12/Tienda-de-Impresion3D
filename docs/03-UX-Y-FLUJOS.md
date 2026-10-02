@@ -23,23 +23,41 @@ Solicitud → Ayuda de diseño → Descripción → Requisitos → Revisión →
 
 ### Dos intenciones del cotizador — decisión del usuario (2026-10-02)
 
-La entrada `/solicitud` debe comenzar ofreciendo dos caminos explícitos y no
-mezclarlos:
+La entrada `/solicitud` ahora presenta dos caminos explícitos y no los mezcla:
 
-1. **Ya tengo la pieza/archivo:** el cliente entrega su STL/OBJ; el sistema debe
-   obtener una cotización y enviarla al taller para revisión/gestión. El asistente
-   no debe convertir esta ruta en una conversación de diseño.
+1. **Ya tengo la pieza/archivo:** el cliente solicita revisión técnica de su
+   STL/OBJ para cotizarlo. Esta ruta debe entregar el archivo al taller; no debe
+   convertirse en una conversación de diseño.
 2. **Quiero ayuda para crearla:** el chatbot conversa para aclarar uso,
    dimensiones, material y cantidad, orienta el diseño y prepara la cotización.
 
-El estado actual no completa todavía ninguno como flujo real de producción: el
-upload seguro y la medición/laminado STL/OBJ no están implementados; el Agent de
-cotización solo consulta perfiles y estimaciones DEMO, y no guarda ni envía una
-solicitud. La pantalla actual `/solicitud` presenta una calculadora DEMO de
-referencias análogas, no estas dos opciones. No afirmar que un archivo fue
-recibido, medido, cotizado o enviado hasta que exista evidencia de cada paso.
-La ruta de ayuda puede orientar al cliente, pero requiere una acción de guardado
-explícita y cálculo del servidor para producir una cotización persistida.
+La implementación React ahora muestra las dos opciones en `/solicitud`, separa
+la ruta de ayuda (`/solicitud/ayuda-diseno`) y rotula la calculadora de perfiles
+como DEMO, sin guardado ni correo. La ruta de archivo (`/solicitud/archivo`)
+explica que el upload seguro aún no está conectado y no acepta archivos. El
+Agent de cotización orienta sobre creación de piezas y consulta perfiles DEMO.
+Está disponible para visitantes porque sus herramientas son públicas; Admin y
+los datos privados siguen protegidos. No guarda ni envía solicitudes. No afirmar
+recepción, medición, cotización
+o envío de un archivo hasta que cada paso tenga implementación y confirmación.
+
+### Recorrido de compra de una pieza personalizada
+
+1. Cliente elige archivo existente o ayuda para definir una pieza.
+2. El archivo o los requisitos llegan como **solicitud pendiente**, nunca como
+   pedido listo para pagar.
+3. El taller revisa geometría, uso, material, cantidad y costos; Admin guarda
+   la cotización final.
+4. Admin envía un único correo al cliente con copia oculta al taller. Solo una
+   aceptación confirmada del proveedor avanza a `AWAITING_APPROVAL`.
+5. El cliente revisa y aprueba o rechaza desde su cuenta. Solo una cotización
+   aprobada puede pasar a checkout/pago; luego el pedido entra al flujo de
+   producción.
+
+Hoy están implementadas la preparación/envío de cotización desde Admin y la
+aprobación demo del cliente. Siguen pendientes el intake real de archivo, el
+guardado de requisitos recopilados por el bot y el pago real. El botón de correo
+del cliente no debe enviar una cotización demo directamente como precio final.
 
 ### Admin
 Login → Dashboard → bandeja → detalle → acción → actividad.

@@ -95,6 +95,19 @@ transiciones terminales/alternativas y su escritura auditada.
 
 ## Cotización
 
+La entrada del cliente distingue **pieza/archivo existente** de **ayuda para
+crear una pieza**. El primer camino entrega el archivo y datos técnicos al
+taller; el segundo usa el chatbot para completar especificaciones. Ambos deben
+crear/actualizar una solicitud `PENDING_QUOTE`, no saltar a precio final ni a
+checkout. En este MVP Admin conserva la emisión de la cotización final; el bot
+puede asistir, pero no decide ni envía un monto como oferta.
+
+La calculadora de perfiles en `/solicitud` es una DEMO. No mide archivos ni debe
+mandarse como cotización final. Antes de una automatización real por archivo se
+requiere almacenamiento privado, lectura/laminado STL/OBJ y costos calibrados.
+La ruta del chatbot necesita una acción confirmada para guardar los requisitos
+como solicitud; su conversación por sí sola no crea un encargo.
+
 Conservar requestId, monto, moneda, vigencia, notas, tiempo estimado, fecha y admin emisor.
 El Admin calcula el costo con datos técnicos por pieza y tarifas vigentes introducidos
 por una persona; el cliente ve el monto total y alcance, no una tarifa inventada ni
