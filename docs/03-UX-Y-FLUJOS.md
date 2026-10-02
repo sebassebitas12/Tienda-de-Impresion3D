@@ -1,6 +1,6 @@
 # Vértice CR — UX, navegación y estados
 
-> Última actualización: **2026-10-01**.
+> Última actualización: **2026-10-02**.
 
 ## Rutas públicas
 
@@ -20,6 +20,26 @@ Solicitud → Archivo → Requisitos → Revisión → Pendiente de cotización 
 
 ### Personalizada sin archivo
 Solicitud → Ayuda de diseño → Descripción → Requisitos → Revisión → Pendiente de cotización → Cuenta → Cotización.
+
+### Dos intenciones del cotizador — decisión del usuario (2026-10-02)
+
+La entrada `/solicitud` debe comenzar ofreciendo dos caminos explícitos y no
+mezclarlos:
+
+1. **Ya tengo la pieza/archivo:** el cliente entrega su STL/OBJ; el sistema debe
+   obtener una cotización y enviarla al taller para revisión/gestión. El asistente
+   no debe convertir esta ruta en una conversación de diseño.
+2. **Quiero ayuda para crearla:** el chatbot conversa para aclarar uso,
+   dimensiones, material y cantidad, orienta el diseño y prepara la cotización.
+
+El estado actual no completa todavía ninguno como flujo real de producción: el
+upload seguro y la medición/laminado STL/OBJ no están implementados; el Agent de
+cotización solo consulta perfiles y estimaciones DEMO, y no guarda ni envía una
+solicitud. La pantalla actual `/solicitud` presenta una calculadora DEMO de
+referencias análogas, no estas dos opciones. No afirmar que un archivo fue
+recibido, medido, cotizado o enviado hasta que exista evidencia de cada paso.
+La ruta de ayuda puede orientar al cliente, pero requiere una acción de guardado
+explícita y cálculo del servidor para producir una cotización persistida.
 
 ### Admin
 Login → Dashboard → bandeja → detalle → acción → actividad.

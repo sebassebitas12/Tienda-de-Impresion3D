@@ -626,6 +626,32 @@ comerciales/técnicos no respaldados quedan vacíos en borrador, nunca inventado
 
 ## Automatización n8n con AI Agent y herramientas acotadas — R-H71 (2026-10-02)
 
+### Cotizador: dos intenciones y capacidades pendientes (2026-10-02)
+
+La UX acordada tiene dos rutas: (a) cliente con pieza/archivo, que necesita
+adjuntar STL/OBJ y enviar la cotización al taller; (b) cliente que quiere crear
+una pieza, que conversa con el Agent para concretar requisitos y cotizarla.
+Son intenciones distintas; la primera no debe convertirse en una charla de
+diseño.
+
+**Bloqueos comprobados en la implementación actual:** no existe servicio de
+recepción/almacenamiento privado de bytes STL/OBJ ni proceso de laminado/medición
+que devuelva gramos y horas reales. `fileName` es solo metadato. El Agent quote
+puede consultar perfiles análogos y ejecutar una estimación DEMO, pero sus tools
+no guardan solicitudes ni envían correos. `/quotes/create` guarda una cotización
+DEMO a partir de un perfil, y el envío de correo actual no debe presentarse como
+cotización medida de una pieza adjunta. Por tanto, no reutilizar ese endpoint
+para simular la cotización de un archivo real.
+
+Antes de activar el camino de archivo se necesita acordar/implementar:
+almacenamiento privado con acceso autorizado, análisis verificable del STL/OBJ,
+costos de taller calibrados, persistencia de solicitud vinculada al objeto
+almacenado y notificación al taller con resultado/errores trazables. Para ayuda
+de diseño se necesita una acción explícita que convierta los requisitos
+recopilados en solicitud; el Agent actual no la tiene. Hasta completar esos
+contratos, separar visualmente las dos intenciones y rotular la calculadora y
+estimaciones como DEMO, sin afirmar que el flujo real se ejecutó.
+
 La definición de prompts, tools, roles y esquemas vive en
 `src/utils/assistantPolicies.js`; `scripts/assistant-runtime.js` limita datos,
 valida argumentos y ejecuta consultas/cálculos con el actor autenticado.
