@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { ASSISTANT_COMMON_PROMPT, ASSISTANT_PROMPTS, ASSISTANT_TOOLS, ROLE_TOOLS, ADMIN_GUIDE } from '../src/utils/assistantPolicies.js';
 import { calculateAutomaticDemoQuote, DEMO_PROFILES } from '../src/utils/quoteAutomation.js';
 import { FDM_MATERIALS } from '../src/utils/quotePricing.js';
@@ -9,7 +10,31 @@ const GUIDE = {
   ABS: 'Prototipos que necesitan tolerar más temperatura; requiere control del proceso.',
   TPU: 'Piezas flexibles. La dureza y geometría determinan el comportamiento.',
 };
+const toolCapabilities = new Map();
 const PROCESS = { path: '/solicitud', steps: ['Definir pieza, material y cantidad', 'Calcular simulación demo y guardar solicitud', 'Enviar oferta al cliente', 'Cliente aprueba', 'Pago verificado antes de fabricación'], mode: 'DEMO', stock: 'Fabricación bajo pedido' };
+
+export function issueAssistantToolCapability(context, now = Date.now()) {
+  for (const [key, value] of toolCapabilities) if (value.expiresAt <= now) toolCapabilities.delete(key);
+  const capability = randomBytes(32).toString('base64url');
+  toolCapabilities.set(capability, { ...context, expiresAt: now + 90_000, calls: 0 });
+  return capability;
+}
+
+export function revokeAssistantToolCapability(capability) {
+  toolCapabilities.delete(capability);
+}
+
+export async function executeAssistantToolCapability(capability, { mode, name, args }, now = Date.now()) {
+  const context = toolCapabilities.get(capability);
+  if (!context || context.expiresAt <= now || context.mode !== mode || context.calls >= 3) {
+    toolCapabilities.delete(capability);
+    return { error: 'TOOL_CAPABILITY_INVALID' };
+  }
+  context.calls += 1;
+  const result = await executeAssistantTool(name, args, context);
+  if (result.error) return { error: result.error };
+  return { result };
+}
 
 export function validateToolArguments(name, args) {
   const schema = ASSISTANT_TOOLS[name]?.function.parameters;
@@ -66,44 +91,29 @@ export async function runAssistant({ mode, message, history = [], language = 'es
     ...history.filter(item => ['user', 'assistant'].includes(item?.role) && typeof item.content === 'string').slice(-10).map(({ role, content }) => ({ role, content: content.slice(0, 3000) })),
     { role: 'user', content: message.trim() },
   ];
-  const trace = [];
-  for (let round = 0; round < 4; round += 1) {
-    let response;
-    try {
-      const webhook = env[`VERTICE_ASSISTANT_${mode.toUpperCase()}_URL`] || `http://localhost:5678/webhook/vertice-assistant-${mode}`;
-      response = await fetchImpl(webhook, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Vertice-Webhook-Token': env.VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN || '' },
-        body: JSON.stringify({ mode, language, messages, tools: ROLE_TOOLS[mode].map(name => ASSISTANT_TOOLS[name]) }), signal: AbortSignal.timeout(45000) });
-      if (!response.ok) throw new Error('provider');
-      const body = await response.json();
-      const result = Array.isArray(body) ? body[0] : body;
-      const answer = result.message;
-      if (result.error || !answer || answer.role !== 'assistant') throw new Error('provider');
-      if (Array.isArray(answer.tool_calls) && answer.tool_calls.length) {
-        if (answer.tool_calls.length > 3) return { error: 'TOOL_LIMIT' };
-        messages.push({ role: 'assistant', content: answer.content || null, tool_calls: answer.tool_calls });
-        for (const call of answer.tool_calls) {
-          let args;
-          try { args = JSON.parse(call.function.arguments); } catch { args = null; }
-          const output = await executeAssistantTool(call.function.name, args, { ...context, mode });
-          trace.push({ name: call.function.name, success: !output.error });
-          messages.push({ role: 'tool', tool_call_id: call.id, content: JSON.stringify(output) });
-        }
-        continue;
-      }
-      const output = JSON.parse(answer.content || '{}');
-      if (typeof output.reply !== 'string' || !output.reply.trim() || output.reply.length > 5000) return { error: 'ASSISTANT_RESPONSE_INVALID' };
-      return { reply: output.reply, links: safeLinks(output.links, mode), source: 'DEEPSEEK', tools: trace };
-    } catch {
-      // Useful local, explicitly labeled rule-based fallback before API credentials are set.
-      if (round > 0) return { error: 'ASSISTANT_UNAVAILABLE' };
-      if (mode === 'admin') {
-        const overview = await executeAssistantTool('admin_overview', {}, { ...context, mode });
-        return { source: 'DEMO_RULES', reply: language === 'en' ? `There are ${overview.activeOrders} active orders and ${overview.workshopRequests} requests to review. Open Requests to calculate a demo quote. Catalog manages published models and drafts. Choose a section below.` : `Hay ${overview.activeOrders} pedidos activos y ${overview.workshopRequests} solicitudes por revisar. Abrí Solicitudes para calcular una cotización demo; Catálogo organiza publicación y borradores. Elegí una sección abajo para recorrerla.`, links: ADMIN_GUIDE.map(({ label, path }) => ({ label, path })), tools: [{ name: 'admin_overview', success: true }] };
-      }
-      if (mode === 'quote') return { source: 'DEMO_RULES', reply: language === 'en' ? 'Choose a reference model, material and quantity. Calculation uses an analogue with demo costs and an itemized breakdown. Saving creates a request in Admin; a photograph is not a measurement.' : 'Elegí el tipo de pieza, material y cantidad en el formulario. Calcular simulación usa un perfil análogo con costos demo y muestra el desglose. Guardar la solicitud la incorpora a Admin; la fotografía no se toma como una medición.', links: [{ label: language === 'en' ? 'Get a quote' : 'Cotizar una pieza', path: '/solicitud' }], tools: [] };
-      const rows = await executeAssistantTool('search_catalog', { query: message.length < 80 ? message : '' }, { ...context, mode });
-      return { source: 'DEMO_RULES', reply: language === 'en' ? (rows.length ? `I found ${rows.length} published model(s). They are made to order. You can calculate a demo estimate for a custom piece.` : 'We offer made-to-order FDM with PLA, PETG, ASA, ABS and TPU. Compare materials or use the quote page to try an analogue profile and see its demo breakdown.') : (rows.length ? `Encontré ${rows.length} modelo(s) publicados que coinciden. Se fabrican bajo pedido. Para un encargo propio podés calcular una simulación en Cotizar.` : 'Trabajamos FDM bajo pedido con PLA, PETG, ASA, ABS y TPU. Para decoración interior suele servir PLA; para un soporte general podés comparar PETG. En Cotizar podés probar un perfil de pieza y ver su cálculo demo.'), links: rows.slice(0, 3).map(({ name, path }) => ({ label: name, path })).concat({ label: language === 'en' ? 'Get a quote' : 'Cotizar', path: '/solicitud' }), tools: [{ name: 'search_catalog', success: true }] };
+  const capability = issueAssistantToolCapability({ mode, actor: context.actor, data: context.data, getRates: context.getRates });
+  try {
+    const webhook = env[`VERTICE_ASSISTANT_${mode.toUpperCase()}_URL`] || `http://localhost:5678/webhook/vertice-assistant-${mode}`;
+    const toolEndpointUrl = env.VERTICE_ASSISTANT_TOOLS_URL || 'http://localhost:3000/assistants/tools';
+    const response = await fetchImpl(webhook, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Vertice-Webhook-Token': env.VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN || '' },
+      body: JSON.stringify({ mode, language, messages, toolCapability: capability, toolEndpointUrl }), signal: AbortSignal.timeout(90000) });
+    if (!response.ok) throw new Error('provider');
+    const body = await response.json();
+    const result = Array.isArray(body) ? body[0] : body;
+    const agentOutput = result.output;
+    const output = typeof agentOutput === 'string' ? JSON.parse(agentOutput) : agentOutput;
+    if (result.error || !output || typeof output.reply !== 'string' || !output.reply.trim() || output.reply.length > 5000) throw new Error('provider');
+    return { reply: output.reply, links: safeLinks(output.links, mode), source: 'DEEPSEEK' };
+  } catch {
+    // Useful local, explicitly labeled rule-based fallback before provider credentials are configured.
+    if (mode === 'admin') {
+      const overview = await executeAssistantTool('admin_overview', {}, { ...context, mode });
+      return { source: 'DEMO_RULES', reply: language === 'en' ? `There are ${overview.activeOrders} active orders and ${overview.workshopRequests} requests to review. Open Requests to calculate a demo quote. Catalog manages published models and drafts. Choose a section below.` : `Hay ${overview.activeOrders} pedidos activos y ${overview.workshopRequests} solicitudes por revisar. Abrí Solicitudes para calcular una cotización demo; Catálogo organiza publicación y borradores. Elegí una sección abajo para recorrerla.`, links: ADMIN_GUIDE.map(({ label, path }) => ({ label, path })) };
     }
+    if (mode === 'quote') return { source: 'DEMO_RULES', reply: language === 'en' ? 'Choose a reference model, material and quantity. Calculation uses an analogue with demo costs and an itemized breakdown. Saving creates a request in Admin; a photograph is not a measurement.' : 'Elegí el tipo de pieza, material y cantidad en el formulario. Calcular simulación usa un perfil análogo con costos demo y muestra el desglose. Guardar la solicitud la incorpora a Admin; la fotografía no se toma como una medición.', links: [{ label: language === 'en' ? 'Get a quote' : 'Cotizar una pieza', path: '/solicitud' }] };
+    const rows = await executeAssistantTool('search_catalog', { query: message.length < 80 ? message : '' }, { ...context, mode });
+    return { source: 'DEMO_RULES', reply: language === 'en' ? (rows.length ? `I found ${rows.length} published model(s). They are made to order. You can calculate a demo estimate for a custom piece.` : 'We offer made-to-order FDM with PLA, PETG, ASA, ABS and TPU. Compare materials or use the quote page to try an analogue profile and see its demo breakdown.') : (rows.length ? `Encontré ${rows.length} modelo(s) publicados que coinciden. Se fabrican bajo pedido. Para un encargo propio podés calcular una simulación en Cotizar.` : 'Trabajamos FDM bajo pedido con PLA, PETG, ASA, ABS y TPU. Para decoración interior suele servir PLA; para un soporte general podés comparar PETG. En Cotizar podés probar un perfil de pieza y ver su cálculo demo.'), links: rows.slice(0, 3).map(({ name, path }) => ({ label: name, path })).concat({ label: language === 'en' ? 'Get a quote' : 'Cotizar', path: '/solicitud' }) };
+  } finally {
+    revokeAssistantToolCapability(capability);
   }
-  return { error: 'TOOL_LIMIT' };
 }

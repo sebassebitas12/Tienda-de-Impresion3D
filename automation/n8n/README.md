@@ -2,9 +2,9 @@
 
 ## Qué importar
 
-Importa **solo `vertice-cr-unificado.json`**. El archivo está en esta carpeta y también es el único workflow incluido en `automation/vertice-n8n-import.zip` junto con esta guía. En n8n: **Workflows → Import from File** y selecciona ese JSON. No importes por separado los archivos `vertice-assistant-*.json`, `vertice-rates.json` ni `vertice-quote-email.json`; son componentes internos usados para generar y verificar el workflow unificado.
+Importa **solo `vertice-cr-unificado.json`**. En n8n: **Workflows → Import from File** y selecciona ese JSON. No importes por separado los archivos `vertice-assistant-*.json`, `vertice-rates.json` ni `vertice-quote-email.json`; son componentes internos usados para generar y verificar el workflow unificado.
 
-El canvas trae cinco entradas Webhook dentro del mismo workflow: asistente general, asistente Admin, asistente de cotización, tasas y correo de cotización. Las tres entradas de IA pasan por una preparación de rol distinta y llegan a **un mismo nodo DeepSeek**. Tasas y Gmail conservan sus propias ramas, conectadas a sus respectivos Webhooks. Al activar este workflow se habilitan sus cinco rutas.
+El canvas trae cinco entradas Webhook dentro del mismo workflow: asistente general, asistente Admin, asistente de cotización, tasas y correo de cotización. Las tres entradas conversacionales pasan por un contexto/rol común, llegan al **AI Agent nativo de n8n** y se conectan al nodo **DeepSeek Chat Model**. El Agent tiene una herramienta HTTP que llama a la API Vértice con una capacidad aleatoria y temporal. La API limita el rol, valida el nombre y argumentos de cada herramienta y ejecuta solo lectura/cálculo; no se entrega el JWT académico a n8n ni se habilita acceso directo a JSON Server. El historial viene acotado desde la app, por lo que no hay memoria duplicada. Tasas y Gmail son ramas deterministas separadas; el Agent no decide envíos ni fuentes de tarifas.
 
 El JSON no incluye secretos ni permisos de cuentas. Tras importarlo, asigna las credenciales indicadas abajo en los nodos correspondientes. El workflow se importa inactivo; no lo publiques/actives hasta conectar las credenciales y poner las URLs correctas en el `.env` del backend.
 
@@ -25,12 +25,7 @@ Pon ese mismo valor en `VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN` en `.env` y en la cre
 
 ## 2. DeepSeek para los tres asistentes
 
-Abre el nodo **DeepSeek — orquestador compartido**. En **Credential for Header Auth**, crea o selecciona una credencial **Header Auth**:
-
-- **Name:** `Authorization`
-- **Value:** `Bearer TU_API_KEY`
-
-Usa la API key de tu cuenta DeepSeek. Esta credencial queda en n8n y se usa para las tres entradas de asistente. El modelo configurado es `deepseek-flash`; si tu cuenta no lo ofrece, cambia el modelo por otro habilitado en tu cuenta.
+Abre el nodo **DeepSeek Chat Model** y crea una credencial de tipo **DeepSeek API** con la API key de tu cuenta. El Agent la usa para las tres entradas conversacionales. Selecciona un modelo que aparezca disponible para tu cuenta en el selector de n8n; el nodo carga dinámicamente los modelos autorizados. La temperatura inicial es baja y el Agent tiene un máximo de cuatro iteraciones por respuesta.
 
 ## 3. Gmail para el correo de cotización
 
@@ -45,12 +40,13 @@ En `.env`, configura cada variable con la URL de producción que muestra su nodo
 | `VERTICE_ASSISTANT_GENERAL_URL` | `/webhook/vertice-assistant-general` |
 | `VERTICE_ASSISTANT_ADMIN_URL` | `/webhook/vertice-assistant-admin` |
 | `VERTICE_ASSISTANT_QUOTE_URL` | `/webhook/vertice-assistant-quote` |
+| `VERTICE_ASSISTANT_TOOLS_URL` | `/assistants/tools` (callback desde n8n hacia la API Vértice) |
 | `VERTICE_RATES_WEBHOOK_URL` | `/webhook/vertice-rates` |
 | `VERTICE_QUOTE_EMAIL_WEBHOOK_URL` | `/webhook/vertice-quote-email` |
 
 Los valores de `.env.example` apuntan a `localhost:5678`; solo sirven si n8n está escuchando en ese host y puerto. Si usas n8n Cloud u otra computadora, copia las URLs que muestra tu instancia. No uses una URL de prueba `/webhook-test/` en las variables del backend: el backend necesita que el workflow esté activo y su URL de producción disponible.
 
-Los nodos Webhook requieren el mismo Header Auth que espera el backend. No compartas la URL pública con el token ni pongas secretos en el navegador.
+Los nodos Webhook requieren el mismo Header Auth que espera el backend. La URL de `VERTICE_ASSISTANT_TOOLS_URL` debe ser alcanzable **desde el entorno de n8n**: si n8n corre en Docker Desktop y la API en Windows, prueba `http://host.docker.internal:3000/assistants/tools`; si ambos corren en el mismo host fuera de Docker, `http://localhost:3000/assistants/tools` puede servir. El API de demo se enlaza a `localhost` por defecto. No abras todo JSON Server/API a Internet para resolver conectividad; en n8n Cloud o redes separadas usa una URL accesible con TLS que exponga solo el callback autorizado, o prueba n8n local junto a la API. No compartas la URL pública con el token ni pongas secretos en el navegador.
 
 ## 5. Tasas y alcance de la cotización
 

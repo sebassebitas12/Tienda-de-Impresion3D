@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import process from 'node:process';
 import { DEMO_PROFILES, calculateAutomaticDemoQuote } from '../src/utils/quoteAutomation.js';
 import { sessionActor } from './session-access.js';
-import { runAssistant } from './assistant-runtime.js';
+import { executeAssistantToolCapability, runAssistant } from './assistant-runtime.js';
 import { createRatesProvider } from './quote-rates.js';
 import { deliverQuote } from './quote-email.js';
 import { prepareQuoteFulfillment } from './quote-fulfillment.js';
@@ -57,6 +57,19 @@ export function installAutomationOperations({ registerAction, db, serialize, per
       if (result.error) return failure(res, result.error, result.error === 'ROLE_REQUIRED' ? 403 : 422);
       res.json(result);
     } catch { failure(res, 'ASSISTANT_UNAVAILABLE', 502); }
+  });
+
+  registerAction('/assistants/tools', async (req, res) => {
+    const { capability, mode, name, args } = req.body || {};
+    if (typeof capability !== 'string' || capability.length < 40 || capability.length > 100 ||
+        !['general', 'admin', 'quote'].includes(mode) || typeof name !== 'string') {
+      return failure(res, 'INVALID_TOOL_CALL');
+    }
+    try {
+      const result = await executeAssistantToolCapability(capability, { mode, name, args });
+      if (result.error) return failure(res, result.error, result.error === 'TOOL_FORBIDDEN' ? 403 : 422);
+      return res.json(result);
+    } catch { return failure(res, 'ASSISTANT_TOOL_FAILED', 500); }
   });
 
   registerAction('/quotes/create', async (req, res) => {

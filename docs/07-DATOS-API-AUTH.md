@@ -624,15 +624,31 @@ carga, muestra el fallback «Sin foto». Las imágenes de productos nuevos se
 incorporan al dataset solo cuando hay correspondencia identificable; los campos
 comerciales/técnicos no respaldados quedan vacíos en borrador, nunca inventados.
 
-## Automatización n8n por rol y cotización demo — R-H69 (2026-10-02)
+## Automatización n8n con AI Agent y herramientas acotadas — R-H71 (2026-10-02)
 
 La definición de prompts, tools, roles y esquemas vive en
 `src/utils/assistantPolicies.js`; `scripts/assistant-runtime.js` limita datos,
-valida tool calls y ejecuta consultas con el actor autenticado. `/assistants/chat`
-permite general público, Admin solo `admin`, y quote solo cliente autenticado.
-Las tools son de consulta o cálculo puro; no tienen tool para correo, pago,
-edición del catálogo o transición de estado. n8n recibe solo el contexto y las
-tools permitidas por el servidor y delega texto a DeepSeek.
+valida argumentos y ejecuta consultas/cálculos con el actor autenticado.
+`/assistants/chat` permite general público, Admin solo `admin`, y quote solo
+cliente autenticado. El workflow usa el **AI Agent nativo de n8n** conectado a
+**DeepSeek Chat Model**. Un HTTP Request Tool dedicado ofrece un dispatcher; el
+backend conserva la allowlist efectiva por rol y valida cada llamada.
+
+Al iniciar una conversación, el backend emite una capacidad aleatoria de 256
+bits, con alcance de modo/actor, máximo de 3 invocaciones y caducidad de 90 s.
+El nodo herramienta la presenta a `POST /assistants/tools`; no se transmite el
+JWT académico ni se da al Agent acceso a JSON Server. La capacidad se revoca al
+terminar `/assistants/chat`. Los argumentos pasan por el esquema de
+`ASSISTANT_TOOLS` y las autorizaciones de `executeAssistantTool`. La API local
+conserva estos permisos en memoria de proceso: esto protege el flujo de demo,
+pero no reemplaza autenticación/aislamiento de producción ni escala a múltiples
+instancias backend sin un almacén compartido.
+
+El Agent usa el historial acotado que entrega la app y no añade memoria n8n. El
+límite del Agent es de 4 iteraciones; la capacidad limita hasta 3 llamadas de
+herramienta. Ninguna herramienta de IA envía correo, registra pagos, edita
+catálogo ni cambia estados. Tasas y Gmail permanecen como ramas deterministas
+independientes; el Agent no las invoca.
 
 `POST /quotes/profiles` y `/quotes/preview` son consultas/cálculo DEMO;
 `/quotes/create` exige customer y clave de idempotencia; `/quotes/mine` y
@@ -641,15 +657,19 @@ versión/estado esperado. `/admin/actions/order-transition` aplica la secuencia
 permitida y deja evento. `/admin/actions/quote-fulfillment` evita pedido
 duplicado; la modalidad DEMO queda rotulada como no pago real.
 
-Un solo workflow importable contiene las cinco entradas (tres asistentes, tasas
-y correo) en `automation/n8n/vertice-cr-unificado.json`; el ZIP de importación
-incluye ese workflow y su guía. Las fuentes JSON por capacidad no se importan
-individualmente. Las claves viven solo en credenciales n8n; el token se comparte
-por `.env` backend y Header Auth `X-Vertice-Webhook-Token`. Los endpoints Hacienda venta y ARESEP son
-públicos. ARESEP solo se acepta tras validar empresa/tipo/bloque kWh exacto y
-único del mes; los costos de material/desgaste permanecen DEMO. Gmail exige
-confirmación con `deliveryKey` y `messageId`; outbox `SENDING/SENT/UNKNOWN`
-evita falsos éxitos y reenvíos ciegos.
+Un solo workflow importable contiene cinco entradas (tres asistentes, tasas y
+correo) en `automation/n8n/vertice-cr-unificado.json`. Los JSON por capacidad
+son insumos internos para construir/verificar ese export y no se importan por
+separado. Credenciales DeepSeek API y Gmail OAuth2 se asignan en sus propios
+nodos; Header Auth `X-Vertice-Webhook-Token` protege las entradas webhook y se
+comparte con el backend por `.env`. `VERTICE_ASSISTANT_TOOLS_URL` configura la
+URL de callback desde n8n hacia `POST /assistants/tools`; debe ser alcanzable
+desde el runtime de n8n (localhost no cruza automáticamente una frontera Docker
+o de red). Los endpoints Hacienda venta y ARESEP son públicos. ARESEP solo se
+acepta tras validar empresa/tipo/bloque kWh exacto y único del mes; los costos
+de material/desgaste permanecen DEMO. Gmail exige confirmación con `deliveryKey`
+y `messageId`; outbox `SENDING/SENT/UNKNOWN` evita falsos éxitos y reenvíos
+ciegos.
 
 Límite: las guardas y persistencia de esta arquitectura académica local protegen
 la lógica funcional; JSON Server/token simulado y la serialización por proceso

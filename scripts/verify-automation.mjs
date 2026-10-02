@@ -8,26 +8,6 @@ import process from 'node:process';
 import { DEMO_PROFILES } from '../src/utils/quoteAutomation.js';
 import { ROLE_TOOLS } from '../src/utils/assistantPolicies.js';
 
-function readStoredZip(buffer) {
-  const entries = new Map();
-  let offset = 0;
-  while (buffer.readUInt32LE(offset) === 0x04034b50) {
-    const flags = buffer.readUInt16LE(offset + 6);
-    const method = buffer.readUInt16LE(offset + 8);
-    assert.equal(method, 0, 'Import ZIP entries use the supported stored format');
-    assert.equal(flags & 0x0008, 0, 'Import ZIP entries include sizes in local headers');
-    const size = buffer.readUInt32LE(offset + 22);
-    const nameLength = buffer.readUInt16LE(offset + 26);
-    const extraLength = buffer.readUInt16LE(offset + 28);
-    const nameStart = offset + 30;
-    const dataStart = nameStart + nameLength + extraLength;
-    const name = buffer.subarray(nameStart, nameStart + nameLength).toString('utf8');
-    entries.set(name, buffer.subarray(dataStart, dataStart + size));
-    offset = dataStart + size;
-  }
-  return entries;
-}
-
 // Isolated database and mock HTTP provider. Never sends email or calls a paid API.
 const directory = await mkdtemp(join(tmpdir(), 'vertice-automation-'));
 const dbFile = join(directory, 'db.json');
@@ -46,9 +26,12 @@ const provider = createServer(async (req, res) => {
   if (req.url === '/rates') payload = { exchange: { venta: { valor: 460, fecha: new Date().toISOString().slice(0, 10) } }, electricity: { value: [] } };
   else if (req.url === '/email') { mails++; payload = { delivered: true, deliveryKey: body.deliveryKey, messageId: 'mock-gmail-1' }; }
   else {
-    const hadTools = body.messages.some(message => message.role === 'tool');
-    payload = { message: hadTools ? { role: 'assistant', content: JSON.stringify({ reply: 'Herramienta consultada correctamente.', links: [] }) }
-      : { role: 'assistant', tool_calls: [{ id: 'qa-call', type: 'function', function: { name: body.mode === 'admin' ? 'admin_overview' : body.mode === 'quote' ? 'quote_profiles' : 'search_catalog', arguments: '{}' } }] } };
+    const name = body.mode === 'admin' ? 'admin_overview' : body.mode === 'quote' ? 'quote_profiles' : 'search_catalog';
+    const tool = await fetch(`http://127.0.0.1:${port}/assistants/tools`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ capability: body.toolCapability, mode: body.mode, name, args: name === 'search_catalog' ? { query: '' } : {} }) });
+    assert.equal(tool.status, 200, `assistant tool callback: ${await tool.clone().text()}`);
+    const toolResult = await tool.json();
+    payload = { output: JSON.stringify({ reply: `Herramienta ${name} consultada.`, links: toolResult.result?.path ? [{ label: 'Abrir', path: toolResult.result.path }] : [] }) };
   }
   res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(payload));
 });
@@ -58,7 +41,8 @@ const portProbe = createServer(); await new Promise(resolve => portProbe.listen(
 const port = portProbe.address().port; await new Promise(resolve => portProbe.close(resolve));
 const api = spawn(process.execPath, ['scripts/api-server.js'], { cwd: process.cwd(), env: { ...process.env, PORT: String(port), HOST: '127.0.0.1', VERTICE_DB_FILE: dbFile,
   VERTICE_QUOTE_EMAIL_WEBHOOK_URL: `${mockUrl}/email`, VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN: 'qa-only-token', VERTICE_RATES_WEBHOOK_URL: `${mockUrl}/rates`,
-  VERTICE_ASSISTANT_GENERAL_URL: `${mockUrl}/assistant`, VERTICE_ASSISTANT_ADMIN_URL: `${mockUrl}/assistant`, VERTICE_ASSISTANT_QUOTE_URL: `${mockUrl}/assistant`, VERTICE_WORKSHOP_EMAIL: 'qa-admin@vertice.cr',
+  VERTICE_ASSISTANT_GENERAL_URL: `${mockUrl}/assistant`, VERTICE_ASSISTANT_ADMIN_URL: `${mockUrl}/assistant`, VERTICE_ASSISTANT_QUOTE_URL: `${mockUrl}/assistant`,
+  VERTICE_ASSISTANT_TOOLS_URL: `http://127.0.0.1:${port}/assistants/tools`, VERTICE_WORKSHOP_EMAIL: 'qa-admin@vertice.cr',
 } });
 let output = ''; api.stdout.on('data', chunk => { output += chunk; }); api.stderr.on('data', chunk => { output += chunk; });
 const token = id => `sim.v1.${Buffer.from(JSON.stringify({ kind: 'SIMULATED_JWT', sub: id, role: users.find(u => u.id === id).role, exp: Math.floor(Date.now() / 1000) + 3600 })).toString('base64url')}`;
@@ -78,8 +62,9 @@ try {
   await post('/assistants/chat', { mode: 'quote', message: 'Ayuda' }, undefined, 403);
   for (const [mode, id] of [['general', undefined], ['admin', 'admin-test'], ['quote', 'customer-test']]) {
     const chat = await post('/assistants/chat', { mode, message: 'Ayuda', history: [] }, id);
-    assert.equal(chat.source, 'DEEPSEEK'); assert.equal(chat.tools.length, 1); assertions += 2;
+    assert.equal(chat.source, 'DEEPSEEK'); assert.ok(chat.reply.includes('consultada')); assertions += 2;
   }
+  await post('/assistants/tools', { mode: 'general', name: 'search_catalog', args: {} }, undefined, 400);
   const form = { profileId: 'organizador', material: 'PETG', quantity: 2, sizeScale: 1, needsDesign: false, description: 'Organizador para escritorio', idempotencyKey: 'qa-quote-one' };
   const preview = await post('/quotes/preview', form); assert.equal(preview.quote.mode, 'DEMO'); assertions++;
   const created = await post('/quotes/create', { ...form, sendEmail: true }, 'customer-test', 201);
@@ -127,35 +112,31 @@ try {
   const unifiedWebhooks = unified.nodes.filter(node => node.type.endsWith('.webhook'));
   assert.deepEqual(unifiedWebhooks.map(node => node.parameters.path).sort(), [...expectedWebhookPaths].sort()); assertions++;
   assert.ok(unifiedWebhooks.every(node => node.parameters.authentication === 'headerAuth' && node.parameters.responseData === 'firstEntryJson')); assertions++;
-  const deepSeekNodes = unified.nodes.filter(node => node.name === 'DeepSeek — orquestador compartido');
-  assert.equal(deepSeekNodes.length, 1); assert.equal(deepSeekNodes[0].parameters.url, 'https://api.deepseek.com/chat/completions'); assertions += 2;
-  const deepSeekIncoming = Object.values(unified.connections).flatMap(connection => connection.main.flat()).filter(connection => connection.node === deepSeekNodes[0].name);
-  assert.equal(deepSeekIncoming.length, 3); assertions++;
+  const aiAgent = unified.nodes.find(node => node.name === 'AI Agent — atención Vértice');
+  const deepSeekNode = unified.nodes.find(node => node.name === 'DeepSeek Chat Model');
+  const toolNode = unified.nodes.find(node => node.name === 'Consultar herramientas autorizadas Vértice');
+  assert.equal(aiAgent.type, '@n8n/n8n-nodes-langchain.agent'); assert.equal(aiAgent.parameters.options.maxIterations, 4); assertions += 2;
+  assert.equal(deepSeekNode.type, '@n8n/n8n-nodes-langchain.lmChatDeepSeek'); assert.equal(deepSeekNode.parameters.model.value, 'deepseek-chat'); assertions += 2;
+  assert.equal(toolNode.type, 'n8n-nodes-base.httpRequestTool'); assert.ok(toolNode.parameters.toolDescription); assertions += 2;
+  assert.deepEqual(unified.connections[deepSeekNode.name].ai_languageModel[0][0], { node: aiAgent.name, type: 'ai_languageModel', index: 0 }); assertions++;
+  assert.deepEqual(unified.connections[toolNode.name].ai_tool[0][0], { node: aiAgent.name, type: 'ai_tool', index: 0 }); assertions++;
   assert.equal(unified.nodes.filter(node => node.type.endsWith('.gmail')).length, 1); assertions++;
+  const preparer = unified.nodes.find(node => node.name === 'Preparar contexto y permisos');
+  const run = new Function('$input', preparer.parameters.jsCode);
+  const makeInput = mode => ({ first: () => ({ json: { body: { mode, language: 'es', toolCapability: 'a'.repeat(43),
+    toolEndpointUrl: 'http://localhost:3000/assistants/tools', messages: [{ role: 'user', content: 'Prueba' }] } } }) });
   for (const mode of ['general', 'admin', 'quote']) {
-    const preparer = unified.nodes.find(node => node.name === `Preparar rol — ${mode}`);
-    const run = new Function('$input', '$', preparer.parameters.jsCode);
-    const makeInput = currentMode => ({ first: () => ({ json: { body: {
-      mode: currentMode,
-      language: 'es',
-      messages: [{ role: 'user', content: 'Prueba' }],
-      tools: [...ROLE_TOOLS[mode].map(name => ({ type: 'function', function: { name } })), { type: 'function', function: { name: 'una_tool_no_permitida' } }],
-    } } }) });
-    const prepared = run(makeInput(mode));
-    assert.equal(prepared[0].json.model, 'deepseek-flash');
-    assert.deepEqual(prepared[0].json.tools.map(tool => tool.function.name), ROLE_TOOLS[mode]);
-    assert.throws(() => run(makeInput('otro-rol')), /Contexto inválido/);
-    assertions += 3;
+    const prepared = run(makeInput(mode)); assert.equal(prepared[0].json.mode, mode);
+    assert.ok(prepared[0].json.systemPrompt.includes(ROLE_TOOLS[mode][0])); assertions += 2;
   }
+  assert.throws(() => run(makeInput('otro-rol')), /Contexto de asistente inválido/); assertions++;
   for (const [from, output] of Object.entries(unified.connections)) {
     assert.ok(unifiedNames.has(from));
-    for (const branch of output.main) for (const connection of branch) assert.ok(unifiedNames.has(connection.node));
-    assertions += output.main.flat().length + 1;
+    for (const branch of output.main || []) for (const connection of branch) assert.ok(unifiedNames.has(connection.node));
+    for (const [type, branches] of Object.entries(output)) if (type !== 'main') for (const branch of branches.flat()) assert.ok(unifiedNames.has(branch.node));
+    assertions += (output.main?.flat().length || 0) + Object.entries(output).filter(([type]) => type !== 'main').reduce((sum, [, branches]) => sum + branches.flat().length, 0) + 1;
   }
   for (const node of unified.nodes) if (node.type.endsWith('.code')) { new Function('$input', '$', node.parameters.jsCode); assertions++; }
-  const importZip = readStoredZip(await readFile('automation/vertice-n8n-import.zip'));
-  assert.deepEqual([...importZip.keys()].sort(), ['n8n/README.md', 'n8n/vertice-cr-unificado.json']); assertions++;
-  assert.deepEqual(JSON.parse(importZip.get('n8n/vertice-cr-unificado.json').toString('utf8')), unified); assertions++;
   for (const profile of DEMO_PROFILES) { await readFile(`public${profile.image}`); assertions++; }
   console.log(`PASS: ${assertions} comprobaciones HTTP, permisos, idempotencia, correo mock, tools, workflows y assets. Base aislada: ${dbFile}`);
 } finally {

@@ -55,7 +55,7 @@ No uses un documento histórico para invalidar una decisión vigente.
 
 `05-AUDITORIA-HF-Y-MOCKUPS.md` conserva evidencia, hallazgos y evolución de mockups.
 
-El workflow n8n unificado y su guía de importación están en `automation/n8n/`. Los cinco JSON por capacidad son componentes internos para generar/verificar ese único workflow; no se importan por separado.
+El workflow n8n unificado y su guía de importación están en `automation/n8n/`. Los cinco JSON fuente por capacidad son componentes internos para generar/verificar ese único workflow; no se importan por separado. La arquitectura IA vigente está registrada en `docs/07-DATOS-API-AUTH.md`.
 
 `DECISIONES-POST-AUDITORIA.md` y `auditoriaclaude.md` son referencias históricas y deben estar marcadas como tales.
 

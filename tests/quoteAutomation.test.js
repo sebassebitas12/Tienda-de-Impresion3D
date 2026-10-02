@@ -4,7 +4,7 @@ import { calculateAutomaticDemoQuote, resolveDemoProfile, DEMO_PROFILES } from '
 import { normalizeExchange, selectElectricity, createRatesProvider } from '../scripts/quote-rates.js';
 import { prepareOrderTransition, prepareAutomaticRequest } from '../scripts/automation-operations.js';
 import { sessionActor } from '../scripts/session-access.js';
-import { executeAssistantTool, runAssistant, validateToolArguments } from '../scripts/assistant-runtime.js';
+import { executeAssistantTool, executeAssistantToolCapability, issueAssistantToolCapability, revokeAssistantToolCapability, runAssistant, validateToolArguments } from '../scripts/assistant-runtime.js';
 import { deliverQuote } from '../scripts/quote-email.js';
 
 const now = '2026-10-02T12:00:00Z';
@@ -76,10 +76,24 @@ describe('roles, herramientas y recorridos', () => {
     expect(await executeAssistantTool('admin_overview', {}, { mode: 'general', data, getRates: rates })).toEqual({ error: 'TOOL_FORBIDDEN' });
     expect(await executeAssistantTool('request_details', { requestId: 'q1' }, { mode: 'quote', actor: { id: 'other' }, data, getRates: rates })).toEqual({ error: 'REQUEST_NOT_FOUND' });
   });
-  test('ejecuta tools autorizadas y filtra enlaces externos', async () => {
-    let calls = 0;
-    const result = await runAssistant({ mode: 'admin', message: 'Resumen' }, { actor, data, getRates: rates }, { fetchImpl: async () => ({ ok: true, json: async () => (++calls === 1 ? { message: { role: 'assistant', tool_calls: [{ id: 'call1', function: { name: 'admin_overview', arguments: '{}' } }] } } : { message: { role: 'assistant', content: JSON.stringify({ reply: 'Resumen disponible.', links: [{ label: 'Resumen', path: '/admin' }, { label: 'Externo', path: 'https://bad.test' }] }) } }) }) });
-    expect(result.source).toBe('DEEPSEEK'); expect(result.tools).toEqual([{ name: 'admin_overview', success: true }]); expect(result.links).toHaveLength(1);
+  test('limita capacidades efímeras por rol y número de invocaciones', async () => {
+    const capability = issueAssistantToolCapability({ mode: 'admin', actor, data, getRates: rates }, 1000);
+    expect((await executeAssistantToolCapability(capability, { mode: 'admin', name: 'admin_overview', args: {} }, 1001)).result.activeOrders).toBe(0);
+    expect(await executeAssistantToolCapability(capability, { mode: 'admin', name: 'admin_overview', args: {} }, 1002)).toMatchObject({ result: { activeOrders: 0 } });
+    expect(await executeAssistantToolCapability(capability, { mode: 'admin', name: 'admin_overview', args: {} }, 1003)).toMatchObject({ result: { activeOrders: 0 } });
+    expect(await executeAssistantToolCapability(capability, { mode: 'admin', name: 'admin_overview', args: {} }, 1004)).toEqual({ error: 'TOOL_CAPABILITY_INVALID' });
+    const scoped = issueAssistantToolCapability({ mode: 'general', actor: null, data, getRates: rates }, 2000);
+    expect(await executeAssistantToolCapability(scoped, { mode: 'general', name: 'admin_overview', args: {} }, 2001)).toEqual({ error: 'TOOL_FORBIDDEN' });
+    expect(await executeAssistantToolCapability(scoped, { mode: 'general', name: 'search_catalog', args: { query: '' } }, 92001)).toEqual({ error: 'TOOL_CAPABILITY_INVALID' });
+    revokeAssistantToolCapability(capability); revokeAssistantToolCapability(scoped);
+  });
+  test('consume salida del Agent y filtra enlaces externos', async () => {
+    const result = await runAssistant({ mode: 'admin', message: 'Resumen' }, { actor, data, getRates: rates }, { fetchImpl: async (_url, options) => {
+      const body = JSON.parse(options.body);
+      expect(body.mode).toBe('admin'); expect(body.toolCapability).toHaveLength(43); expect(body.messages.at(-1).content).toBe('Resumen');
+      return { ok: true, json: async () => ({ output: JSON.stringify({ reply: 'Resumen disponible.', links: [{ label: 'Resumen', path: '/admin' }, { label: 'Externo', path: 'https://bad.test' }] }) }) };
+    } });
+    expect(result.source).toBe('DEEPSEEK'); expect(result.links).toEqual([{ label: 'Resumen', path: '/admin' }]);
   });
   test('no deja saltar etapas de pedidos y exige motivo al cancelar', () => {
     const order = { status: 'PENDING' };

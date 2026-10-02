@@ -9,10 +9,10 @@
 
 - **Admin:** solicitud, cotización, email, aprobación del cliente y avance de pedidos con reglas e historial. Las cantidades de perfiles y costos son DEMO, no medidas, cobros, inventario ni producción real.
 - **Responsive revisado:** Resumen, Pedidos, Solicitudes/detalle, Catálogo, Categorías y Clientes en capturas de breakpoints y temas; capturas locales en `automation/evidence/`. Activity queda para el bloque posterior que reservó el usuario.
-- **n8n:** un único JSON importable en `automation/n8n/vertice-cr-unificado.json` contiene cinco entradas y una rama DeepSeek compartida por los tres roles; tasas y Gmail son ramas del mismo workflow. El ZIP incluye solo ese JSON y la guía. La instancia/credenciales Gmail y DeepSeek no están verificadas; no asumir conexión ni activación. Pruebas locales usan proveedores simulados.
+- **n8n:** el export único `automation/n8n/vertice-cr-unificado.json` ahora usa el AI Agent nativo de n8n, DeepSeek Chat Model y HTTP Request Tool hacia un dispatcher temporal con permisos backend. Tasas y Gmail permanecen ramas deterministas separadas. Credenciales y ejecución real en la instancia n8n siguen sin confirmar. Verificación local: 23 suites/120 tests, lint, `check:ui`, build y 160 checks de automatización pasan; build conserva warning de chunk >500 kB. CI de este cambio pendiente.
 - **Tasas:** cambio venta Hacienda puede ser oficial reciente; ARESEP requiere selección exacta de distribuidora/tarifa/bloque. Sin coincidencia, sigue DEMO. Los costos reales de materiales, desgaste y energía dependen de calibración del taller.
-- **Verificación local de R-H70:** 23 suites/119 pruebas, 160 comprobaciones de automatización, lint, `check:ui`, build y diff check pasan. El build conserva una advertencia de chunk >500 kB. CI de la unificación pendiente de push; el commit base `1e87bd0` sí quedó verde.
-- **Siguiente:** importar el workflow único, asignar credenciales propias en sus nodos, configurar `.env`, activar y hacer una prueba controlada a correo del usuario; después continuar Activity. No reabrir Home integral.
+- **Base previa:** el commit `7b6cfc2` quedó en `Pruebas`; la instancia/credenciales reales n8n nunca se verificaron. Los resultados anteriores pertenecen a esa versión y no certifican este cambio.
+- **Siguiente:** confirmar CI del commit antes de recomendar pull/importación. Después se requiere conocer si n8n corre local, en Docker o Cloud para elegir una URL segura para el callback. Probar primero los asistentes con DeepSeek y después Gmail a una dirección propia; no asumir credenciales activas.
 
 Este estado vigente prevalece sobre los cortes históricos que aparecen más abajo.
 
@@ -130,7 +130,7 @@ La UI no contiene reglas de negocio complejas ni accede directamente a JSON Serv
 
 Referencia: `docs/07`.
 
-Contratos académicos base cerrados para abrir el gate: modelo/estados y auth simulado contra JSON Server. La implementación continúa por slices. El proveedor y contrato de API externa siguen pendientes en `docs/07`; N8N/IA tienen patrón conceptual, pero faltan endpoints/workflows reales. No inventar proveedores o URLs.
+Contratos académicos base cerrados para abrir el gate: modelo/estados y auth simulado contra JSON Server. La implementación continúa por slices. El proveedor externo y credenciales reales de n8n siguen pendientes en `docs/07`; el webhook único y callback de herramientas ya están implementados y verificados localmente con servicios mock.
 
 ## 11. Calidad
 

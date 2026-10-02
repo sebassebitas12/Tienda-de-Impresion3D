@@ -69,5 +69,4 @@ email.settings = { ...email.settings, saveDataSuccessExecution: 'none', saveData
 email.nodes.push({ name: 'Configuración del correo', id: 'email-setup', type: 'n8n-nodes-base.stickyNote', typeVersion: 1, position: [180, 50], parameters: { width: 1020, height: 180, content: '## Cotización y copia al taller\nAsigna Header Auth en Webhook y autoriza Gmail OAuth en su nodo. Publica solo tras configurar credenciales y URL. La API guarda una clave de entrega por solicitud/versión para evitar reintentos ambiguos. Gmail confirma messageId; solo entonces se registra el envío. Las simulaciones llevan [DEMO] y las pruebas [PRUEBA]. No actives retries automáticos del nodo Gmail.' } });
 await writeFile(emailPath, JSON.stringify(email, null, 2) + '\n');
 await import('./build-n8n-unified.mjs');
-await import('./package-n8n-import.mjs');
 console.log('Generados componentes internos y un workflow n8n unificado para importar.');
