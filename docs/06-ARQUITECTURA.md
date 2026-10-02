@@ -221,3 +221,7 @@ Requisitos cerrados antes de iniciar React:
 - API/auth definidos;
 - contrato de datos listo;
 - estrategia de testing preparada.
+
+## Corrección de recorridos y referencias — 2026-10-02
+
+ReferencePicker vive en features/customRequests y comparte búsqueda/selección visual entre QuoteRequestPage y AutomaticQuote. AssistantPanel acepta embedded para cotización: conserva servicio, permisos y estados, pero usa section dentro del flujo; soporte general/Admin conservan Panel. UI no guarda solicitudes ni envía correos mediante este cambio.

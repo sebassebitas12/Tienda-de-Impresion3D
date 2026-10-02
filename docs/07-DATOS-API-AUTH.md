@@ -736,3 +736,7 @@ la tool.
 Límite: las guardas y persistencia de esta arquitectura académica local protegen
 la lógica funcional; JSON Server/token simulado y la serialización por proceso
 no reemplazan un backend transaccional ni seguridad de producción.
+
+## Corrección de recorridos y referencias — 2026-10-02
+
+El filtro de links del asistente público permite exactamente /solicitud/archivo y /solicitud/ayuda-diseno, además de rutas públicas existentes; rechaza subrutas arbitrarias y Admin. El chat de diseño está integrado en /solicitud/ayuda-diseno. No cambian capacidades de tools ni credenciales. La recepción privada STL/OBJ, laminado real y creación transaccional del brief siguen pendientes.

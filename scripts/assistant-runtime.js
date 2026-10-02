@@ -80,7 +80,7 @@ export async function executeAssistantTool(name, args, { mode, actor, data, getR
 
 function safeLinks(links, mode) {
   if (!Array.isArray(links)) return [];
-  const allowed = mode === 'admin' ? /^\/admin(?:\/(?:pedidos|solicitudes|catalogo|clientes|actividad)(?:\/[a-zA-Z0-9_-]+){0,2})?$/ : /^\/(?:catalogo|solicitud|cuenta|producto\/[a-zA-Z0-9_-]+)$/;
+  const allowed = mode === 'admin' ? /^\/admin(?:\/(?:pedidos|solicitudes|catalogo|clientes|actividad)(?:\/[a-zA-Z0-9_-]+){0,2})?$/ : /^\/(?:catalogo|solicitud(?:\/(?:archivo|ayuda-diseno))?|cuenta|producto\/[a-zA-Z0-9_-]+)$/;
   return links.filter(link => link && typeof link.label === 'string' && allowed.test(link.path)).slice(0, 4).map(link => ({ label: link.label.slice(0, 80), path: link.path }));
 }
 

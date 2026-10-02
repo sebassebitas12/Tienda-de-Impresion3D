@@ -1098,3 +1098,7 @@ distintos bajo la misma escala de marca. En el shell público, logo/navegación/
 utilidades usan columnas intrínsecas para evitar el choque de Contáctenos con
 Buscar. El cotizador colapsa a una columna bajo 860 px y usa el atributo vigente
 `data-motion="reduced"` además de respetar la preferencia del sistema.
+
+## Corrección de recorridos y referencias — 2026-10-02
+
+Fuente: cuatro anotaciones del usuario del 2026-10-02 → patrón: continuidad de tarea y referencias reconocibles → adaptación: conversación integrada, superficies cálidas de marca y selector visual con búsqueda, selección persistente y foco visible → motivo: definir una pieza requiere espacio de trabajo, no una ventana de soporte. Este patrón se comparte entre cotizador y Admin; no obliga a reemplazar selects pequeños y acotados, como cinco materiales. Sin dependencias nuevas.

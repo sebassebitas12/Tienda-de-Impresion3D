@@ -61,8 +61,8 @@ const content = {
     projectKicker: 'Tu proyecto',
     projectTitleA: '¿Tenés un archivo',
     projectTitleB: 'que quiere existir?',
-    projectIntro: 'Envíanos STL u OBJ para una revisión técnica. Primero entendemos el proyecto; después construimos una cotización detallada.',
-    startRequest: 'Cotizar archivo',
+    projectIntro: 'Tu STL u OBJ requiere una revisión técnica antes de cotizar. Conocé qué información necesita el taller para preparar el encargo.',
+    startRequest: 'Preparar mi archivo',
     viewProduct: 'Ver ficha',
     imageUnavailable: 'Imagen no disponible',
     heroPieces: {
@@ -124,8 +124,8 @@ const content = {
     projectKicker: 'Your project',
     projectTitleA: 'Have a file',
     projectTitleB: 'that should exist?',
-    projectIntro: 'Send us an STL or OBJ for a technical review. We understand the project first, then build a detailed quote.',
-    startRequest: 'Quote a file',
+    projectIntro: 'Your STL or OBJ needs a technical review before quoting. Learn what information the workshop needs to prepare your project.',
+    startRequest: 'Prepare my file',
     viewProduct: 'View details',
     imageUnavailable: 'Image unavailable',
     heroPieces: {

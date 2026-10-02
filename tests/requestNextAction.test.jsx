@@ -9,6 +9,10 @@ jest.mock('../src/services/adminActionsService.js', () => ({
   sendQuoteEmail: jest.fn(),
   transitionRequest: jest.fn(),
 }));
+jest.mock('../src/services/automationService.js', () => ({
+  automationAction: jest.fn(async () => ({ profiles: [] })),
+  automationError: jest.fn(() => 'Servicio no disponible'),
+}));
 
 const inputs = {
   material: 'PETG', weightGrams: 100, printHours: 1, filamentUsdPerKg: 20, wearUsdPerKg: 5,
@@ -38,12 +42,13 @@ describe('paso de envío de cotización', () => {
     expect(screen.getByText(/Copia oculta: taller@vertice.cr/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Enviar al cliente y copiarme' }));
     await waitFor(() => expect(sendQuoteEmail).toHaveBeenCalledWith({ requestId: 'r2', actorId: 'u1', expectedVersion: 2 }, { token: undefined }));
-    expect(await screen.findByRole('status')).toHaveTextContent(/Correo enviado al cliente con copia oculta/);
+    expect(await screen.findByText(/Correo enviado al cliente con copia oculta/)).toHaveAttribute('role', 'status');
     expect(transitionRequest).not.toHaveBeenCalled();
   });
 
-  it('bloquea el envío cuando la dirección aún es un correo de ejemplo', () => {
+  it('bloquea el envío cuando la dirección aún es un correo de ejemplo', async () => {
     renderAction({ customerEmail: 'ana@example.com' });
+    await screen.findByText('0 referencias');
     expect(screen.getByRole('button', { name: 'Enviar al cliente y copiarme' })).toBeDisabled();
     expect(screen.getByText(/contienen correos de ejemplo o inválidos/)).toBeInTheDocument();
   });

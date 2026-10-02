@@ -1382,3 +1382,7 @@ roles, versiones, duplicados, cierre/cancelación e idempotencia en la integraci
 No se pudo certificar el proveedor real de DeepSeek o la entrega real de Gmail:
 el check usa proveedores simulados y los workflows requieren importación y
 publicación en n8n. Activity continúa en el bloque que el usuario reservó.
+
+## Corrección de recorridos y referencias — 2026-10-02
+
+Defectos confirmados en React: mezcla de intenciones/DEMO con archivo no recibido, chat modal que cubría la tarea y dropdown largo sin búsqueda, repetido en Admin. Corregidos. Evidencia de navegador: diseño Dark en 1280/768/375, diseño Light en 375, archivo Light en 375 y selector Admin Light en 1280 con búsqueda soporte. Chat integrado sin dialog; diseño móvil sin overflow horizontal (375 de viewport/360 de contenido). No se verificó en esta pasada todo Admin móvil ni Gmail/n8n real. No se reaudita HF-01.

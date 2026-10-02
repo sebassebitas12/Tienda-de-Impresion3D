@@ -16,7 +16,7 @@
 .assistant-composer{padding:16px 20px;border-top:1px solid var(--line);background:var(--ink-soft);flex-shrink:0}
 .assistant-composer label{font-size:12px;display:block;margin-bottom:8px}
 .assistant-composer>div{display:flex;gap:8px}
-.assistant-composer input{width:100%;min-width:0;padding:12px;background:var(--ink);color:var(--paper);border:1px solid var(--line);border-radius:4px;font:inherit}
+.assistant-composer textarea{width:100%;min-width:0;padding:12px;background:var(--ink);color:var(--paper);border:1px solid var(--line);border-radius:10px;font:inherit;resize:vertical;line-height:1.5}
 .assistant-composer button{padding:10px 16px;flex-shrink:0}
 .assistant-composer small{display:block;margin-top:8px}
 .assistant-error{padding:12px 20px;color:var(--lava);margin:0;font-size:13px}

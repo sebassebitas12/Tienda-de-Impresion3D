@@ -65,6 +65,13 @@ describe('tasas oficiales, sin confundir energía y demanda', () => {
 });
 
 describe('roles, herramientas y recorridos', () => {
+  test('conserva las dos rutas de cotización y rechaza rutas no autorizadas', async () => {
+    const links = ['/solicitud/archivo', '/solicitud/ayuda-diseno', '/solicitud/desconocida', '/admin'].map(path => ({ label: path, path }));
+    const result = await runAssistant({ mode: 'quote', message: 'Opciones' }, { actor: null, data, getRates: rates }, {
+      fetchImpl: async () => ({ ok: true, json: async () => ({ output: JSON.stringify({ reply: 'Elegí tu camino.', links }) }) }),
+    });
+    expect(result.links.map(link => link.path)).toEqual(['/solicitud/archivo', '/solicitud/ayuda-diseno']);
+  });
   test('rechaza sesión expirada y vuelve a comprobar el rol en la base', () => {
     const token = payload => `Bearer sim.v1.${btoa(JSON.stringify(payload)).replace(/=+$/, '')}`;
     expect(sessionActor(token({ kind: 'SIMULATED_JWT', sub: actor.id, role: 'admin', exp: 9999999999 }), data)?.id).toBe(actor.id);

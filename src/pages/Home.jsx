@@ -147,7 +147,7 @@ export function Home() {
                 <Button as="a" href="#piezas" variant="primary" pill>
                   {content.explore} <span aria-hidden="true">↓</span>
                 </Button>
-                <Button as={Link} to="/solicitud" variant="ghost">
+                <Button as={Link} to="/solicitud/archivo" variant="ghost">
                   {content.hasFile} <span aria-hidden="true">↗</span>
                 </Button>
               </div>
@@ -288,7 +288,7 @@ export function Home() {
               <h2>{content.projectTitleA}<br />{content.projectTitleB}</h2>
               <p>{content.projectIntro}</p>
             </div>
-            <Button as={Link} to="/solicitud" variant="primary" pill>
+            <Button as={Link} to="/solicitud/archivo" variant="primary" pill>
               {content.startRequest} <span aria-hidden="true">↗</span>
             </Button>
           </RevealOnScroll>

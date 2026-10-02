@@ -275,3 +275,7 @@ protegida y manda `mode: admin`, y el botón de `/solicitud` manda `mode: quote`
 Cada webhook llega a su propio AI Agent nativo en n8n, con prompt y herramienta
 HTTP aislados. Comparten el modelo/credencial DeepSeek, no la identidad ni las
 herramientas disponibles.
+
+## Corrección de recorridos y referencias — 2026-10-02
+
+Las cuatro anotaciones del usuario se aplican como reglas de recorrido: /solicitud solo elige intención; /archivo tiene requisitos y comunica recepción pendiente sin mezclar un estimador de otra pieza; /ayuda-diseno integra la conversación en la página, sin modal. La simulación opcional tiene referencias visuales buscables y ninguna preseleccionada. Admin comparte ese selector. Home enlaza directamente al camino de archivo y no promete una carga disponible. No sustituir una función ausente por un enlace a Contacto, que sigue en construcción. Pendiente: recepción/medición del archivo y envío transaccional del brief a Admin.
