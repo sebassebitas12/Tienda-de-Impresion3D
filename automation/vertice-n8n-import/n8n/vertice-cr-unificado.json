@@ -56,8 +56,8 @@
     {
       "name": "Herramientas autorizadas — general",
       "id": "vertice-authorized-tools-general",
-      "type": "n8n-nodes-base.httpRequestTool",
-      "typeVersion": 1.2,
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
       "position": [
         790,
         580
@@ -138,8 +138,8 @@
     {
       "name": "Herramientas autorizadas — admin",
       "id": "vertice-authorized-tools-admin",
-      "type": "n8n-nodes-base.httpRequestTool",
-      "typeVersion": 1.2,
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
       "position": [
         790,
         830
@@ -220,8 +220,8 @@
     {
       "name": "Herramientas autorizadas — quote",
       "id": "vertice-authorized-tools-quote",
-      "type": "n8n-nodes-base.httpRequestTool",
-      "typeVersion": 1.2,
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
       "position": [
         790,
         1080
