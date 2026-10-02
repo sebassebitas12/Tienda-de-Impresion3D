@@ -49,6 +49,14 @@ revisión técnica; el mismo comando cambia a `IN_REVIEW` y registra actor/fecha
 `activityLog`. Estado desactualizado o rol inválido se rechazan. Archivo visible
 es solo `fileName` y no descarga hasta conectar almacenamiento privado. El
 registro `SUBMITTED` y estados desconocidos se revisan aparte sin recodificarlos.
+
+En `IN_REVIEW`, el operador prepara y guarda el costeo/cotización. En `QUOTED`,
+Admin muestra el correo del cliente y el correo del administrador autenticado, y
+ofrece **Enviar al cliente y copiarme**. Un único correo va al cliente y lleva
+copia oculta al taller; un envío confirmado por n8n cambia el estado a
+`AWAITING_APPROVAL` y registra la entrega en actividad. Si no hay proveedor,
+fallan las direcciones o n8n no confirma, la cotización permanece `QUOTED` y la
+interfaz explica el motivo. Las direcciones de ejemplo no se aceptan como reales.
 En la interfaz se identifican como **Estado no reconocido**; la explicación
 indica que el origen lo conserva, que no pertenece a las etapas vigentes y que
 queda separado de sus métricas.
@@ -191,7 +199,7 @@ Mantener el navbar público derivado de HF-01 con ajustes mínimos. En checkout 
 
 ### Hallazgo de estado actual
 
-La Home separa modelos de catálogo fabricados bajo pedido de piezas propias que requieren revisión y cotización. El recorrido de compra aún no se puede completar: catálogo público, detalle, solicitud, carrito, checkout, cuenta y pedidos del cliente siguen en `ConstructionPage`. En Admin están implementados dashboard, solicitudes, actividad, lectura de pedidos, catálogo, formularios de producto y CRUD de categorías. Clientes conserva pantallas de construcción. Login y registro sí tienen pantallas propias. Es una brecha funcional confirmada por código, no un fallo visual de checkout implementado.
+La Home separa modelos de catálogo fabricados bajo pedido de piezas propias que requieren revisión y cotización. El catálogo público, ficha y carrito ya tienen una base funcional para explorar modelos, seleccionar color/cantidad y conservar la selección local; checkout aún no está conectado. El flujo de solicitud personalizada, cuenta y pedidos del cliente conserva páginas pendientes. En Admin existen dashboard, solicitudes con preparación/publicación de cotización, actividad, lectura de pedidos, CRUD de catálogo/categorías y lectura de clientes con historial asociado. Los datos académicos y el token simulado no son controles de seguridad de producción. Login y registro tienen páginas propias.
 
 ### Recorrido recomendado
 
@@ -206,6 +214,19 @@ La incertidumbre se resuelve con estados vacíos, errores y una explicación cla
 
 ### Tipografía de chrome global
 
-La auditoría del instructor encontró textos ilegibles por defecto, en especial navbar y footer. El shell React sube navegación pública a 14 px en escritorio y 13 px en tablet; copy/enlaces del footer a 14 px y títulos/metadata secundaria a 12 px. Revisar a escala 100% y 150/200%, además de conservar las explicaciones en lenguaje natural y no reemplazarlas por etiquetas técnicas pequeñas.
+La auditoría del instructor encontró textos ilegibles por defecto, en especial navbar y footer. El shell React sube navegación pública a 14 px en escritorio y 13 px en tablet; copy/enlaces del footer a 14 px y títulos/metadata secundaria a 12 px. Revisar a escala 100% y 150/200%, además de conservar las explicaciones en lenguaje natural y no reemplazarlas por etiquetas técnicas pequeñas. En viewport estrecho deben conservarse carrito, idioma y menú; el buscador puede vivir en el menú cuando no quepa como control de primer nivel.
 
 **Actualización R-H46 (2026-10-01; supersedida en R-H48):** navbar/CTA a 16/15 px, footer a 16 px y colapso de navegación a 1000 px se revirtieron cuando el usuario aclaró que la captura se observó con zoom al 75%. Se restaura la primera iteración R-H45: navbar 14/13 px, CTA 13/12 px, idioma 12 px, footer 14 px con secundarios a 12 px y menú a partir de 820 px. La revisión de otros breakpoints y escalas sigue pendiente.
+
+## Solicitud/cotización DEMO y asistentes por contexto (2026-10-02)
+
+`/solicitud` deja a cualquier visitante calcular una estimación desde un perfil
+análogo. La cuenta customer la puede guardar, consultar en `/cuenta` y aprobar
+por versión vigente. Admin también puede generar la simulación y enviarla al
+cliente con copia al taller; solo respuesta Gmail confirmada registra envío.
+Errores y direcciones no entregables no se presentan como éxito.
+
+TP vive en el shell público; el asistente operativo aparece en Admin, y la
+orientación de cotización en `/solicitud`. Cada uno usa prompt y herramientas
+permitidas del backend. No se mezclan cuentas, no se autoriza al modelo a cambiar
+estados y el monto sale del motor reproducible.

@@ -24,6 +24,7 @@ export function buildAdminRequests({ customPrintRequests = [], users = [] } = {}
       ...request,
       phase: getRequestPhase(request.status),
       customerName: usersById.get(String(request.userId))?.name || null,
+      customerEmail: usersById.get(String(request.userId))?.email || null,
       reviewStartedByName: usersById.get(String(request.reviewStartedBy))?.name || null,
     }))
     .sort((a, b) => submittedDate(b.submittedAt) - submittedDate(a.submittedAt));

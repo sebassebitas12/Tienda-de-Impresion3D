@@ -1,6 +1,6 @@
 # Vértice CR — Diseño visual, temas y accesibilidad
 
-> Última actualización: **2026-10-01**.
+> Última actualización: **2026-10-02**.
 
 ## Dirección vigente
 
@@ -147,6 +147,29 @@ Reglas de aplicación Light:
 - `border-radius: 12px` — referencia base para superficies hero.
 - Sin `border-radius` universal aplicado a todo.
 
+### Fotos de producto en Tienda — decisión R-H64
+
+En las tarjetas del catálogo público, el escenario de imagen ocupa de borde a
+borde la superficie superior. Evitar una foto rectangular con margen sobre otra
+superficie contrastante: crea el efecto de “tarjeta dentro de tarjeta”. Usar un
+escenario oscuro uniforme y `object-fit: contain` para que el producto no se
+recorte aunque las fotos tengan distintas proporciones. El zoom compartido de
+hover debe desactivarse en estas fotos: al escalar el elemento dentro del
+escenario con `overflow: hidden`, vuelve a cortar llaveros y otros productos
+cuadrados. Además, el `img` debe tener su caja geométrica limitada al escenario
+(por ejemplo, `position:absolute; inset:0; width:100%; height:100%`); `object-fit`
+solo controla el contenido dentro de esa caja, no impide que una caja cuadrada
+desborde una celda apaisada. Para una fuente cuadrada, conservar la foto original
+completa centrada y extender a los lados su mismo fondo mediante una capa
+ambiental desenfocada; fundir suavemente solo el borde exterior de la foto para
+que no parezca una tarjeta dentro de otra ni franjas negras puras. No usar IA
+para reconstruir/alterar la pieza o sus accesorios: la foto tiene que seguir
+siendo fiel al modelo. La interacción puede enfatizar la tarjeta, nunca amputar
+el objeto.
+Este tratamiento es
+específico de la grilla de Tienda; no reemplaza las composiciones de Home ni las
+miniaturas de Admin.
+
 ### Excepciones de HF-01 en evaluación
 
 HF-01 puede usar radios mayores o asimétricos en composiciones facetadas del workbench, chatbot y superficies destacadas cuando la geometría aporte identidad. Estas variantes **no se convierten en tokens globales de React hasta que el usuario apruebe HF-01**. La auditoría debe distinguir entre una excepción intencional de composición y un radio heredado de una iteración anterior.
@@ -156,6 +179,60 @@ HF-01 puede usar radios mayores o asimétricos en composiciones facetadas del wo
 Admin comparte el lenguaje Vértice, pero organiza el trabajo como un registro de taller: métricas abiertas, etapas legibles, tablas sin paneles anidados y solicitudes como una cola accionable. Evitar la cuadrícula de tarjetas KPI gemelas y los contenedores con el mismo peso. Añadir una gráfica solo si deriva de los datos disponibles y ayuda a identificar la distribución operativa; declarar su conjunto en texto y no implicar periodo, meta o pronóstico ausente. Reservar Lava para la tarea que conduce a una acción real; mantener las etapas diferenciables por texto y forma además de color. La animación de entrada debe guiar la lectura, ser breve y desaparecer con `prefers-reduced-motion` y el ajuste de movimiento del sitio.
 
 **Referencias → patrón → adaptación → razón:** [Impeccable](https://github.com/pbakaus/impeccable) identifica las tarjetas repetidas/anidadas como cliché y recomienda variar jerarquía; Admin reemplaza paneles gemelos por un anillo de distribución real, una tabla y una cola abierta para que cada bloque tenga peso según su tarea. [taste-skill](https://github.com/senlindesign/taste-skill) documenta el porqué y el trade-off de cada token; aquí Lava es solo la llamada accionable y no pinta todas las etapas. [Emil Kowalski / skills](https://github.com/emilkowalski/skills) enseña a escoger duración, curva y propiedades según intención; el anillo y las filas entran con movimiento corto, sin física decorativa y con reduced-motion. Solo se adoptan criterios; no se copia código, no se ejecuta una instalación específica de Claude y no se añade dependencia.
+
+### R-H59 — Fondos de Admin sin círculos ornamentales
+
+El usuario rechaza los círculos concéntricos/halos usados como textura de fondo en
+las capturas del tablero. Se conservan los gráficos circulares que codifican
+distribuciones reales (por ejemplo, el anillo de pedidos por etapa); se eliminan
+las circunferencias decorativas. Las superficies Admin usan veladuras diagonales
+y trazos lineales de plano de fabricación, con bajo contraste y sin añadir
+dependencias. Alto contraste apaga las texturas. El lenguaje se varía por
+superficie; no se aplica una retícula idéntica a toda ruta.
+
+**Fuente → patrón → adaptación → razón:** Codrops, referencia de composición y
+`background-blend-mode` ya registrada en este documento → construir profundidad
+combinando capas CSS → geometría angular y rayado diagonal con tokens existentes,
+sin anillos → conservar atmósfera industrial y sacar el motivo circular que el
+usuario identificó como repetido. También se eliminó una regla global de
+`shop.css` que ocultaba el selector de idioma y sobrescribía el grid del navbar
+en todos los viewports bajo 1100 px; la regla queda limitada al grid de Tienda.
+La aprobación visual de Admin en render queda pendiente.
+
+### R-H60 — Registros Admin y claridad de datos — 2026-10-02
+
+La revisión del usuario pidió que Pedidos y Clientes recuperen un acabado de
+registro coherente con el resumen, sin duplicar una plantilla: Pedidos enfatiza
+etapa, fecha e importe de origen en una tabla de producción; Clientes prioriza
+identidad, estado y conteos de relaciones en filas de solo lectura. Ambos
+comparten jerarquía, divisores, superficies y feedback Vértice, con composición
+propia. En móvil la tabla de Pedidos refluye a fichas con etiquetas por campo.
+
+En Categorías, editar se abre en contexto debajo del elemento elegido y separa
+claramente la alta nueva del cambio existente; una vista previa muestra el
+nombre, slug y conteo real de modelos asociados antes de guardar. El aviso del
+dashboard explica que `SUBMITTED` es un valor heredado, no lo equipara
+automáticamente con `PENDING_QUOTE` y conduce a revisar la ficha antes de
+incorporarlo. La leyenda del gráfico de etapas ajusta sus columnas al espacio
+disponible para evitar que las etiquetas choquen cuando el sidebar reduce el
+ancho útil. No se alteran registros al inspeccionar estas pantallas.
+
+**Fuente → patrón → adaptación → razón:** HF-01 y tokens vigentes de Vértice →
+registros técnicos con lectura por tarea, jerarquía tipográfica y superficies
+con intención → tabla de producción, registro de cuentas y editor contextual
+comparten lenguaje, no disposición → dar continuidad visual al Admin sin
+convertir páginas diferentes en copias ni confundir valores históricos con el
+flujo actual. Sin dependencias nuevas ni contenido/datos inventados.
+
+### Selector de idioma — alcance local
+
+La preferencia representa idioma de interfaz, no ubicación. Por ahora se
+mantienen Español (Costa Rica) e Inglés, en un control segmentado con botones
+independientes y estado accesible. La región se usa solo al formatear
+moneda/fechas y no debe cambiarse mediante geolocalización. No agregar idiomas
+por ranking global sin público objetivo o traducciones completas revisadas.
+Para una ampliación futura, agregar locales explícitos (p. ej. `es-CR` y
+`en-US`) y fallback definido, manteniendo la selección manual.
 
 
 ## Accesibilidad — reglas concretas
@@ -991,3 +1068,33 @@ dependencias ni datos nuevos.
 ### Customer journey de compra — criterio incorporado
 
 En checkout, [Baymard](https://baymard.com/research-articles/show-shipping-costs-on-product-pages) observa la necesidad de conocer costos de envío que afectan el total antes de llegar al final de compra. Vértice debe hacer visibles costo total y condiciones de entrega antes del pago cuando esos datos estén definidos; no se deben inventar montos ni plazos. El recorrido catálogo (producto con precio definido) permanece separado de solicitud `PENDING_QUOTE` (sin precio final ni pago hasta cotizar). Contrato UX completo y estado de implementación: `docs/03-UX-Y-FLUJOS.md`.
+
+### R-H61 — Regla permanente de pasada visual real
+
+Por indicación explícita del usuario, **toda modificación de interfaz se revisa
+en el navegador antes de darla por terminada**, aunque el usuario no vuelva a
+pedir auditoría. La revisión se repite después de cada ajuste visual y sobre el
+render final. Las pantallas relacionadas deben compartir sistema (tokens,
+tipografía, superficies, ritmo y respuesta) sin copiarse entre sí; cada una
+mantiene una atmósfera/composición adecuada a su tarea. En responsive se apunta a
+1280/768/375 px; cualquier tamaño que el navegador no permita probar queda
+declarado pendiente, nunca inferido como aprobado.
+
+### Admin — envío de cotización con destinatarios visibles
+
+El paso de correo se integra en la superficie de costeo existente: mostrar
+destinatario cliente y copia ciega al taller como texto operativo, dar una única
+acción primaria clara y exponer el estado de envío/error. No crear un panel Gmail
+genérico ni afirmar éxito antes de la respuesta del servidor. Mantener el CTA
+deshabilitado cuando las direcciones son de muestra/no entregables; seguir usando
+tokens, tipografía y superficies de Admin, con movimiento reducido respetado.
+
+### Responsive Admin y navegación de cotización (2026-10-02)
+
+La pasada real detectó compresión de sidebar en tablet y filtros demasiado altos
+en móvil; Admin ahora adopta navegación compacta intermedia y dos columnas para
+filtros operativos estrechos. Clientes y Pedidos conservan tratamientos de lista
+distintos bajo la misma escala de marca. En el shell público, logo/navegación/
+utilidades usan columnas intrínsecas para evitar el choque de Contáctenos con
+Buscar. El cotizador colapsa a una columna bajo 860 px y usa el atributo vigente
+`data-motion="reduced"` además de respetar la preferencia del sistema.

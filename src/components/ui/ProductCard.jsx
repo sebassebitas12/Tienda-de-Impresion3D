@@ -17,20 +17,25 @@ export function ProductCard({
   imageUnavailableLabel = 'Imagen no disponible',
 }) {
   const [failedSource, setFailedSource] = useState(null);
+  const [photoShape, setPhotoShape] = useState(null);
   const src = product.images?.[0];
   const unpublished = String(product.status || 'ACTIVE').toUpperCase() !== 'ACTIVE';
   const imageAlt = product.imageAlt || (product.name + ' en ' + product.material);
   const featured = layout === 'featured';
+  const hasPhoto = Boolean(src && failedSource !== src);
 
   return (
     <Card hover className={'v-product-card' + (featured ? ' v-product-card--featured' : '')} data-unavailable={unpublished}>
-      <div className="v-product-image">
+      <div className="v-product-image" data-has-photo={hasPhoto} data-photo-shape={photoShape} style={hasPhoto ? { '--product-photo-backdrop': `url(${JSON.stringify(src)})` } : undefined}>
         <div className="v-product-meta">
           {!featured && <Badge variant="material-tag">{product.material}</Badge>}
           {showMadeToOrder && <Badge variant="production-tag">Bajo pedido</Badge>}
         </div>
-        {src && failedSource !== src ?
-          <img src={src} alt={imageAlt} loading="lazy" decoding="async" onError={() => setFailedSource(src)} /> :
+        {hasPhoto ?
+          <img src={src} alt={imageAlt} loading="lazy" decoding="async" onLoad={event => {
+            const { naturalWidth, naturalHeight } = event.currentTarget;
+            setPhotoShape(Math.abs(naturalWidth / naturalHeight - 1) < 0.08 ? 'square' : 'landscape');
+          }} onError={() => setFailedSource(src)} /> :
           <span className="v-image-empty">{imageUnavailableLabel}</span>}
       </div>
       <div className="v-product-body">

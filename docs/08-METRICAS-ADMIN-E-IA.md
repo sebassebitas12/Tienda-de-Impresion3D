@@ -109,6 +109,19 @@ orden cronológico inverso y permite filtrar por solicitud; el vacío indica que
 todavía no hay acciones guardadas. No usar `stock`/`minStock` en el dashboard ni
 inferir disponibilidad material de piezas: el catálogo se fabrica bajo pedido.
 
+### Clientes Admin — lectura e historial (2026-10-02)
+
+`/admin/clientes` lista únicamente cuentas `role: customer`; permite buscar por
+nombre, correo o ID y enlaza a una ficha de solo lectura. La ficha relaciona
+pedidos y solicitudes por `userId` y lleva a sus vistas de detalle. No expone
+`demoPassword`, no permite editar/eliminar cuentas y no inventa teléfono,
+dirección, facturación, gasto total ni estado de pagos. Si esos campos se
+incorporan al modelo, deberán tener propósito y permisos documentados.
+
+El trabajo separado en tres asistentes públicos/Admin/cotización está
+especificado en `docs/07`; no forma parte de este slice ni simula una respuesta
+de IA sin webhook configurado.
+
 ### Referencia de contenido para el tablero
 
 Las capturas aportadas por el usuario (2026-10-01) muestran tipos útiles de
@@ -176,9 +189,11 @@ un contrato de transición y auditabilidad.
 La ficha permite iniciar revisión únicamente desde `PENDING_QUOTE`. La acción
 valida estado esperado y actor Admin, transiciona a `IN_REVIEW` y agrega el evento
 en una sola escritura del API académico. El resultado y los errores se anuncian;
-la ficha actualiza el estado y muestra quién inició la revisión. No cotiza ni
-modifica precio. La ruta global de actividad muestra estos eventos desde
-`activityLog` y permite filtrarlos por solicitud, descrito en este mismo documento.
+la ficha actualiza el estado y muestra quién inició la revisión. Desde `IN_REVIEW`,
+Admin puede calcular y guardar una cotización manual con snapshot auditado (ver
+“Cotización manual desde la ficha de solicitud” abajo); aún no ejecuta laminado ni
+consulta tarifas en vivo. La ruta global de actividad muestra eventos desde
+`activityLog` y permite filtrarlos por solicitud.
 
 #### Referencias de movimiento y datos
 
@@ -243,3 +258,54 @@ bajo pedido. No se muestran cifras de inventario, no se cambia publicación y no
 se habilita edición hasta que existan reglas, endpoint transaccional y storage.
 Los registros con un material no admitido por la capacidad actual se hacen
 visibles para revisión, en lugar de borrarlos u ocultarlos.
+
+### Aviso de registros heredados en Resumen — 2026-10-02
+
+El dashboard separa los estados fuera del flujo oficial y no los incluye en las
+métricas ni los convierte automáticamente. Para el fixture `SUBMITTED`, la UI
+explica que es una etiqueta del formato anterior, enlaza a la ficha de la
+solicitud y señala que desde allí se puede registrar como `PENDING_QUOTE` si la
+revisión confirma que corresponde. La existencia del dato por sí sola no
+autoriza una conversión ni permite inferir equivalencia de negocio.
+
+### Cotización manual desde la ficha de solicitud (2026-10-02)
+
+La cotización dejó de solicitar un monto final aislado. Admin introduce mediciones
+del laminador y costos/tasas reales, ve un desglose antes de guardar, y guarda/publica
+solo la cifra calculada y persistida. La aritmética corre de nuevo en el servidor
+JSON académico; la solicitud conserva parámetros, desglose, fecha de tarifas y
+versión de reglas. Es preparación manual asistida, no conexión de DeepSeek, BCCR,
+ARESEP o un laminador.
+
+La tarifa eléctrica corresponde a la distribuidora/servicio del taller y se verifica
+por factura o tarifa oficial aplicable; el tipo BCCR venta es un campo independiente
+para los costos USD/kg. No hay tarifas maestras ni actualización automática. La UI
+advierte que impuestos, envío y costos no incluidos siguen fuera del total si no se
+agregan explícitamente.
+
+### Entrega de cotización por correo — 2026-10-02
+
+El action de envío confirmado registra `REQUEST_QUOTE_EMAIL_SENT` en
+`activityLog`, con solicitud, actor, estados y fecha. No crea métricas de venta,
+pago ni ingresos. Sin confirmación del webhook, la solicitud queda `QUOTED` y no
+se registra envío.
+
+## Flujo Admin funcional y tres bots (2026-10-02)
+
+Admin puede cotizar automáticamente perfiles conocidos desde imágenes públicas;
+el número es DEMO, se muestra con desglose y la aprobación es una acción separada
+del cliente. Email (cliente + copia oculta al taller) requiere Gmail confirmado.
+Después de `APPROVED`, fulfillment ofrece registro simulado rotulado o cobro
+verificado manualmente; no existe pago real ni cobro automático en esta entrega.
+Pedido guarda snapshot de pieza/alcance y cambia por una etapa permitida por vez.
+
+Herramientas: TP general (buscar catálogo publicado, guía de materiales, explicar
+proceso); bot Admin (resumen, solicitudes, pedidos, calidad de catálogo, guía
+Admin, materiales, perfiles/cálculo DEMO, detalle autorizado); bot cotizador
+(perfiles/cálculo DEMO, materiales, proceso y detalle del dueño). La ejecución de
+tools ocurre detrás del API después de comprobar la sesión/rol; n8n/DeepSeek
+redacta la respuesta y no modifica estados ni dispara emails.
+
+El indicador de ventas cobradas conserva `null` si no existe evidencia. Totales
+del pedido, cotizaciones DEMO, aprobaciones e intenciones de pago no se suman
+como ingreso confirmado.

@@ -4,7 +4,8 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { PreferencesProvider } from '../src/app/providers/PreferencesProvider.jsx';
 import { AdminCatalogDetailPage, AdminCatalogPage } from '../src/features/admin/AdminCatalog.jsx';
 import { getAdminCatalogData } from '../src/services/adminCatalogService.js';
-import { buildAdminCatalog, filterAdminCatalog, summarizeAdminCatalog } from '../src/utils/adminCatalog.js';
+import { buildAdminCatalog, filterAdminCatalog, isCatalogProductReadyToPublish, summarizeAdminCatalog } from '../src/utils/adminCatalog.js';
+import { isOrderableProduct } from '../src/utils/cart.js';
 
 jest.mock('../src/services/adminCatalogService.js', () => ({ getAdminCatalogData: jest.fn() }));
 
@@ -73,5 +74,34 @@ describe('administración del catálogo', () => {
     expect(screen.getByText(/₡8.?500/)).toBeInTheDocument();
     expect(screen.getByText('180 × 120 × 60 mm')).toBeInTheDocument();
     expect(screen.queryByText('20')).not.toBeInTheDocument();
+  });
+
+  it('mantiene borradores sin precio fuera de publicación y del conteo de materiales legados', async () => {
+    const draft = { id: 'p7', name: 'Base para control', slug: 'base-control', categoryId: 'c1', images: ['/images/producto-base-control.jpg'], price: null, currency: 'CRC', material: null, status: 'DRAFT', featured: false };
+    const draftData = { products: [rawData.products[0], draft], categories: [{ id: 'c1', name: 'Gadgets' }] };
+    getAdminCatalogData.mockResolvedValue(draftData);
+    renderAdmin();
+    expect(await screen.findByRole('link', { name: /Base para control/ })).toHaveAttribute('href', '/admin/catalogo/p7');
+    expect(screen.getByText(/Los borradores siguen ocultos/)).toBeInTheDocument();
+    const reviewLink = screen.getByRole('link', { name: 'Revisar borradores (1) ↗' });
+    expect(reviewLink).toHaveAttribute('href', '/admin/catalogo?estado=DRAFT');
+    fireEvent.click(reviewLink);
+    await waitFor(() => expect(screen.getByRole('button', { name: /Borrador 1/ })).toHaveAttribute('aria-pressed', 'true'));
+    expect(document.querySelectorAll('.admin-catalog-row')).toHaveLength(1);
+    expect(screen.queryByText(/material fuera de la capacidad vigente/)).not.toBeInTheDocument();
+    expect(filterAdminCatalog(buildAdminCatalog(draftData), { status: 'DRAFT' })).toHaveLength(1);
+    expect(summarizeAdminCatalog(draftData.products)).toMatchObject({ drafts: 1, needsReview: 0, statuses: { DRAFT: 1 } });
+    expect(isOrderableProduct(draft)).toBe(false);
+  });
+
+  it('bloquea la publicación del borrador hasta tener precio, material y categoría válidos', async () => {
+    const draft = { id: 'p7', name: 'Base para control', slug: 'base-control', categoryId: 'c1', images: ['/images/producto-base-control.jpg'], price: null, currency: 'CRC', material: null, status: 'DRAFT', featured: false };
+    getAdminCatalogData.mockResolvedValue({ products: [draft], categories: [{ id: 'c1', name: 'Gadgets' }] });
+    renderAdmin('/admin/catalogo/p7');
+    expect(await screen.findByRole('heading', { name: 'Base para control' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Publicar' })).toBeDisabled();
+    expect(screen.getByText(/sigue en borrador/i)).toBeInTheDocument();
+    expect(isCatalogProductReadyToPublish(draft)).toBe(false);
+    expect(isCatalogProductReadyToPublish({ ...draft, price: 1200, material: 'PLA' })).toBe(true);
   });
 });

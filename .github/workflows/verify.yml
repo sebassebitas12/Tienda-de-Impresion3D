@@ -49,6 +49,11 @@ jobs:
         continue-on-error: true
         run: npm run check:ui
 
+      - name: Automation integration check
+        id: automation
+        continue-on-error: true
+        run: npm run check:automation
+
       - name: Production build
         id: build
         continue-on-error: true
@@ -61,7 +66,9 @@ jobs:
           echo "tests=${{ steps.tests.outcome }}"
           echo "ui=${{ steps.ui.outcome }}"
           echo "build=${{ steps.build.outcome }}"
+          echo "automation=${{ steps.automation.outcome }}"
           test "${{ steps.lint.outcome }}" = "success"
           test "${{ steps.tests.outcome }}" = "success"
           test "${{ steps.ui.outcome }}" = "success"
           test "${{ steps.build.outcome }}" = "success"
+          test "${{ steps.automation.outcome }}" = "success"

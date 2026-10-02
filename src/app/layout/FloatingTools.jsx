@@ -1,20 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { AssistantPanel } from '../../features/chatbot/AssistantPanel.jsx';
+import { useAuth } from '../../hooks/useAuth.js';
 import { Button, IconButton, Panel, Switch } from '../../components/ui/index.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
 
 export function FloatingTools({ active, onActiveChange }) {
+  const auth = useAuth();
   const location = useLocation();
   const preferences = usePreferences();
   const { copy } = preferences;
-  const [message, setMessage] = useState('');
-  const [chatFeedback, setChatFeedback] = useState(null);
   const [scrolling, setScrolling] = useState(false);
   const [speechStatus, setSpeechStatus] = useState('idle');
   const speechRun = useRef(0);
   const chatTrigger = useRef(null);
   const readingTrigger = useRef(null);
-  const messageField = useRef(null);
 
   useEffect(() => {
     const resetStatus = window.setTimeout(() => setSpeechStatus('idle'), 0);
@@ -84,7 +84,7 @@ export function FloatingTools({ active, onActiveChange }) {
   return (
     <>
       <div className="floating-tools" role="group" aria-label={copy.tools} data-scrolling={scrolling && !active} data-panel-open={Boolean(active)}>
-        <IconButton
+        {!location.pathname.startsWith('/solicitud') && <IconButton
           ref={chatTrigger}
           className="chat-trigger"
           variant="floating-button"
@@ -92,7 +92,7 @@ export function FloatingTools({ active, onActiveChange }) {
           aria-expanded={active === 'chat'}
           aria-controls="chat-panel"
           onClick={() => onActiveChange(active === 'chat' ? null : 'chat')}
-        >✦</IconButton>
+        >✦</IconButton>}
         <IconButton
           ref={readingTrigger}
           variant="floating-button"
@@ -103,70 +103,7 @@ export function FloatingTools({ active, onActiveChange }) {
         >♿</IconButton>
       </div>
 
-      <Panel
-        id="chat-panel"
-        className="chat-panel"
-        open={active === 'chat'}
-        title={<span className="chat-panel-title"><img src="/favicon-32.png" alt="" /><span><strong>{copy.chat}</strong><small>{copy.chatSubtitle}</small></span></span>}
-        closeLabel={copy.close}
-        onClose={() => onActiveChange(null)}
-        triggerRef={chatTrigger}
-        initialFocusRef={messageField}
-      >
-        <div className="chat-thread">
-          <div className="chat-welcome">
-            <span className="chat-eyebrow">{copy.chatLabel}</span>
-            <h3>{copy.chatIntro}</h3>
-            <p>{copy.chatContext}</p>
-          </div>
-
-          {!chatFeedback && <div className="chat-demo-note">
-            <p>{copy.chatDemo}</p>
-            <Link to="/solicitud" onClick={() => onActiveChange(null)}>{copy.quoteFile}<span aria-hidden="true"> ↗</span></Link>
-          </div>}
-
-          <div className="chat-suggestions" role="group" aria-label={copy.topics}>
-            <span className="chat-suggestions-label">{copy.chatStartWith}</span>
-            {['chooseMaterial', 'reviewFiles', 'process'].map(key => (
-              <button
-                type="button"
-                key={key}
-                onClick={() => {
-                  setMessage(copy[key]);
-                  setChatFeedback(null);
-                  messageField.current?.focus();
-                }}
-              >
-                {copy[key]}
-              </button>
-            ))}
-          </div>
-
-          {chatFeedback && <p role="status" className="chat-feedback">
-            {copy[chatFeedback]}
-            {chatFeedback === 'chatUnavailable' && <> <Link to="/solicitud" onClick={() => onActiveChange(null)}>{copy.quoteFile}</Link></>}
-          </p>}
-        </div>
-
-        <form className="chat-composer" onSubmit={event => {
-          event.preventDefault();
-          setChatFeedback(message.trim() ? 'chatUnavailable' : 'messageRequired');
-        }}>
-          <label htmlFor="chat-message">{copy.message}</label>
-          <div className="chat-compose">
-            <input
-              ref={messageField}
-              className="v-input"
-              id="chat-message"
-              value={message}
-              placeholder={copy.messagePlaceholder}
-              onChange={event => { setMessage(event.target.value); setChatFeedback(null); }}
-            />
-            <IconButton type="submit" label={copy.send}>↑</IconButton>
-          </div>
-          <small>{copy.chatInputHint}</small>
-        </form>
-      </Panel>
+      <AssistantPanel key={auth?.user?.id || 'guest'} mode="general" open={active === 'chat' && !location.pathname.startsWith('/solicitud')} onClose={() => onActiveChange(null)} triggerRef={chatTrigger} />
 
       <Panel
         id="accessibility-panel"

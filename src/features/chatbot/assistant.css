@@ -1,0 +1,25 @@
+.assistant-panel{width:min(420px,calc(100vw - 24px));max-height:calc(100dvh - 110px);overflow:hidden}
+.assistant-panel .v-panel__body{padding:0;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.assistant-thread{padding:22px;overflow:auto;overscroll-behavior:contain;min-height:0;background:var(--ink)}
+.assistant-intro>span,.assistant-speaker{font:11px var(--mono);letter-spacing:.08em;color:var(--lava)}
+.assistant-intro h3{font-size:24px;line-height:1.2;margin:10px 0}
+.assistant-intro p,.assistant-composer small{font-size:12px;color:var(--muted);line-height:1.6}
+.assistant-topics{display:grid;gap:8px;margin-top:24px}
+.assistant-topics button{display:flex;justify-content:space-between;gap:16px;text-align:left;padding:14px;background:var(--ink-soft);border:1px solid var(--line);border-radius:4px;color:var(--paper);font:inherit;cursor:pointer}
+.assistant-topics button:hover{border-color:var(--lava)}
+.assistant-topics span{color:var(--lava)}
+.assistant-message{padding:14px 0;border-top:1px solid var(--line);margin-top:14px}
+.assistant-message--user{padding:14px;background:var(--ink-soft);border:1px solid var(--line);border-radius:8px;margin-left:24px}
+.assistant-message p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;font-size:14px;margin:8px 0}
+.assistant-message small{display:block;font-size:11px;color:var(--muted)}
+.assistant-message a{display:block;margin-top:10px;color:var(--lava);font-size:13px}
+.assistant-composer{padding:16px 20px;border-top:1px solid var(--line);background:var(--ink-soft);flex-shrink:0}
+.assistant-composer label{font-size:12px;display:block;margin-bottom:8px}
+.assistant-composer>div{display:flex;gap:8px}
+.assistant-composer input{width:100%;min-width:0;padding:12px;background:var(--ink);color:var(--paper);border:1px solid var(--line);border-radius:4px;font:inherit}
+.assistant-composer button{padding:10px 16px;flex-shrink:0}
+.assistant-composer small{display:block;margin-top:8px}
+.assistant-error{padding:12px 20px;color:var(--lava);margin:0;font-size:13px}
+.admin-utilities{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding-top:16px;border-top:1px solid var(--line)}
+.admin-assistant-trigger{font-size:13px!important;padding:10px 14px!important}
+@media(max-width:760px){.assistant-panel{right:12px!important;bottom:80px!important;max-height:calc(100dvh - 96px)}.admin-utilities{padding-top:8px;gap:8px}}

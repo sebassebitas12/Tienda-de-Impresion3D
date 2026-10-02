@@ -1,0 +1,129 @@
+{
+  "name": "Vértice — Tasas públicas de cotización",
+  "nodes": [
+    {
+      "name": "Entrada segura",
+      "id": "entrada-segura",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        180,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vertice-rates",
+        "authentication": "headerAuth",
+        "responseMode": "lastNode",
+        "responseData": "firstEntryJson",
+        "options": {}
+      }
+    },
+    {
+      "name": "Consultar Hacienda",
+      "id": "consultar-hacienda",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        300
+      ],
+      "parameters": {
+        "url": "https://api.hacienda.go.cr/indicadores/tc/dolar",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "name": "Consultar ARESEP",
+      "id": "consultar-aresep",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "url": "https://datos.aresep.go.cr/ws.datosabiertos/Services/IE/TarifasElectricidad.svc/ObtenerTarifasElectricidadDistribucion/0",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "name": "Recortar tarifas y responder",
+      "id": "recortar-tarifas-y-responder",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const body=$('Entrada segura').first().json.body||{};\nconst selection=body.selection||{}; const date=String(body.date||'');\nconst rows=$('Consultar ARESEP').first().json.value||[];\nconst value=Array.isArray(rows)?rows.filter(r=>Number(r.anho)===Number(date.slice(0,4))&&Number(r.id_Mes)===Number(date.slice(5,7))&&r.empresa===selection.company&&r.tipoTarifa===selection.tariff&&String(r.bloque).trim()===String(selection.block||'').trim()).slice(0,3):[];\nreturn [{json:{exchange:$('Consultar Hacienda').first().json,electricity:{value}}}];"
+      }
+    },
+    {
+      "name": "Configuración y alcance",
+      "id": "setup-note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        60
+      ],
+      "parameters": {
+        "content": "## Tasas oficiales\nSelecciona Header Auth existente en Entrada segura y publica. Hacienda entrega USD compra/venta sin API key. ARESEP devuelve empresa/tarifa/bloque; la API Vértice revalida fecha, unidad y coincidencia única. Sin selección exacta se mantiene electricidad DEMO. Errores externos producen fallback DEMO identificado en el snapshot; no se inventa una tasa oficial.",
+        "width": 930,
+        "height": 200
+      }
+    }
+  ],
+  "connections": {
+    "Entrada segura": {
+      "main": [
+        [
+          {
+            "node": "Consultar Hacienda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Hacienda": {
+      "main": [
+        [
+          {
+            "node": "Consultar ARESEP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar ARESEP": {
+      "main": [
+        [
+          {
+            "node": "Recortar tarifas y responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "executionTimeout": 90
+  },
+  "tags": []
+}

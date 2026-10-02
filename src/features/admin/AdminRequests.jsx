@@ -167,7 +167,8 @@ export function AdminRequestsPage() {
 
 export function AdminRequestDetailPage() {
   const { language } = usePreferences();
-  const user = useAuth()?.user;
+  const auth = useAuth();
+  const user = auth?.user;
   const text = words[language];
   const { status, requests, retry } = useAdminRequests();
   const [reviewAction, setReviewAction] = useState({ status: 'idle', message: '' });
@@ -182,7 +183,7 @@ export function AdminRequestDetailPage() {
     if (!request || request.status !== 'PENDING_QUOTE' || user?.role !== 'admin' || reviewAction.status === 'loading') return;
     setReviewAction({ status: 'loading', message: '' });
     try {
-      await startRequestReview({ requestId: request.id, actorId: user.id });
+      await startRequestReview({ requestId: request.id, actorId: user.id, ...(auth?.token ? { token: auth.token } : {}) });
       setReviewAction({ status: 'success', message: text.reviewStarted });
       retry();
     } catch (error) {
@@ -215,7 +216,7 @@ export function AdminRequestDetailPage() {
             <p>{request.customerName || text.customerUnknown} <span aria-hidden="true">·</span> {formatDate(request.submittedAt, language)}</p></div>
           <span className="admin-state" data-status={request.status}>{text.statuses[request.status] || request.status}</span>
         </header>
-        {['SUBMITTED', 'IN_REVIEW', 'QUOTED', 'AWAITING_APPROVAL', 'APPROVED', 'PAID'].includes(request.status) && <RequestNextAction key={`${request.id}-${request.updatedAt || request.status}`} request={request} user={user} language={language} onSaved={retry} />}
+        {['SUBMITTED', 'PENDING_QUOTE', 'IN_REVIEW', 'QUOTED', 'AWAITING_APPROVAL', 'APPROVED', 'PAID'].includes(request.status) && <RequestNextAction key={`${request.id}-${request.updatedAt || request.status}`} request={request} user={user} language={language} onSaved={retry} />}
         {phaseIsLegacy ? <aside className="admin-detail-legacy" role="status"><strong>{text.legacyTitle}</strong><p>{text.legacyDescription(request.status)}</p></aside> : (
           <>
           {request.status === 'PENDING_QUOTE' && user?.role === 'admin' && <div className="admin-review-action">

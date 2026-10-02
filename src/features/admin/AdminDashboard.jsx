@@ -21,7 +21,13 @@ const labels = {
     flowDescription: count => `${count} pedidos activos distribuidos por etapa de producción.`, flowCaption: 'Cada segmento representa una proporción del total activo.',
     statuses: { PENDING: 'Pendiente', CONFIRMED: 'Confirmado', IN_PRODUCTION: 'En producción', READY: 'Listo', SHIPPED: 'Enviado',
       PENDING_QUOTE: 'Pendiente de cotización', IN_REVIEW: 'En revisión' },
-    legacyTitle: 'Solicitudes por incorporar', legacyText: count => `${count} registro${count === 1 ? '' : 's'} necesita${count === 1 ? '' : 'n'} una etapa para poder continuar. Revisalos desde la bandeja de solicitudes.`,
+    legacyTitle: 'Registro fuera del flujo actual', legacyText: (requests, orders) => {
+      const submitted = requests.some(request => request.status === 'SUBMITTED');
+      const parts = [];
+      if (requests.length) parts.push(`${requests.length} solicitud${requests.length === 1 ? '' : 'es'}`);
+      if (orders.length) parts.push(`${orders.length} pedido${orders.length === 1 ? '' : 's'}`);
+      return `Hay ${parts.join(' y ')} con un estado que el flujo actual no reconoce. ${submitted ? 'SUBMITTED es una etiqueta del formato anterior: no equivale automáticamente a “Pendiente de cotización”. ' : ''}No se convierte${parts.length === 1 ? '' : 'n'} ni se cuenta${parts.length === 1 ? '' : 'n'} en las etapas actuales. ${requests.length ? 'Abrí la solicitud y revisá sus datos; su ficha permite registrarla como pendiente si corresponde. ' : ''}${orders.length ? 'El pedido conserva su estado de origen y no se modifica desde este aviso.' : ''}`;
+    },
     legacyStatus: 'Estado', errorTitle: 'No pudimos cargar el resumen',
     errorText: 'Revisá que JSON Server esté activo y volvé a intentar.', retry: 'Reintentar',
     loading: 'Cargando información del taller', noPayments: 'Sin datos de cobros',
@@ -38,7 +44,14 @@ const labels = {
     flowDescription: count => `${count} active orders distributed by production stage.`, flowCaption: 'Each segment shows its share of active orders.',
     statuses: { PENDING: 'Pending', CONFIRMED: 'Confirmed', IN_PRODUCTION: 'In production', READY: 'Ready', SHIPPED: 'Shipped',
       PENDING_QUOTE: 'Pending quote', IN_REVIEW: 'Under review' },
-    legacyTitle: 'Unrecognized status', legacyText: count => `${count} record${count === 1 ? ' uses' : 's use'} a status that does not match the current stages.`,
+    legacyTitle: 'Record outside the current workflow', legacyText: (requests, orders) => {
+      const submitted = requests.some(request => request.status === 'SUBMITTED');
+      const parts = [];
+      if (requests.length) parts.push(`${requests.length} request${requests.length === 1 ? '' : 's'}`);
+      if (orders.length) parts.push(`${orders.length} order${orders.length === 1 ? '' : 's'}`);
+      const conversionRule = parts.length === 1 ? 'It is not converted or counted in current stages. ' : 'They are not converted or counted in current stages. ';
+      return `${parts.join(' and ')} ${parts.length === 1 ? 'has' : 'have'} a status not recognized by the current workflow. ${submitted ? 'SUBMITTED is a label from the previous format; it does not automatically mean “Pending quote”. ' : ''}${conversionRule}${requests.length ? 'Open the request and review its details; its record lets you register it as pending if appropriate. ' : ''}${orders.length ? 'The order keeps its original status and is not changed from this notice.' : ''}`;
+    },
     legacyStatus: 'Status', errorTitle: 'We could not load the overview',
     errorText: 'Check that JSON Server is running and try again.', retry: 'Retry',
     loading: 'Loading workshop data', noPayments: 'No collection data',
@@ -178,15 +191,21 @@ export function AdminDashboard() {
           </section>
         </div>
 
-        {legacyCount > 0 && <aside className="admin-data-notice" role="status">
-          <span className="admin-data-notice__mark" aria-hidden="true">!</span>
-          <span className="admin-eyebrow">{text.legacyTitle}</span>
-          <div><p>{text.legacyText(legacyCount)}</p>
-            <ul>
-              {data.legacyRequests.map(request => <li key={`request-${request.id}`}><Link to={`/admin/solicitudes/${encodeURIComponent(request.id)}`}>Solicitud {request.id} · {language === 'es' ? 'Abrir e incorporar' : 'Open and register'} ↗</Link></li>)}
-              {data.legacyOrders.map(order => <li key={`order-${order.id}`}>Pedido {order.id} · {text.legacyStatus}: {order.status}</li>)}
-            </ul>
-          </div>
+        {legacyCount > 0 && <aside className="admin-data-notice" aria-labelledby="admin-data-notice-title">
+          <header className="admin-data-notice__header"><span className="admin-data-notice__mark" aria-hidden="true">!</span>
+            <div><span className="admin-eyebrow">{language === 'es' ? 'REVISIÓN DE DATOS' : 'DATA REVIEW'}</span><h2 id="admin-data-notice-title">{text.legacyTitle}</h2><p>{text.legacyText(data.legacyRequests, data.legacyOrders)}</p></div>
+          </header>
+          <ul className="admin-data-notice__records">
+            {data.legacyRequests.map(request => <li key={`request-${request.id}`}>
+              <span><strong>{language === 'es' ? 'Solicitud' : 'Request'} {request.id}</strong><small>{text.legacyStatus}: {request.status}</small></span>
+              <Link to={`/admin/solicitudes/${encodeURIComponent(request.id)}`}>{language === 'es' ? 'Revisar registro' : 'Review record'} ↗</Link>
+            </li>)}
+            {data.legacyOrders.map(order => <li key={`order-${order.id}`}>
+              <span><strong>{language === 'es' ? 'Pedido' : 'Order'} {formatOrderReference(order.id)}</strong><small>{text.legacyStatus}: {order.status}</small></span>
+              <Link to={`/admin/pedidos/${encodeURIComponent(order.id)}`}>{language === 'es' ? 'Ver pedido' : 'View order'} ↗
+              </Link>
+            </li>)}
+          </ul>
         </aside>}
       </>}
     </section>

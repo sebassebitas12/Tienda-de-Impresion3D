@@ -1,6 +1,6 @@
 # Vértice CR — Roadmap
 
-> **Última actualización:** 2026-10-01
+> **Última actualización:** 2026-10-02
 > **Estado:** ACTIVO  
 > **Fase actual:** 4 — Fundaciones React.  
 > **React:** DESBLOQUEADO (Gate abierto 2026-09-30).
@@ -131,7 +131,27 @@ El primer slice del dashboard muestra pedidos activos, solicitudes `PENDING_QUOT
 
 **Slice actual — CRUD esencial de catálogo:** el requisito Must de `01` exige CRUD principal y `ANTEPROYECTO_FINAL.md` concreta productos/categorías, pero las rutas ya declaradas `/admin/catalogo/nuevo`, `/admin/catalogo/:id/editar` y `/admin/catalogo/categorias` seguían en `ConstructionPage`. Se cerró el contrato mínimo: producto ACTIVE/INACTIVE; baja lógica preferida; baja definitiva bloqueada ante `orderItems`; categoría no se borra si tiene productos; no inventario ni storage. Implementados formularios de producto y CRUD de categorías sobre servicios JSON Server. Pendiente completar verificación funcional de mutations, escenario de datos con referencia histórica, inspección visual/responsive y CI.
 
-**Siguiente bloque:** recorrido Clientes Admin con lectura/ficha y privacidad; luego verificación/ajustes del CRUD recién implementado y cerrar las operaciones faltantes que salgan en el recorrido. Después avanzar storefront y checkout académico. IA/N8N se reserva tras cubrir Admin operativo. Las transiciones de cotización requieren contrato de precio/validez/notas y upload/descarga proveedor/URL de almacenamiento privado. No borrar ni editar pedidos desde CRUD genérico.
+**Corte 2026-10-02:** `/admin/clientes` y detalle de solo lectura quedaron implementados: lista/filtro de clientes, conteos y relaciones a pedidos/solicitudes; no incluye credenciales demo ni edición de PII. El pull ya contenía incorporación del legacy `SUBMITTED`, preparación/publicación de cotizaciones con actor/actividad y filtros combinables; no rehacer esas capacidades. Fondos Admin ya no usan anillos decorativos; el anillo de distribución por etapa permanece porque expresa datos. Buscador global ofrece coincidencias reales de catálogo ACTIVE, selector ES/EN segmentado. La última revisión dio a Pedidos y Clientes superficies de registro distintas pero coherentes, un editor contextual para categorías y una explicación explícita del estado `SUBMITTED`; la leyenda del resumen se refluye según su ancho útil. Activity se deja para más adelante a pedido del usuario. Responsive global, Light y GitHub Actions siguen pendientes.
+
+**R-H67 — Cotizador manual (2026-10-02):** en la ficha `/admin/solicitudes/:id`, el monto aislado se reemplaza por costeo editable para un operador. Captura mediciones por unidad, material confirmado, precios USD/kg, cambio CRC/USD, energía/tarifa, mano de obra/postprocesado, diseño, otros costos y recargo; presenta desglose y guarda un snapshot que el servidor recalcula con la cantidad de la solicitud y deja versionado. Fuentes de tarifas quedan documentadas en `docs/07`; aún no hay valores reales cargados ni consulta externa/laminador automáticos. La prueba visual local comprobó la ficha real en Dark y Light a 1265×633. Lint, 19 suites/101 tests, `check:ui` (48 módulos), build (134 módulos) y `git diff --check` pasan; falta revisar viewport estrecho y el recorrido con costos operativos auténticos sin guardar cotizaciones ficticias.
+
+**R-H68 — Envío de cotización por correo (2026-10-02):** desde una cotización guardada se puede enviar al cliente y copiar al operador autenticado por BCC mediante webhook privado n8n + Gmail. Solo una respuesta confirmada cambia a `AWAITING_APPROVAL` y registra actividad; errores mantienen `QUOTED`. Se bloquean direcciones demo. Gmail OAuth ya quedó conectado por el usuario; su captura muestra la alerta pendiente en el nodo Webhook. El JSON importable está en `automation/n8n/vertice-quote-email.json`; falta generar/configurar Header Auth, guardar `.env`, publicar y probar un correo controlado. Hacienda ofrece tipo de cambio USD público sin token (usar venta para reposición en USD); BCCR indicador 318 requiere suscripción y queda como alternativa. ARESEP publica tarifas por empresa/tipo/bloque, a seleccionar según recibo. Ninguna fuente está conectada a Admin. Lint, `check:ui`, build, `git diff --check` y 22 suites/106 tests pasan. Captura visual Admin e integración de extremo a extremo pendientes.
+
+**Siguiente bloque:** configurar Header Auth (mismo secreto aleatorio en n8n y `.env`) y publicar el workflow; revisar visualmente el cotizador en Admin con sesión autenticada, Dark/Light y responsive, y hacer prueba controlada usando direcciones propias válidas. Después cerrar el recorrido CRUD de catálogo/categorías y guardia de referencias históricas. Activity queda aplazada a pedido del usuario. Correcciones puntuales de Tienda/Admin siguen en alcance. Solo cuando Admin esté cerrado se avanza a IA/N8N y los tres asistentes separados; la automatización inteligente de cotización es posterior a la integración verificable de tarifas/laminador y depende de perfiles, mediciones y privacidad. No inferir precio eléctrico sin la empresa/tarifa de la factura.
+
+**Checkpoint R-H64 (2026-10-02):** Auth continúa cerrado como slice académico; el
+foco no se mueve todavía a IA. Admin ya tiene dashboard, solicitudes/revisión
+inicial, Pedidos, CRUD Catálogo/Categorías y lectura de Clientes. Para dar por
+cerrado Admin falta el recorrido manual en navegador de crear/editar/ocultar y
+el bloqueo de baja con referencias históricas; la auditoría responsive y de
+tema en 375/768/1280; y una prueba explícita de `/admin/actividad`, que está
+implementada pero el usuario pidió dejar para después. Datos de los 19 borradores
+de producto siguen pendientes de confirmación, sin bloquear ni falsear lo que
+está publicado. Al cerrar Admin, el siguiente módulo será IA/N8N; allí se
+construirán los tres asistentes separados y se evaluará DeepSeek de pago antes de
+integrarlo. El asistente Admin pertenece a esa capa de IA, no es una capacidad ya
+implementada del dashboard. CI de GitHub sigue siendo gate antes de recomendar
+pull.
 
 ### Capa 5 — IA / N8N
 Entra después de que Auth + Admin tengan contratos y datos suficientes.
@@ -216,3 +236,12 @@ Una feature queda terminada solo si:
 ## Regla
 
 No avanzar por “tener algo funcionando”. Avanzar cuando el bloque actual tiene evidencia suficiente para no contaminar el siguiente.
+
+## Continuidad vigente — 2026-10-02
+
+Admin funcional y sus revisiones responsive señaladas se cierran en este corte.
+Los workflows de n8n se entregan importables, inactivos y documentados; sigue
+pendiente que el operador los importe, asigne credenciales y publique para la
+prueba real DeepSeek/Gmail. Los valores del motor continúan DEMO hasta calibrar
+los costos físicos del taller. Activity es el siguiente módulo que el usuario
+reservó para después. No se bloquea el uso local esperando la integración real.

@@ -1,6 +1,6 @@
 # Vértice CR — Índice de documentación
 
-> **Última actualización:** 2026-10-01
+> **Última actualización:** 2026-10-02
 > **Estado:** ACTIVO  
 > **Uso:** mapa rápido para humanos y agentes.
 
@@ -54,6 +54,8 @@ No uses un documento histórico para invalidar una decisión vigente.
 ### Auditoría / historial
 
 `05-AUDITORIA-HF-Y-MOCKUPS.md` conserva evidencia, hallazgos y evolución de mockups.
+
+Los cinco workflows n8n de los asistentes, tasas públicas y correo, junto con la guía de importación, están en `automation/n8n/`.
 
 `DECISIONES-POST-AUDITORIA.md` y `auditoriaclaude.md` son referencias históricas y deben estar marcadas como tales.
 

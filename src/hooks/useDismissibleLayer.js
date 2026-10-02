@@ -13,7 +13,7 @@ export function useDismissibleLayer({ open, modal, panelRef, triggerRef, initial
     const previous = triggerRef?.current || document.activeElement;
     layers.push(panel);
     const animationFrame = requestAnimationFrame(() => {
-      (initialFocusRef?.current || panel.querySelector(focusableSelector) || panel).focus();
+      (initialFocusRef?.current || panel.querySelector(focusableSelector) || panel).focus({ preventScroll: true });
     });
     const keydown = event => {
       if (layers.at(-1) !== panel) return;
@@ -43,7 +43,7 @@ export function useDismissibleLayer({ open, modal, panelRef, triggerRef, initial
       document.removeEventListener('keydown', keydown);
       const index = layers.indexOf(panel);
       if (index !== -1) layers.splice(index, 1);
-      if (previous?.isConnected) previous.focus();
+      if (previous?.isConnected) previous.focus({ preventScroll: true });
     };
   }, [open, modal, panelRef, triggerRef, initialFocusRef]);
 }

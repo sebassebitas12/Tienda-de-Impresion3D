@@ -1,6 +1,6 @@
 # Vértice CR — Auditoría HF y mockups
 
-> Última actualización: **2026-10-01**.
+> Última actualización: **2026-10-02**.
 
 ## Estado oficial
 
@@ -1115,3 +1115,270 @@ suite cubre REST de alta/edición/baja y protege la lista contra los nuevos
 enlaces de gestión. Falta recorrer create/edit/category/remove en navegador,
 probar el bloqueo real con referencias, y revisar Responsive/Light; no se declara
 aprobación visual.
+
+### R-H60 — Registros de Pedidos/Clientes y editor de Categorías — 2026-10-02
+
+**Feedback:** las listas de Pedidos y Clientes seguían sintiéndose antiguas y
+sin una gramática visual compartida con el Resumen; editar categoría reutilizaba
+el formulario de alta, sin contexto ni una señal clara del resultado. El aviso
+de la captura no explicaba el estado de la solicitud que quedaba fuera del flujo.
+
+**Cambio:** Pedidos recibe un registro de producción delimitado con filtros,
+conteo y tabla legible en escritorio; hasta 760 px cada fila se convierte en una
+ficha con nombre accesible por campo. Clientes usa otra composición de registro:
+monograma derivado del nombre, estado real y conteos de pedidos/solicitudes. No
+se añaden datos personales ni de negocio. La categoría se edita debajo de su
+propia fila, con alta separada, preview del slug y conteo de modelos enlazados.
+El aviso denomina la anomalía como registro fuera del flujo, explica que
+`SUBMITTED` es un valor anterior y exige revisar la ficha; no lo convierte ni lo
+suma como etapa actual. Además, el layout de la leyenda del resumen ahora
+responde al ancho disponible en vez de imponer cinco columnas.
+
+**Evidencia visual:** screenshots del navegador local en `/admin`,
+`/admin/pedidos`, `/admin/clientes` y `/admin/catalogo/categorias` confirmaron
+el aviso explicativo, el registro de Pedidos, la jerarquía propia de Clientes y
+el editor contextual abierto sin guardar cambios. En `/admin` se confirmó que
+la leyenda se reordena en tres columnas y segunda fila, sin superposición, en el
+viewport conectado. Las anotaciones y acciones expuestas se mantienen legibles
+en el árbol accesible observado. La Activity no se recorrió por decisión del
+usuario. Esto es evidencia visual local, no aprobación humana ni CI verde.
+
+### R-H61 — Pasada comparativa de Clientes y Pedidos — 2026-10-02
+
+**Revisión real:** se capturaron `/admin/clientes` y `/admin/pedidos` al mismo
+ancho integrado (~1166 px). Ambas vistas conservan sidebar, encabezado, lenguaje
+de tipografía, acento Lava, superficies cálidas y radios Vértice. Clientes se
+lee como registro de cuentas con búsqueda, estado y conteos; Pedidos como mesa
+de producción con filtros de etapa y tabla de fechas/importes. La gramática está
+unificada y las composiciones no son copia-pega. No encontré un defecto visual
+que justificara retocar esas dos vistas en este corte; se preservó el trabajo.
+
+El intento de viewport 768 px no alteró el tamaño real del documento (`innerWidth`
+siguió en 1166); por eso 768/375 y Light quedan pendientes, no verificados. No se
+tocaron datos ni Activity. La regla de screenshots tras cada iteración queda
+permanente en `docs/04`, R-H61 y en el contexto del proyecto.
+
+### R-H62 — Tema Light, navbar y fotografías del catálogo — 2026-10-02
+
+**Revisión visual real:** con la sesión académica local se inspeccionaron en
+Light `/admin/clientes` y `/admin/catalogo/categorias`, además de `/catalogo`,
+al ancho integrado de aproximadamente 1166 px. Clientes y Categorías conservaron
+contraste, jerarquía y lectura de sus registros; no se justificó un retoque
+visual adicional. El catálogo mostró las nuevas fotografías que sí coinciden
+con los productos cargados.
+
+**Corrección puntual:** en Home, el navbar se encimaba cerca de 1166 px porque
+la variante compacta solo se activaba hasta 1120 px. Se amplió ese rango hasta
+1220 px; una captura posterior en el mismo ancho confirmó la navegación y las
+acciones separadas, sin solapamiento.
+
+**Imágenes:** se vincularon en `db.json` las fotos correspondientes para
+organizador (p1), dragón (p3), maceta (p4), engranaje (p5) y llavero (p6), usando
+archivos reales de `public/images`. El soporte para audífonos (p2) conserva su
+fallback: las fotos nuevas de soporte para laptop y celular no representan ese
+producto. No se asignó una imagen engañosa.
+
+**Límite y verificación:** el navegador conectado no expone control de viewport;
+por tanto 768/375 px siguen pendientes de inspección renderizada y no se declara
+cierre responsive. En el ancho disponible, ESLint, 18 suites/96 tests,
+`check:ui` (48 módulos), build (133 módulos) y `git diff --check` pasan. No se
+guardaron datos durante la verificación. Activity sigue fuera de alcance por
+decisión del usuario. La preferencia por DeepSeek de pago y por automatizar la
+cotización sin revisión humana obligatoria se registró como objetivo a evaluar
+en `docs/07`; no es una integración ni promesa actual.
+
+### R-H63 — Productos aportados y animación de listas Admin — 2026-10-02
+
+**Corrección del alcance:** antes solo se habían sustituido fotos en cinco
+fichas; no se había convertido el resto de las imágenes en productos. Se
+añadieron 19 borradores (`p7`–`p25`) a `db.json`, cada uno con una foto existente
+de `public/images/`. Permanecen fuera de la tienda; no se inventaron precio,
+material ni especificaciones. Admin los identifica como borradores y bloquea la
+publicación hasta completar nombre, slug, categoría, precio y material FDM
+permitido. Placeholders temporales no se incorporaron. Las seis fichas activas
+anteriores permanecen publicadas.
+
+**Motion:** se restauró la entrada breve y escalonada para las filas de Clientes
+y Categorías, usando `admin-row-enter` y `--row-index`; respeta la preferencia
+compartida `data-motion="reduced"` y `prefers-reduced-motion: reduce`.
+
+**Evidencia:** en navegador Light al ancho integrado (~1166 px) se inspeccionaron
+`/admin/clientes`, `/admin/catalogo/categorias` y `/admin/catalogo`. En la captura
+de Categorías se ve la secuencia de entrada; Catálogo muestra 25 registros (6
+publicados, 19 borradores) y las fotos cargadas en Admin. No se publicó ningún
+producto ni se alteraron otros datos. Responsive a 768/375 px y completar las
+fichas con información comercial/técnica real siguen pendientes. Activity
+continúa fuera del alcance por decisión del usuario.
+
+### R-H64 — Fotografía encajada dentro de la tarjeta de Tienda — 2026-10-02
+
+**Hallazgo visual confirmado:** la foto del engranaje aparecía insetada con
+márgenes sobre una superficie clara de la tarjeta. El fondo oscuro rectangular
+de la fotografía parecía otro recuadro dentro de la tarjeta y cortaba la
+composición.
+
+**Causa y corrección:** el componente compartido daba a `.v-product-image`
+30 px de padding y 230 px de alto fijo; en Tienda la foto quedaba reducida y
+aislada dentro del plano claro. La grilla de Tienda ahora presenta un escenario
+oscuro a sangre, con proporción 1.8:1, sin padding ni máscara radial. Se usa
+`object-fit: contain` para conservar las piezas completas aunque las fuentes
+varíen de formato. Home y Admin no cambian.
+
+**Evidencia:** capturas reales de `/catalogo` en Light y Dark (~1150 px): el
+escenario oscuro ocupa el ancho de la tarjeta, sin otra superficie clara que
+encuadre la foto. El engranaje llega a los bordes laterales; llavero y maceta
+quedan completos y contenidos. No se probaron 768/375 px porque el navegador
+conectado no permite controlar ese viewport.
+
+### R-H65 — Tarjetas de tienda, recorte al hover y borradores accionables (2026-10-01)
+
+**Hallazgo confirmado por anotación y código:** `ProductCard` aplica un zoom
+`scale(1.06)` al pasar el cursor. Aunque la imagen se dibuja con
+`object-fit: contain`, el escenario de Tienda tiene `overflow: hidden`. El
+navegador midió la caja cuadrada del `<img>` en 338×338 dentro de un escenario
+338×187, incluso sin hover: `object-fit` no corrige el desborde de la caja. Al
+pasar el cursor, la regla compartida `scale(1.06)` agregaba otro recorte. La
+fuente del llavero es 1024×1024 y muestra el objeto entero; el asset no era la
+causa.
+
+**Cambio:** la caja de la foto ahora cubre exactamente su escenario; `contain`
+reduce la imagen cuadrada para conservarla completa y se anula el zoom
+únicamente en las tarjetas de `/catalogo`, sin quitar la respuesta visual
+compartida de la tarjeta. Admin deja de tener el
+enlace naranja «Ver tienda» aislado: era redundante con el logotipo, que ya lleva
+al sitio público. Sesión y cierre quedan agrupados al final del sidebar; en
+móvil también aparecen en un orden explícito.
+
+**Cambio funcional:** el aviso de borradores explica que las fichas se mantienen
+fuera de la tienda hasta confirmar sus datos y enlaza a un filtro directo
+«Revisar borradores». La acción filtra `estado=DRAFT`; no publica ni rellena
+precio/material. Se agregó cobertura del filtro y de la ausencia del enlace
+duplicado.
+
+**Cotización investigada:** `docs/07` contiene política de automatización por
+casos estándar, esquema de costos que requiere tarifas del taller, fronteras
+LLM/laminador/motor y prompt inicial. El precio depende de mediciones de slice y
+tarifas reales; no se añadieron importes ni se activó emisión automática. Las
+fuentes enlazadas se verificaron el 2026-10-01.
+
+**Verificación visual y técnica:** screenshots locales revisados en Light para
+Tienda (~1150, 768 y 375 px), Admin Catálogo (~1150 px) y Admin Resumen
+(1280, 768 y 375 px). En Tienda se comprobó que la caja de cada `<img>` coincide
+con el escenario en los tres tamaños, conserva `object-fit: contain` y no recibe
+transformación de zoom; a 375 px no hay desbordamiento horizontal. La forma
+cuadrada de la fuente queda completa y centrada dentro del escenario ancho, por
+lo que aparecen márgenes laterales: es el costo explícito de no cortar el
+producto. Admin Catálogo muestra el CTA; al activarlo quedan seleccionados los
+19 borradores y solo esas 19 fichas aparecen. En el sidebar del Admin no existe
+el enlace duplicado «Ver tienda»; a 375 px logout sigue visible y no hay
+desbordamiento horizontal. La primera captura de Admin Resumen a 768 px mostró
+colisión entre etiquetas de etapa; se corrigió la leyenda de tres a dos columnas
+en ese rango. El nuevo screenshot confirma etiquetas legibles, números en su
+propia línea y ausencia de colisión. El shell/nav y las métricas también caben.
+Esto cierra el defecto responsive detectado en el gráfico, pero no equivale a
+una auditoría integral de todas las rutas Admin.
+
+**Verificación automatizada:** ESLint, 18 suites/98 pruebas, `check:ui` (48
+módulos), build (133 módulos) y `git diff --check` pasan. Cambios locales; no
+se han committeado ni pusheado.
+
+### R-H66 — Catálogo: coherencia entre fondos de foto (2026-10-02)
+
+**Aclaración del usuario:** una anotación de imagen representa el patrón del
+catálogo completo; hay que revisar todas las tarjetas relacionadas, no limitarse
+al elemento seleccionado. En el catálogo hay cuatro productos con foto: el
+engranaje horizontal (1024×559) y tres fuentes cuadradas (llavero, maceta y
+organizador, 1024×1024). El quinto producto usa un placeholder.
+
+**Hallazgo visual:** la caja anterior conservaba completa la fuente cuadrada,
+pero dejaba ver su marco vertical dentro del escenario apaisado; el fondo negro
+del escenario se leía como una tarjeta insertada y contrastaba con Light.
+**Cambio:** el escenario ahora extiende el fondo de la misma foto mediante una
+capa ambiental desenfocada; la imagen original se mantiene centrada, completa y
+sin zoom/crop. Solo se difuminan suavemente los bordes laterales de las fuentes
+cuadradas para fundir el cambio de proporción. El engranaje horizontal conserva
+su composición edge-to-edge. El fallback sin imagen no crea una capa ambiental.
+
+Se exploró outpainting de producto como alternativa, pero se descartó: una
+variante alteraba divisores/herramientas del organizador. No se reemplazaron ni
+modificaron los assets originales; la fidelidad del modelo tiene prioridad sobre
+una edición generativa que pueda falsear la pieza.
+
+**Verificación visual:** screenshots reales del catálogo en Light a ~1135 px,
+768 px y 375 px, y Dark a 375 px y ~1135 px. Se revisaron las cuatro fotos y el
+placeholder, incluida la segunda fila; el fondo deja de ser una franja negra
+lisa y no se observa un marco cuadrado duro. En 375 px no hay scroll horizontal
+(documento 360 px, viewport 375 px). La caja de cada fuente cuadrada es 1:1 y
+coincide con la altura del escenario; se conserva `object-fit: contain`, sin
+recorte ni zoom. El placeholder usa la superficie de panel y color de texto
+según tema, no el falso bloque negro de foto.
+
+**Verificación automatizada:** ESLint, 18 suites/98 tests, `check:ui` (48
+módulos), build (133 módulos) y `git diff --check` pasan. Cambios locales; no
+se han committeado ni pusheado.
+
+**Cotización — alcance corregido:** la investigación/prompt de `docs/07` no era
+una implementación y el usuario ya indicó que primero quiere el costeo manual,
+antes del bot de IA. Ese slice está implementado abajo; no hay cotización
+automática ni tarifas operativas cargadas.
+
+### R-H67 — Cotizador manual Admin (2026-10-02)
+
+**Cambio funcional con pasada visual real:** la ficha Admin sustituye el monto
+libre por una hoja de costeo manual FDM, con unidades explícitas y desglose
+previo. No crea tarifas de ejemplo ni modifica el catálogo/demo.
+
+**Hallazgo Light:** la primera captura mostró que el selector/campos aún tenían
+fondo oscuro en el panel claro. Se invirtieron los tokens de superficie/texto de
+entrada para Light y se recapturó; controles y texto ya contrastan con la
+superficie. Dark se comprobó también en la misma ficha. Capturas reales a
+1265×633: no se ingresaron cifras ni se guardó una oferta ficticia.
+
+**Cobertura visual pendiente:** no se capturaron viewports estrechos 768/375; el
+CSS cambia a dos columnas <=900 px y una columna <=760 px, pero la pasada
+responsive queda pendiente. Tampoco se probó aún con datos tarifarios reales ni
+se guardó/publicó un cálculo contra el API real. La suite automatizada cubre la
+aritmética y el recálculo/validación de la acción.
+
+**Verificación local de código:** ESLint, 19 suites/101 tests, `check:ui` (48
+módulos), build (134 módulos) y `git diff --check` pasan. No hay tarifas reales
+del taller ni credencial BCCR/DeepSeek añadida.
+
+### R-H68 — Envío de cotización al cliente y copia al taller (2026-10-02)
+
+**Cambio:** desde `QUOTED`, Admin presenta al cliente como destinatario y al
+administrador autenticado como copia oculta. La acción envía el desglose guardado
+por un webhook n8n privado (token solo de servidor) y Gmail; el envío confirmado
+mueve a `AWAITING_APPROVAL` y escribe el evento. Un error/configuración ausente
+mantiene `QUOTED`. Destinatarios inválidos o de muestra se bloquean. Se añadió
+workflow importable, `.env.example` y carga de `.env` solo para el API local.
+
+**Criterio visual:** CTA único “Enviar al cliente y copiarme”, direcciones
+visibles antes de enviar y explicación cuando el fixture `example.*` lo bloquea.
+Conservar el lenguaje y la densidad de la hoja de costeo; no simular conectividad.
+
+**Pendiente de verificación/cierre:** capturas reales del CTA en Dark/Light,
+probar el endpoint con n8n/Gmail configurados y correo de prueba controlado; no
+usar las direcciones `example.*`. No se han transmitido correos. Responsive
+375/768 pendiente si el navegador no permite fijar viewport.
+
+### R-H69 — Cotizador DEMO, tres asistentes y última pasada Admin (2026-10-02)
+
+El flujo se extiende con cálculo reproducible desde perfiles análogos basados en
+los assets de producto conocidos, cuenta de cliente, aprobación por versión,
+fulfillment `DEMO` explícito, transición serializada de pedidos y tres contextos
+de asistente. Esta simulación no mide archivos, confirma stock/pago ni habilita
+producción. Se añadió además el workflow independiente de tasas de Hacienda y
+ARESEP, con sustitución de DEMO solo ante dato reciente y selección exacta.
+
+La revisión visual guardó capturas en `automation/evidence/`: Clientes
+1280×930 Dark/Light, 768 Light y 375 Dark; Pedidos 1280/768 Light y 375 Light;
+Categorías 375 Dark/Light y 768 Light; Cotización 768 Light y vista pública
+1280 Light; más los cortes finales Resumen/Pedidos/R5 a 375 Light. La vista
+1280 de `/solicitud` después del ajuste confirmó navegación sin choque, perfiles
+cargados y tema claro completo. Se recorrieron en móvil Resumen, Pedidos,
+Solicitudes, detalle cotizado R5, Catálogo, Categorías y Clientes; se recorrieron
+roles, versiones, duplicados, cierre/cancelación e idempotencia en la integración.
+No se pudo certificar el proveedor real de DeepSeek o la entrega real de Gmail:
+el check usa proveedores simulados y los workflows requieren importación y
+publicación en n8n. Activity continúa en el bloque que el usuario reservó.

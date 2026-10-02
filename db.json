@@ -86,7 +86,7 @@
       "description": "Sistema modular para organizar accesorios de escritorio.",
       "categoryId": "cat1",
       "images": [
-        "/products/organizador.jpg"
+        "/images/producto-organizador-cajones.jpg"
       ],
       "price": 8500,
       "currency": "CRC",
@@ -139,7 +139,7 @@
       "description": "Figura articulada decorativa y coleccionable.",
       "categoryId": "cat2",
       "images": [
-        "/products/dragon.jpg"
+        "/images/producto-dragon.jpg"
       ],
       "price": 12000,
       "currency": "CRC",
@@ -166,7 +166,7 @@
       "description": "Maceta decorativa con patrón geométrico.",
       "categoryId": "cat4",
       "images": [
-        "/products/maceta.jpg"
+        "/images/producto-maceta-escultural.jpg"
       ],
       "price": 7500,
       "currency": "CRC",
@@ -193,7 +193,7 @@
       "description": "Engranaje para prototipos y proyectos maker.",
       "categoryId": "cat5",
       "images": [
-        "/products/engranaje.jpg"
+        "/images/producto-engranaje.jpg"
       ],
       "price": 4800,
       "currency": "CRC",
@@ -219,7 +219,7 @@
       "description": "Base personalizable para pequeños encargos.",
       "categoryId": "cat3",
       "images": [
-        "/products/llavero.jpg"
+        "/images/producto-llavero-charm.jpg"
       ],
       "price": 2500,
       "currency": "CRC",
@@ -239,6 +239,386 @@
       "featured": false,
       "createdAt": "2026-08-15T10:00:00Z",
       "updatedAt": "2026-09-07T12:00:00Z"
+    },
+    {
+      "id": "p7",
+      "name": "Base para control",
+      "slug": "base-para-control",
+      "description": "",
+      "categoryId": "cat1",
+      "images": [
+        "/images/producto-base-control.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p8",
+      "name": "Brazo articulado de mesa",
+      "slug": "brazo-articulado-mesa",
+      "description": "",
+      "categoryId": "cat5",
+      "images": [
+        "/images/producto-brazo-articulado.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p9",
+      "name": "Carcasa para Raspberry Pi",
+      "slug": "carcasa-raspberry-pi",
+      "description": "",
+      "categoryId": "cat1",
+      "images": [
+        "/images/producto-carcasa-raspberry.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p10",
+      "name": "Clips organizadores de cables",
+      "slug": "clips-organizadores-cables",
+      "description": "",
+      "categoryId": "cat1",
+      "images": [
+        "/images/producto-clips-cables.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p11",
+      "name": "Dispensador de bolsas",
+      "slug": "dispensador-bolsas",
+      "description": "",
+      "categoryId": "cat1",
+      "images": [
+        "/images/producto-dispensador-bolsas.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p12",
+      "name": "Escurridor para cubiertos",
+      "slug": "escurridor-cubiertos",
+      "description": "",
+      "categoryId": "cat5",
+      "images": [
+        "/images/producto-escurridor-cubiertos.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p13",
+      "name": "Prototipo de soporte anatómico",
+      "slug": "prototipo-soporte-anatomico",
+      "description": "",
+      "categoryId": "cat5",
+      "images": [
+        "/images/producto-ferula-ortopedica.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p14",
+      "name": "Ganchos para llaves",
+      "slug": "ganchos-llaves",
+      "description": "",
+      "categoryId": "cat1",
+      "images": [
+        "/images/producto-ganchos-llaves.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p15",
+      "name": "Letrero de escritorio",
+      "slug": "letrero-escritorio",
+      "description": "",
+      "categoryId": "cat4",
+      "images": [
+        "/images/producto-letrero-escritorio.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p16",
+      "name": "Patas niveladoras",
+      "slug": "patas-niveladoras",
+      "description": "",
+      "categoryId": "cat5",
+      "images": [
+        "/images/producto-patas-niveladoras.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p17",
+      "name": "Soporte para celular",
+      "slug": "soporte-celular",
+      "description": "",
+      "categoryId": "cat1",
+      "images": [
+        "/images/producto-soporte-celular.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p18",
+      "name": "Soporte para laptop",
+      "slug": "soporte-laptop",
+      "description": "",
+      "categoryId": "cat1",
+      "images": [
+        "/images/producto-soporte-laptop.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p19",
+      "name": "Soporte para regleta",
+      "slug": "soporte-regleta",
+      "description": "",
+      "categoryId": "cat1",
+      "images": [
+        "/images/producto-soporte-regleta.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p20",
+      "name": "Torre para dados",
+      "slug": "torre-dados",
+      "description": "",
+      "categoryId": "cat3",
+      "images": [
+        "/images/producto-torre-dados.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p21",
+      "name": "Neumático deportivo a escala",
+      "slug": "neumatico-deportivo-escala",
+      "description": "",
+      "categoryId": "cat4",
+      "images": [
+        "/images/llanta_pirelli_editada.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p22",
+      "name": "Máscara de calavera",
+      "slug": "mascara-calavera",
+      "description": "",
+      "categoryId": "cat2",
+      "images": [
+        "/images/mascara_calavera_editada.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p23",
+      "name": "Soporte decorativo Oni",
+      "slug": "soporte-decorativo-oni",
+      "description": "",
+      "categoryId": "cat2",
+      "images": [
+        "/images/soporte_oni_editado.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p24",
+      "name": "Brazo para dron",
+      "slug": "brazo-para-dron",
+      "description": "",
+      "categoryId": "cat5",
+      "images": [
+        "/images/producto-drone.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
+    },
+    {
+      "id": "p25",
+      "name": "Maqueta arquitectónica",
+      "slug": "maqueta-arquitectonica",
+      "description": "",
+      "categoryId": "cat4",
+      "images": [
+        "/images/producto-maqueta.jpg"
+      ],
+      "price": null,
+      "currency": "CRC",
+      "material": null,
+      "availableColors": [],
+      "dimensions": "",
+      "weightGrams": null,
+      "estimatedProductionHours": null,
+      "status": "DRAFT",
+      "featured": false,
+      "createdAt": "2026-10-02T03:10:27Z"
     }
   ],
   "orders": [
@@ -454,16 +834,111 @@
       "userId": "u2",
       "sourceType": "DESIGN_HELP",
       "description": "Organizador para herramientas",
-      "status": "SUBMITTED",
+      "status": "QUOTED",
       "quantity": 5,
       "material": "PETG",
-      "submittedAt": "2026-09-12T10:00:00Z"
+      "submittedAt": "2026-09-12T10:00:00Z",
+      "originalStatus": "SUBMITTED",
+      "updatedAt": "2026-10-02T06:32:38.028Z",
+      "reviewStartedAt": "2026-10-02T02:46:33.536Z",
+      "reviewStartedBy": "u1",
+      "quotedPrice": 27603,
+      "currency": "CRC",
+      "quotePricing": {
+        "rulesVersion": "demo-fdm-2026-10-v1",
+        "quantity": 5,
+        "inputs": {
+          "material": "PETG",
+          "weightGrams": 150,
+          "printHours": 5.04,
+          "filamentUsdPerKg": 26,
+          "wearUsdPerKg": 3,
+          "printerPowerWatts": 120,
+          "usdToCrc": 460.73,
+          "electricityCrcPerKwh": 95,
+          "postProcessMinutesPerPiece": 12,
+          "laborCrcPerHour": 3000,
+          "designHours": 0.75,
+          "designCrcPerHour": 6000,
+          "otherCostsCrc": 0,
+          "markupPercent": 55,
+          "ratesCheckedAt": "2026-10-02"
+        },
+        "breakdown": {
+          "materialCrc": 8984.24,
+          "wearCrc": 1036.64,
+          "electricityCrc": 287.28,
+          "postProcessCrc": 3000,
+          "designCrc": 4500,
+          "otherCostsCrc": 0,
+          "costSubtotalCrc": 17808.16,
+          "markupPercent": 55,
+          "amountCrc": 27603
+        },
+        "mode": "DEMO",
+        "profileId": "organizador",
+        "provenance": {
+          "slicing": "DEMO_ANALOGUE",
+          "costs": "DEMO",
+          "exchange": "DEMO",
+          "exchangeDate": null,
+          "electricity": "DEMO",
+          "electricityReference": null
+        },
+        "profile": {
+          "id": "organizador",
+          "name": "Organizador modular",
+          "image": "/images/producto-organizador-cajones.jpg"
+        },
+        "validUntil": "2026-10-09",
+        "notes": "SIMULACIÓN DEMO. Perfil análogo: Organizador modular; 5 pieza(s) en PETG. Peso, tiempo, desgaste y mano de obra simulados; no se midieron desde una imagen o STL. Diseño: 0.75 h. No incluye envío, impuestos ni certificación de uso. No autoriza producción ni cobros reales."
+      },
+      "quoteValidUntil": "2026-10-09T23:59:59-06:00",
+      "quoteNotes": "SIMULACIÓN DEMO. Perfil análogo: Organizador modular; 5 pieza(s) en PETG. Peso, tiempo, desgaste y mano de obra simulados; no se midieron desde una imagen o STL. Diseño: 0.75 h. No incluye envío, impuestos ni certificación de uso. No autoriza producción ni cobros reales.",
+      "quotedAt": "2026-10-02T06:32:38.028Z",
+      "quotedBy": "u1",
+      "quoteVersion": 1,
+      "automationSource": "DEMO_ENGINE"
     }
   ],
   "reviews": [],
   "coupons": [],
   "notifications": [],
-  "activityLog": [],
+  "activityLog": [
+    {
+      "id": "d2a3d9eb-2148-465b-8d2a-0506ed1f4445",
+      "entity": "customPrintRequest",
+      "entityId": "r5",
+      "action": "REQUEST_INCORPORATED",
+      "fromStatus": "SUBMITTED",
+      "toStatus": "PENDING_QUOTE",
+      "actorId": "u1",
+      "actorName": "Sebastián Flores",
+      "occurredAt": "2026-10-02T02:46:29.951Z"
+    },
+    {
+      "id": "36971c31-7767-4ca4-b0d6-1eed626fd435",
+      "entity": "customPrintRequest",
+      "entityId": "r5",
+      "action": "REQUEST_REVIEW_STARTED",
+      "fromStatus": "PENDING_QUOTE",
+      "toStatus": "IN_REVIEW",
+      "actorId": "u1",
+      "actorName": "Sebastián Flores",
+      "occurredAt": "2026-10-02T02:46:33.536Z"
+    },
+    {
+      "id": "e0a01bcd-aed2-4eff-ba45-42adebdbe794",
+      "entity": "customPrintRequest",
+      "entityId": "r5",
+      "action": "REQUEST_AUTO_QUOTED",
+      "fromStatus": "IN_REVIEW",
+      "toStatus": "QUOTED",
+      "actorId": "u1",
+      "actorName": "Sebastián Flores",
+      "occurredAt": "2026-10-02T06:32:38.028Z"
+    }
+  ],
   "settings": {
     "currency": "CRC",
     "lowStockDefaultThreshold": 5,

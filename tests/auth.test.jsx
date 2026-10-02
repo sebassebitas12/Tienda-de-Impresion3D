@@ -191,6 +191,8 @@ describe('Navbar account session actions', () => {
       </MemoryRouter>
     );
 
+    expect(await screen.findByRole('link', { name: 'Vértice CR, inicio' })).toHaveAttribute('href', '/');
+    expect(screen.queryByRole('link', { name: 'Ver tienda' })).not.toBeInTheDocument();
     await userEvent.click(await screen.findByRole('button', { name: 'Cerrar sesión' }));
     await waitFor(() => expect(screen.getByLabelText('Ruta actual')).toHaveTextContent(/^\/$/u));
     expect(logout).toHaveBeenCalledTimes(1);

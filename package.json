@@ -5,12 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "api": "node scripts/api-server.js",
+    "api": "node --env-file-if-exists=.env scripts/api-server.js",
     "build": "vite build",
     "lint": "eslint .",
     "test": "jest --runInBand",
     "test:coverage": "jest --runInBand --coverage",
     "check:ui": "node scripts/check-ui-build.mjs",
+    "check:automation": "node scripts/verify-automation.mjs",
+    "build:n8n": "node scripts/build-n8n-workflows.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

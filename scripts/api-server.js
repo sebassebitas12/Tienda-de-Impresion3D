@@ -6,6 +6,9 @@ import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { createApp } from 'json-server/lib/app.js';
 import { prepareRequestAction } from './request-actions.js';
+import { installAutomationOperations } from './automation-operations.js';
+import { deliverQuote } from './quote-email.js';
+import { sessionActor } from './session-access.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const databasePath = resolve(root, process.env.VERTICE_DB_FILE || 'db.json');
@@ -66,8 +69,8 @@ registerAction('/admin/actions/start-review', async (req, res) => {
 
   try {
     const result = await serializeReviewAction(async () => {
-      const actor = db.data.users?.find(user => String(user.id) === actorId && user.role === 'admin' && user.status === 'ACTIVE');
-      if (!actor) return { status: 403, body: { code: 'ADMIN_REQUIRED' } };
+      const actor = sessionActor(req.headers.authorization, db.data);
+      if (actor?.role !== 'admin' || String(actor.id) !== actorId) return { status: 403, body: { code: 'ADMIN_REQUIRED' } };
 
       const index = db.data.customPrintRequests.findIndex(request => String(request.id) === requestId);
       if (index < 0) return { status: 404, body: { code: 'REQUEST_NOT_FOUND' } };
@@ -123,10 +126,11 @@ registerAction('/admin/actions/start-review', async (req, res) => {
 registerAction('/admin/actions/request-transition', async (req, res) => {
   const payload = req.body || {};
   if (typeof payload.requestId !== 'string' || typeof payload.actorId !== 'string') return res.status(400).json({ code: 'INVALID_ACTION' });
+  if (payload.action === 'email-quote-sent' || payload.action === 'publish-quote') return res.status(400).json({ code: 'INVALID_ACTION' });
   try {
     const result = await serializeReviewAction(async () => {
-      const actor = db.data.users?.find(user => String(user.id) === payload.actorId && user.role === 'admin' && user.status === 'ACTIVE');
-      if (!actor) return { status: 403, body: { code: 'ADMIN_REQUIRED' } };
+      const actor = sessionActor(req.headers.authorization, db.data);
+      if (actor?.role !== 'admin' || String(actor.id) !== payload.actorId) return { status: 403, body: { code: 'ADMIN_REQUIRED' } };
       const index = db.data.customPrintRequests.findIndex(request => String(request.id) === payload.requestId);
       if (index < 0) return { status: 404, body: { code: 'REQUEST_NOT_FOUND' } };
       const request = db.data.customPrintRequests[index];
@@ -147,7 +151,30 @@ registerAction('/admin/actions/request-transition', async (req, res) => {
   } catch { res.status(500).json({ code: 'ACTION_PERSISTENCE_FAILED' }); }
 });
 
+registerAction('/admin/actions/send-quote-email', async (req, res) => {
+  const payload = req.body || {};
+  const actor = sessionActor(req.headers.authorization, db.data);
+  if (actor?.role !== 'admin') return res.status(403).json({ code: 'ADMIN_REQUIRED' });
+  if (typeof payload.requestId !== 'string' || payload.expectedStatus !== 'QUOTED' || !Number.isSafeInteger(payload.expectedVersion)) return res.status(400).json({ code: 'INVALID_ACTION' });
+  try {
+    const result = await serializeReviewAction(() => deliverQuote({
+      data: db.data, requestId: payload.requestId, actor, expectedVersion: payload.expectedVersion,
+      testRecipient: payload.testRecipient, persist: persistData,
+    }));
+    return res.status(result.status).json(result.body);
+  } catch { return res.status(500).json({ code: 'ACTION_PERSISTENCE_FAILED' }); }
+});
+
+async function persistData(nextData) {
+  const previous = db.data;
+  db.data = nextData;
+  try { await db.write(); } catch (error) { db.data = previous; throw error; }
+}
+
 const port = Number(process.env.PORT || 3000);
+installAutomationOperations({ registerAction, db, serialize: serializeReviewAction,
+  persist: persistData,
+});
 const host = process.env.HOST || 'localhost';
 app.listen(port, host, () => {
   console.log(`JSON Server + operaciones Vértice en http://${host}:${port}`);

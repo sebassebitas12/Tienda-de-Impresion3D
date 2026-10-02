@@ -13,14 +13,14 @@ export class AdminActionError extends Error {
   }
 }
 
-async function postAction(path, payload, { fetchImpl = globalThis.fetch, baseUrl = getBaseUrl() } = {}) {
+async function postAction(path, payload, { fetchImpl = globalThis.fetch, baseUrl = getBaseUrl(), token } = {}) {
   if (typeof fetchImpl !== 'function') throw new AdminActionError('CONNECTION_UNAVAILABLE');
 
   let response;
   try {
     response = await fetchImpl(`${baseUrl}/admin/actions/${path}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify(payload),
     });
   } catch {
@@ -39,4 +39,10 @@ export function startRequestReview({ requestId, actorId, ...options }) {
 
 export function transitionRequest({ requestId, actorId, ...payload }, options) {
   return postAction('request-transition', { ...payload, requestId: String(requestId), actorId: String(actorId) }, options);
+}
+
+export function sendQuoteEmail({ requestId, actorId, expectedVersion }, options) {
+  return postAction('send-quote-email', {
+    requestId: String(requestId), actorId: String(actorId), expectedStatus: 'QUOTED', expectedVersion,
+  }, options);
 }

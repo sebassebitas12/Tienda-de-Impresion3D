@@ -40,6 +40,13 @@ function eventTitle(event, text) {
   if (event.action === 'REQUEST_INCORPORATED') return es ? 'Solicitud incorporada a pendientes' : 'Request registered as pending';
   if (event.action === 'REQUEST_QUOTE_SAVED') return es ? 'Cotización preparada' : 'Quote prepared';
   if (event.action === 'REQUEST_QUOTE_PUBLISHED') return es ? 'Cotización disponible para aprobación' : 'Quote available for approval';
+  if (event.action === 'REQUEST_AUTO_QUOTED') return es ? 'Cotización DEMO calculada automáticamente' : 'DEMO quote calculated automatically';
+  if (event.action === 'REQUEST_DEMO_FULFILLED') return es ? 'Pago simulado y pedido DEMO creado' : 'Payment simulated and DEMO order created';
+  if (event.action === 'REQUEST_PAYMENT_RECORDED') return es ? 'Comprobante de pago verificado y pedido creado' : 'Payment evidence verified and order created';
+  if (event.action === 'REQUEST_CUSTOMER_APPROVED') return es ? 'El cliente aprobó el alcance' : 'Customer approved the scope';
+  if (event.action === 'ORDER_STATUS_CHANGED') return es ? 'Etapa del pedido actualizada' : 'Order stage updated';
+  if (event.action === 'REQUEST_QUOTE_EMAIL_SENT') return es ? 'Cotización enviada por correo' : 'Quote emailed';
+  if (event.action === 'REQUEST_QUOTE_TEST_EMAIL_SENT') return es ? 'Correo de prueba DEMO enviado' : 'DEMO test email sent';
   return text.unknownAction;
 }
 
@@ -87,6 +94,7 @@ export function AdminActivityPage() {
                 {text.requestTitle(event.entityId)} · <Link to={`/admin/solicitudes/${encodeURIComponent(event.entityId)}`}>{text.requestLink}</Link>
                 <br />
               </>}
+              {event.entity === 'order' && <><Link to={`/admin/pedidos/${encodeURIComponent(event.entityId)}`}>{language === 'es' ? 'Abrir pedido' : 'Open order'} {event.entityId}</Link><br /></>}
               {text.by(event.actorName || event.actorId || '—')}
               {event.fromStatus && event.toStatus && <> · {text.statusChange(text.statuses[event.fromStatus] || event.fromStatus, text.statuses[event.toStatus] || event.toStatus)}</>}
             </p>

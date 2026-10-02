@@ -12,8 +12,8 @@ const materials = ['ASA', 'PLA', 'PETG', 'ABS', 'TPU'];
 const slugify = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 const copy = {
-  es: { catalog: 'Volver al catálogo', new: 'Nuevo modelo', edit: 'Editar modelo', name: 'Nombre', slug: 'Referencia URL', description: 'Descripción', category: 'Categoría', material: 'Material FDM', price: 'Precio publicado (₡)', colors: 'Colores disponibles (separados por coma)', dimensions: 'Dimensiones', weight: 'Peso (g)', hours: 'Horas estimadas de producción', status: 'Publicación', active: 'Publicado', inactive: 'Oculto de la tienda', featured: 'Destacar en la tienda', save: 'Guardar modelo', saving: 'Guardando…', cancel: 'Cancelar', loading: 'Cargando datos', required: 'Completa los campos obligatorios.', duplicate: 'Ya existe un modelo con ese nombre o referencia.', failure: 'No pudimos guardar el modelo.', saved: 'Modelo guardado.', remove: 'Eliminar definitivamente', archive: 'Ocultar de la tienda', restore: 'Publicar en la tienda', confirmDelete: '¿Eliminar este modelo definitivamente? Solo se permite si no está ligado a pedidos.', referenced: 'Este modelo forma parte del historial de pedidos. Ocúltalo en lugar de eliminarlo.', categoriesTitle: 'Categorías del catálogo', categoriesHelp: 'Organizan las piezas visibles en la tienda.', categoryName: 'Nombre de categoría', categorySlug: 'Referencia URL', addCategory: 'Agregar categoría', saveCategory: 'Guardar', deleteCategory: 'Eliminar', categoryUsed: 'No se puede eliminar: hay modelos asociados. Primero reasigna esos modelos.', categoryDuplicate: 'Ya existe una categoría con ese nombre o referencia.', categoryConfirm: '¿Eliminar esta categoría?', savingCategory: 'Guardando…', back: 'Volver', errorTitle: 'No pudimos cargar el catálogo', errorHint: 'Revisá JSON Server y volvé a intentar.', retry: 'Reintentar', noCategory: 'Elegí una categoría' },
-  en: { catalog: 'Back to catalog', new: 'New model', edit: 'Edit model', name: 'Name', slug: 'URL reference', description: 'Description', category: 'Category', material: 'FDM material', price: 'Listed price (₡)', colors: 'Available colors (comma separated)', dimensions: 'Dimensions', weight: 'Weight (g)', hours: 'Estimated production hours', status: 'Publication', active: 'Published', inactive: 'Hidden from store', featured: 'Feature in store', save: 'Save model', saving: 'Saving…', cancel: 'Cancel', loading: 'Loading data', required: 'Complete the required fields.', duplicate: 'A model with that name or reference already exists.', failure: 'Could not save the model.', saved: 'Model saved.', remove: 'Delete permanently', archive: 'Hide from store', restore: 'Publish in store', confirmDelete: 'Delete this model permanently? This is only allowed when no orders reference it.', referenced: 'This model is in order history. Hide it instead of deleting it.', categoriesTitle: 'Catalog categories', categoriesHelp: 'Organize the pieces shown in the store.', categoryName: 'Category name', categorySlug: 'URL reference', addCategory: 'Add category', saveCategory: 'Save', deleteCategory: 'Delete', categoryUsed: 'Cannot delete: models use this category. Reassign them first.', categoryDuplicate: 'A category with that name or reference already exists.', categoryConfirm: 'Delete this category?', savingCategory: 'Saving…', back: 'Back', errorTitle: 'Could not load catalog', errorHint: 'Check JSON Server and try again.', retry: 'Retry', noCategory: 'Choose a category' },
+  es: { catalog: 'Volver al catálogo', new: 'Nuevo modelo', edit: 'Editar modelo', name: 'Nombre', slug: 'Referencia URL', description: 'Descripción', category: 'Categoría', material: 'Material FDM', price: 'Precio publicado (₡)', colors: 'Colores disponibles (separados por coma)', dimensions: 'Dimensiones', weight: 'Peso (g)', hours: 'Horas estimadas de producción', status: 'Publicación', active: 'Publicado', inactive: 'Oculto de la tienda', featured: 'Destacar en la tienda', save: 'Guardar modelo', saving: 'Guardando…', cancel: 'Cancelar', loading: 'Cargando datos', required: 'Completa los campos obligatorios.', duplicate: 'Ya existe un modelo con ese nombre o referencia.', failure: 'No pudimos guardar el modelo.', saved: 'Modelo guardado.', remove: 'Eliminar definitivamente', archive: 'Ocultar de la tienda', restore: 'Publicar en la tienda', confirmDelete: '¿Eliminar este modelo definitivamente? Solo se permite si no está ligado a pedidos.', referenced: 'Este modelo forma parte del historial de pedidos. Ocúltalo en lugar de eliminarlo.', categoriesTitle: 'Categorías del catálogo', categoriesHelp: 'Organizan las piezas visibles en la tienda.', categoryName: 'Nombre de categoría', categorySlug: 'Referencia URL', addCategory: 'Agregar categoría', saveCategory: 'Guardar categoría', editCategory: 'Editar categoría', categoryPreview: 'Así se identifica en el catálogo', categoryProducts: 'Modelos asociados', categoryUrlHelp: 'Referencia interna para organizar y reconocer la categoría.', deleteCategory: 'Eliminar', categoryUsed: 'No se puede eliminar: hay modelos asociados. Primero reasigna esos modelos.', categoryDuplicate: 'Ya existe una categoría con ese nombre o referencia.', categoryConfirm: '¿Eliminar esta categoría?', savingCategory: 'Guardando…', back: 'Volver', errorTitle: 'No pudimos cargar el catálogo', errorHint: 'Revisá JSON Server y volvé a intentar.', retry: 'Reintentar', noCategory: 'Elegí una categoría' },
+  en: { catalog: 'Back to catalog', new: 'New model', edit: 'Edit model', name: 'Name', slug: 'URL reference', description: 'Description', category: 'Category', material: 'FDM material', price: 'Listed price (₡)', colors: 'Available colors (comma separated)', dimensions: 'Dimensions', weight: 'Weight (g)', hours: 'Estimated production hours', status: 'Publication', active: 'Published', inactive: 'Hidden from store', featured: 'Feature in store', save: 'Save model', saving: 'Saving…', cancel: 'Cancel', loading: 'Loading data', required: 'Complete the required fields.', duplicate: 'A model with that name or reference already exists.', failure: 'Could not save the model.', saved: 'Model saved.', remove: 'Delete permanently', archive: 'Hide from store', restore: 'Publish in store', confirmDelete: 'Delete this model permanently? This is only allowed when no orders reference it.', referenced: 'This model is in order history. Hide it instead of deleting it.', categoriesTitle: 'Catalog categories', categoriesHelp: 'Organize the pieces shown in the store.', categoryName: 'Category name', categorySlug: 'URL reference', addCategory: 'Add category', saveCategory: 'Save category', editCategory: 'Edit category', categoryPreview: 'Catalog identifier preview', categoryProducts: 'Linked models', deleteCategory: 'Delete', categoryUsed: 'Cannot delete: models use this category. Reassign them first.', categoryDuplicate: 'A category with that name or reference already exists.', categoryConfirm: 'Delete this category?', savingCategory: 'Saving…', back: 'Back', errorTitle: 'Could not load catalog', errorHint: 'Check JSON Server and try again.', retry: 'Retry', noCategory: 'Choose a category' },
 };
 
 export function AdminProductFormPage() {
@@ -41,14 +41,17 @@ export function AdminProductFormPage() {
   const save = async event => {
     event.preventDefault(); setError('');
     const slug = slugify(product.slug || product.name);
-    if (!product.name.trim() || !slug || !product.categoryId || product.price === '' || !Number.isFinite(Number(product.price)) || Number(product.price) < 0 || !materials.includes(product.material) || !['ACTIVE', 'INACTIVE'].includes(product.status) || [product.weightGrams, product.estimatedProductionHours].some(value => value !== '' && (!Number.isFinite(Number(value)) || Number(value) < 0))) { setError(t.required); return; }
+    const isDraft = product.status === 'DRAFT';
+    const invalidPrice = product.price !== '' && (!Number.isFinite(Number(product.price)) || Number(product.price) < 0);
+    const invalidMaterial = product.material !== '' && !materials.includes(product.material);
+    if (!product.name.trim() || !slug || !product.categoryId || (!isDraft && (product.price === '' || !Number.isFinite(Number(product.price)) || Number(product.price) < 0 || !materials.includes(product.material))) || (isDraft && (invalidPrice || invalidMaterial)) || !['ACTIVE', 'INACTIVE', 'DRAFT'].includes(product.status) || [product.weightGrams, product.estimatedProductionHours].some(value => value !== '' && (!Number.isFinite(Number(value)) || Number(value) < 0))) { setError(t.required); return; }
     const collision = products.some(item => String(item.id) !== id && (slugify(item.slug || '') === slug || item.name.trim().toLocaleLowerCase() === product.name.trim().toLocaleLowerCase()));
     if (collision) { setError(t.duplicate); return; }
     setBusy(true);
     const now = new Date().toISOString();
     const payload = {
       name: product.name.trim(), slug, description: product.description.trim(), categoryId: product.categoryId,
-      price: Number(product.price), currency: 'CRC', material: product.material,
+      price: product.price === '' ? null : Number(product.price), currency: 'CRC', material: product.material || null,
       availableColors: product.colors.split(',').map(color => color.trim()).filter(Boolean), dimensions: product.dimensions.trim(),
       weightGrams: product.weightGrams === '' ? null : Number(product.weightGrams),
       estimatedProductionHours: product.estimatedProductionHours === '' ? null : Number(product.estimatedProductionHours),
@@ -75,13 +78,13 @@ export function AdminProductFormPage() {
         <label>{t.name}<input name="name" value={product.name} onChange={onChange} required autoComplete="off" /></label>
         <label>{t.slug}<input name="slug" value={product.slug} onChange={onChange} placeholder={slugify(product.name)} autoComplete="off" /></label>
         <label>{t.category}<select name="categoryId" value={product.categoryId} onChange={onChange} required><option value="">{t.noCategory}</option>{availableCategories.map(category => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
-        <label>{t.material}<select name="material" value={materials.includes(product.material) ? product.material : ''} onChange={onChange} required><option value="">{language === 'es' ? 'Seleccionar material' : 'Select material'}</option>{materials.map(material => <option key={material}>{material}</option>)}</select></label>
-        <label>{t.price}<input name="price" type="number" min="0" step="1" value={product.price} onChange={onChange} required /></label>
+        <label>{t.material}<select name="material" value={materials.includes(product.material) ? product.material : ''} onChange={onChange} required={product.status !== 'DRAFT'}><option value="">{language === 'es' ? 'Seleccionar material' : 'Select material'}</option>{materials.map(material => <option key={material}>{material}</option>)}</select></label>
+        <label>{t.price}<input name="price" type="number" min="0" step="1" value={product.price} onChange={onChange} required={product.status !== 'DRAFT'} /></label>
         <label>{t.colors}<input name="colors" value={product.colors} onChange={onChange} /></label>
         <label>{t.dimensions}<input name="dimensions" value={product.dimensions} onChange={onChange} /></label>
         <label>{t.weight}<input name="weightGrams" type="number" min="0" step="1" value={product.weightGrams} onChange={onChange} /></label>
         <label>{t.hours}<input name="estimatedProductionHours" type="number" min="0" step="0.5" value={product.estimatedProductionHours} onChange={onChange} /></label>
-        <label>{t.status}<select name="status" value={product.status} onChange={onChange}><option value="ACTIVE">{t.active}</option><option value="INACTIVE">{t.inactive}</option></select></label>
+        <label>{t.status}<select name="status" value={product.status} onChange={onChange}><option value="ACTIVE">{t.active}</option><option value="INACTIVE">{t.inactive}</option><option value="DRAFT">{language === 'es' ? 'Borrador · incompleto' : 'Draft · incomplete'}</option></select></label>
         <label className="admin-catalog-form__wide">{t.description}<textarea name="description" rows="4" value={product.description} onChange={onChange} /></label>
         <label className="admin-catalog-form__check"><input type="checkbox" name="featured" checked={product.featured} onChange={onChange} />{t.featured}</label>
       </div>
@@ -100,17 +103,19 @@ export function AdminCategoriesPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [draft, setDraft] = useState({ name: '', slug: '' });
+  const [editDraft, setEditDraft] = useState({ name: '', slug: '' });
   const usedCategories = useMemo(() => new Set(products.map(product => String(product.categoryId))), [products]);
-  const submit = async event => {
+  const saveCategory = async (event, categoryId = null) => {
     event.preventDefault(); setError('');
-    const slug = slugify(draft.slug || draft.name);
-    if (!draft.name.trim() || !slug) { setError(t.required); return; }
-    if (categories.some(item => String(item.id) !== String(editing || '') && (slugify(item.slug || '') === slug || item.name.trim().toLocaleLowerCase() === draft.name.trim().toLocaleLowerCase()))) { setError(t.categoryDuplicate); return; }
+    const currentDraft = categoryId ? editDraft : draft;
+    const slug = slugify(currentDraft.slug || currentDraft.name);
+    if (!currentDraft.name.trim() || !slug) { setError(t.required); return; }
+    if (categories.some(item => String(item.id) !== String(categoryId || '') && (slugify(item.slug || '') === slug || item.name.trim().toLocaleLowerCase() === currentDraft.name.trim().toLocaleLowerCase()))) { setError(t.categoryDuplicate); return; }
     setBusy(true);
     try {
-      const payload = { name: draft.name.trim(), slug, status: categories.find(item => String(item.id) === String(editing))?.status || 'ACTIVE' };
-      if (editing) await updateAdminCategory(editing, payload); else await createAdminCategory(payload);
-      setEditing(null); setDraft({ name: '', slug: '' }); retry();
+      const payload = { name: currentDraft.name.trim(), slug, status: categories.find(item => String(item.id) === String(categoryId))?.status || 'ACTIVE' };
+      if (categoryId) await updateAdminCategory(categoryId, payload); else await createAdminCategory(payload);
+      setEditing(null); setEditDraft({ name: '', slug: '' }); setDraft({ name: '', slug: '' }); retry();
     } catch { setError(t.failure); }
     finally { setBusy(false); }
   };
@@ -124,19 +129,34 @@ export function AdminCategoriesPage() {
   };
   if (status === 'loading') return <div className="admin-catalog-form" role="status" aria-label={t.loading}><Skeleton height="240px" /></div>;
   if (status === 'error') return <ErrorState title={t.errorTitle} description={t.errorHint} onRetry={retry} retryLabel={t.retry} />;
+  const cancelEdit = () => { setEditing(null); setEditDraft({ name: '', slug: '' }); setError(''); };
   return <section className="admin-catalog-form" aria-labelledby="admin-categories-title">
     <Link className="admin-request-back" to="/admin/catalogo">← {t.back}</Link>
     <header className="admin-page-heading"><div><span className="admin-eyebrow">CATÁLOGO / ORGANIZACIÓN</span><h1 id="admin-categories-title">{t.categoriesTitle}</h1><p>{t.categoriesHelp}</p></div></header>
-    <form className="admin-catalog-form__surface admin-category-form" onSubmit={submit}>
-      <label>{t.categoryName}<input value={draft.name} onChange={event => setDraft(current => ({ ...current, name: event.target.value, slug: current.slug || slugify(event.target.value) }))} required /></label>
-      <label>{t.categorySlug}<input value={draft.slug} onChange={event => setDraft(current => ({ ...current, slug: event.target.value }))} required /></label>
-      <button className="admin-action-primary" disabled={busy}>{busy ? t.savingCategory : editing ? t.saveCategory : t.addCategory}</button>
-      {editing && <button className="admin-action-secondary" type="button" onClick={() => { setEditing(null); setDraft({ name: '', slug: '' }); }}>{t.cancel}</button>}
+    <form className="admin-catalog-form__surface admin-category-create" aria-label={t.addCategory} onSubmit={event => saveCategory(event)}>
+      <div className="admin-category-create__heading"><span className="admin-eyebrow">01 / {language === 'es' ? 'NUEVA EN EL CATÁLOGO' : 'ADD TO CATALOG'}</span><h2>{t.addCategory}</h2><p>{language === 'es' ? 'Definí un nombre y una referencia para agrupar modelos.' : 'Set a name and reference to group models.'}</p></div>
+      <div className="admin-category-create__fields">
+        <label>{t.categoryName}<input value={draft.name} onChange={event => setDraft(current => ({ ...current, name: event.target.value, slug: current.slug || slugify(event.target.value) }))} required /></label>
+        <label>{t.categorySlug}<input value={draft.slug} onChange={event => setDraft(current => ({ ...current, slug: event.target.value }))} required /></label>
+        <button className="admin-action-primary" disabled={busy}>{busy ? t.savingCategory : t.addCategory}</button>
+      </div>
     </form>
-    {error && <p className="admin-catalog-form__error" role="alert">{error}</p>}
-    <div className="admin-category-list">{categories.map(category => <article className="admin-category-row" key={category.id}>
-      <div><strong>{category.name}</strong><small>{category.slug} · {products.filter(product => String(product.categoryId) === String(category.id)).length} {language === 'es' ? 'modelos' : 'models'}</small></div>
-      <div><button className="admin-action-secondary" type="button" onClick={() => { setEditing(category.id); setDraft({ name: category.name, slug: category.slug }); }}>{language === 'es' ? 'Editar' : 'Edit'}</button><button className="admin-action-secondary" type="button" disabled={busy} onClick={() => remove(category)}>{t.deleteCategory}</button></div>
+    {error && !editing && <p className="admin-catalog-form__error" role="alert">{error}</p>}
+    <div className="admin-category-list">{categories.map((category, index) => <article className="admin-category-row" key={category.id} style={{ '--row-index': index }}>
+      <div className="admin-category-row__summary"><span className="admin-eyebrow">{language === 'es' ? 'CATEGORÍA' : 'CATEGORY'} / {String(category.id).toUpperCase()}</span><strong>{category.name}</strong><small>{category.slug} · {products.filter(product => String(product.categoryId) === String(category.id)).length} {language === 'es' ? 'modelos' : 'models'}</small></div>
+      <div className="admin-category-row__actions"><button className="admin-action-secondary" type="button" aria-expanded={editing === category.id} aria-controls={`category-editor-${category.id}`} onClick={() => { setEditing(editing === category.id ? null : category.id); setEditDraft({ name: category.name, slug: category.slug }); setError(''); }}>{editing === category.id ? t.cancel : (language === 'es' ? 'Editar categoría' : 'Edit category')}</button><button className="admin-action-secondary admin-category-delete" type="button" disabled={busy} onClick={() => remove(category)}>{t.deleteCategory}</button></div>
+      {editing === category.id && <form id={`category-editor-${category.id}`} className="admin-category-editor" aria-label={`${t.editCategory}: ${category.name}`} onSubmit={event => saveCategory(event, category.id)}>
+        <header><div><span className="admin-eyebrow">02 / {language === 'es' ? 'IDENTIDAD DE CATÁLOGO' : 'CATALOG IDENTITY'}</span><h2>{t.editCategory}: {category.name}</h2></div><p>{t.categoryUrlHelp}</p></header>
+        <div className="admin-category-editor__body">
+          <div className="admin-category-editor__fields">
+            <label>{t.categoryName}<input autoFocus value={editDraft.name} onChange={event => setEditDraft(current => ({ ...current, name: event.target.value, slug: current.slug || slugify(event.target.value) }))} required /></label>
+            <label>{t.categorySlug}<input value={editDraft.slug} onChange={event => setEditDraft(current => ({ ...current, slug: event.target.value }))} required /></label>
+          </div>
+          <aside className="admin-category-preview" aria-live="polite"><span className="admin-eyebrow">{t.categoryPreview}</span><strong>{editDraft.name || category.name}</strong><code>{slugify(editDraft.slug || editDraft.name) || category.slug}</code><span>{t.categoryProducts}: {products.filter(product => String(product.categoryId) === String(category.id)).length}</span></aside>
+        </div>
+        {error && <p className="admin-catalog-form__error" role="alert">{error}</p>}
+        <footer className="admin-category-editor__actions"><button className="admin-action-secondary" type="button" disabled={busy} onClick={cancelEdit}>{t.cancel}</button><button className="admin-action-primary" disabled={busy}>{busy ? t.savingCategory : t.saveCategory}</button></footer>
+      </form>}
     </article>)}</div>
   </section>;
 }

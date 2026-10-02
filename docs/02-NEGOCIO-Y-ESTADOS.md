@@ -21,7 +21,7 @@ Reglas:
 - PENDING_QUOTE no tiene precio final.
 - Solo `role: admin` puede iniciar `PENDING_QUOTE → IN_REVIEW`; el cambio y el evento con actor/fecha se registran juntos en `activityLog`.
 - El rango de IA es orientativo.
-- Solo el admin emite la cotización final.
+- En el MVP actual, solo el admin emite la cotización final. Meta de producto indicada por el usuario: automatizar los casos FDM estándar y dejar intervención del taller para excepciones; ver condiciones y datos pendientes en `docs/07`. Esta meta no cambia el flujo operativo hasta implementar y validar el motor.
 - Solo una cotización aprobada puede pagarse.
 - El pedido pagado conserva requestId.
 - Solicitud y pedido son entidades relacionadas, no la misma entidad.
@@ -42,8 +42,11 @@ Campos mínimos: id, name, slug, description, categoryId, images, price, currenc
 La bandeja Admin del catálogo consulta modelos y categorías y permite buscar y
 filtrar por los valores de publicación/material presentes en el origen. CRUD de
 catálogo: Admin puede crear/editar productos y categorías; los productos usan
-`ACTIVE` (publicado) y `INACTIVE` (oculto) como estados de publicación, nunca
-disponibilidad. PATCH modifica solo campos autorizados y no escribe campos de
+`ACTIVE` (publicado), `INACTIVE` (oculto con ficha completa) y `DRAFT`
+(incompleto y no visible en la tienda) como estados de publicación, nunca
+disponibilidad. Un borrador puede tener `price: null` y `material: null`; no se
+puede publicar hasta confirmar nombre, categoría, precio no negativo y un
+filamento FDM vigente. PATCH modifica solo campos autorizados y no escribe campos de
 inventario heredados. `images` existentes se conservan al editar y producto
 nuevo inicia con `images: []`; carga/cambio de imágenes queda fuera hasta definir
 almacenamiento. Una categoría no se elimina si tiene modelos asociados. Un
@@ -55,7 +58,7 @@ existente tiene otro material, Admin lo señala para revisión sin cambiarlo ni
 ocultarlo silenciosamente.
 
 Reglas:
-- price >= 0.
+- `price >= 0` para cualquier producto publicado; `null` solo se admite en `DRAFT`.
 - el precio publicado corresponde al modelo de catálogo y no implica existencia física previa al pedido.
 
 ## Carrito híbrido
@@ -93,6 +96,32 @@ transiciones terminales/alternativas y su escritura auditada.
 ## Cotización
 
 Conservar requestId, monto, moneda, vigencia, notas, tiempo estimado, fecha y admin emisor.
+El Admin calcula el costo con datos técnicos por pieza y tarifas vigentes introducidos
+por una persona; el cliente ve el monto total y alcance, no una tarifa inventada ni
+un rango de IA. Guardar entradas, desglose, fecha de revisión de tarifas y versión
+de fórmula como snapshot de esa cotización. Una actualización de tarifas futura no
+cambia una oferta ya guardada.
+
+Para el primer cálculo manual FDM: gramos y horas son por unidad; filamento y desgaste
+se registran en USD/kg y se convierten a CRC con el tipo de cambio ingresado; la
+electricidad se deriva de horas por pieza × potencia media (kW) × tarifa CRC/kWh;
+postprocesado se escala por cantidad; diseño es por pedido; otros costos son un
+monto por pedido. Un recargo explícito se aplica al
+costo total y se distingue de margen bruto. El monto final se redondea a colones.
+Costos no incluidos (por ejemplo impuestos, envío o comisiones) deben declararse en
+condiciones o sumarse a “otros costos”; el cálculo no los presume incluidos.
+
+### Envío de cotización
+
+Una cotización guardada (`QUOTED`) se entrega desde Admin en un único correo: el
+cliente es `To` y la dirección del administrador autenticado es `BCC` (el cliente
+no ve la copia interna). Solo después de que el proveedor confirme la aceptación
+del mensaje la solicitud avanza a `AWAITING_APPROVAL`; también se guarda fecha,
+destinatarios y evento `REQUEST_QUOTE_EMAIL_SENT`. Una dirección incompleta o de
+dominio reservado de ejemplo (`example.*`, `.test`, `.invalid`, `.localhost`)
+bloquea el envío. Si el proveedor no está configurado/falla, la cotización sigue
+en `QUOTED` para poder corregir configuración y reintentar. El envío de correo no
+calcula ni modifica el precio.
 
 ## IA
 
@@ -162,3 +191,19 @@ Una solicitud `QUOTED` debe llevar primero a revisión/aprobación.
 Una solicitud `APPROVED` puede llevar al pago de cotización.
 
 El usuario debe saber en todo momento si está comprando un producto o pagando una cotización técnica.
+
+## Cotización y fulfillment DEMO (2026-10-02)
+
+`src/utils/quoteAutomation.js` ofrece perfiles análogos para los modelos
+conocidos. Gramos, horas, desgaste, energía y costos son **DEMO estimado**: no
+provienen del STL, laminador, inventario físico ni lectura eléctrica. La fórmula
+determinista guarda desglose, versión/fecha y validez; el snapshot no acredita
+precio comercial ni fabricación. La cotización puede generarse desde Admin o
+`/solicitud`; el cliente aprueba el alcance vigente desde `/cuenta`.
+
+La etapa `PAID` de esta entrega solo representa una verificación manual o un
+registro `DEMO` rotulado. DEMO crea un pedido `PENDING` con snapshot de alcance y
+referencia `SIMULATED-NO-REAL-PAYMENT`; no acredita SINPE, no mueve dinero ni
+inicia producción. Idempotencia de solicitud→pedido evita duplicar el encargo en
+reintentos. Los asistentes no ejecutan mutaciones; herramientas de cotización
+calculan y el servidor aplica roles al invocarlas.

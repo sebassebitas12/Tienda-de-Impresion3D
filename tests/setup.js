@@ -5,6 +5,7 @@ import { jest } from '@jest/globals';
 if (!globalThis.TextEncoder) Object.defineProperty(globalThis, 'TextEncoder', { value: TextEncoder });
 if (!globalThis.TextDecoder) Object.defineProperty(globalThis, 'TextDecoder', { value: TextDecoder });
 
+if (typeof window !== 'undefined') {
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn(query => ({
@@ -20,4 +21,5 @@ window.IntersectionObserver = class {
 if (!HTMLDialogElement.prototype.showModal) {
   HTMLDialogElement.prototype.showModal = function () { this.open = true; };
   HTMLDialogElement.prototype.close = function () { this.open = false; };
+}
 }

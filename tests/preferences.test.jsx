@@ -3,6 +3,9 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { MemoryRouter } from 'react-router-dom';
 import { FloatingTools } from '../src/app/layout/FloatingTools.jsx';
 import { PreferencesProvider } from '../src/app/providers/PreferencesProvider.jsx';
+import { automationAction } from '../src/services/automationService.js';
+
+jest.mock('../src/services/automationService.js', () => ({ automationAction: jest.fn(), automationError: () => 'No se pudo responder.' }));
 
 function renderReadingPanel() {
   return render(
@@ -114,22 +117,22 @@ describe('Asistencia del taller', () => {
     localStorage.clear();
   });
 
-  it('explica que la respuesta automática es demo y ofrece iniciar una solicitud', () => {
+  it('muestra herramientas por contexto sin prometer que la IA está conectada', () => {
     renderChatPanel();
 
-    expect(screen.getByText(/respuesta automática todavía no está conectada/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /cotizar archivo/i })).toHaveAttribute('href', '/solicitud');
-    expect(screen.getByRole('group', { name: 'Temas para empezar' })).toBeInTheDocument();
+    expect(screen.getByText(/No cambio pedidos ni envío correos por mi cuenta/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Qué material me conviene/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Enviar pregunta' })).toBeDisabled();
   });
 
-  it('usa un tema sugerido para completar el campo y no simula una respuesta', () => {
+  it('consulta un tema sugerido y distingue la guía local del proveedor IA', async () => {
+    automationAction.mockResolvedValue({ reply: 'Compará PLA y PETG para este uso.', source: 'DEMO_RULES', links: [{ label: 'Cotizar', path: '/solicitud' }] });
     renderChatPanel();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Elegir material' }));
-    expect(screen.getByRole('textbox', { name: 'Escribí tu mensaje' })).toHaveValue('Elegir material');
-
-    fireEvent.click(screen.getByRole('button', { name: 'Enviar pregunta' }));
-    expect(screen.getByRole('status')).toHaveTextContent(/asistencia automática no está disponible/i);
-    expect(screen.getByRole('link', { name: /cotizar archivo/i })).toHaveAttribute('href', '/solicitud');
+    fireEvent.click(screen.getByRole('button', { name: /Qué material me conviene/ }));
+    expect(await screen.findByText('Compará PLA y PETG para este uso.')).toBeInTheDocument();
+    expect(screen.getByText(/Guía local · proveedor IA no conectado/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Cotizar/ })).toHaveAttribute('href', '/solicitud');
+    expect(automationAction).toHaveBeenCalledWith('/assistants/chat', expect.objectContaining({ mode: 'general', message: '¿Qué material me conviene?' }), expect.any(Object));
   });
 });

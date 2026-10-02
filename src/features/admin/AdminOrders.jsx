@@ -7,6 +7,7 @@ import { filterAdminOrders, formatOrderReference, summarizeOrderGroups } from '.
 import { FilterChips } from '../../components/ui/FilterChips.jsx';
 import { toggleFacetParams } from '../../utils/facetFilters.js';
 import { useAdminOrders } from './useAdminOrders.js';
+import { OrderActions } from './OrderActions.jsx';
 import './admin.css';
 
 const words = {
@@ -84,7 +85,7 @@ export function AdminOrdersPage() {
       {status === 'loading' && <div className="admin-orders__loading" role="status" aria-label={text.loading}>{[1, 2, 3].map(index => <Skeleton key={index} height="68px" />)}</div>}
       {status === 'error' && <ErrorState title={text.error} description={text.errorHint} onRetry={retry} retryLabel={text.retry} />}
       {status === 'success' && <>
-        <FilterChips className="admin-orders__filters" label={text.title} selected={groups} onToggle={chooseGroup} options={FILTERS.map(key => ({ value: key, label: text[key], count: counts[key] }))} />
+        <FilterChips className="admin-orders__filters" label={text.title} selected={groups} onToggle={chooseGroup} options={FILTERS.filter(key => key !== 'unrecognized' || counts[key] > 0).map(key => ({ value: key, label: text[key], count: counts[key] }))} />
         <section className="admin-orders__register" aria-labelledby="admin-orders-register-title">
           <header className="admin-orders__register-heading">
             <div><span className="admin-eyebrow">02 / {text.id}</span><h2 id="admin-orders-register-title">{groups.length > 1 ? groups.map(key => text[key]).join(' + ') : text[group]}</h2>
@@ -99,11 +100,11 @@ export function AdminOrdersPage() {
                 <caption className="admin-sr-only">{text.title}: {filtered.length}</caption>
                 <thead><tr><th scope="col">{text.id}</th><th scope="col">{text.client}</th><th scope="col">{text.created}</th><th scope="col">{text.stage}</th><th scope="col">{text.amount}</th></tr></thead>
                 <tbody>{filtered.map((order, index) => <tr key={order.id} style={{ '--row-index': index }}>
-                  <th scope="row"><Link className="admin-order-id" to={`/admin/pedidos/${encodeURIComponent(order.id)}`}>{formatOrderReference(order.id)}<span aria-hidden="true">↗</span></Link></th>
-                  <td>{order.customer?.name || '—'}</td>
-                  <td><time dateTime={order.createdAt}>{formatDate(order.createdAt, language)}</time></td>
-                  <td><OrderState status={order.status} text={text} /></td>
-                  <td>{formatCRC(order.total) || '—'}</td>
+                  <th scope="row"><Link className="admin-order-id" to={`/admin/pedidos/${encodeURIComponent(order.id)}`}>{formatOrderReference(order.id)}<span aria-hidden="true">↗</span></Link>{order.pricingMode === 'DEMO' && <small className="admin-eyebrow"> DEMO</small>}</th>
+                  <td data-label={text.client}>{order.customer?.name || '—'}</td>
+                  <td data-label={text.created}><time dateTime={order.createdAt}>{formatDate(order.createdAt, language)}</time></td>
+                  <td data-label={text.stage}><OrderState status={order.status} text={text} /></td>
+                  <td data-label={text.amount}>{formatCRC(order.total) || '—'}</td>
                 </tr>)}</tbody>
               </table>
             </div>
@@ -153,11 +154,13 @@ export function AdminOrderDetailPage() {
         </header>
 
         <OrderFlow order={order} text={text} />
+        {order.pricingMode === 'DEMO' && <p role="status">{language === 'es' ? 'PEDIDO DEMO · pago simulado. Las etapas siguientes son una práctica, no instrucciones de fabricación real.' : 'DEMO ORDER · simulated payment. Next stages are practice, not real manufacturing instructions.'}</p>}
+        <OrderActions key={`${order.id}-${order.updatedAt || order.status}`} order={order} onSaved={retry} language={language} />
 
         <div className="admin-order-detail__grid">
           <section className="admin-order-items" aria-labelledby="admin-order-items-title">
             <header><span className="admin-eyebrow">02 / {text.items}</span><h2 id="admin-order-items-title">{text.items}</h2></header>
-            {order.items.length === 0 ? <EmptyState title={text.noItems} /> : <div className="admin-table-scroll">
+            {order.scopeSnapshot ? <><h3>{order.scopeSnapshot.name}</h3><p>{order.scopeSnapshot.quantity} × {order.scopeSnapshot.material}</p><p>{order.scopeSnapshot.notes}</p></> : order.items.length === 0 ? <EmptyState title={text.noItems} /> : <div className="admin-table-scroll">
               <table className="admin-table admin-order-items__table">
                 <caption className="admin-sr-only">{text.items}: {order.items.length}</caption>
                 <thead><tr><th scope="col">{text.item}</th><th scope="col">{text.quantity}</th><th scope="col">{text.each}</th><th scope="col">{text.lineTotal}</th></tr></thead>

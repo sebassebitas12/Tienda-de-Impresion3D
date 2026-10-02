@@ -1,9 +1,20 @@
 # AI_CONTEXT.md — Vértice CR
 
-> **Última actualización:** 2026-10-01
+> **Última actualización:** 2026-10-02
 > **Estado:** SNAPSHOT ACTIVO  
 > **Rama:** `Pruebas`  
 > **No es un diario:** este archivo resume el presente. El historial detallado vive en los documentos de dominio.
+
+## Estado vigente para continuar (2026-10-02)
+
+- **Admin:** solicitud, cotización, email, aprobación del cliente y avance de pedidos con reglas e historial. Las cantidades de perfiles y costos son DEMO, no medidas, cobros, inventario ni producción real.
+- **Responsive revisado:** Resumen, Pedidos, Solicitudes/detalle, Catálogo, Categorías y Clientes en capturas de breakpoints y temas; capturas locales en `automation/evidence/`. Activity queda para el bloque posterior que reservó el usuario.
+- **n8n:** cinco JSON importables, independientes e inactivos en `automation/n8n/`, con bots por rol, tasas públicas y Gmail. El ZIP incluye guía. Falta importar/publicar y comprobar credencial real DeepSeek/correo; pruebas locales usan proveedores simulados.
+- **Tasas:** cambio venta Hacienda puede ser oficial reciente; ARESEP requiere selección exacta de distribuidora/tarifa/bloque. Sin coincidencia, sigue DEMO. Los costos reales de materiales, desgaste y energía dependen de calibración del taller.
+- **Verificación local:** 23 suites/119 pruebas más integración de automatización de 108 verificaciones; lint, `check:ui` y build aprobados localmente. CI pendiente de este push.
+- **Siguiente:** importar/publicar workflows, elegir las credenciales ya configuradas y hacer un envío controlado; después continuar Activity. No reabrir Home integral.
+
+Este estado vigente prevalece sobre los cortes históricos que aparecen más abajo.
 
 ## 1. Misión del proyecto
 
@@ -200,9 +211,23 @@ Antes de editar:
 - **R-H41/R-H42 Home:** R-H41 afirmaba que el líder acababa sobre las cuatro piezas; el usuario comprobó en el render que seguía en el fondo. R-H42 calcula el endpoint midiendo el `object-fit: contain`, paddings y dimensiones naturales del asset; recalcula al redimensionar o cambiar la pieza y conecta desde el rótulo. Inspección local confirma el líder sobre las cuatro piezas a 1280×800 y sobre soporte a 375×812. «Filamento · PETG» contextualiza el material; lattice pasa a «estructura aligerada» también en la tarjeta del soporte. La ProductCard destacada omite su badge flotante; las columnas de precisión pierden índice/chip redundante. Pasaron lint, 53 tests, `check:ui` (48 módulos), build y `git diff --check`; faltan tamaños/temas restantes.
 - **Assets del mockup publicados:** `hero-soporte.jpg`, `producto-engranaje.jpg`, `producto-dragon.jpg`, `producto-drone.jpg` y `producto-maqueta.jpg` fueron reutilizados desde `mockups/images/` en `public/images/` sin alterar el mockup congelado.
 
-**Admin actual:** R-H55/R-H56 extienden atmósfera a rutas de Admin; R-H57 documenta el criterio transversal (no canvas seco ni repetición mecánica de fondos). `/admin/actividad` consulta `activityLog`; pedidos se consultan sin editar etapas ni confirmar pagos. Catálogo: alta/edición de productos, ocultar/publicar y CRUD de categorías usando servicios JSON Server. Publicación `ACTIVE`/`INACTIVE`; baja de producto bloquea referencias históricas, categorías bloquean productos asociados; fotos existentes se preservan, nuevas vacías hasta storage. `stock`/`minStock` no se muestran, escriben ni limitan la cantidad del carrito; `ProductCard` solo ofrece “Bajo pedido” si se solicita. Un material histórico `PLA Silk` se señala para revisión. ESLint, 13 suites/83 tests, `check:ui` (48 módulos), build (119 módulos) y diff check pasan con binarios locales; `npm` global del host apunta a `npm-cli.js` inexistente. Forms no se inspeccionaron visualmente.
+**Admin actual:** `/admin/actividad` consulta `activityLog`; el usuario pidió dejar su prueba para más adelante. Pedidos son de solo lectura; las solicitudes pueden preparar/publicar cotizaciones e incorporar el legacy `SUBMITTED` mediante registro explícito. Catálogo tiene CRUD de productos/categorías con bajas protegidas por referencias; sin stock ni storage. `/admin/clientes` y ficha son lectura de usuarios `customer`, búsqueda y relaciones a pedidos/solicitudes; no exponen credenciales ni editan PII. En este corte, el aviso del resumen explica `SUBMITTED` sin convertirlo por defecto, la leyenda adapta columnas al ancho disponible, Categorías ofrece edición contextual con preview, y Pedidos/Clientes tienen registros visualmente diferenciados dentro del lenguaje Admin. Buscador global ofrece coincidencias reales de modelos ACTIVE. Idioma ES/EN en selector segmentado; no se amplían locales sin traducciones completas y público objetivo. El asistente Admin debe también enseñar cómo recorrer el panel, explicar secciones/estados y orientar al operador sin ejecutar cambios; este requisito responde a que el uso del dashboard todavía no es autoevidente.
 
-**Siguiente bloque exacto:** recorrer en navegador alta/edición/ocultar/borrar producto y CRUD de categorías, probar el bloqueo real por pedidos/productos asociados y auditar el ambiente de formularios/listados a 375/768/1280 Dark/Light. Después Clientes Admin con privacidad, y luego storefront/compra. IA/N8N se reserva hasta cubrir Admin operativo. Acordar storage antes de carga/descarga y contrato de cotización antes de `IN_REVIEW → QUOTED`. CI de GitHub pendiente de publicar el commit final.
+**Cotizaciones IA (dirección nueva del usuario):** se busca evitar revisión humana obligatoria y evaluar DeepSeek de pago como API. Sigue pendiente comprobar viabilidad/costo/capacidades y definir cálculo verificable con reglas del taller, guardas de confianza y excepciones; no exponer una promesa de precio automático hasta implementar y probar el flujo completo. Detalle en `docs/07`.
+
+**Regla visual permanente (indicación del usuario, 2026-10-02):** cada cambio de UI exige screenshots y revisión en navegador tras cada iteración y en el render final, comparando rutas relacionadas para conservar un sistema común sin copiar su composición. Responsive se comprueba en 1280/768/375; si el navegador impide un tamaño, dejarlo explícitamente pendiente y no afirmar que se revisó.
+
+**Verificación más reciente:** ESLint, 18 suites/98 tests, `check:ui` (48 módulos), build (133 módulos) y `git diff --check` pasan localmente. Capturas de `/catalogo` Light/Dark (~1150 px) verifican el tratamiento de imagen full-bleed R-H64. La captura de Admin en el corte R-H63 muestra 25 modelos, 6 publicados y 19 borradores con fotos; Clientes/Categorías Light también fueron revisadas. No hay control del viewport integrado: 768/375 siguen pendientes. Se añadieron 19 fichas DRAFT; no se editaron datos ajenos a esas fichas. Activity no se recorrió por decisión del usuario. GitHub Actions no está confirmado verde.
+
+**Siguiente bloque exacto:** cerrar Admin sin saltar a IA: recorrido manual de create/edit/hide y guardia de referencias históricas en CRUD; auditoría responsive (375/768/1280) y tema; luego la prueba de Activity cuando el usuario la retome. Los datos comerciales/técnicos de las 19 fichas DRAFT requieren confirmación, pero pueden esperar y no se publican accidentalmente. Después de Admin, el siguiente módulo es IA/N8N: allí construir los tres asistentes independientes y evaluar DeepSeek de pago. El asistente Admin aún no está implementado; no es un chat oculto en el dashboard. GitHub CI verde sigue siendo gate antes de recomendar pull.
+
+**R-H63 — Productos y motion Admin (2026-10-02):** se agregaron 19 borradores `p7`–`p25` a `db.json`, asociados a 19 fotos identificables en `public/images`; no se inventaron datos comerciales/técnicos, todos tienen precio/material sin confirmar, no aparecen en la tienda y su publicación está bloqueada hasta completar lo requerido. Los seis productos activos preexistentes siguen publicados. Clientes y Categorías recuperan entrada escalonada `admin-row-enter`; ambas preferencias de movimiento reducido la desactivan. Navegador Light (~1166 px) inspeccionado: `/admin/clientes`, `/admin/catalogo/categorias`, `/admin/catalogo`; Catálogo muestra 25 registros, 6 publicados, 19 borradores. Todas las rutas de imagen están presentes. Lint, 18 suites/98 tests, `check:ui` (48 módulos), build (133 módulos) y `git diff --check` pasan. No se tocó Activity. Responsive 768/375 y completar datos de fichas pendientes; sin commit/push ni confirmación de CI.
+
+**R-H64 — Tienda, fotografía de producto (2026-10-02):** se quitó el marco
+visual anidado de las imágenes de `/catalogo` haciendo que la foto llene la zona
+superior de su tarjeta (1.8:1, sin padding ni máscara). El render Light/Dark se
+inspeccionó a ~1150 px; responsive móvil/tablet pendiente. El orden sigue siendo
+Auth → Admin → IA.
 
 **Skills de proyecto activas:** `.agents/skills/vertice-continuity/SKILL.md` y `.agents/skills/vertice-visual-audit/SKILL.md`. Nuevas skills/referencias aportadas por el usuario se evalúan por utilidad real; no se incorporan automáticamente.
 
@@ -228,3 +253,68 @@ este orden se conserva en `docs/10`.
 **Claims aún no confirmados:** la tolerancia `±0.05 mm` de HF-01 y los plazos/
 cobertura logística no son compromisos operativos. React los omite hasta que se
 definan con datos reales.
+
+**Corte de anotaciones (2026-10-01):** hallada y corregida la causa del recorte
+de fotos de Tienda (zoom de hover compartido + escenario con `overflow:hidden`),
+sin alterar el asset completo. El aviso de borradores ahora explica que falta
+confirmar la ficha y enlaza al filtro `DRAFT`; no completa ni publica nada.
+«Ver tienda» se quitó del pie aislado de Admin porque duplicaba el enlace del
+logotipo; sesión y cierre quedan como grupo terminal. Se documentó en `docs/07`
+una primera política/prompt investigados para cotizar FDM de forma automática
+en los casos comprobables y derivar excepciones al taller; faltan tarifas y
+perfiles reales, no hay integración activa.
+
+**Verificado localmente:** screenshots en navegador Light: Tienda ~1150/768/375,
+Admin Catálogo ~1150 y Admin Resumen 1280/768/375. Las cajas de imagen empatan
+con sus escenarios, contain muestra productos completos y 375 no desborda; el
+CTA filtra exactamente 19 borradores sin publicarlos. Logout y navegación del
+sidebar responden en móvil. 18 suites/98 pruebas, lint, `check:ui` (48 módulos),
+build (133 módulos) y `git diff --check` pasan. El screenshot inicial de 768 px
+reveló choque de etiquetas en la leyenda del gráfico; se cambió a dos columnas
+para ese rango y el screenshot posterior muestra etiquetas/números legibles,
+sin colisión. La revisión no cubre aún todas las rutas de Admin. No commit ni
+push en este corte.
+
+**Siguiente bloque:** revisar visualmente y probar el cotizador manual de
+`/admin/solicitudes/:id`, traer los inputs reales del taller (sin sustituirlos por
+datos demo) y confirmar recorrido Guardar → Publicar. Luego seguir con los
+pendientes de cierre de Admin; Activity se mantiene para el bloque que el usuario
+reservó. Después de Admin, avanzar a asistentes separados y automatizar laminado/
+cotización solo cuando perfiles, tarifas y privacidad estén resueltos. R-H66 revisa las
+cuatro fotos y el placeholder del catálogo: las fuentes cuadradas siguen
+completas y ahora prolongan su fondo para no quedar como una caja negra inserta;
+assets originales intactos. También se unificó el placeholder sin foto. Light
+validado a ~1135/768/375 y Dark a ~1135/375; no hay overflow horizontal en móvil.
+
+**R-H67 — Cotizador manual Admin (2026-10-02):** `RequestNextAction` reemplaza el
+monto libre por captura guiada de material FDM, gramos/horas por pieza, filamento
+y desgaste USD/kg, cambio BCCR, potencia media de impresora y tarifa eléctrica,
+postprocesado, diseño, otros costos y recargo. Una función pura calcula costos y
+total; la acción de servidor recalcula y persiste valores, desglose, cantidad,
+fecha y versión de regla con la cotización. Las tarifas se copian manualmente por
+solicitud; sin AI, API BCCR/ARESEP en vivo ni integración de laminador. No hay
+importes precargados. Impuestos/envío solo se consideran si se agregan o se
+explican en condiciones. En captura local la ficha real ya se revisó en Dark y
+Light a 1265×633; al detectar los campos negros en Light se corrigió el uso de
+tokens y se recapturó. Lint, 19 suites/101 tests, `check:ui` (48 módulos), build
+(134 módulos) y `git diff --check` pasan. Responsive estrecho y el recorrido
+manual contra tarifas verdaderas/API siguen pendientes; no se guardó una oferta
+de ejemplo.
+
+**Cotización por email (R-H68, 2026-10-02):** en `QUOTED`, Admin tiene un único
+CTA para enviar al cliente y copiar al operador por BCC; el servidor hace el
+dispatch a n8n, registra actividad y avanza a `AWAITING_APPROVAL` solo tras 2xx.
+Direcciones `example.*` se bloquean. Gmail OAuth ya fue conectado por el usuario;
+el Webhook todavía muestra alerta de configuración en n8n. Falta generar el
+secreto compartido Header Auth, guardarlo en `.env`, publicar el workflow y probar
+un correo controlado; no se envió ningún correo. Hacienda ofrece un endpoint
+oficial sin token para USD compra/venta (usar venta para reposición en USD); BCCR
+(indicador 318, con suscripción/token) queda como alternativa. ARESEP publica
+tarifas por empresa/tipo/bloque de la factura. Ninguna fuente está conectada a la
+calculadora. El cotizador se inspeccionó en sesión real local: el registro R5 está
+En revisión y el formulario no tiene datos de costos reales, así que no se guardó
+una cotización ni se forzó el CTA de email. Cierre de código local: 22 suites/106
+tests, lint, `check:ui`, build y diff check; no hay commit/push. Próximo:
+configuración de Header Auth y publicación del workflow, integrar Hacienda y
+definir la tarifa ARESEP exacta a partir de la factura, además del cierre
+CRUD/responsive de Admin antes de IA y los tres asistentes.

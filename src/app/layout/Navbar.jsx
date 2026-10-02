@@ -5,6 +5,23 @@ import { useTheme } from '../../hooks/useTheme.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
 import { useAuth } from '../../hooks/useAuth.js';
 import { useCart } from '../../hooks/useCart.js';
+import { useCatalog } from '../../hooks/useCatalog.js';
+
+function SearchCatalogMatches({ query, language, onSelect }) {
+  const { products, status } = useCatalog();
+  if (status === 'loading') return <p className="search-results-status" role="status">{language === 'es' ? 'Buscando en el catálogo…' : 'Searching the catalog…'}</p>;
+  if (status !== 'success') return <p className="search-results-status" role="status">{language === 'es' ? 'El catálogo no está disponible ahora.' : 'The catalog is unavailable right now.'}</p>;
+  const term = query.trim().toLocaleLowerCase();
+  const matches = products.filter(product => String(product.status).toUpperCase() === 'ACTIVE'
+    && [product.id, product.slug, product.name, product.description, product.material, product.category?.name, ...(product.availableColors || [])]
+      .filter(Boolean).join(' ').toLocaleLowerCase().includes(term)).slice(0, 5);
+  return <section className="search-results" aria-label={language === 'es' ? 'Coincidencias del catálogo' : 'Catalog matches'}>
+    <span className="search-shortcuts-label">{language === 'es' ? 'COINCIDENCIAS DEL CATÁLOGO' : 'CATALOG MATCHES'}</span>
+    {matches.length ? <ul>{matches.map(product => <li key={product.id}><Link to={`/producto/${encodeURIComponent(product.id)}`} onClick={onSelect}>
+      <span><strong>{product.name}</strong><small>{[product.material, product.category?.name].filter(Boolean).join(' · ')}</small></span><span aria-hidden="true">↗</span>
+    </Link></li>)}</ul> : <p role="status">{language === 'es' ? 'No hay modelos publicados que coincidan. Podés ver todos los resultados.' : 'No published models match. You can still view all results.'}</p>}
+  </section>;
+}
 
 
 function AccountMenuIcon({ type }) {
@@ -174,6 +191,7 @@ export function Navbar({ onReading }) {
                 )}
               </div>
             </form>
+            {panel === 'search' && query.trim() && <SearchCatalogMatches query={query} language={language} onSelect={closePanel} />}
           </Panel>
 
           <Panel

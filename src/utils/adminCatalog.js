@@ -27,7 +27,15 @@ export function summarizeAdminCatalog(products = []) {
     counts.statuses[status] = (counts.statuses[status] || 0) + 1;
     const material = String(product.material || 'UNSPECIFIED').toUpperCase();
     counts.materials[material] = (counts.materials[material] || 0) + 1;
-    if (!CATALOG_MATERIALS.has(material)) counts.needsReview += 1;
+    if (status === 'DRAFT') counts.drafts += 1;
+    else if (material !== 'UNSPECIFIED' && !CATALOG_MATERIALS.has(material)) counts.needsReview += 1;
     return counts;
-  }, { all: 0, needsReview: 0, statuses: {}, materials: {} });
+  }, { all: 0, drafts: 0, needsReview: 0, statuses: {}, materials: {} });
+}
+
+export function isCatalogProductReadyToPublish(product) {
+  const material = String(product?.material || '').toUpperCase();
+  return Boolean(product?.name?.trim() && product?.slug?.trim() && product?.categoryId)
+    && Number.isFinite(product?.price) && product.price >= 0
+    && CATALOG_MATERIALS.has(material);
 }

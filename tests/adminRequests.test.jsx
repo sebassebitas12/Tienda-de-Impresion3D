@@ -14,7 +14,7 @@ const rows = [
   { id: 'r2', userId: 'u2', status: 'QUOTED', sourceType: 'DESIGN_HELP', description: 'Pieza universitaria', material: 'PLA', quantity: 2, quotedPrice: 38000, currency: 'CRC', submittedAt: '2026-09-04T10:00:00Z' },
   { id: 'r3', userId: 'u1', status: 'SUBMITTED', submittedAt: '2026-09-03T10:00:00Z' },
 ];
-const users = [{ id: 'u1', name: 'Ana Rodríguez' }, { id: 'u2', name: 'Carlos Mora' }];
+const users = [{ id: 'u1', name: 'Ana Rodríguez', email: 'ana@example.net' }, { id: 'u2', name: 'Carlos Mora', email: 'carlos@example.net' }];
 
 function renderRoute(path, component) {
   return render(<MemoryRouter initialEntries={[path]}><PreferencesProvider><Routes>
@@ -29,6 +29,7 @@ describe('solicitudes administrativas', () => {
   it('agrupa estados oficiales, mantiene SUBMITTED separado y permite filtrar por búsqueda', () => {
     const requests = buildAdminRequests({ customPrintRequests: rows, users });
     expect(getRequestPhase('SUBMITTED')).toBe('legacy');
+    expect(requests.find(request => request.id === 'r1').customerEmail).toBe('ana@example.net');
     expect(summarizeRequestPhases(requests)).toEqual({ workshop: 1, customer: 1, production: 0, closed: 0 });
     expect(filterAdminRequests(requests, 'all')).toHaveLength(2);
     expect(filterAdminRequests(requests, 'all', 'soporte')).toHaveLength(1);

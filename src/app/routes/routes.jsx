@@ -12,14 +12,17 @@ import { AdminActivityPage } from '../../features/admin/AdminActivity.jsx';
 import { AdminOrderDetailPage, AdminOrdersPage } from '../../features/admin/AdminOrders.jsx';
 import { AdminCatalogDetailPage, AdminCatalogPage } from '../../features/admin/AdminCatalog.jsx';
 import { AdminCategoriesPage, AdminProductFormPage } from '../../features/admin/AdminCatalogManagement.jsx';
+import { AdminCustomerDetailPage, AdminCustomersPage } from '../../features/admin/AdminCustomers.jsx';
 import { NotFoundPage } from '../../pages/NotFoundPage.jsx';
 import { RouteErrorPage } from '../../pages/RouteErrorPage.jsx';
 import { CartPage, CatalogPage, ProductPage } from '../../pages/Shop.jsx';
+import { QuoteRequestPage } from '../../pages/QuoteRequestPage.jsx';
+import { CustomerQuotesPage } from '../../pages/CustomerQuotesPage.jsx';
 import { adminPages, publicPages } from './manifest.js';
 
 const pages = manifest => manifest.map(([path, titleKey]) => ({
   path,
-  element: path === '/carrito' ? <CartPage /> : path === '/catalogo' ? <CatalogPage /> : path === '/producto/:id' ? <ProductPage /> : <ConstructionPage titleKey={titleKey} />,
+  element: path === '/cuenta' ? <CustomerQuotesPage /> : path.startsWith('/solicitud') ? <QuoteRequestPage /> : path === '/carrito' ? <CartPage /> : path === '/catalogo' ? <CatalogPage /> : path === '/producto/:id' ? <ProductPage /> : <ConstructionPage titleKey={titleKey} />,
 }));
 
 const protectedPublicPaths = new Set(['/cuenta', '/pedidos/:id']);
@@ -36,6 +39,8 @@ const adminRoutePages = adminPages.map(([path, titleKey]) => ({
           : path === '/admin/catalogo/categorias' ? <AdminCategoriesPage />
           : path === '/admin/catalogo/:id' ? <AdminCatalogDetailPage />
         : path === '/admin/actividad' ? <AdminActivityPage />
+        : path === '/admin/clientes' ? <AdminCustomersPage />
+        : path === '/admin/clientes/:id' ? <AdminCustomerDetailPage />
         : path === '/admin/solicitudes' ? <AdminRequestsPage />
       : path === '/admin/solicitudes/:id' ? <AdminRequestDetailPage />
         : <ConstructionPage titleKey={titleKey} />,
