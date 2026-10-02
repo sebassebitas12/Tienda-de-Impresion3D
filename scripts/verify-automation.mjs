@@ -6,6 +6,27 @@ import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
 import process from 'node:process';
 import { DEMO_PROFILES } from '../src/utils/quoteAutomation.js';
+import { ROLE_TOOLS } from '../src/utils/assistantPolicies.js';
+
+function readStoredZip(buffer) {
+  const entries = new Map();
+  let offset = 0;
+  while (buffer.readUInt32LE(offset) === 0x04034b50) {
+    const flags = buffer.readUInt16LE(offset + 6);
+    const method = buffer.readUInt16LE(offset + 8);
+    assert.equal(method, 0, 'Import ZIP entries use the supported stored format');
+    assert.equal(flags & 0x0008, 0, 'Import ZIP entries include sizes in local headers');
+    const size = buffer.readUInt32LE(offset + 22);
+    const nameLength = buffer.readUInt16LE(offset + 26);
+    const extraLength = buffer.readUInt16LE(offset + 28);
+    const nameStart = offset + 30;
+    const dataStart = nameStart + nameLength + extraLength;
+    const name = buffer.subarray(nameStart, nameStart + nameLength).toString('utf8');
+    entries.set(name, buffer.subarray(dataStart, dataStart + size));
+    offset = dataStart + size;
+  }
+  return entries;
+}
 
 // Isolated database and mock HTTP provider. Never sends email or calls a paid API.
 const directory = await mkdtemp(join(tmpdir(), 'vertice-automation-'));
@@ -81,7 +102,7 @@ try {
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'CONFIRMED', expectedUpdatedAt: advanced.order.updatedAt, nextStatus: 'CANCELLED', reason: 'Cierre QA de prueba' }, 'admin-test');
   const persisted = JSON.parse(await readFile(dbFile, 'utf8')); assert.equal(persisted.quoteDeliveries[0].status, 'SENT'); assert.equal(persisted.activityLog.length, 6); assertions += 2;
 
-  const files = (await readdir('automation/n8n')).filter(name => name.endsWith('.json')); assert.equal(files.length, 5); assertions++;
+  const files = (await readdir('automation/n8n')).filter(name => name.endsWith('.json') && name !== 'vertice-cr-unificado.json'); assert.equal(files.length, 5); assertions++;
   for (const file of files) {
     const workflow = JSON.parse(await readFile(`automation/n8n/${file}`, 'utf8'));
     assert.equal(workflow.active, false); assertions++;
@@ -98,6 +119,43 @@ try {
       assert.ok(prepared[0].json.subject.startsWith('[DEMO]')); assert.equal(prepared[0].json.deliveryKey, 'qa:1'); assert.ok(!prepared[0].json.html.includes('<script>')); assertions += 3;
     }
   }
+  const unified = JSON.parse(await readFile('automation/n8n/vertice-cr-unificado.json', 'utf8'));
+  const unifiedNames = new Set(unified.nodes.map(node => node.name));
+  const unifiedIds = unified.nodes.map(node => node.id);
+  assert.equal(unified.active, false); assert.equal(new Set(unifiedIds).size, unifiedIds.length); assertions += 2;
+  const expectedWebhookPaths = ['vertice-assistant-general', 'vertice-assistant-admin', 'vertice-assistant-quote', 'vertice-rates', 'vertice-quote-email'];
+  const unifiedWebhooks = unified.nodes.filter(node => node.type.endsWith('.webhook'));
+  assert.deepEqual(unifiedWebhooks.map(node => node.parameters.path).sort(), [...expectedWebhookPaths].sort()); assertions++;
+  assert.ok(unifiedWebhooks.every(node => node.parameters.authentication === 'headerAuth' && node.parameters.responseData === 'firstEntryJson')); assertions++;
+  const deepSeekNodes = unified.nodes.filter(node => node.name === 'DeepSeek — orquestador compartido');
+  assert.equal(deepSeekNodes.length, 1); assert.equal(deepSeekNodes[0].parameters.url, 'https://api.deepseek.com/chat/completions'); assertions += 2;
+  const deepSeekIncoming = Object.values(unified.connections).flatMap(connection => connection.main.flat()).filter(connection => connection.node === deepSeekNodes[0].name);
+  assert.equal(deepSeekIncoming.length, 3); assertions++;
+  assert.equal(unified.nodes.filter(node => node.type.endsWith('.gmail')).length, 1); assertions++;
+  for (const mode of ['general', 'admin', 'quote']) {
+    const preparer = unified.nodes.find(node => node.name === `Preparar rol — ${mode}`);
+    const run = new Function('$input', '$', preparer.parameters.jsCode);
+    const makeInput = currentMode => ({ first: () => ({ json: { body: {
+      mode: currentMode,
+      language: 'es',
+      messages: [{ role: 'user', content: 'Prueba' }],
+      tools: [...ROLE_TOOLS[mode].map(name => ({ type: 'function', function: { name } })), { type: 'function', function: { name: 'una_tool_no_permitida' } }],
+    } } }) });
+    const prepared = run(makeInput(mode));
+    assert.equal(prepared[0].json.model, 'deepseek-flash');
+    assert.deepEqual(prepared[0].json.tools.map(tool => tool.function.name), ROLE_TOOLS[mode]);
+    assert.throws(() => run(makeInput('otro-rol')), /Contexto inválido/);
+    assertions += 3;
+  }
+  for (const [from, output] of Object.entries(unified.connections)) {
+    assert.ok(unifiedNames.has(from));
+    for (const branch of output.main) for (const connection of branch) assert.ok(unifiedNames.has(connection.node));
+    assertions += output.main.flat().length + 1;
+  }
+  for (const node of unified.nodes) if (node.type.endsWith('.code')) { new Function('$input', '$', node.parameters.jsCode); assertions++; }
+  const importZip = readStoredZip(await readFile('automation/vertice-n8n-import.zip'));
+  assert.deepEqual([...importZip.keys()].sort(), ['n8n/README.md', 'n8n/vertice-cr-unificado.json']); assertions++;
+  assert.deepEqual(JSON.parse(importZip.get('n8n/vertice-cr-unificado.json').toString('utf8')), unified); assertions++;
   for (const profile of DEMO_PROFILES) { await readFile(`public${profile.image}`); assertions++; }
   console.log(`PASS: ${assertions} comprobaciones HTTP, permisos, idempotencia, correo mock, tools, workflows y assets. Base aislada: ${dbFile}`);
 } finally {

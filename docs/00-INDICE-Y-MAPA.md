@@ -55,7 +55,7 @@ No uses un documento histórico para invalidar una decisión vigente.
 
 `05-AUDITORIA-HF-Y-MOCKUPS.md` conserva evidencia, hallazgos y evolución de mockups.
 
-Los cinco workflows n8n de los asistentes, tasas públicas y correo, junto con la guía de importación, están en `automation/n8n/`.
+El workflow n8n unificado y su guía de importación están en `automation/n8n/`. Los cinco JSON por capacidad son componentes internos para generar/verificar ese único workflow; no se importan por separado.
 
 `DECISIONES-POST-AUDITORIA.md` y `auditoriaclaude.md` son referencias históricas y deben estar marcadas como tales.
 

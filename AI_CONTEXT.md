@@ -9,10 +9,10 @@
 
 - **Admin:** solicitud, cotización, email, aprobación del cliente y avance de pedidos con reglas e historial. Las cantidades de perfiles y costos son DEMO, no medidas, cobros, inventario ni producción real.
 - **Responsive revisado:** Resumen, Pedidos, Solicitudes/detalle, Catálogo, Categorías y Clientes en capturas de breakpoints y temas; capturas locales en `automation/evidence/`. Activity queda para el bloque posterior que reservó el usuario.
-- **n8n:** cinco JSON importables, independientes e inactivos en `automation/n8n/`, con bots por rol, tasas públicas y Gmail. El ZIP incluye guía. Falta importar/publicar y comprobar credencial real DeepSeek/correo; pruebas locales usan proveedores simulados.
+- **n8n:** un único JSON importable en `automation/n8n/vertice-cr-unificado.json` contiene cinco entradas y una rama DeepSeek compartida por los tres roles; tasas y Gmail son ramas del mismo workflow. El ZIP incluye solo ese JSON y la guía. La instancia/credenciales Gmail y DeepSeek no están verificadas; no asumir conexión ni activación. Pruebas locales usan proveedores simulados.
 - **Tasas:** cambio venta Hacienda puede ser oficial reciente; ARESEP requiere selección exacta de distribuidora/tarifa/bloque. Sin coincidencia, sigue DEMO. Los costos reales de materiales, desgaste y energía dependen de calibración del taller.
-- **Verificación local:** 23 suites/119 pruebas más integración de automatización de 108 verificaciones; lint, `check:ui` y build aprobados localmente. CI pendiente de este push.
-- **Siguiente:** importar/publicar workflows, elegir las credenciales ya configuradas y hacer un envío controlado; después continuar Activity. No reabrir Home integral.
+- **Verificación local de R-H70:** 23 suites/119 pruebas, 160 comprobaciones de automatización, lint, `check:ui`, build y diff check pasan. El build conserva una advertencia de chunk >500 kB. CI de la unificación pendiente de push; el commit base `1e87bd0` sí quedó verde.
+- **Siguiente:** importar el workflow único, asignar credenciales propias en sus nodos, configurar `.env`, activar y hacer una prueba controlada a correo del usuario; después continuar Activity. No reabrir Home integral.
 
 Este estado vigente prevalece sobre los cortes históricos que aparecen más abajo.
 
@@ -304,10 +304,10 @@ de ejemplo.
 **Cotización por email (R-H68, 2026-10-02):** en `QUOTED`, Admin tiene un único
 CTA para enviar al cliente y copiar al operador por BCC; el servidor hace el
 dispatch a n8n, registra actividad y avanza a `AWAITING_APPROVAL` solo tras 2xx.
-Direcciones `example.*` se bloquean. Gmail OAuth ya fue conectado por el usuario;
-el Webhook todavía muestra alerta de configuración en n8n. Falta generar el
-secreto compartido Header Auth, guardarlo en `.env`, publicar el workflow y probar
-un correo controlado; no se envió ningún correo. Hacienda ofrece un endpoint
+Direcciones `example.*` se bloquean. La conexión de Gmail OAuth y Webhook no
+quedó verificada; no se asume conectada. Falta generar el secreto compartido
+Header Auth, guardarlo en `.env`, publicar el workflow y probar un correo
+controlado; no se envió ningún correo. Hacienda ofrece un endpoint
 oficial sin token para USD compra/venta (usar venta para reposición en USD); BCCR
 (indicador 318, con suscripción/token) queda como alternativa. ARESEP publica
 tarifas por empresa/tipo/bloque de la factura. Ninguna fuente está conectada a la

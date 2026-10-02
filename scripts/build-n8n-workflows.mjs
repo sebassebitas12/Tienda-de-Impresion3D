@@ -66,6 +66,8 @@ if (!sent.id || !context.deliveryKey) throw new Error('Gmail no confirmó identi
 return [{json:{delivered:true,messageId:sent.id,deliveryKey:context.deliveryKey}}];`, 1040));
 email.connections['Enviar correo al cliente + copia oculta'] = { main: [[{ node: finalName, type: 'main', index: 0 }]] };
 email.settings = { ...email.settings, saveDataSuccessExecution: 'none', saveDataErrorExecution: 'none', executionTimeout: 60 };
-email.nodes.push({ name: 'Configuración del correo', id: 'email-setup', type: 'n8n-nodes-base.stickyNote', typeVersion: 1, position: [180, 50], parameters: { width: 1020, height: 180, content: '## Cotización y copia al taller\nReutiliza Header Auth en Webhook y tu Gmail conectado. Publica. La API guarda una clave de entrega por solicitud/versión para evitar reintentos ambiguos. Gmail confirma messageId; solo entonces se registra el envío. Las simulaciones llevan [DEMO] y las pruebas [PRUEBA]. No actives retries automáticos del nodo Gmail.' } });
+email.nodes.push({ name: 'Configuración del correo', id: 'email-setup', type: 'n8n-nodes-base.stickyNote', typeVersion: 1, position: [180, 50], parameters: { width: 1020, height: 180, content: '## Cotización y copia al taller\nAsigna Header Auth en Webhook y autoriza Gmail OAuth en su nodo. Publica solo tras configurar credenciales y URL. La API guarda una clave de entrega por solicitud/versión para evitar reintentos ambiguos. Gmail confirma messageId; solo entonces se registra el envío. Las simulaciones llevan [DEMO] y las pruebas [PRUEBA]. No actives retries automáticos del nodo Gmail.' } });
 await writeFile(emailPath, JSON.stringify(email, null, 2) + '\n');
-console.log('Generados 5 workflows n8n: 3 asistentes, tasas oficiales y correo.');
+await import('./build-n8n-unified.mjs');
+await import('./package-n8n-import.mjs');
+console.log('Generados componentes internos y un workflow n8n unificado para importar.');

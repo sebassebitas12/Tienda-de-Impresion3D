@@ -92,9 +92,12 @@ Dark/Light siguen pendientes de credenciales y verificación manual controlada.
 `npm run check:automation` levanta API aislada con base temporal y proveedor
 mock; recorre separación de roles, los tres bots/tools, perfiles 23, cálculo,
 idempotencia, cotización/aprobación, email/outbox, fulfillment y estados de
-pedido, además de inspeccionar los cinco JSON n8n. No llama DeepSeek, APIs
-externas o Gmail. Verificación más reciente: 23 suites/119 tests, 108 checks de
-automatización, ESLint, `check:ui`, Vite build y diff check pasan en local.
+pedido. Inspecciona los cinco módulos fuente y el JSON unificado: rutas, entradas,
+convergencia al nodo DeepSeek compartido, Gmail, IDs únicos y conexiones válidas.
+No llama DeepSeek, APIs externas o Gmail. Verificación local de R-H70: 23
+suites/119 tests, 160 checks de automatización, ESLint, `check:ui`, Vite build y
+diff check pasan. Vite deja una advertencia de bundle principal mayor a 500 kB;
+el build termina correctamente. CI remoto queda pendiente del push de R-H70.
 
 Las capturas `automation/evidence/` documentan el render real de Clientes,
 Pedidos, Categorías y cotizador en vistas estrechas/medias/anchas y Dark/Light.

@@ -202,10 +202,11 @@ relación directa entre ellas.
   de facturas del taller, medición del equipo, perfil de laminado y reglas
   comerciales aprobadas; un API general no puede conocerlos.
 
-**Estado de integración (2026-10-01):** se investigaron endpoints oficiales, pero
-no se conectaron a la calculadora. Hacienda ofrece una ruta pública sin token para
-USD/CRC; BCCR queda como alternativa oficial autenticada. Gmail OAuth ya quedó conectado por el usuario
-en n8n; la captura muestra pendiente la credencial Header Auth del webhook. ARESEP
+**Estado de integración (revisado 2026-10-02):** se investigaron endpoints
+oficiales, pero no se conectaron a la calculadora. Hacienda ofrece una ruta
+pública sin token para USD/CRC; BCCR queda como alternativa oficial autenticada.
+La conexión de Gmail/DeepSeek en la instancia n8n no está verificada en esta
+sesión y no debe darse por hecha; `.env` local tampoco está configurado. ARESEP
 requiere seleccionar la empresa/categoría de la factura. Hasta completar la
 integración y esa selección, Admin sigue solicitando las tarifas explícitamente y
 no presenta una cifra automática como si fuera vigente.
@@ -230,8 +231,8 @@ destinatarios no se aceptan desde el navegador. Bloquea dominios reservados de
 ejemplo y exige configuración de servidor:
 `VERTICE_QUOTE_EMAIL_WEBHOOK_URL` y `VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN`.
 
-El API llama al webhook privado de n8n con token por header. El workflow
-importable está en `automation/n8n/vertice-quote-email.json`: valida y presenta el
+El API llama al webhook privado de n8n con token por header. La rama de correo del
+workflow unificado `automation/n8n/vertice-cr-unificado.json` valida y presenta el
 desglose guardado, envía al cliente por Gmail y pone al admin en BCC. En n8n hay
 que conectar una credencial Header Auth y la credencial Gmail. Para crear el
 secreto compartido, desde la raíz del repo ejecutar en PowerShell:
@@ -250,11 +251,10 @@ Solo si el webhook responde 2xx el servidor cambia `QUOTED` →
 `AWAITING_APPROVAL`, persiste `quoteEmailSentAt`, destinatarios y el evento
 `REQUEST_QUOTE_EMAIL_SENT`. Si n8n no confirma, no se publica el estado. Si el
 correo pudo salir pero falla la escritura local, Admin advierte revisar la bandeja
-antes de reintentar para prevenir duplicados. La captura del usuario confirma
-Gmail conectado; el nodo Webhook aún muestra alerta de configuración, así que
-falta Header Auth + Publish. También faltan el `.env` local y una prueba con
-correos reales; el dataset `example.com` está bloqueado y nunca se usa para un
-envío.
+antes de reintentar para prevenir duplicados. El estado actual de Gmail OAuth y
+de Header Auth en la instancia n8n es **no verificado**; no se asume que estén
+conectados. También falta `.env` en el checkout revisado y falta una prueba con
+correo real; el dataset `example.com` está bloqueado y nunca se usa para un envío.
 
 #### Frontera entre el LLM y el motor
 
@@ -641,9 +641,11 @@ versión/estado esperado. `/admin/actions/order-transition` aplica la secuencia
 permitida y deja evento. `/admin/actions/quote-fulfillment` evita pedido
 duplicado; la modalidad DEMO queda rotulada como no pago real.
 
-Los cinco workflows importables y guía están en `automation/n8n/`. Claves solo
-en credenciales n8n; el token ya configurado se comparte por `.env` backend y
-Header Auth `X-Vertice-Webhook-Token`. Los endpoints Hacienda venta y ARESEP son
+Un solo workflow importable contiene las cinco entradas (tres asistentes, tasas
+y correo) en `automation/n8n/vertice-cr-unificado.json`; el ZIP de importación
+incluye ese workflow y su guía. Las fuentes JSON por capacidad no se importan
+individualmente. Las claves viven solo en credenciales n8n; el token se comparte
+por `.env` backend y Header Auth `X-Vertice-Webhook-Token`. Los endpoints Hacienda venta y ARESEP son
 públicos. ARESEP solo se acepta tras validar empresa/tipo/bloque kWh exacto y
 único del mes; los costos de material/desgaste permanecen DEMO. Gmail exige
 confirmación con `deliveryKey` y `messageId`; outbox `SENDING/SENT/UNKNOWN`
