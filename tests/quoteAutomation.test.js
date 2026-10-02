@@ -95,6 +95,24 @@ describe('roles, herramientas y recorridos', () => {
     } });
     expect(result.source).toBe('DEEPSEEK'); expect(result.links).toEqual([{ label: 'Resumen', path: '/admin' }]);
   });
+  test('envía cada panel al webhook del agente de su propio contexto', async () => {
+    const cases = [
+      ['general', null, 'http://n8n/webhook/vertice-assistant-general'],
+      ['admin', actor, 'http://n8n/webhook/vertice-assistant-admin'],
+      ['quote', customer, 'http://n8n/webhook/vertice-assistant-quote'],
+    ];
+    for (const [mode, currentActor, expectedUrl] of cases) {
+      const result = await runAssistant({ mode, message: 'Prueba' }, { actor: currentActor, data, getRates: rates }, {
+        env: { [`VERTICE_ASSISTANT_${mode.toUpperCase()}_URL`]: expectedUrl },
+        fetchImpl: async (url, options) => {
+          expect(url).toBe(expectedUrl);
+          expect(JSON.parse(options.body).mode).toBe(mode);
+          return { ok: true, json: async () => ({ output: JSON.stringify({ reply: `Agente ${mode}`, links: [] }) }) };
+        },
+      });
+      expect(result.reply).toBe(`Agente ${mode}`);
+    }
+  });
   test('no deja saltar etapas de pedidos y exige motivo al cancelar', () => {
     const order = { status: 'PENDING' };
     expect(prepareOrderTransition(order, { expectedStatus: 'PENDING', nextStatus: 'READY' }, now).error).toBe('TRANSITION_FORBIDDEN');

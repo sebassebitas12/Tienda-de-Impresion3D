@@ -1,6 +1,6 @@
 # Vértice CR — Datos, API externa, JWT y N8N
 
-> Última actualización: **2026-10-01**.
+> Última actualización: **2026-10-02**.
 
 ## Propósito
 
@@ -644,11 +644,19 @@ conserva estos permisos en memoria de proceso: esto protege el flujo de demo,
 pero no reemplaza autenticación/aislamiento de producción ni escala a múltiples
 instancias backend sin un almacén compartido.
 
+La app dispone de tres entradas que corresponden a tres agentes n8n **separados**:
+`AI Agent — público`, `AI Agent — Admin` y `AI Agent — cotización`. Cada entrada
+tiene preparación/contexto, prompt, allowlist de herramientas y nodo HTTP Tool
+propios. Los tres comparten únicamente el nodo/credencial de DeepSeek Chat Model;
+no comparten agente ni contexto de conversación. El webhook y el `mode` se
+validan tanto en frontend/backend como en la preparación fija de cada rama. Un
+test de integración local comprueba el mapeo de panel → URL → modo.
+
 El Agent usa el historial acotado que entrega la app y no añade memoria n8n. El
-límite del Agent es de 4 iteraciones; la capacidad limita hasta 3 llamadas de
-herramienta. Ninguna herramienta de IA envía correo, registra pagos, edita
+límite de cada Agent es de 4 iteraciones; la capacidad limita hasta 3 llamadas
+de herramienta. Ninguna herramienta de IA envía correo, registra pagos, edita
 catálogo ni cambia estados. Tasas y Gmail permanecen como ramas deterministas
-independientes; el Agent no las invoca.
+independientes; los Agents no las invocan.
 
 `POST /quotes/profiles` y `/quotes/preview` son consultas/cálculo DEMO;
 `/quotes/create` exige customer y clave de idempotencia; `/quotes/mine` y
@@ -658,7 +666,9 @@ permitida y deja evento. `/admin/actions/quote-fulfillment` evita pedido
 duplicado; la modalidad DEMO queda rotulada como no pago real.
 
 Un solo workflow importable contiene cinco entradas (tres asistentes, tasas y
-correo) en `automation/n8n/vertice-cr-unificado.json`. Los JSON por capacidad
+correo) en `automation/n8n/vertice-cr-unificado.json`. En la fila de asistentes
+se ven tres ramas completas y aisladas hasta sus Agents; solo el cable de modelo
+DeepSeek es compartido. Los JSON por capacidad
 son insumos internos para construir/verificar ese export y no se importan por
 separado. Credenciales DeepSeek API y Gmail OAuth2 se asignan en sus propios
 nodos; Header Auth `X-Vertice-Webhook-Token` protege las entradas webhook y se
@@ -670,6 +680,14 @@ acepta tras validar empresa/tipo/bloque kWh exacto y único del mes; los costos
 de material/desgaste permanecen DEMO. Gmail exige confirmación con `deliveryKey`
 y `messageId`; outbox `SENDING/SENT/UNKNOWN` evita falsos éxitos y reenvíos
 ciegos.
+
+Referencias técnicas oficiales para esta composición: [n8n Tools Agent y
+herramientas/API](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/tools-agent/),
+[nodo DeepSeek Chat Model](https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.lmchatdeepseek/)
+y [DeepSeek Tool Calls](https://api-docs.deepseek.com/guides/tool_calls/). Se adapta
+el patrón de tool-calling con una rama/Agent por contexto y validación de datos
+en el servidor; el modelo no determina permisos ni ejecuta operaciones fuera de
+la tool.
 
 Límite: las guardas y persistencia de esta arquitectura académica local protegen
 la lógica funcional; JSON Server/token simulado y la serialización por proceso

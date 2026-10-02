@@ -4,7 +4,7 @@
 
 Importa **solo `vertice-cr-unificado.json`**. En n8n: **Workflows → Import from File** y selecciona ese JSON. No importes por separado los archivos `vertice-assistant-*.json`, `vertice-rates.json` ni `vertice-quote-email.json`; son componentes internos usados para generar y verificar el workflow unificado.
 
-El canvas trae cinco entradas Webhook dentro del mismo workflow: asistente general, asistente Admin, asistente de cotización, tasas y correo de cotización. Las tres entradas conversacionales pasan por un contexto/rol común, llegan al **AI Agent nativo de n8n** y se conectan al nodo **DeepSeek Chat Model**. El Agent tiene una herramienta HTTP que llama a la API Vértice con una capacidad aleatoria y temporal. La API limita el rol, valida el nombre y argumentos de cada herramienta y ejecuta solo lectura/cálculo; no se entrega el JWT académico a n8n ni se habilita acceso directo a JSON Server. El historial viene acotado desde la app, por lo que no hay memoria duplicada. Tasas y Gmail son ramas deterministas separadas; el Agent no decide envíos ni fuentes de tarifas.
+El canvas trae cinco entradas Webhook dentro del mismo workflow: asistente general, asistente Admin, asistente de cotización, tasas y correo de cotización. Los tres chatbots siguen tres ramas completas: cada una tiene su contexto fijo, su **AI Agent nativo**, sus permisos y su HTTP Request Tool. El chat general corresponde al botón flotante de la tienda, Admin al botón visible dentro del panel protegido y cotización al botón de `/solicitud`. Los tres Agents comparten únicamente el nodo/credencial **DeepSeek Chat Model**; nunca convergen en un solo Agent. La herramienta de cada rama llama a la API Vértice con una capacidad aleatoria y temporal. La API limita el rol, valida el nombre y argumentos de cada herramienta y ejecuta solo lectura/cálculo; no se entrega el JWT académico a n8n ni se habilita acceso directo a JSON Server. El historial viene acotado desde la app, por lo que no se duplica memoria. Tasas y Gmail son ramas deterministas separadas; los Agents no deciden envíos ni fuentes de tarifas.
 
 El JSON no incluye secretos ni permisos de cuentas. Tras importarlo, asigna las credenciales indicadas abajo en los nodos correspondientes. El workflow se importa inactivo; no lo publiques/actives hasta conectar las credenciales y poner las URLs correctas en el `.env` del backend.
 
@@ -25,7 +25,7 @@ Pon ese mismo valor en `VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN` en `.env` y en la cre
 
 ## 2. DeepSeek para los tres asistentes
 
-Abre el nodo **DeepSeek Chat Model** y crea una credencial de tipo **DeepSeek API** con la API key de tu cuenta. El Agent la usa para las tres entradas conversacionales. Selecciona un modelo que aparezca disponible para tu cuenta en el selector de n8n; el nodo carga dinámicamente los modelos autorizados. La temperatura inicial es baja y el Agent tiene un máximo de cuatro iteraciones por respuesta.
+Abre el nodo **DeepSeek Chat Model** y crea una credencial de tipo **DeepSeek API** con la API key de tu cuenta. Los tres Agents consumen esta conexión compartida; no hace falta crear tres credenciales. Selecciona un modelo que aparezca disponible para tu cuenta en el selector de n8n. Cada Agent tiene instrucciones, herramientas y un máximo de cuatro iteraciones propios.
 
 ## 3. Gmail para el correo de cotización
 

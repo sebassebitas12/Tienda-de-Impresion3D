@@ -118,9 +118,11 @@ pedidos y solicitudes por `userId` y lleva a sus vistas de detalle. No expone
 dirección, facturación, gasto total ni estado de pagos. Si esos campos se
 incorporan al modelo, deberán tener propósito y permisos documentados.
 
-El trabajo separado en tres asistentes públicos/Admin/cotización está
-especificado en `docs/07`; no forma parte de este slice ni simula una respuesta
-de IA sin webhook configurado.
+Los tres asistentes (público, Admin y cotización) ya tienen puntos de entrada
+separados en React y contratos de rol en `docs/07`. El export n8n debe conservar
+un AI Agent nativo independiente para cada uno; compartir solo modelo y
+credencial no significa fusionar los agentes. Mientras no se configure el
+webhook/proveedor real, React conserva el fallback local etiquetado como demo.
 
 ### Referencia de contenido para el tablero
 

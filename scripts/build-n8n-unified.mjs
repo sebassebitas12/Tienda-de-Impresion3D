@@ -30,58 +30,60 @@ const connectAi = (from, type, to) => {
   connections[from][type] = [[{ node: to, type, index: 0 }]];
 };
 
-// Three authenticated entry points share one role-aware native n8n Tools Agent.
+// Each product entry has its own fixed-role prompt, native Agent, and tool boundary.
+const agentLabels = { general: 'público', admin: 'Admin', quote: 'cotización' };
 for (const [index, mode] of assistantModes.entries()) {
+  const row = index;
+  const y = 430 + row * 250;
   const trigger = assistants[index].nodes.find((node) => node.type.endsWith('.webhook'));
-  add(trigger, { name: `Entrada — asistente ${mode}`, id: `entry-assistant-${mode}`, position: [180, 430 + index * 170] });
-}
-const prepareName = 'Preparar contexto y permisos';
-nodes.push({
-  name: prepareName, id: 'prepare-ai-context', type: 'n8n-nodes-base.code', typeVersion: 2,
-  position: [480, 680], parameters: { mode: 'runOnceForAllItems', jsCode: `const body = $input.first().json.body || {};
-const modes = ${JSON.stringify(assistantModes)};
-if (!modes.includes(body.mode) || !Array.isArray(body.messages) || body.messages.length > 12 || typeof body.toolCapability !== 'string' || body.toolCapability.length < 40 || typeof body.toolEndpointUrl !== 'string' || !/^https?:\\/\\//.test(body.toolEndpointUrl)) throw new Error('Contexto de asistente inválido');
+  const entryName = `Entrada — asistente ${mode}`;
+  const prepareName = `Preparar contexto — ${mode}`;
+  const agentName = `AI Agent — ${agentLabels[mode]}`;
+  const toolName = `Herramientas autorizadas — ${mode}`;
+  add(trigger, { name: entryName, id: `entry-assistant-${mode}`, position: [180, y] });
+  nodes.push({
+    name: prepareName, id: `prepare-ai-${mode}`, type: 'n8n-nodes-base.code', typeVersion: 2,
+    position: [470, y], parameters: { mode: 'runOnceForAllItems', jsCode: `const body = $input.first().json.body || {};
+const mode = ${JSON.stringify(mode)};
+if (body.mode !== mode || !Array.isArray(body.messages) || body.messages.length > 12 || typeof body.toolCapability !== 'string' || body.toolCapability.length < 40 || typeof body.toolEndpointUrl !== 'string' || !/^https?:\\/\\//.test(body.toolEndpointUrl)) throw new Error('Contexto de asistente inválido');
 const turns = body.messages.filter(m => ['user','assistant'].includes(m?.role) && typeof m.content === 'string').slice(-11).map(m => ({role:m.role,content:m.content.slice(0,3000)}));
 if (!turns.length || turns.at(-1).role !== 'user') throw new Error('Falta el mensaje actual');
 const transcript = turns.map(m => (m.role === 'user' ? 'Cliente' : 'Asistente') + ': ' + m.content).join('\\n\\n');
-const prompts = ${JSON.stringify(ASSISTANT_PROMPTS)};
-return [{json:{mode:body.mode,toolCapability:body.toolCapability,toolEndpointUrl:body.toolEndpointUrl,language:body.language==='en'?'English':'español de Costa Rica',systemPrompt:prompts[body.mode]+'\\n'+${JSON.stringify(ASSISTANT_COMMON_PROMPT)}+'\\nIdioma: '+(body.language==='en'?'English':'español de Costa Rica')+'\\nHerramientas permitidas: '+${JSON.stringify(ROLE_TOOLS)}[body.mode].join(', '),agentInput:transcript+'\\n\\nDevuelve exclusivamente el JSON solicitado por el sistema.'}}];` },
-});
-for (const mode of assistantModes) connectMain(`Entrada — asistente ${mode}`, prepareName);
-
-const agentName = 'AI Agent — atención Vértice';
-nodes.push({
-  name: agentName, id: 'vertice-ai-agent', type: '@n8n/n8n-nodes-langchain.agent', typeVersion: 2.2,
-  position: [800, 680], parameters: {
-    promptType: 'define', text: '={{ $json.agentInput }}',
-    options: { systemMessage: '={{ $json.systemPrompt }}', maxIterations: 4, returnIntermediateSteps: false },
-    hasOutputParser: false,
-  },
-});
-connectMain(prepareName, agentName);
+const systemPrompt = ${JSON.stringify(ASSISTANT_PROMPTS[mode] + '\n' + ASSISTANT_COMMON_PROMPT)} + '\\nIdioma: ' + (body.language === 'en' ? 'English' : 'español de Costa Rica') + '\\nHerramientas permitidas: ' + ${JSON.stringify(ROLE_TOOLS[mode].join(', '))};
+return [{json:{mode,toolCapability:body.toolCapability,toolEndpointUrl:body.toolEndpointUrl,systemPrompt,agentInput:transcript+'\\n\\nDevuelve exclusivamente el JSON solicitado por el sistema.'}}];` },
+  });
+  connectMain(entryName, prepareName);
+  nodes.push({
+    name: agentName, id: `vertice-ai-agent-${mode}`, type: '@n8n/n8n-nodes-langchain.agent', typeVersion: 2.2,
+    position: [790, y], parameters: {
+      promptType: 'define', text: '={{ $json.agentInput }}',
+      options: { systemMessage: '={{ $json.systemPrompt }}', maxIterations: 4, returnIntermediateSteps: false },
+      hasOutputParser: false,
+    },
+  });
+  connectMain(prepareName, agentName);
+  nodes.push({
+    name: toolName, id: `vertice-authorized-tools-${mode}`, type: 'n8n-nodes-base.httpRequestTool', typeVersion: 1.2,
+    position: [790, y + 150], parameters: {
+      method: 'POST', url: `={{ $('${prepareName}').first().json.toolEndpointUrl }}`,
+      sendHeaders: true, headerParameters: { parameters: [{ name: 'Content-Type', value: 'application/json' }] },
+      sendBody: true, specifyBody: 'json', jsonBody: `={{ JSON.stringify({ capability: $('${prepareName}').first().json.toolCapability, mode: '${mode}', name: $fromAI('tool_name', 'Nombre exacto de una herramienta permitida para ${mode}: ${ROLE_TOOLS[mode].join(', ')}', 'string'), args: $fromAI('arguments', 'Argumentos JSON de esa herramienta; usa un objeto vacío cuando no requiera argumentos.', 'json') }) }}`,
+      toolDescription: `Herramienta del asistente ${agentLabels[mode]}: ${ROLE_TOOLS[mode].join(', ')}. Ejecuta consultas/cálculos autorizados por Vértice; no edita registros ni envía mensajes.`,
+      options: { timeout: 12000 },
+    },
+  });
+  connectAi(toolName, 'ai_tool', agentName);
+  connectMain(agentName, 'Validar respuesta del asistente');
+}
 
 nodes.push({
   name: 'DeepSeek Chat Model', id: 'deepseek-chat-model', type: '@n8n/n8n-nodes-langchain.lmChatDeepSeek', typeVersion: 1,
-  position: [760, 930], parameters: {
+  position: [470, 1160], parameters: {
     model: { __rl: true, mode: 'list', value: 'deepseek-chat', cachedResultName: 'deepseek-chat' },
     options: { temperature: 0.2, maxTokens: 1600, timeout: 40000, maxRetries: 1 },
   },
 });
-connectAi('DeepSeek Chat Model', 'ai_languageModel', agentName);
-
-const toolName = 'Consultar herramientas autorizadas Vértice';
-const toolList = assistantModes.map((mode) => `${mode}: ${ROLE_TOOLS[mode].join(', ')}`).join(' | ');
-nodes.push({
-  name: toolName, id: 'vertice-authorized-tools', type: 'n8n-nodes-base.httpRequestTool', typeVersion: 1.2,
-  position: [1080, 930], parameters: {
-    method: 'POST', url: "={{ $('Preparar contexto y permisos').first().json.toolEndpointUrl }}",
-    sendHeaders: true, headerParameters: { parameters: [{ name: 'Content-Type', value: 'application/json' }] },
-    sendBody: true, specifyBody: 'json', jsonBody: `={{ JSON.stringify({ capability: $('Preparar contexto y permisos').first().json.toolCapability, mode: $('Preparar contexto y permisos').first().json.mode, name: $fromAI('tool_name', 'Nombre exacto de una herramienta autorizada para este rol. ${toolList}', 'string'), args: $fromAI('arguments', 'Argumentos JSON requeridos por esa herramienta; pasa un objeto vacío si no requiere argumentos.', 'json') }) }}`,
-    toolDescription: 'Consulta una herramienta de solo lectura/cálculo autorizada para el rol activo. La API valida rol, esquema y sesión; no edita catálogo, no cambia estados y no envía mensajes.',
-    options: { timeout: 12000 },
-  },
-});
-connectAi(toolName, 'ai_tool', agentName);
+connections['DeepSeek Chat Model'] = { ai_languageModel: [[...assistantModes.map((mode) => ({ node: `AI Agent — ${agentLabels[mode]}`, type: 'ai_languageModel', index: 0 }))]] };
 
 const normalizeName = 'Validar respuesta del asistente';
 nodes.push({
@@ -93,7 +95,6 @@ try { output = JSON.parse(raw); } catch { output = {reply:raw,links:[]}; }
 if (!output || typeof output.reply !== 'string' || !output.reply.trim() || output.reply.length > 5000 || !Array.isArray(output.links)) throw new Error('Formato de respuesta inválido');
 return [{json:{output:{reply:output.reply.trim(),links:output.links.filter(link => link && typeof link.label === 'string' && typeof link.path === 'string').slice(0,4)}}}];` },
 });
-connectMain(agentName, normalizeName);
 
 const rateWebhook = rates.nodes.find((node) => node.type.endsWith('.webhook'));
 const rateWebhookName = add(rateWebhook, { name: 'Entrada — tasas públicas', id: 'entry-rates', position: [180, 1260] });
@@ -117,7 +118,7 @@ connectMain(emailNames.get('Enviar correo al cliente + copia oculta'), emailName
 
 nodes.push({ name: 'Mapa del flujo', id: 'unified-setup-guide', type: 'n8n-nodes-base.stickyNote', typeVersion: 1, position: [160, 30], parameters: {
   width: 1220, height: 330,
-  content: `# Vértice CR · Automatizaciones conectadas\n\n## Conversación IA (fila superior)\nTres webhooks protegidos → contexto/rol → **AI Agent** → respuesta validada. El modelo conectado es **DeepSeek Chat Model**; la herramienta HTTP invoca el dispatcher de Vértice con una capacidad efímera. La API aplica allowlist por rol, valida argumentos y lee/calcúla datos; n8n no recibe JWT ni acceso directo a JSON Server. La app entrega historial acotado; no se duplica memoria.\n\n## Procesos deterministas (filas inferiores)\n**Tasas:** webhook → Hacienda → ARESEP → recorte/validación. **Correo:** webhook → validar → Gmail → confirmar messageId. El Agent nunca controla esos envíos ni inventa tarifas.\n\n## Credenciales y conexión\nSelecciona Header Auth «X-Vertice-Webhook-Token» en los 5 webhooks, credencial **DeepSeek API** en el Chat Model y **Gmail OAuth2** en el nodo Gmail. Configura las 3 URLs de webhook y VERTICE_ASSISTANT_TOOLS_URL en el backend. Si n8n corre en Docker, la URL de callback debe alcanzar el host del backend (por ejemplo host.docker.internal); no uses localhost para salir del contenedor.\n\nWorkflow inactivo al importar. Costos de cotización DEMO; las tasas oficiales no vuelven reales materiales, energía ni mano de obra.`
+  content: `# Vértice CR · Automatizaciones conectadas\n\n## Tres asistentes independientes\n**General:** webhook → contexto general → AI Agent público → respuesta. **Admin:** webhook → contexto Admin → AI Agent Admin → respuesta. **Cotización:** webhook → contexto de cotización → AI Agent de cotización → respuesta. Cada agente tiene instrucciones, permisos y herramienta HTTP propios. Comparten solo la conexión de modelo **DeepSeek Chat Model**; el servidor vuelve a validar rol y argumentos. Los botones ya existen en Home/Tienda, Admin protegido y /solicitud.\n\nLa herramienta llama al dispatcher Vértice con una capacidad temporal; no se transmite JWT ni se da acceso directo a JSON Server. El historial lo aporta la app.\n\n## Procesos deterministas\n**Tasas:** webhook → Hacienda → ARESEP → recorte/validación. **Correo:** webhook → validar → Gmail → confirmar messageId. Los agentes no controlan envíos ni inventan tarifas.\n\n## Credenciales y conexión\nSelecciona Header Auth «X-Vertice-Webhook-Token» en los 5 webhooks, credencial **DeepSeek API** en el Chat Model y **Gmail OAuth2** en el nodo Gmail. Configura las 3 URLs de webhook y VERTICE_ASSISTANT_TOOLS_URL en el backend. Si n8n corre en Docker, la URL de callback debe alcanzar el host del backend (por ejemplo host.docker.internal); no uses localhost para salir del contenedor.\n\nWorkflow inactivo al importar. Costos de cotización DEMO; las tasas oficiales no vuelven reales materiales, energía ni mano de obra.`
 } });
 
 const unified = { name: 'Vértice CR — Agentes y automatizaciones', nodes, connections, active: false,

@@ -230,3 +230,10 @@ TP vive en el shell público; el asistente operativo aparece en Admin, y la
 orientación de cotización en `/solicitud`. Cada uno usa prompt y herramientas
 permitidas del backend. No se mezclan cuentas, no se autoriza al modelo a cambiar
 estados y el monto sale del motor reproducible.
+
+La conexión técnica mantiene esos tres puntos de entrada: el botón flotante
+público manda `mode: general`, Admin muestra su botón solo dentro de la ruta
+protegida y manda `mode: admin`, y el botón de `/solicitud` manda `mode: quote`.
+Cada webhook llega a su propio AI Agent nativo en n8n, con prompt y herramienta
+HTTP aislados. Comparten el modelo/credencial DeepSeek, no la identidad ni las
+herramientas disponibles.

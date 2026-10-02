@@ -112,24 +112,37 @@ try {
   const unifiedWebhooks = unified.nodes.filter(node => node.type.endsWith('.webhook'));
   assert.deepEqual(unifiedWebhooks.map(node => node.parameters.path).sort(), [...expectedWebhookPaths].sort()); assertions++;
   assert.ok(unifiedWebhooks.every(node => node.parameters.authentication === 'headerAuth' && node.parameters.responseData === 'firstEntryJson')); assertions++;
-  const aiAgent = unified.nodes.find(node => node.name === 'AI Agent — atención Vértice');
+  const aiAgents = unified.nodes.filter(node => node.type === '@n8n/n8n-nodes-langchain.agent');
+  const aiAgentNames = ['AI Agent — público', 'AI Agent — Admin', 'AI Agent — cotización'];
+  assert.deepEqual(aiAgents.map(node => node.name), aiAgentNames); assertions++;
+  assert.ok(aiAgents.every(node => node.parameters.options.maxIterations === 4)); assertions++;
   const deepSeekNode = unified.nodes.find(node => node.name === 'DeepSeek Chat Model');
-  const toolNode = unified.nodes.find(node => node.name === 'Consultar herramientas autorizadas Vértice');
-  assert.equal(aiAgent.type, '@n8n/n8n-nodes-langchain.agent'); assert.equal(aiAgent.parameters.options.maxIterations, 4); assertions += 2;
   assert.equal(deepSeekNode.type, '@n8n/n8n-nodes-langchain.lmChatDeepSeek'); assert.equal(deepSeekNode.parameters.model.value, 'deepseek-chat'); assertions += 2;
-  assert.equal(toolNode.type, 'n8n-nodes-base.httpRequestTool'); assert.ok(toolNode.parameters.toolDescription); assertions += 2;
-  assert.deepEqual(unified.connections[deepSeekNode.name].ai_languageModel[0][0], { node: aiAgent.name, type: 'ai_languageModel', index: 0 }); assertions++;
-  assert.deepEqual(unified.connections[toolNode.name].ai_tool[0][0], { node: aiAgent.name, type: 'ai_tool', index: 0 }); assertions++;
-  assert.equal(unified.nodes.filter(node => node.type.endsWith('.gmail')).length, 1); assertions++;
-  const preparer = unified.nodes.find(node => node.name === 'Preparar contexto y permisos');
-  const run = new Function('$input', preparer.parameters.jsCode);
-  const makeInput = mode => ({ first: () => ({ json: { body: { mode, language: 'es', toolCapability: 'a'.repeat(43),
-    toolEndpointUrl: 'http://localhost:3000/assistants/tools', messages: [{ role: 'user', content: 'Prueba' }] } } }) });
-  for (const mode of ['general', 'admin', 'quote']) {
-    const prepared = run(makeInput(mode)); assert.equal(prepared[0].json.mode, mode);
-    assert.ok(prepared[0].json.systemPrompt.includes(ROLE_TOOLS[mode][0])); assertions += 2;
+  assert.deepEqual(unified.connections[deepSeekNode.name].ai_languageModel[0].map(connection => connection.node), aiAgentNames); assertions++;
+  for (const [index, mode] of ['general', 'admin', 'quote'].entries()) {
+    const entryName = `Entrada — asistente ${mode}`;
+    const prepareName = `Preparar contexto — ${mode}`;
+    const agentName = aiAgentNames[index];
+    const toolName = `Herramientas autorizadas — ${mode}`;
+    const entry = unified.nodes.find(node => node.name === entryName);
+    const preparer = unified.nodes.find(node => node.name === prepareName);
+    const agent = unified.nodes.find(node => node.name === agentName);
+    const toolNode = unified.nodes.find(node => node.name === toolName);
+    assert.equal(entry.parameters.path, `vertice-assistant-${mode}`);
+    assert.deepEqual(unified.connections[entryName].main[0].map(connection => connection.node), [prepareName]);
+    assert.deepEqual(unified.connections[prepareName].main[0].map(connection => connection.node), [agentName]);
+    assert.equal(unified.connections[toolName].ai_tool[0][0].node, agentName);
+    assert.ok(toolNode.parameters.toolDescription.includes(ROLE_TOOLS[mode].join(', ')));
+    assert.equal(agent.parameters.options.maxIterations, 4);
+    const run = new Function('$input', preparer.parameters.jsCode);
+    const input = { first: () => ({ json: { body: { mode, language: 'es', toolCapability: 'a'.repeat(43), toolEndpointUrl: 'http://localhost:3000/assistants/tools', messages: [{ role: 'user', content: 'Prueba' }] } } }) };
+    const prepared = run(input);
+    assert.equal(prepared[0].json.mode, mode);
+    assert.ok(prepared[0].json.systemPrompt.includes(ROLE_TOOLS[mode][0]));
+    assert.throws(() => run({ first: () => ({ json: { body: { ...input.first().json.body, mode: 'otro-rol' } } }) }), /Contexto de asistente inválido/);
+    assertions += 9;
   }
-  assert.throws(() => run(makeInput('otro-rol')), /Contexto de asistente inválido/); assertions++;
+  assert.equal(unified.nodes.filter(node => node.type.endsWith('.gmail')).length, 1); assertions++;
   for (const [from, output] of Object.entries(unified.connections)) {
     assert.ok(unifiedNames.has(from));
     for (const branch of output.main || []) for (const connection of branch) assert.ok(unifiedNames.has(connection.node));
