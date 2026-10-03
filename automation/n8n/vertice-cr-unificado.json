@@ -65,18 +65,10 @@
       "parameters": {
         "method": "POST",
         "url": "={{ $('Preparar contexto — general').first().json.toolEndpointUrl }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
+        "sendHeaders": false,
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ capability: $('Preparar contexto — general').first().json.toolCapability, mode: 'general', name: $fromAI('tool_name', 'Nombre exacto de una herramienta permitida para general: search_catalog, material_guide, explain_process', 'string'), args: $fromAI('arguments', 'Argumentos JSON de esa herramienta; usa un objeto vacío cuando no requiera argumentos.', 'json') }) }}",
+        "jsonBody": "={{ ({ capability: $('Preparar contexto — general').first().json.toolCapability, mode: 'general', name: $fromAI('tool_name', 'Nombre exacto de una herramienta permitida para general: search_catalog, material_guide, explain_process', 'string'), args: $fromAI('tool_args', 'Argumentos JSON de esa herramienta; usa un objeto vacío cuando no requiera argumentos.', 'json') }) }}",
         "toolDescription": "Herramienta del asistente público: search_catalog, material_guide, explain_process. Ejecuta consultas/cálculos autorizados por Vértice; no edita registros ni envía mensajes.",
         "options": {
           "timeout": 12000
@@ -147,18 +139,10 @@
       "parameters": {
         "method": "POST",
         "url": "={{ $('Preparar contexto — admin').first().json.toolEndpointUrl }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
+        "sendHeaders": false,
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ capability: $('Preparar contexto — admin').first().json.toolCapability, mode: 'admin', name: $fromAI('tool_name', 'Nombre exacto de una herramienta permitida para admin: admin_overview, list_requests, list_orders, catalog_quality, navigation_guide, material_guide, quote_profiles, estimate_quote, request_details', 'string'), args: $fromAI('arguments', 'Argumentos JSON de esa herramienta; usa un objeto vacío cuando no requiera argumentos.', 'json') }) }}",
+        "jsonBody": "={{ ({ capability: $('Preparar contexto — admin').first().json.toolCapability, mode: 'admin', name: $fromAI('tool_name', 'Nombre exacto de una herramienta permitida para admin: admin_overview, list_requests, list_orders, catalog_quality, navigation_guide, material_guide, quote_profiles, estimate_quote, request_details', 'string'), args: $fromAI('tool_args', 'Argumentos JSON de esa herramienta; usa un objeto vacío cuando no requiera argumentos.', 'json') }) }}",
         "toolDescription": "Herramienta del asistente Admin: admin_overview, list_requests, list_orders, catalog_quality, navigation_guide, material_guide, quote_profiles, estimate_quote, request_details. Ejecuta consultas/cálculos autorizados por Vértice; no edita registros ni envía mensajes.",
         "options": {
           "timeout": 12000
@@ -229,18 +213,10 @@
       "parameters": {
         "method": "POST",
         "url": "={{ $('Preparar contexto — quote').first().json.toolEndpointUrl }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
+        "sendHeaders": false,
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ capability: $('Preparar contexto — quote').first().json.toolCapability, mode: 'quote', name: $fromAI('tool_name', 'Nombre exacto de una herramienta permitida para quote: quote_profiles, estimate_quote, material_guide, explain_process', 'string'), args: $fromAI('arguments', 'Argumentos JSON de esa herramienta; usa un objeto vacío cuando no requiera argumentos.', 'json') }) }}",
+        "jsonBody": "={{ ({ capability: $('Preparar contexto — quote').first().json.toolCapability, mode: 'quote', name: $fromAI('tool_name', 'Nombre exacto de una herramienta permitida para quote: quote_profiles, estimate_quote, material_guide, explain_process', 'string'), args: $fromAI('tool_args', 'Argumentos JSON de esa herramienta; usa un objeto vacío cuando no requiera argumentos.', 'json') }) }}",
         "toolDescription": "Herramienta del asistente cotización: quote_profiles, estimate_quote, material_guide, explain_process. Ejecuta consultas/cálculos autorizados por Vértice; no edita registros ni envía mensajes.",
         "options": {
           "timeout": 12000
@@ -257,12 +233,7 @@
         1160
       ],
       "parameters": {
-        "model": {
-          "__rl": true,
-          "mode": "list",
-          "value": "deepseek-chat",
-          "cachedResultName": "deepseek-chat"
-        },
+        "model": "deepseek-flash",
         "options": {
           "temperature": 0.2,
           "maxTokens": 1600,

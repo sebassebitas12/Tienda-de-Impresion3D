@@ -754,6 +754,22 @@ ejecución del workflow, sus credenciales ni las llamadas a proveedores. La
 prueba local aislada valida estructura/permisos sin enviar correo ni usar APIs
 pagadas; los recorridos reales quedan registrados solo tras evidencia de n8n.
 
+### Evidencia en n8n local — 2026-10-03
+
+El usuario importó manualmente el export canónico y el workflow figura publicado.
+La primera ejecución real del asistente público atravesó el webhook y alcanzó
+DeepSeek, donde el proveedor rechazó la credencial guardada como API key inválida.
+Por eso no se consideran ejecutadas las tools ni aprobados los prompts de rol,
+inyección, ni los estados de respuesta del frontend. Tras renovar la clave en
+n8n, probar cada rol desde su UI con respuesta normal, uso de herramienta e
+inyección rechazada; verificar además loading, proveedor caído, timeout y
+respuesta inválida.
+
+La fuente local ahora serializa el cuerpo HTTP Tool como objeto JSON con
+`$fromAI('tool_args', ..., 'json')`, sin `JSON.stringify` ni parámetros vacíos
+de headers. La misma forma se corrigió en las tres herramientas de la versión
+publicada en n8n. No sustituir el nodo v1.1 confirmado por el usuario.
+
 ## Corrección de recorridos y referencias — 2026-10-02
 
 El filtro de links del asistente público permite exactamente /solicitud/archivo y /solicitud/ayuda-diseno, además de rutas públicas existentes; rechaza subrutas arbitrarias y Admin. El chat de diseño está integrado en /solicitud/ayuda-diseno. No cambian capacidades de tools ni credenciales. La recepción privada STL/OBJ, laminado real y creación transaccional del brief siguen pendientes.

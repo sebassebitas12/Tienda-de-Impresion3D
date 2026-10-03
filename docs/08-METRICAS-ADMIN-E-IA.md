@@ -331,14 +331,32 @@ comprueba que no vuelva a aparecer. Los nodos HTTP Tool mantienen
 `@n8n/n8n-nodes-langchain.toolHttpRequest` v1.1, compatible con la instancia
 local según la comprobación comunicada por el usuario.
 
-No se consideran probados por esa compatibilidad ni los Agents con DeepSeek,
-las llamadas a herramientas desde la UI, las tasas reales de Hacienda/ARESEP,
-ni el correo Gmail. Registrar recorridos únicamente con ejecución real,
-resultado observable y evidencia sin secretos ni datos de clientes. Para correo,
-usar el modo de prueba solo a la cuenta controlada del usuario y confirmar el
-acuse `messageId` en la app antes de contar un envío como éxito. Activity se
-verifica con un evento operativo legítimo, nunca con filas sembradas para que
-la pantalla parezca poblada.
+Esa compatibilidad no prueba por sí sola credenciales, Agents ni herramientas.
+El 2026-10-03 la instancia n8n local mostró el workflow publicado y una llamada
+desde la UI alcanzó DeepSeek, pero el proveedor rechazó la API key vinculada como
+inválida antes de responder o invocar tools. Hacienda respondió en la prueba de
+tasas y ARESEP devolvió el conjunto público; sin datos exactos del servicio del
+taller no hubo coincidencia tarifaria, que es el resultado esperado. Gmail OAuth
+aparece conectado, lo que no demuestra entrega.
+
+Se intentó una única prueba de correo DEMO dirigida solo a la cuenta controlada
+del usuario. La app no recibió confirmación y guardó `quoteDeliveries.status`
+como `UNKNOWN`, sin `messageId`; Gmail no mostró el correo por la búsqueda del
+asunto de prueba y n8n no presentó una ejecución nueva de correo al revisar el
+historial. No repetir: el estado podría representar entrega incierta. Para
+reconciliarlo, revisar Sent de Gmail y el historial de ejecuciones de n8n antes
+de cualquier reintento. Nunca enviar al cliente demo `ana@example.com`.
+
+Activity se verifica con un evento operativo legítimo, nunca con filas sembradas
+para que la pantalla parezca poblada.
+
+### Prueba live y estado del correo — 2026-10-03
+
+La app registra el estado `UNKNOWN` como protección contra duplicados cuando el
+webhook o su acuse se interrumpen después de que pudo ocurrir un envío. Para esta
+prueba no se vio el `messageId` ni se encontró el mensaje en Gmail, así que el
+resultado no se declara éxito ni fracaso definitivo. No volver a pulsar ni
+reprocesar ese `deliveryKey` hasta reconciliarlo manualmente.
 
 La revisión local de Activity del 2026-10-03 leyó tres eventos ya persistidos
 desde JSON Server y confirmó su presentación/enlace en Admin (Light, 1280×720).

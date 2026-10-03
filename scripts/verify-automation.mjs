@@ -120,7 +120,7 @@ try {
   assert.deepEqual(aiAgents.map(node => node.name), aiAgentNames); assertions++;
   assert.ok(aiAgents.every(node => node.parameters.options.maxIterations === 4)); assertions++;
   const deepSeekNode = unified.nodes.find(node => node.name === 'DeepSeek Chat Model');
-  assert.equal(deepSeekNode.type, '@n8n/n8n-nodes-langchain.lmChatDeepSeek'); assert.equal(deepSeekNode.parameters.model.value, 'deepseek-chat'); assertions += 2;
+  assert.equal(deepSeekNode.type, '@n8n/n8n-nodes-langchain.lmChatDeepSeek'); assert.equal(deepSeekNode.parameters.model, 'deepseek-flash'); assertions += 2;
   assert.deepEqual(unified.connections[deepSeekNode.name].ai_languageModel[0].map(connection => connection.node), aiAgentNames); assertions++;
   for (const [index, mode] of ['general', 'admin', 'quote'].entries()) {
     const entryName = `Entrada — asistente ${mode}`;
@@ -138,6 +138,10 @@ try {
     assert.equal(toolNode.type, '@n8n/n8n-nodes-langchain.toolHttpRequest');
     assert.equal(toolNode.typeVersion, 1.1);
     assert.ok(toolNode.parameters.toolDescription.includes(ROLE_TOOLS[mode].join(', ')));
+    assert.equal(toolNode.parameters.sendHeaders, false);
+    assert.match(toolNode.parameters.jsonBody, /\$fromAI\('tool_name'/);
+    assert.match(toolNode.parameters.jsonBody, /\$fromAI\('tool_args'/);
+    assert.doesNotMatch(toolNode.parameters.jsonBody, /JSON\.stringify/);
     assert.equal(agent.parameters.options.maxIterations, 4);
     const run = new Function('$input', preparer.parameters.jsCode);
     const input = { first: () => ({ json: { body: { mode, language: 'es', toolCapability: 'a'.repeat(43), toolEndpointUrl: 'http://localhost:3000/assistants/tools', messages: [{ role: 'user', content: 'Prueba' }] } } }) };

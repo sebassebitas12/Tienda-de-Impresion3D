@@ -66,8 +66,8 @@ return [{json:{mode,toolCapability:body.toolCapability,toolEndpointUrl:body.tool
     name: toolName, id: `vertice-authorized-tools-${mode}`, type: '@n8n/n8n-nodes-langchain.toolHttpRequest', typeVersion: 1.1,
     position: [790, y + 150], parameters: {
       method: 'POST', url: `={{ $('${prepareName}').first().json.toolEndpointUrl }}`,
-      sendHeaders: true, headerParameters: { parameters: [{ name: 'Content-Type', value: 'application/json' }] },
-      sendBody: true, specifyBody: 'json', jsonBody: `={{ JSON.stringify({ capability: $('${prepareName}').first().json.toolCapability, mode: '${mode}', name: $fromAI('tool_name', 'Nombre exacto de una herramienta permitida para ${mode}: ${ROLE_TOOLS[mode].join(', ')}', 'string'), args: $fromAI('arguments', 'Argumentos JSON de esa herramienta; usa un objeto vacío cuando no requiera argumentos.', 'json') }) }}`,
+      sendHeaders: false,
+      sendBody: true, specifyBody: 'json', jsonBody: `={{ ({ capability: $('${prepareName}').first().json.toolCapability, mode: '${mode}', name: $fromAI('tool_name', 'Nombre exacto de una herramienta permitida para ${mode}: ${ROLE_TOOLS[mode].join(', ')}', 'string'), args: $fromAI('tool_args', 'Argumentos JSON de esa herramienta; usa un objeto vacío cuando no requiera argumentos.', 'json') }) }}`,
       toolDescription: `Herramienta del asistente ${agentLabels[mode]}: ${ROLE_TOOLS[mode].join(', ')}. Ejecuta consultas/cálculos autorizados por Vértice; no edita registros ni envía mensajes.`,
       options: { timeout: 12000 },
     },
@@ -79,7 +79,7 @@ return [{json:{mode,toolCapability:body.toolCapability,toolEndpointUrl:body.tool
 nodes.push({
   name: 'DeepSeek Chat Model', id: 'deepseek-chat-model', type: '@n8n/n8n-nodes-langchain.lmChatDeepSeek', typeVersion: 1,
   position: [470, 1160], parameters: {
-    model: { __rl: true, mode: 'list', value: 'deepseek-chat', cachedResultName: 'deepseek-chat' },
+    model: 'deepseek-flash',
     options: { temperature: 0.2, maxTokens: 1600, timeout: 40000, maxRetries: 1 },
   },
 });
