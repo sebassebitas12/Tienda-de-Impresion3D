@@ -9,7 +9,7 @@
 
 - **Handoff, bloque A:** selector de 26 fotos locales integrado en alta/edición; reemplaza portada sin perder fotos secundarias. Altas por defecto DRAFT sin precio/material inventados. CRUD de productos/categorías recorrido en navegador con registros QA desechables; protección de historial y categorías utilizadas intacta. Confirmación de borrado propia, foco inicial en Cancelar y retorno al disparador.
 - **Auditoría visual real:** 13 rutas/estados Admin × 375/768/1280 × Dark/Light (78 capturas en `automation/evidence/a3-*.png`, más estados adicionales). Corregidos desborde de Catálogo, campos monetarios ocultos en móvil, steps de pedidos/cotización, densidad de referencias en tablet y estados técnicos en historial de Clientes. Activity sigue reservada para después.
-- **Verificación del bloque:** 25 suites / 135 tests, lint, check:ui, build y 201 checks de automatización pasan. Build conserva aviso >500 kB. CI del nuevo commit pendiente hasta push/verificación; no equiparar pruebas locales con CI verde.
+- **Verificación del bloque:** 25 suites / 135 tests, lint, check:ui, build y 201 checks de automatización pasan. Build conserva aviso >500 kB. Código subido en `fb44abb`; GitHub Actions Verify Pruebas verde, run `37136992470`. Las credenciales y db.json no se incluyeron ni modificaron.
 - **Compatibilidad n8n:** generador y ambas copias del workflow unificado alineados en `@n8n/n8n-nodes-langchain.toolHttpRequest` 1.1; prueba de regresión agregada. No se importó/ejecutó n8n real ni se enviaron correos.
 - **Dato pendiente:** p2 apunta a una foto inexistente y conserva placeholder; no sustituirla por una foto de otro producto. Base original intacta: 25 productos, 5 categorías, 8 pedidos y 5 solicitudes. No hay SUBMITTED actualmente.
 

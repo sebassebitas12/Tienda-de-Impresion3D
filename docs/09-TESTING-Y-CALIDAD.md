@@ -8,7 +8,7 @@
 - Lint, check:ui y build pasan; aviso de chunk >500 kB sigue presente.
 - check:automation: 201 comprobaciones HTTP/permisos/idempotencia/correo mock/tools/workflows/assets con base aislada, no envíos externos. Se detectó y corrigió divergencia previa entre copias del workflow unificado y su generador; se fijan tipo y versión de tool HTTP en cada rol.
 - Navegador: CRUD completo con registros temporales y guardias; 13 vistas × 3 anchos × 2 temas, evidencia y hallazgos en docs/05. Costeo avanzado abierto y selector por teclado revisados; no sustituye una prueba con lector de pantalla.
-- Base original sin cambios tras limpiar registros QA. CI del commit final se comprueba después del push; los resultados locales no autorizan afirmar CI verde.
+- Base original sin cambios tras limpiar registros QA. Commit de código `fb44abb` subido a Pruebas; [Verify Pruebas](https://github.com/sebassebitas12/Tienda-de-Impresion3D/actions/runs/37136992470) terminó success para ese SHA. Incluye npm ci, lint, tests, check:ui, check:automation y build.
 
 ## Objetivo
 
