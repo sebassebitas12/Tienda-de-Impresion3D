@@ -1,0 +1,6 @@
+.admin-catalog-delete.v-panel{position:fixed;inset:0;margin:auto;width:min(480px,calc(100vw - 32px));height:fit-content;max-height:calc(100dvh - 32px);border:1px solid var(--line-strong);border-radius:var(--radius-workbench) var(--radius-control);background:var(--panel);color:var(--paper)}
+.admin-catalog-delete .v-panel__body{padding:22px}
+.admin-catalog-delete .v-panel__body>p{margin:0 0 15px;color:var(--muted);font-size:14px;line-height:1.5}
+.admin-catalog-delete .v-panel__body>strong{display:block;margin-bottom:18px;overflow-wrap:anywhere;font-size:21px;line-height:1.4}
+.admin-catalog-delete [role="alert"]{color:var(--warning)!important}
+.admin-catalog-delete footer{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;padding-top:16px;border-top:1px solid var(--line)}

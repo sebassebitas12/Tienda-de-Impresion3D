@@ -166,7 +166,7 @@ export function AdminOrderDetailPage() {
                 <thead><tr><th scope="col">{text.item}</th><th scope="col">{text.quantity}</th><th scope="col">{text.each}</th><th scope="col">{text.lineTotal}</th></tr></thead>
                 <tbody>{order.items.map((item, index) => <tr key={item.id || `${item.orderId}-${item.productId}`} style={{ '--row-index': index }}>
                   <th scope="row">{item.product?.name || text.missingProduct(item.productId)}{item.product?.material && <span className="admin-order-items__material">{item.product.material}</span>}</th>
-                  <td>{item.quantity ?? '—'}</td><td>{formatCRC(item.unitPrice) || '—'}</td><td>{formatCRC(item.subtotal) || '—'}</td>
+                  <td data-label={text.quantity}>{item.quantity ?? '—'}</td><td data-label={text.each}>{formatCRC(item.unitPrice) || '—'}</td><td data-label={text.lineTotal}>{formatCRC(item.subtotal) || '—'}</td>
                 </tr>)}</tbody>
               </table>
             </div>}

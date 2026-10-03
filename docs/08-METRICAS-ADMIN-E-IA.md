@@ -1,6 +1,15 @@
 # Vértice CR — Métricas, Admin e IA operativa
 
-> Última actualización: **2026-10-01**.
+> Última actualización: **2026-10-03**.
+
+## Cierre del handoff A — 2026-10-03
+
+- Alta/edición de producto permite escoger una de 26 imágenes existentes, buscar por nombre, ver portada y quitarla. Se conservan imágenes secundarias; seleccionar una foto no publica ni asigna precio/material.
+- Nuevos productos: DRAFT, precio/material vacíos hasta confirmación. Se conserva el guard de publicación; las 19 fichas originales no se completan automáticamente con datos inferidos.
+- Bajas: diálogo Vértice con nombre del registro, Cancelar como foco inicial, Escape y retorno de foco. Modelos referenciados por pedidos y categorías utilizadas no se eliminan. La referencia URL de una categoría nueva se genera desde el nombre completo; una referencia manual no se sobrescribe.
+- Recorrido real: crear/editar/publicar/ocultar/eliminar un producto QA; crear/editar/eliminar categoría QA; cancelar y confirmar modal de borrado; guard de historial y de categoría usada. Registros temporales retirados; db.json no cambia respecto del corte inicial.
+- Responsive y temas: resumen/pedidos adaptan filas en móvil sin ocultar cliente/etapa/total ni cantidad/unitario/subtotal; steps muestran las seis etapas; referencias de cotización pasan a dos columnas legibles en tablet. Historial de Clientes muestra estados conocidos en lenguaje humano ES/EN, con fallback para un valor desconocido.
+- Alcance: Admin local académico, no integración n8n real ni Activity cerrada. La portada de p2 no existe en disco; queda pendiente obtener/asignar la foto correcta. No publicar borradores solo por tener imagen.
 
 ## Principio
 

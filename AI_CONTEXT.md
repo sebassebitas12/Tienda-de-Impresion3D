@@ -1,11 +1,17 @@
 # AI_CONTEXT.md — Vértice CR
 
-> **Última actualización:** 2026-10-02
+> **Última actualización:** 2026-10-03
 > **Estado:** SNAPSHOT ACTIVO  
 > **Rama:** `Pruebas`  
 > **No es un diario:** este archivo resume el presente. El historial detallado vive en los documentos de dominio.
 
-## Estado vigente para continuar (2026-10-02)
+## Estado vigente para continuar (2026-10-03)
+
+- **Handoff, bloque A:** selector de 26 fotos locales integrado en alta/edición; reemplaza portada sin perder fotos secundarias. Altas por defecto DRAFT sin precio/material inventados. CRUD de productos/categorías recorrido en navegador con registros QA desechables; protección de historial y categorías utilizadas intacta. Confirmación de borrado propia, foco inicial en Cancelar y retorno al disparador.
+- **Auditoría visual real:** 13 rutas/estados Admin × 375/768/1280 × Dark/Light (78 capturas en `automation/evidence/a3-*.png`, más estados adicionales). Corregidos desborde de Catálogo, campos monetarios ocultos en móvil, steps de pedidos/cotización, densidad de referencias en tablet y estados técnicos en historial de Clientes. Activity sigue reservada para después.
+- **Verificación del bloque:** 25 suites / 135 tests, lint, check:ui, build y 201 checks de automatización pasan. Build conserva aviso >500 kB. CI del nuevo commit pendiente hasta push/verificación; no equiparar pruebas locales con CI verde.
+- **Compatibilidad n8n:** generador y ambas copias del workflow unificado alineados en `@n8n/n8n-nodes-langchain.toolHttpRequest` 1.1; prueba de regresión agregada. No se importó/ejecutó n8n real ni se enviaron correos.
+- **Dato pendiente:** p2 apunta a una foto inexistente y conserva placeholder; no sustituirla por una foto de otro producto. Base original intacta: 25 productos, 5 categorías, 8 pedidos y 5 solicitudes. No hay SUBMITTED actualmente.
 
 - **Cotizador — alcance corregido por el usuario:** dos intenciones: “Ya tengo la pieza” para solicitar revisión del archivo y “Quiero ayuda para crearla” para definir el diseño con el chatbot. La UI muestra ambas rutas y el chatbot quote está disponible a visitantes; la solicitud transaccional todavía no está conectada.
 - **Bloqueo técnico del cotizador:** no existe almacenamiento privado ni laminador/costos calibrados que calculen peso/tiempo reales. El Agent quote solo orienta y consulta perfiles DEMO; no guarda, mide archivos ni envía solicitudes. `/quotes/create` genera una cotización DEMO por perfil y no debe usarse como precio de un STL adjunto. El flujo Admin de precio final/email se conserva; no se activa precio comercial desde el bot.
@@ -21,7 +27,7 @@
 - **n8n/Asistentes:** la app ofrece chat general público, Asistente Admin dentro del panel protegido y Asistente de cotización público en `/solicitud`; cada mode llega a un Agent nativo separado. Comparten únicamente DeepSeek Chat Model. Las tools quote son perfiles/cálculos DEMO y guías; no persisten requests ni acceden a datos personales. Tasas y Gmail siguen como procesos deterministas separados. La instancia n8n real no fue configurada ni probada.
 - **Tasas:** cambio venta Hacienda puede ser oficial reciente; ARESEP requiere selección exacta de distribuidora/tarifa/bloque. Sin coincidencia, sigue DEMO. Los costos reales de materiales, desgaste y energía dependen de calibración del taller.
 - **Base remota y CI:** `306e2c8` (`feat: clarify quote journeys and sync unified n8n workflow`) está en `Pruebas`; GitHub Actions `Verify Pruebas` terminó `success` en run `37063031464`. El build mantiene aviso de chunk >500 kB.
-- **Siguiente bloque:** implementar envío transaccional del brief de diseño a `customPrintRequests` con confirmación explícita/idempotencia y que Admin lo pueda revisar; definir upload privado STL/OBJ con acceso Admin y medición real antes de prometer cotización automática. Después, importar el JSON exacto de `automation/vertice-n8n-import/n8n/`, asignar credenciales DeepSeek/Gmail y probar correos a una dirección propia. La instancia/credenciales n8n reales no se han conectado.
+- **Siguiente bloque, por prioridad del handoff:** B: importar el JSON exacto de `automation/vertice-n8n-import/n8n/`, asignar las credenciales y probar los tres asistentes/tools y correo a una dirección propia. Después C (completar fichas DRAFT con datos confirmados) y D (Tienda). La recepción transaccional del brief, upload privado y laminado real permanecen pendientes; no prometer precios comerciales calculados a partir de fotos/DEMO.
 
 Este estado vigente prevalece sobre los cortes históricos que aparecen más abajo.
 

@@ -1,6 +1,12 @@
 # Vértice CR — Diseño visual, temas y accesibilidad
 
-> Última actualización: **2026-10-02**.
+> Última actualización: **2026-10-03**.
+
+## Selección de fotografías y densidad Admin — 2026-10-03
+
+La biblioteca de fotos es un control operativo del formulario, no una reproducción de las tarjetas públicas: preview, búsqueda y grilla scrollable de 4/3/2 columnas para escritorio/tablet/móvil. Usa contain para reconocer el objeto completo; las bandas de miniatura son intencionales y no cambian el tratamiento de Tienda. Tokens Dark/Light existentes, selección visible y foco de teclado; sin dependencias ni estética de Stitch.
+
+En móvil, resumen y detalle de pedido deben mostrar todos los valores importantes sin scroll horizontal de tabla. Los recorridos de seis etapas se distribuyen 3×2. Las referencias del cotizador Admin requieren ancho mínimo 260 px para no fragmentar títulos en tablet. Se elimina el círculo ornamental del panel de cotización, manteniendo superficie y jerarquía.
 
 ## Dirección vigente
 

@@ -64,7 +64,7 @@ return [{json:{mode,toolCapability:body.toolCapability,toolEndpointUrl:body.tool
   });
   connectMain(prepareName, agentName);
   nodes.push({
-    name: toolName, id: `vertice-authorized-tools-${mode}`, type: 'n8n-nodes-base.httpRequestTool', typeVersion: 1.2,
+    name: toolName, id: `vertice-authorized-tools-${mode}`, type: '@n8n/n8n-nodes-langchain.toolHttpRequest', typeVersion: 1.1,
     position: [790, y + 150], parameters: {
       method: 'POST', url: `={{ $('${prepareName}').first().json.toolEndpointUrl }}`,
       sendHeaders: true, headerParameters: { parameters: [{ name: 'Content-Type', value: 'application/json' }] },

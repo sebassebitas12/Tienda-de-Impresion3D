@@ -1,6 +1,14 @@
 # Vértice CR — Testing y calidad
 
-> Última actualización: **2026-09-24**.
+> Última actualización: **2026-10-03**.
+
+## Verificación del handoff A — 2026-10-03
+
+- 25 suites, 135 tests pasan. `adminCatalogForm.test.jsx` agrega 8 regresiones: alta DRAFT sin precio/material, portada elegida, sustitución sin perder secundarias, edición sin perder imágenes, publicación incompleta bloqueada, slug completo/manual, confirmación de categoría, guard de historial y retorno de foco de producto (varias condiciones dentro de cada caso).
+- Lint, check:ui y build pasan; aviso de chunk >500 kB sigue presente.
+- check:automation: 201 comprobaciones HTTP/permisos/idempotencia/correo mock/tools/workflows/assets con base aislada, no envíos externos. Se detectó y corrigió divergencia previa entre copias del workflow unificado y su generador; se fijan tipo y versión de tool HTTP en cada rol.
+- Navegador: CRUD completo con registros temporales y guardias; 13 vistas × 3 anchos × 2 temas, evidencia y hallazgos en docs/05. Costeo avanzado abierto y selector por teclado revisados; no sustituye una prueba con lector de pantalla.
+- Base original sin cambios tras limpiar registros QA. CI del commit final se comprueba después del push; los resultados locales no autorizan afirmar CI verde.
 
 ## Objetivo
 

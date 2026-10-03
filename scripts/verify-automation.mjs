@@ -135,6 +135,8 @@ try {
     assert.deepEqual(unified.connections[entryName].main[0].map(connection => connection.node), [prepareName]);
     assert.deepEqual(unified.connections[prepareName].main[0].map(connection => connection.node), [agentName]);
     assert.equal(unified.connections[toolName].ai_tool[0][0].node, agentName);
+    assert.equal(toolNode.type, '@n8n/n8n-nodes-langchain.toolHttpRequest');
+    assert.equal(toolNode.typeVersion, 1.1);
     assert.ok(toolNode.parameters.toolDescription.includes(ROLE_TOOLS[mode].join(', ')));
     assert.equal(agent.parameters.options.maxIterations, 4);
     const run = new Function('$input', preparer.parameters.jsCode);
@@ -143,7 +145,7 @@ try {
     assert.equal(prepared[0].json.mode, mode);
     assert.ok(prepared[0].json.systemPrompt.includes(ROLE_TOOLS[mode][0]));
     assert.throws(() => run({ first: () => ({ json: { body: { ...input.first().json.body, mode: 'otro-rol' } } }) }), /Contexto de asistente inválido/);
-    assertions += 9;
+    assertions += 11;
   }
   assert.equal(unified.nodes.filter(node => node.type.endsWith('.gmail')).length, 1); assertions++;
   for (const [from, output] of Object.entries(unified.connections)) {

@@ -253,7 +253,6 @@ html[data-motion="reduced"] .admin-sidebar nav a,html[data-motion="reduced"] .ad
 .admin-detail-panel .admin-detail-description{grid-column:1/-1}
 .admin-detail-file{font-family:var(--mono);font-size:14px!important}
 .admin-quote-panel{position:relative;overflow:hidden;min-height:250px;background:linear-gradient(145deg,color-mix(in srgb,var(--lava) 9%,var(--panel)),var(--panel) 58%)}
-.admin-quote-panel::after{position:absolute;right:-46px;bottom:-70px;width:150px;height:150px;border:1px solid color-mix(in srgb,var(--lava) 24%,transparent);border-radius:50%;content:""}
 .admin-quote-panel p{position:relative;z-index:1;color:var(--muted);font-size:15px;line-height:1.55}
 .admin-quote-panel__amount{display:block;margin:20px 0;color:var(--paper);font:500 clamp(30px,4vw,44px)/1 var(--mono)}
 .admin-quote-panel .admin-quote-panel__note{margin-top:20px;padding-top:14px;border-top:1px solid var(--line);color:var(--paper)}
@@ -543,6 +542,7 @@ html[data-motion="reduced"] .admin-orders__filter,html[data-motion="reduced"] .a
 /* Catálogo Admin: lectura editorial de modelos, sin controles de inventario ni edición incompleta. */
 .admin-catalog,.admin-catalog-detail{width:min(100%,1480px);margin:0 auto}
 .admin-catalog .admin-page-heading{align-items:end;margin-bottom:22px}
+@media(max-width:760px){.admin-catalog .admin-page-heading{align-items:stretch;flex-direction:column;gap:16px}.admin-catalog .admin-page-heading>div{min-width:0}.admin-catalog .admin-orders__total{align-self:start}}
 .admin-catalog__review-note{margin:0 0 20px;padding:13px 17px;border-left:2px solid var(--warning);border-top-right-radius:var(--radius-control);border-bottom-right-radius:var(--radius-control);background:color-mix(in srgb,var(--warning) 6%,var(--panel));color:var(--muted);font-size:14px}
 .admin-catalog__draft-note{display:flex;align-items:center;justify-content:space-between;gap:18px}
 .admin-catalog__draft-note p{margin:0;line-height:1.5}
@@ -930,7 +930,20 @@ html[data-motion="reduced"] .admin-queue--orders .admin-table tbody :is(th,td){t
 .admin-queue--requests .admin-queue-heading{border-left:0;border-bottom:1px solid var(--line);border-radius:8px 24px 0 0}
 .admin-data-notice{border:1px solid color-mix(in srgb,var(--warning) 35%,var(--line));border-radius:20px 8px;background:color-mix(in srgb,var(--warning) 4%,var(--panel));padding:20px}
 .admin-data-notice a{color:var(--paper);text-decoration:underline;text-underline-offset:4px}
-@media(max-width:760px){.admin-queue--requests{border-radius:10px 24px}.admin-queue--orders .admin-table{min-width:520px}}
+@media(max-width:760px){
+  .admin-queue--requests{border-radius:10px 24px}
+  .admin-queue--orders .admin-table{min-width:0}
+  .admin-queue--orders .admin-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .admin-queue--orders .admin-table tbody{display:grid;gap:8px}
+  .admin-queue--orders .admin-table tr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);padding:12px;background:color-mix(in srgb,var(--paper) 3%,transparent);border-radius:14px}
+  .admin-queue--orders .admin-table tbody :is(th,td){min-width:0;padding:5px 0;background:transparent;border-radius:0;overflow-wrap:anywhere}
+  .admin-queue--orders .admin-table tbody th{grid-column:1/-1}
+  .admin-queue--orders .admin-table tbody td:first-of-type{grid-column:1/-1}
+  .admin-queue--orders .admin-table td::before{display:block;content:attr(data-label);font:10px/1.6 var(--mono);color:var(--dim)}
+  .admin-queue--orders .admin-state{white-space:normal;font-size:13px}
+  .admin-request-workflow .admin-workflow-steps,.admin-order-flow .admin-workflow-steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 8px;overflow:visible;padding:5px 0 12px}
+  .admin-request-workflow .admin-workflow-steps::before,.admin-order-flow .admin-workflow-steps::before{display:none}
+}
 
 /* R-H58: Admin replaces decorative circles/halos with angled workshop drafting layers. */
 .admin-shell>main{background-image:linear-gradient(118deg,color-mix(in srgb,var(--lava) 4%,transparent),transparent 36%),linear-gradient(160deg,color-mix(in srgb,var(--warning) 2%,transparent),transparent 48%)}
@@ -943,6 +956,7 @@ html[data-motion="reduced"] .admin-queue--orders .admin-table tbody :is(th,td){t
 .admin-metrics,.admin-flow,.admin-orders__total,.admin-order-flow,.admin-order-summary,.admin-catalog__list,.admin-catalog-detail__layout,.admin-catalog-form__surface,.admin-category-list,.admin-request-map,.admin-request-inbox{background-image:linear-gradient(126deg,color-mix(in srgb,var(--lava) 6%,transparent),transparent 52%),linear-gradient(180deg,color-mix(in srgb,var(--panel) 74%,var(--ink)),color-mix(in srgb,var(--ink-soft) 82%,var(--panel)))}
 .admin-catalog-detail__image-fallback{background-image:repeating-linear-gradient(135deg,transparent 0 24px,color-mix(in srgb,var(--line) 28%,transparent) 25px 26px,transparent 27px 52px),linear-gradient(135deg,color-mix(in srgb,var(--paper) 3%,var(--image-surface)),var(--image-surface))}
 .admin-request-workflow,.admin-detail-panel,.admin-quote-panel{background-image:linear-gradient(126deg,color-mix(in srgb,var(--lava) 6%,transparent),transparent 52%),linear-gradient(180deg,color-mix(in srgb,var(--panel) 74%,var(--ink)),color-mix(in srgb,var(--ink-soft) 82%,var(--panel)))}
+.admin-auto-quote .reference-picker__results{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
 .admin-orders__filter[aria-pressed="true"]{background:linear-gradient(112deg,color-mix(in srgb,var(--lava) 12%,var(--panel-raised)),color-mix(in srgb,var(--panel-raised) 78%,var(--panel)))}
 html[data-contrast="high"] .admin-request-map::after{display:none}
 html[data-contrast="high"] :is(.admin-shell>main,.admin-sidebar,.admin-metrics,.admin-flow,.admin-orders__total,.admin-order-flow,.admin-order-summary,.admin-catalog__list,.admin-catalog-detail__layout,.admin-catalog-form__surface,.admin-category-list,.admin-request-map,.admin-request-inbox,.admin-request-workflow,.admin-detail-panel,.admin-quote-panel){background-image:none}
@@ -1116,4 +1130,11 @@ html[data-motion="reduced"] .admin-customers__list>li,html[data-motion="reduced"
   .admin-orders__table tbody td time{white-space:normal}
   .admin-orders__table .admin-state{width:fit-content;max-width:100%;white-space:normal}
   html[data-contrast="high"] .admin-orders__table tbody tr{background:var(--panel)}
+  .admin-order-items__table{min-width:0}
+  .admin-order-items__table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .admin-order-items__table tbody{display:grid;gap:12px}
+  .admin-order-items__table tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:12px;border-bottom:1px solid var(--line)}
+  .admin-order-items__table tbody :is(th,td){min-width:0;padding:8px 0;border:0;font-size:13px;overflow-wrap:anywhere}
+  .admin-order-items__table tbody th{grid-column:1/-1}
+  .admin-order-items__table td::before{display:block;content:attr(data-label);color:var(--muted);font:10px/1.6 var(--mono)}
 }

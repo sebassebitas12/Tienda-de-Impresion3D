@@ -737,6 +737,10 @@ Límite: las guardas y persistencia de esta arquitectura académica local proteg
 la lógica funcional; JSON Server/token simulado y la serialización por proceso
 no reemplazan un backend transaccional ni seguridad de producción.
 
+## Compatibilidad del export n8n — 2026-10-03
+
+La corrección del corte 908a285 estaba solo en la copia importable. Se alinean generador, fuente `automation/n8n/vertice-cr-unificado.json` y copia importable con `@n8n/n8n-nodes-langchain.toolHttpRequest` 1.1 para las tres herramientas HTTP. verify-automation exige igualdad de copias y tipo/versión por rol; 201 checks pasan. No cambia credenciales, permisos, prompts ni endpoints; no acredita ejecución en n8n real.
+
 ## Corrección de recorridos y referencias — 2026-10-02
 
 El filtro de links del asistente público permite exactamente /solicitud/archivo y /solicitud/ayuda-diseno, además de rutas públicas existentes; rechaza subrutas arbitrarias y Admin. El chat de diseño está integrado en /solicitud/ayuda-diseno. No cambian capacidades de tools ni credenciales. La recepción privada STL/OBJ, laminado real y creación transaccional del brief siguen pendientes.

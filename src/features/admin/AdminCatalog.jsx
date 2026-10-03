@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { EmptyState, ErrorState, Skeleton } from '../../components/ui/index.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
@@ -9,6 +9,7 @@ import { AdminCatalogMutationError, deleteAdminProduct, getAdminCatalogReference
 import './admin.css';
 import { FilterChips } from '../../components/ui/FilterChips.jsx';
 import { toggleFacetParams } from '../../utils/facetFilters.js';
+import { CatalogDeleteDialog } from './CatalogDeleteDialog.jsx';
 
 const words = {
   es: {
@@ -118,6 +119,8 @@ export function AdminCatalogDetailPage() {
   const { status, products, retry } = useAdminCatalog();
   const [mutationError, setMutationError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const deleteTriggerRef = useRef(null);
   const product = products.find(item => String(item.id) === id);
   const hasSupportedMaterial = product && CATALOG_MATERIALS.has(String(product.material || '').toUpperCase());
   const canPublish = product && isCatalogProductReadyToPublish(product);
@@ -134,7 +137,7 @@ export function AdminCatalogDetailPage() {
           <span className="admin-catalog-row__status" data-status={product.status}>{publicationLabel(product.status, language, text)}<small>{product.featured ? text.featured : text.regular}</small></span>
           <Link className="admin-action-primary" to={`/admin/catalogo/${encodeURIComponent(product.id)}/editar`}>{language === 'es' ? 'Editar' : 'Edit'}</Link>
           <button className="admin-action-secondary" disabled={busy || (String(product.status).toUpperCase() !== 'ACTIVE' && !canPublish)} title={String(product.status).toUpperCase() !== 'ACTIVE' && !canPublish ? text.incompleteDraft : undefined} onClick={async () => { setBusy(true); setMutationError(''); try { await updateAdminProduct(product.id, { status: String(product.status).toUpperCase() === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE', updatedAt: new Date().toISOString() }); retry(); } catch (error) { setMutationError(error instanceof AdminCatalogMutationError ? error.message : text.error); } finally { setBusy(false); } }}>{String(product.status).toUpperCase() === 'ACTIVE' ? (language === 'es' ? 'Ocultar' : 'Hide') : (language === 'es' ? 'Publicar' : 'Publish')}</button>
-          <button className="admin-action-secondary" disabled={busy} onClick={async () => { setBusy(true); setMutationError(''); try { const refs = await getAdminCatalogReferences(); if (refs.some(item => String(item.productId) === String(product.id))) { setMutationError(language === 'es' ? 'Este modelo forma parte del historial de pedidos. Ocúltalo en lugar de eliminarlo.' : 'This model is in order history. Hide it instead of deleting it.'); return; } if (window.confirm(language === 'es' ? '¿Eliminar este modelo definitivamente?' : 'Permanently delete this model?')) { await deleteAdminProduct(product.id); navigate('/admin/catalogo', { replace: true }); } } catch (error) { setMutationError(error instanceof AdminCatalogMutationError ? error.message : text.error); } finally { setBusy(false); } }}>{language === 'es' ? 'Eliminar' : 'Delete'}</button>
+<button ref={deleteTriggerRef} className="admin-action-secondary" disabled={busy} onClick={async () => { setBusy(true); setMutationError(''); try { const refs = await getAdminCatalogReferences(); if (refs.some(item => String(item.productId) === String(product.id))) { setMutationError(language === 'es' ? 'Este modelo forma parte del historial de pedidos. Ocúltalo en lugar de eliminarlo.' : 'This model is in order history. Hide it instead of deleting it.'); return; } setConfirmDelete(true); } catch (error) { setMutationError(error instanceof AdminCatalogMutationError ? error.message : text.error); } finally { setBusy(false); } }}>{language === 'es' ? 'Eliminar' : 'Delete'}</button>
         </div>
       </header>
       {mutationError && <p className="admin-catalog-form__error" role="alert">{mutationError}</p>}
@@ -147,6 +150,15 @@ export function AdminCatalogDetailPage() {
           <p className="admin-catalog-detail__note">{text.madeToOrder}</p>
         </div>
       </div>
+      {confirmDelete && <CatalogDeleteDialog name={product.name} language={language} busy={busy} error={mutationError} triggerRef={deleteTriggerRef} onCancel={() => { setConfirmDelete(false); setMutationError(''); }} onConfirm={async () => {
+        setBusy(true); setMutationError('');
+        try {
+          const refs = await getAdminCatalogReferences();
+          if (refs.some(item => String(item.productId) === String(product.id))) { setMutationError(language === 'es' ? 'Este modelo forma parte del historial de pedidos. Ocúltalo en lugar de eliminarlo.' : 'This model is in order history. Hide it instead of deleting it.'); return; }
+          await deleteAdminProduct(product.id); navigate('/admin/catalogo', { replace: true });
+        } catch (error) { setMutationError(error instanceof AdminCatalogMutationError ? error.message : text.error); }
+        finally { setBusy(false); }
+      }} />}
     </>}
   </section>;
 }

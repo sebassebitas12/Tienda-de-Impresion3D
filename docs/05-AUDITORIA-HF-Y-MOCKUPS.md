@@ -1,6 +1,27 @@
 # Vértice CR — Auditoría HF y mockups
 
-> Última actualización: **2026-10-02**.
+> Última actualización: **2026-10-03**.
+
+## Auditoría Admin A3 con render real — 2026-10-03
+
+Se inspeccionaron 78 vistas: 13 rutas/estados en 375, 768 y 1280 px, Dark y Light. Evidencia en `automation/evidence/a3-{vista}-{ancho}-{tema}.png`:
+
+| Vista | Ruta |
+| --- | --- |
+| resumen | /admin |
+| solicitudes | /admin/solicitudes |
+| solicitud-revision / solicitud-cotizada | /admin/solicitudes/r1 / r5 |
+| pedidos / pedido-detalle | /admin/pedidos / /admin/pedidos/o3 |
+| catalogo / producto-detalle | /admin/catalogo / /admin/catalogo/p7 |
+| producto-editar / producto-nuevo | /admin/catalogo/p7/editar / /admin/catalogo/nuevo |
+| categorias | /admin/catalogo/categorias |
+| clientes / cliente-detalle | /admin/clientes / /admin/clientes/u2 |
+
+Defectos corregidos y revalidados: título/acciones de Catálogo desbordaban a 375; Resumen y piezas del pedido ocultaban columnas monetarias; steps cortaban etapas; referencias demasiado estrechas a 768; círculo ornamental de cotización; códigos de estado expuestos en historial de Clientes. Las capturas se toman después de la animación de entrada, sin eliminar movimiento solicitado. No se observó desborde horizontal del documento en las vistas finales.
+
+Estados adicionales: costeo avanzado abierto a 375 Light, búsqueda de fotos vacía, selección con Enter y modal de baja en Dark/Light. Captura enfocada de selector: `a3-image-picker-1280-light.png`; modal de producto: `a-admin-product-delete-confirm.png`. Escape devuelve foco al botón Eliminar tras corregir el disparador asíncrono. CRUD se hizo con datos desechables; no se enviaron correos ni alteraron pedidos originales.
+
+Activity queda fuera de esta matriz por reserva explícita del usuario. Estas capturas no prueban tecnología asistiva real, n8n real, almacenamiento privado o laminado. p2 sigue con placeholder porque su foto registrada falta. Home/HF-01 no se modifican.
 
 ## Estado oficial
 

@@ -18,6 +18,7 @@ const copy = {
     noOrders: 'Este cliente no tiene pedidos asociados.', noRequests: 'Este cliente no tiene solicitudes asociadas.',
     received: 'Recibido', stage: 'Etapa', viewOrder: 'Abrir pedido', viewRequest: 'Abrir solicitud',
     notFound: 'No encontramos esta cuenta.', active: 'Activa', inactive: 'Inactiva',
+    stages: { PENDING: 'Pendiente', CONFIRMED: 'Confirmado', IN_PRODUCTION: 'En producción', READY: 'Listo', SHIPPED: 'Enviado', DELIVERED: 'Entregado', CANCELLED: 'Cancelado', REJECTED: 'Rechazado', PENDING_QUOTE: 'Pendiente de cotización', IN_REVIEW: 'En revisión', QUOTED: 'Cotizada', AWAITING_APPROVAL: 'Esperando aprobación', APPROVED: 'Aprobada', PAID: 'Pagada', EXPIRED: 'Vencida' },
   },
   en: {
     title: 'Customers', intro: 'Review customer accounts and their linked history. Personal data cannot be edited here.',
@@ -29,6 +30,7 @@ const copy = {
     noOrders: 'This customer has no linked orders.', noRequests: 'This customer has no linked requests.',
     received: 'Received', stage: 'Stage', viewOrder: 'Open order', viewRequest: 'Open request',
     notFound: 'We could not find this account.', active: 'Active', inactive: 'Inactive',
+    stages: { PENDING: 'Pending', CONFIRMED: 'Confirmed', IN_PRODUCTION: 'In production', READY: 'Ready', SHIPPED: 'Shipped', DELIVERED: 'Delivered', CANCELLED: 'Cancelled', REJECTED: 'Rejected', PENDING_QUOTE: 'Pending quote', IN_REVIEW: 'In review', QUOTED: 'Quoted', AWAITING_APPROVAL: 'Awaiting approval', APPROVED: 'Approved', PAID: 'Paid', EXPIRED: 'Expired' },
   },
 };
 
@@ -47,7 +49,7 @@ function CustomerOrders({ orders, text, language }) {
   return <section className="admin-customer-history" aria-labelledby="admin-customer-orders-title">
     <header><span className="admin-eyebrow">01 / {text.orders}</span><h2 id="admin-customer-orders-title">{text.orders} <small>{orders.length}</small></h2></header>
     {orders.length ? <ol>{orders.map(order => <li key={order.id}>
-      <Link to={`/admin/pedidos/${encodeURIComponent(order.id)}`}><strong>{formatOrderReference(order.id)}</strong><span className="admin-state" data-status={order.status}>{order.status}</span><time dateTime={order.createdAt}>{dateLabel(order.createdAt, language)}</time><span aria-hidden="true">↗</span></Link>
+      <Link to={`/admin/pedidos/${encodeURIComponent(order.id)}`}><strong>{formatOrderReference(order.id)}</strong><span className="admin-state" data-status={order.status}>{text.stages[order.status] || order.status}</span><time dateTime={order.createdAt}>{dateLabel(order.createdAt, language)}</time><span aria-hidden="true">↗</span></Link>
     </li>)}</ol> : <p>{text.noOrders}</p>}
   </section>;
 }
@@ -56,7 +58,7 @@ function CustomerRequests({ requests, text, language }) {
   return <section className="admin-customer-history" aria-labelledby="admin-customer-requests-title">
     <header><span className="admin-eyebrow">02 / {text.requests}</span><h2 id="admin-customer-requests-title">{text.requests} <small>{requests.length}</small></h2></header>
     {requests.length ? <ol>{requests.map(request => <li key={request.id}>
-      <Link to={`/admin/solicitudes/${encodeURIComponent(request.id)}`}><strong>{request.fileName || request.description || request.id}</strong><span className="admin-state" data-status={request.status}>{request.status}</span><time dateTime={request.submittedAt}>{dateLabel(request.submittedAt, language)}</time><span aria-hidden="true">↗</span></Link>
+      <Link to={`/admin/solicitudes/${encodeURIComponent(request.id)}`}><strong>{request.fileName || request.description || request.id}</strong><span className="admin-state" data-status={request.status}>{text.stages[request.status] || request.status}</span><time dateTime={request.submittedAt}>{dateLabel(request.submittedAt, language)}</time><span aria-hidden="true">↗</span></Link>
     </li>)}</ol> : <p>{text.noRequests}</p>}
   </section>;
 }

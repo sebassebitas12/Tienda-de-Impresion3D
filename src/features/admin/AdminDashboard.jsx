@@ -157,9 +157,9 @@ export function AdminDashboard() {
                   <tbody>{data.recentOrders.map((order, index) => (
                     <tr key={order.id} style={{ '--row-index': index }}>
                       <th scope="row"><Link className="admin-order-id" to={`/admin/pedidos/${encodeURIComponent(order.id)}`}>{formatOrderReference(order.id)} <span aria-hidden="true">↗</span></Link></th>
-                      <td>{order.customerName || text.customerUnknown}</td>
-                      <td><span className="admin-state" data-status={order.status}>{text.statuses[order.status] || order.status}</span></td>
-                      <td>{formatCRC(order.total) || '—'}</td>
+                      <td data-label={text.customer}>{order.customerName || text.customerUnknown}</td>
+                      <td data-label={text.status}><span className="admin-state" data-status={order.status}>{text.statuses[order.status] || order.status}</span></td>
+                      <td data-label={text.total}>{formatCRC(order.total) || '—'}</td>
                     </tr>
                   ))}</tbody>
                 </table>

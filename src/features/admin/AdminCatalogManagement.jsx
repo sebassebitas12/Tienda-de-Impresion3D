@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ErrorState, Skeleton } from '../../components/ui/index.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
 import { useAdminCatalog } from './useAdminCatalog.js';
+import { ImagePicker } from './ImagePicker.jsx';
+import { CatalogDeleteDialog } from './CatalogDeleteDialog.jsx';
 import {
   createAdminCategory, createAdminProduct, deleteAdminCategory, updateAdminCategory, updateAdminProduct,
 } from '../../services/adminCatalogService.js';
@@ -30,8 +32,8 @@ export function AdminProductFormPage() {
     name: existing.name || '', slug: existing.slug || '', description: existing.description || '', categoryId: existing.categoryId || '',
     price: existing.price ?? '', material: String(existing.material || '').toUpperCase(), colors: (existing.availableColors || []).join(', '),
     dimensions: existing.dimensions || '', weightGrams: existing.weightGrams ?? '', estimatedProductionHours: existing.estimatedProductionHours ?? '',
-    status: existing.status || 'ACTIVE', featured: Boolean(existing.featured),
-  } : { name: '', slug: '', description: '', categoryId: '', price: '', material: 'PLA', colors: '', dimensions: '', weightGrams: '', estimatedProductionHours: '', status: 'ACTIVE', featured: false });
+    status: existing.status || 'ACTIVE', featured: Boolean(existing.featured), images: existing.images || [],
+  } : { name: '', slug: '', description: '', categoryId: '', price: '', material: '', colors: '', dimensions: '', weightGrams: '', estimatedProductionHours: '', status: 'DRAFT', featured: false, images: [] });
   const isEdit = Boolean(id);
   const availableCategories = categories.filter(category => String(category.status || 'ACTIVE').toUpperCase() === 'ACTIVE');
   const onChange = event => {
@@ -56,7 +58,8 @@ export function AdminProductFormPage() {
       weightGrams: product.weightGrams === '' ? null : Number(product.weightGrams),
       estimatedProductionHours: product.estimatedProductionHours === '' ? null : Number(product.estimatedProductionHours),
       status: product.status, featured: Boolean(product.featured), updatedAt: now,
-      ...(existing ? {} : { images: [], createdAt: now }),
+      images: product.images,
+      ...(existing ? {} : { createdAt: now }),
     };
     try {
       if (isEdit) await updateAdminProduct(id, payload);
@@ -88,7 +91,8 @@ export function AdminProductFormPage() {
         <label className="admin-catalog-form__wide">{t.description}<textarea name="description" rows="4" value={product.description} onChange={onChange} /></label>
         <label className="admin-catalog-form__check"><input type="checkbox" name="featured" checked={product.featured} onChange={onChange} />{t.featured}</label>
       </div>
-      <p className="admin-catalog-form__note">{language === 'es' ? 'Se fabrica bajo pedido. Las imágenes existentes se conservan; la carga se habilitará cuando el taller tenga almacenamiento configurado.' : 'Made to order. Existing images are preserved; uploads will be enabled when storage is configured.'}</p>
+      <ImagePicker value={product.images[0] || ''} language={language} disabled={busy} onChange={image => setValues(current => ({ ...product, ...current, images: image ? [image, ...product.images.slice(1).filter(path => path !== image)] : product.images.slice(1) }))} />
+      <p className="admin-catalog-form__note">{language === 'es' ? 'Se fabrica bajo pedido. Guardá como borrador mientras confirmás material, precio y especificaciones. Elegir una foto no publica el modelo.' : 'Made to order. Save as a draft while confirming material, price and specifications. Selecting a photo does not publish the model.'}</p>
       {error && <p className="admin-catalog-form__error" role="alert">{error}</p>}
       <div className="admin-catalog-form__actions"><Link className="admin-action-secondary" to="/admin/catalogo">{t.cancel}</Link><button className="admin-action-primary" type="submit" disabled={busy}>{busy ? t.saving : t.save}</button></div>
     </form>
@@ -104,6 +108,7 @@ export function AdminCategoriesPage() {
   const [error, setError] = useState('');
   const [draft, setDraft] = useState({ name: '', slug: '' });
   const [editDraft, setEditDraft] = useState({ name: '', slug: '' });
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const usedCategories = useMemo(() => new Set(products.map(product => String(product.categoryId))), [products]);
   const saveCategory = async (event, categoryId = null) => {
     event.preventDefault(); setError('');
@@ -121,9 +126,8 @@ export function AdminCategoriesPage() {
   };
   const remove = async category => {
     if (usedCategories.has(String(category.id))) { setError(t.categoryUsed); return; }
-    if (!window.confirm(t.categoryConfirm)) return;
     setBusy(true); setError('');
-    try { await deleteAdminCategory(category.id); retry(); }
+    try { await deleteAdminCategory(category.id); setDeleteTarget(null); retry(); }
     catch { setError(t.failure); }
     finally { setBusy(false); }
   };
@@ -136,15 +140,15 @@ export function AdminCategoriesPage() {
     <form className="admin-catalog-form__surface admin-category-create" aria-label={t.addCategory} onSubmit={event => saveCategory(event)}>
       <div className="admin-category-create__heading"><span className="admin-eyebrow">01 / {language === 'es' ? 'NUEVA EN EL CATÁLOGO' : 'ADD TO CATALOG'}</span><h2>{t.addCategory}</h2><p>{language === 'es' ? 'Definí un nombre y una referencia para agrupar modelos.' : 'Set a name and reference to group models.'}</p></div>
       <div className="admin-category-create__fields">
-        <label>{t.categoryName}<input value={draft.name} onChange={event => setDraft(current => ({ ...current, name: event.target.value, slug: current.slug || slugify(event.target.value) }))} required /></label>
-        <label>{t.categorySlug}<input value={draft.slug} onChange={event => setDraft(current => ({ ...current, slug: event.target.value }))} required /></label>
+        <label>{t.categoryName}<input value={draft.name} onChange={event => setDraft(current => ({ ...current, name: event.target.value }))} required /></label>
+        <label>{t.categorySlug}<input value={draft.slug || slugify(draft.name)} onChange={event => setDraft(current => ({ ...current, slug: event.target.value }))} required /></label>
         <button className="admin-action-primary" disabled={busy}>{busy ? t.savingCategory : t.addCategory}</button>
       </div>
     </form>
     {error && !editing && <p className="admin-catalog-form__error" role="alert">{error}</p>}
     <div className="admin-category-list">{categories.map((category, index) => <article className="admin-category-row" key={category.id} style={{ '--row-index': index }}>
       <div className="admin-category-row__summary"><span className="admin-eyebrow">{language === 'es' ? 'CATEGORÍA' : 'CATEGORY'} / {String(category.id).toUpperCase()}</span><strong>{category.name}</strong><small>{category.slug} · {products.filter(product => String(product.categoryId) === String(category.id)).length} {language === 'es' ? 'modelos' : 'models'}</small></div>
-      <div className="admin-category-row__actions"><button className="admin-action-secondary" type="button" aria-expanded={editing === category.id} aria-controls={`category-editor-${category.id}`} onClick={() => { setEditing(editing === category.id ? null : category.id); setEditDraft({ name: category.name, slug: category.slug }); setError(''); }}>{editing === category.id ? t.cancel : (language === 'es' ? 'Editar categoría' : 'Edit category')}</button><button className="admin-action-secondary admin-category-delete" type="button" disabled={busy} onClick={() => remove(category)}>{t.deleteCategory}</button></div>
+      <div className="admin-category-row__actions"><button className="admin-action-secondary" type="button" aria-expanded={editing === category.id} aria-controls={`category-editor-${category.id}`} onClick={() => { setEditing(editing === category.id ? null : category.id); setEditDraft({ name: category.name, slug: category.slug }); setError(''); }}>{editing === category.id ? t.cancel : (language === 'es' ? 'Editar categoría' : 'Edit category')}</button><button className="admin-action-secondary admin-category-delete" type="button" disabled={busy} onClick={() => { setError(''); if (usedCategories.has(String(category.id))) { setError(t.categoryUsed); return; } setDeleteTarget(category); }}>{t.deleteCategory}</button></div>
       {editing === category.id && <form id={`category-editor-${category.id}`} className="admin-category-editor" aria-label={`${t.editCategory}: ${category.name}`} onSubmit={event => saveCategory(event, category.id)}>
         <header><div><span className="admin-eyebrow">02 / {language === 'es' ? 'IDENTIDAD DE CATÁLOGO' : 'CATALOG IDENTITY'}</span><h2>{t.editCategory}: {category.name}</h2></div><p>{t.categoryUrlHelp}</p></header>
         <div className="admin-category-editor__body">
@@ -158,5 +162,6 @@ export function AdminCategoriesPage() {
         <footer className="admin-category-editor__actions"><button className="admin-action-secondary" type="button" disabled={busy} onClick={cancelEdit}>{t.cancel}</button><button className="admin-action-primary" disabled={busy}>{busy ? t.savingCategory : t.saveCategory}</button></footer>
       </form>}
     </article>)}</div>
+    {deleteTarget && <CatalogDeleteDialog category name={deleteTarget.name} language={language} busy={busy} error={error} onCancel={() => { setDeleteTarget(null); setError(''); }} onConfirm={() => remove(deleteTarget)} />}
   </section>;
 }

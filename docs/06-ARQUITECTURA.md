@@ -1,6 +1,14 @@
 # Vértice CR — Arquitectura
 
-> Última actualización: **2026-10-01**.
+> Última actualización: **2026-10-03**.
+
+## Biblioteca de imágenes Admin — 2026-10-03
+
+`features/admin/catalogImageLibrary.js` es el manifiesto de 26 archivos locales y sus nombres ES/EN. `ImagePicker` es un control presentacional (value/onChange/disabled), con búsqueda normalizada sin acentos y botones nativos aria-pressed. No sube archivos ni consulta JSON Server. El formulario convierte el cambio de portada en `images`, conserva imágenes secundarias y persiste por adminCatalogService.
+
+`CatalogDeleteDialog` reutiliza Panel modal y el manejo de teclado/foco existente. Los guards siguen en el flujo de servicio/referencias, antes de abrir y antes de confirmar una baja de producto; el diálogo no sustituye reglas de negocio. El disparador explícito evita perder foco por la consulta asíncrona previa.
+
+Las tablas conservan cabeceras/estructura semántica en escritorio; en móvil los td data-label exponen los campos al adaptar las filas, sin duplicar la fuente de datos ni quitar importes.
 
 ## Principio
 
