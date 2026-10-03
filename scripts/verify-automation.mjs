@@ -106,8 +106,8 @@ try {
     }
   }
   const unified = JSON.parse(await readFile('automation/n8n/vertice-cr-unificado.json', 'utf8'));
-  const importable = JSON.parse(await readFile('automation/vertice-n8n-import/n8n/vertice-cr-unificado.json', 'utf8'));
-  assert.deepEqual(importable, unified); assertions++;
+  const legacyImportFiles = await readdir('automation/vertice-n8n-import/n8n').catch(() => []);
+  assert.ok(!legacyImportFiles.includes('vertice-cr-unificado.json')); assertions++;
   const unifiedNames = new Set(unified.nodes.map(node => node.name));
   const unifiedIds = unified.nodes.map(node => node.id);
   assert.equal(unified.active, false); assert.equal(new Set(unifiedIds).size, unifiedIds.length); assertions += 2;

@@ -630,10 +630,11 @@ El workflow importable es único y tiene ramas completas independientes:
 `general → AI Agent público`, `admin → AI Agent Admin` y
 `quote → AI Agent de cotización`. Comparten únicamente la conexión
 `DeepSeek Chat Model`; cada Agent conserva su contexto, prompt, allowlist y HTTP
-Tool con `mode` fijo. El generador `scripts/build-n8n-unified.mjs` también
-sincroniza la copia directa para importar en
-`automation/vertice-n8n-import/n8n/vertice-cr-unificado.json`. Tasas y correo
-son ramas deterministas separadas de los Agents.
+Tool con `mode` fijo. La única fuente oficial del workflow importable es
+`automation/n8n/vertice-cr-unificado.json`, generado por
+`scripts/build-n8n-unified.mjs`. El ZIP de importación es un paquete generado
+desde esa fuente; no existe una segunda copia JSON mantenida a mano. Tasas y
+correo son ramas deterministas separadas de los Agents.
 
 ### Cotizador: dos intenciones y capacidades pendientes (2026-10-02)
 
@@ -737,9 +738,21 @@ Límite: las guardas y persistencia de esta arquitectura académica local proteg
 la lógica funcional; JSON Server/token simulado y la serialización por proceso
 no reemplazan un backend transaccional ni seguridad de producción.
 
-## Compatibilidad del export n8n — 2026-10-03
+## Fuente oficial y compatibilidad del export n8n — 2026-10-03
 
-La corrección del corte 908a285 estaba solo en la copia importable. Se alinean generador, fuente `automation/n8n/vertice-cr-unificado.json` y copia importable con `@n8n/n8n-nodes-langchain.toolHttpRequest` 1.1 para las tres herramientas HTTP. verify-automation exige igualdad de copias y tipo/versión por rol; 201 checks pasan. No cambia credenciales, permisos, prompts ni endpoints; no acredita ejecución en n8n real.
+`automation/n8n/vertice-cr-unificado.json` es la única fuente JSON del
+workflow completo. `scripts/build-n8n-unified.mjs` lo genera a partir de los
+cinco componentes por capacidad; `scripts/package-n8n-import.mjs` crea el ZIP
+de entrega leyendo ese archivo y `automation/n8n/README.md`. Se eliminó la
+copia editable de `automation/vertice-n8n-import/n8n/` para evitar divergencia;
+el verificador ahora falla si reaparece allí otro JSON completo.
+
+Las tres herramientas conservan
+`@n8n/n8n-nodes-langchain.toolHttpRequest` v1.1: el usuario confirmó que carga
+en la instancia n8n local. Esto verifica compatibilidad de tipo/versión, no la
+ejecución del workflow, sus credenciales ni las llamadas a proveedores. La
+prueba local aislada valida estructura/permisos sin enviar correo ni usar APIs
+pagadas; los recorridos reales quedan registrados solo tras evidencia de n8n.
 
 ## Corrección de recorridos y referencias — 2026-10-02
 

@@ -4,7 +4,7 @@
 
 ## Auditoría Admin A3 con render real — 2026-10-03
 
-Se inspeccionaron 78 vistas: 13 rutas/estados en 375, 768 y 1280 px, Dark y Light. Evidencia en `automation/evidence/a3-{vista}-{ancho}-{tema}.png`:
+Se inspeccionaron 78 vistas: 13 rutas/estados en 375, 768 y 1280 px, Dark y Light. Para mantener evidencia útil sin versionar decenas de variantes, el repositorio conserva una captura representativa por pantalla/estado y tema en `automation/evidence/a3-{vista}-1280-{dark,light}.png` (26 archivos). Las capturas de 375/768 px y estados auxiliares quedan en `automation/evidence/_local_archive/`, carpeta local ignorada por Git; no se borraron.
 
 | Vista | Ruta |
 | --- | --- |
@@ -21,7 +21,17 @@ Defectos corregidos y revalidados: título/acciones de Catálogo desbordaban a 3
 
 Estados adicionales: costeo avanzado abierto a 375 Light, búsqueda de fotos vacía, selección con Enter y modal de baja en Dark/Light. Captura enfocada de selector: `a3-image-picker-1280-light.png`; modal de producto: `a-admin-product-delete-confirm.png`. Escape devuelve foco al botón Eliminar tras corregir el disparador asíncrono. CRUD se hizo con datos desechables; no se enviaron correos ni alteraron pedidos originales.
 
-Activity queda fuera de esta matriz por reserva explícita del usuario. Estas capturas no prueban tecnología asistiva real, n8n real, almacenamiento privado o laminado. p2 sigue con placeholder porque su foto registrada falta. Home/HF-01 no se modifican.
+Activity no formó parte de la matriz A3 de 13 vistas. La revisión operativa separada se documenta abajo. Estas capturas no prueban tecnología asistiva real, n8n real, almacenamiento privado o laminado. p2 sigue con placeholder porque su foto registrada falta. Home/HF-01 no se modifican.
+
+### Activity con historial operativo local — 2026-10-03
+
+Se abrió `/admin/actividad` con sesión Admin y JSON Server local. La API devolvió
+tres eventos persistidos (`REQUEST_INCORPORATED`, `REQUEST_REVIEW_STARTED`,
+`REQUEST_AUTO_QUOTED`); la pantalla los ordenó del más reciente al más antiguo,
+mostró transición/actor y permitió abrir la solicitud enlazada. La inspección
+visual y del árbol accesible se hizo en Light, 1280×720. No se generaron eventos
+de prueba ni se alteró la base durante esta revisión; la captura puntual no se
+retuvo como archivo, porque la matriz versionada conserva solo la selección A3.
 
 ## Estado oficial
 

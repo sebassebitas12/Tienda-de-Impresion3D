@@ -12,6 +12,7 @@ dist
 dist-ssr
 coverage
 *.local
+automation/evidence/_local_archive/
 .env
 .env.*
 !.env.example

@@ -320,3 +320,27 @@ redacta la respuesta y no modifica estados ni dispara emails.
 El indicador de ventas cobradas conserva `null` si no existe evidencia. Totales
 del pedido, cotizaciones DEMO, aprobaciones e intenciones de pago no se suman
 como ingreso confirmado.
+
+## Contrato de fuente del workflow y evidencia operativa — 2026-10-03
+
+El export unificado tiene una sola fuente oficial:
+`automation/n8n/vertice-cr-unificado.json`. El generador escribe ahí y el
+empaquetador crea el ZIP de importación desde ese archivo y su README. Se retiró
+la segunda copia JSON de `automation/vertice-n8n-import/n8n/`; el verificador
+comprueba que no vuelva a aparecer. Los nodos HTTP Tool mantienen
+`@n8n/n8n-nodes-langchain.toolHttpRequest` v1.1, compatible con la instancia
+local según la comprobación comunicada por el usuario.
+
+No se consideran probados por esa compatibilidad ni los Agents con DeepSeek,
+las llamadas a herramientas desde la UI, las tasas reales de Hacienda/ARESEP,
+ni el correo Gmail. Registrar recorridos únicamente con ejecución real,
+resultado observable y evidencia sin secretos ni datos de clientes. Para correo,
+usar el modo de prueba solo a la cuenta controlada del usuario y confirmar el
+acuse `messageId` en la app antes de contar un envío como éxito. Activity se
+verifica con un evento operativo legítimo, nunca con filas sembradas para que
+la pantalla parezca poblada.
+
+La revisión local de Activity del 2026-10-03 leyó tres eventos ya persistidos
+desde JSON Server y confirmó su presentación/enlace en Admin (Light, 1280×720).
+No se insertaron filas QA. La matriz visual versionada de `docs/05` no incluye
+una captura adicional de Activity.

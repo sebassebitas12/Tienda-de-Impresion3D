@@ -91,7 +91,11 @@ export function AdminProductFormPage() {
         <label className="admin-catalog-form__wide">{t.description}<textarea name="description" rows="4" value={product.description} onChange={onChange} /></label>
         <label className="admin-catalog-form__check"><input type="checkbox" name="featured" checked={product.featured} onChange={onChange} />{t.featured}</label>
       </div>
-      <ImagePicker value={product.images[0] || ''} language={language} disabled={busy} onChange={image => setValues(current => ({ ...product, ...current, images: image ? [image, ...product.images.slice(1).filter(path => path !== image)] : product.images.slice(1) }))} />
+      <ImagePicker value={product.images[0] || ''} language={language} disabled={busy} onChange={image => setValues(current => {
+        const draft = current || product;
+        const images = draft.images || [];
+        return { ...draft, images: image ? [image, ...images.slice(1).filter(path => path !== image)] : images.slice(1) };
+      })} />
       <p className="admin-catalog-form__note">{language === 'es' ? 'Se fabrica bajo pedido. Guardá como borrador mientras confirmás material, precio y especificaciones. Elegir una foto no publica el modelo.' : 'Made to order. Save as a draft while confirming material, price and specifications. Selecting a photo does not publish the model.'}</p>
       {error && <p className="admin-catalog-form__error" role="alert">{error}</p>}
       <div className="admin-catalog-form__actions"><Link className="admin-action-secondary" to="/admin/catalogo">{t.cancel}</Link><button className="admin-action-primary" type="submit" disabled={busy}>{busy ? t.saving : t.save}</button></div>

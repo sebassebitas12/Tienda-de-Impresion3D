@@ -4,10 +4,11 @@
 
 ## Verificación del handoff A — 2026-10-03
 
-- 25 suites, 135 tests pasan. `adminCatalogForm.test.jsx` agrega 8 regresiones: alta DRAFT sin precio/material, portada elegida, sustitución sin perder secundarias, edición sin perder imágenes, publicación incompleta bloqueada, slug completo/manual, confirmación de categoría, guard de historial y retorno de foco de producto (varias condiciones dentro de cada caso).
+- 25 suites, 136 tests pasan. `adminCatalogForm.test.jsx` cubre alta DRAFT, selección/reemplazo de portada (incluidas dos selecciones consecutivas), conservación de fotos secundarias, publicación incompleta, CRUD y protecciones de categoría/historial/foco.
 - Lint, check:ui y build pasan; aviso de chunk >500 kB sigue presente.
 - check:automation: 201 comprobaciones HTTP/permisos/idempotencia/correo mock/tools/workflows/assets con base aislada, no envíos externos. Se detectó y corrigió divergencia previa entre copias del workflow unificado y su generador; se fijan tipo y versión de tool HTTP en cada rol.
 - Navegador: CRUD completo con registros temporales y guardias; 13 vistas × 3 anchos × 2 temas, evidencia y hallazgos en docs/05. Costeo avanzado abierto y selector por teclado revisados; no sustituye una prueba con lector de pantalla.
+- AdminActivity también fue abierto con Admin y datos actuales de JSON Server: 3 eventos persistidos se renderizaron y enlazaron a su solicitud; verificación visual/AX Light a 1280×720 (sin guardar una captura adicional).
 - Base original sin cambios tras limpiar registros QA. Commit de código `fb44abb` subido a Pruebas; [Verify Pruebas](https://github.com/sebassebitas12/Tienda-de-Impresion3D/actions/runs/37136992470) terminó success para ese SHA. Incluye npm ci, lint, tests, check:ui, check:automation y build.
 
 ## Objetivo
@@ -107,7 +108,10 @@ suites/119 tests, 160 checks de automatización, ESLint, `check:ui`, Vite build 
 diff check pasan. Vite deja una advertencia de bundle principal mayor a 500 kB;
 el build termina correctamente. CI remoto queda pendiente del push de R-H70.
 
-Las capturas `automation/evidence/` documentan el render real de Clientes,
-Pedidos, Categorías y cotizador en vistas estrechas/medias/anchas y Dark/Light.
+Las capturas `automation/evidence/` conservan una vista representativa de cada
+pantalla/estado Admin por tema (26 PNG, 1280 px). La matriz completa de render
+real (375/768/1280 × Dark/Light) y estados auxiliares permanece local en la
+carpeta ignorada `automation/evidence/_local_archive/`; no forma parte del
+repositorio ni se usa como evidencia versionada.
 El workflow GitHub `verify.yml` incluye `check:automation`; el resultado de CI
 solo se conoce después de subir este commit.
