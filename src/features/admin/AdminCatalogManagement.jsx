@@ -1,14 +1,17 @@
-import { useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ErrorState, Skeleton } from '../../components/ui/index.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
 import { useAdminCatalog } from './useAdminCatalog.js';
 import { ImagePicker } from './ImagePicker.jsx';
+import { DEMO_PROFILES } from '../../utils/quoteAutomation.js';
+import { calculateProductDemoPrice } from '../../utils/productDemoPricing.js';
 import { CatalogDeleteDialog } from './CatalogDeleteDialog.jsx';
 import {
   createAdminCategory, createAdminProduct, deleteAdminCategory, updateAdminCategory, updateAdminProduct,
 } from '../../services/adminCatalogService.js';
 import './admin.css';
+import './admin-product-pricing.css';
 
 const materials = ['ASA', 'PLA', 'PETG', 'ABS', 'TPU'];
 const slugify = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -22,23 +25,62 @@ export function AdminProductFormPage() {
   const { language } = usePreferences();
   const t = copy[language] || copy.es;
   const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const { status, products, categories, retry } = useAdminCatalog();
   const existing = products.find(product => String(product.id) === id);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [values, setValues] = useState(null);
+  const [pricingProfileId, setPricingProfileId] = useState('');
+  const [postProcessMinutes, setPostProcessMinutes] = useState(0);
+  const [pricingPreview, setPricingPreview] = useState(null);
+  const [confirmDemoPrice, setConfirmDemoPrice] = useState(false);
   const product = values || (existing ? {
     name: existing.name || '', slug: existing.slug || '', description: existing.description || '', categoryId: existing.categoryId || '',
     price: existing.price ?? '', material: String(existing.material || '').toUpperCase(), colors: (existing.availableColors || []).join(', '),
     dimensions: existing.dimensions || '', weightGrams: existing.weightGrams ?? '', estimatedProductionHours: existing.estimatedProductionHours ?? '',
     status: existing.status || 'ACTIVE', featured: Boolean(existing.featured), images: existing.images || [],
-  } : { name: '', slug: '', description: '', categoryId: '', price: '', material: '', colors: '', dimensions: '', weightGrams: '', estimatedProductionHours: '', status: 'DRAFT', featured: false, images: [] });
+    priceSource: existing.priceSource || 'MANUAL', quotePricing: existing.quotePricing || null,
+  } : { name: '', slug: '', description: '', categoryId: '', price: '', material: '', colors: '', dimensions: '', weightGrams: '', estimatedProductionHours: '', status: 'DRAFT', featured: false, images: [], priceSource: 'MANUAL', quotePricing: null });
   const isEdit = Boolean(id);
   const availableCategories = categories.filter(category => String(category.status || 'ACTIVE').toUpperCase() === 'ACTIVE');
+  useEffect(() => {
+    if (location.hash !== '#cotizador' || status !== 'success') return;
+    const heading = document.getElementById('admin-product-pricing-title');
+    heading?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+    heading?.focus?.({ preventScroll: true });
+  }, [location.hash, status]);
   const onChange = event => {
     const { name, value, checked, type } = event.target;
-    setValues(current => ({ ...product, ...current, [name]: type === 'checkbox' ? checked : value }));
+    setValues(current => {
+      const next = { ...product, ...current, [name]: type === 'checkbox' ? checked : value };
+      if (name === 'price') { next.priceSource = 'MANUAL'; next.quotePricing = null; }
+      else if (['material', 'weightGrams', 'estimatedProductionHours'].includes(name) && next.priceSource === 'DEMO') {
+        next.priceSource = 'NEEDS_RECALCULATION'; next.quotePricing = null;
+      }
+      return next;
+    });
+    if (name === 'price' || ['material', 'weightGrams', 'estimatedProductionHours'].includes(name)) {
+      setPricingPreview(null); setConfirmDemoPrice(false);
+    }
+  };
+  const usePricingProfile = () => {
+    const profile = DEMO_PROFILES.find(item => item.id === pricingProfileId);
+    if (!profile) return;
+    setValues(current => ({ ...product, ...current, weightGrams: profile.weightGrams, estimatedProductionHours: profile.printHours }));
+    setPostProcessMinutes(profile.postProcessMinutes);
+    setPricingPreview(null); setError('');
+  };
+  const calculatePrice = () => {
+    const quote = calculateProductDemoPrice({ material: product.material, weightGrams: product.weightGrams, printHours: product.estimatedProductionHours, postProcessMinutes });
+    if (!quote) { setError(language === 'es' ? 'Elegí material y completá gramos y horas de impresión mayores que cero.' : 'Choose a material and enter weight and print hours greater than zero.'); return; }
+    setPricingPreview(quote); setError('');
+  };
+  const applyDemoPrice = () => {
+    if (!pricingPreview) return;
+    setValues(current => ({ ...product, ...current, price: String(pricingPreview.breakdown.amountCrc), priceSource: 'DEMO', quotePricing: pricingPreview }));
+    setConfirmDemoPrice(false); setError('');
   };
   const save = async event => {
     event.preventDefault(); setError('');
@@ -47,6 +89,8 @@ export function AdminProductFormPage() {
     const invalidPrice = product.price !== '' && (!Number.isFinite(Number(product.price)) || Number(product.price) < 0);
     const invalidMaterial = product.material !== '' && !materials.includes(product.material);
     if (!product.name.trim() || !slug || !product.categoryId || (!isDraft && (product.price === '' || !Number.isFinite(Number(product.price)) || Number(product.price) < 0 || !materials.includes(product.material))) || (isDraft && (invalidPrice || invalidMaterial)) || !['ACTIVE', 'INACTIVE', 'DRAFT'].includes(product.status) || [product.weightGrams, product.estimatedProductionHours].some(value => value !== '' && (!Number.isFinite(Number(value)) || Number(value) < 0))) { setError(t.required); return; }
+    if (product.status === 'ACTIVE' && product.priceSource === 'DEMO' && !confirmDemoPrice) { setError(language === 'es' ? 'Confirmá que revisaste el precio DEMO antes de publicarlo.' : 'Confirm that you reviewed the DEMO price before publishing.'); return; }
+    if (product.status === 'ACTIVE' && product.priceSource === 'NEEDS_RECALCULATION') { setError(language === 'es' ? 'Cambiaste datos del cálculo; volvé a calcular la sugerencia o escribí un precio manual.' : 'You changed inputs; recalculate the suggestion or enter a manual price.'); return; }
     const collision = products.some(item => String(item.id) !== id && (slugify(item.slug || '') === slug || item.name.trim().toLocaleLowerCase() === product.name.trim().toLocaleLowerCase()));
     if (collision) { setError(t.duplicate); return; }
     setBusy(true);
@@ -58,6 +102,8 @@ export function AdminProductFormPage() {
       weightGrams: product.weightGrams === '' ? null : Number(product.weightGrams),
       estimatedProductionHours: product.estimatedProductionHours === '' ? null : Number(product.estimatedProductionHours),
       status: product.status, featured: Boolean(product.featured), updatedAt: now,
+      priceSource: product.priceSource || 'MANUAL', quotePricing: product.priceSource === 'DEMO' ? product.quotePricing : null,
+      priceConfirmation: product.priceSource === 'DEMO' && confirmDemoPrice ? { mode: 'DEMO', confirmedAt: now } : null,
       images: product.images,
       ...(existing ? {} : { createdAt: now }),
     };
@@ -91,6 +137,20 @@ export function AdminProductFormPage() {
         <label className="admin-catalog-form__wide">{t.description}<textarea name="description" rows="4" value={product.description} onChange={onChange} /></label>
         <label className="admin-catalog-form__check"><input type="checkbox" name="featured" checked={product.featured} onChange={onChange} />{t.featured}</label>
       </div>
+      <section id="cotizador" className="admin-product-pricing" aria-labelledby="admin-product-pricing-title">
+        <header><span className="admin-eyebrow">PRECIO / SIMULACIÓN DE TALLER</span><h2 id="admin-product-pricing-title" tabIndex="-1">{language === 'es' ? 'Calculá una sugerencia para esta pieza.' : 'Calculate a suggested price for this part.'}</h2>
+          <p>{language === 'es' ? 'Ingresá peso y tiempo del laminador o cargá un perfil análogo como punto de partida. Nunca estimamos esos datos a partir de la foto.' : 'Enter slicer weight and time, or load an analogue profile as a starting point. We never infer these values from the photo.'}</p></header>
+        <div className="admin-product-pricing__controls">
+          <label>{language === 'es' ? 'Referencia de cálculo · DEMO' : 'Calculation reference · DEMO'}<select value={pricingProfileId} onChange={event => setPricingProfileId(event.target.value)}><option value="">{language === 'es' ? 'Elegir perfil análogo' : 'Choose analogue profile'}</option>{DEMO_PROFILES.map(profile => <option key={profile.id} value={profile.id}>{profile.name} · DEMO</option>)}</select></label>
+          <button className="admin-action-secondary" type="button" onClick={usePricingProfile} disabled={!pricingProfileId}>{language === 'es' ? 'Usar peso/tiempo análogos' : 'Use analogue weight/time'}</button>
+          <label>{language === 'es' ? 'Postprocesado por unidad (min)' : 'Post-processing per unit (min)'}<input type="number" min="0" step="1" value={postProcessMinutes} onChange={event => { setPostProcessMinutes(event.target.value); setPricingPreview(null); }} /></label>
+          <button className="admin-action-primary" type="button" onClick={calculatePrice}>{language === 'es' ? 'Calcular sugerencia DEMO' : 'Calculate DEMO suggestion'} ↗</button>
+        </div>
+        {product.priceSource === 'NEEDS_RECALCULATION' && <p className="admin-product-pricing__warning" role="status">{language === 'es' ? 'Cambiaste material, peso u horas después del cálculo. Recalculá antes de publicar.' : 'Material, weight or time changed after the calculation. Recalculate before publishing.'}</p>}
+        {pricingPreview && <div className="admin-product-pricing__result" aria-live="polite"><div><span className="admin-eyebrow">RESULTADO DEMO · CRC</span><strong>{new Intl.NumberFormat(language === 'es' ? 'es-CR' : 'en-CR', { style: 'currency', currency: 'CRC', maximumFractionDigits: 0 }).format(pricingPreview.breakdown.amountCrc)}</strong><p>{language === 'es' ? 'Sugerencia con los gramos/horas ingresados y supuestos internos DEMO. Verificá el laminador y los costos reales antes de decidir el precio.' : 'Suggested from entered grams/hours and internal DEMO assumptions. Verify slicer output and actual costs before setting a price.'}</p></div><dl>{[['Material', 'materialCrc'], [language === 'es' ? 'Desgaste' : 'Wear', 'wearCrc'], [language === 'es' ? 'Electricidad' : 'Electricity', 'electricityCrc'], [language === 'es' ? 'Postprocesado' : 'Post-processing', 'postProcessCrc']].map(([label, key]) => <div key={key}><dt>{label}</dt><dd>{new Intl.NumberFormat(language === 'es' ? 'es-CR' : 'en-CR', { style: 'currency', currency: 'CRC', maximumFractionDigits: 0 }).format(pricingPreview.breakdown[key])}</dd></div>)}</dl><button className="admin-action-primary" type="button" onClick={applyDemoPrice}>{language === 'es' ? 'Aplicar sugerencia al borrador' : 'Apply suggestion to draft'}</button></div>}
+        {product.priceSource === 'DEMO' && product.status === 'ACTIVE' && <label className="admin-product-pricing__confirm"><input type="checkbox" checked={confirmDemoPrice} onChange={event => setConfirmDemoPrice(event.target.checked)} />{language === 'es' ? 'Revisé esta sugerencia DEMO y decido publicarla como precio del catálogo.' : 'I reviewed this DEMO suggestion and choose to publish it as the catalog price.'}</label>}
+        <p className="admin-product-pricing__footnote">{language === 'es' ? 'DEMO: tipo de cambio, filamento, desgaste, energía y mano de obra son supuestos orientativos, no una tarifa vigente del taller. Podés escribir un precio manual en el campo superior.' : 'DEMO: exchange rate, filament, wear, electricity and labor are assumptions, not current workshop rates. You can enter a manual price above.'}</p>
+      </section>
       <ImagePicker value={product.images[0] || ''} language={language} disabled={busy} onChange={image => setValues(current => {
         const draft = current || product;
         const images = draft.images || [];

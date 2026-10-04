@@ -32,6 +32,11 @@ const connectAi = (from, type, to) => {
 
 // Each product entry has its own fixed-role prompt, native Agent, and tool boundary.
 const agentLabels = { general: 'público', admin: 'Admin', quote: 'cotización' };
+const toolDescriptions = {
+  general: `Herramienta del asistente público: ${ROLE_TOOLS.general.join(', ')}. Úsala solo para buscar modelos publicados o consultar una recomendación de material/proceso; no para definiciones generales, no repitas llamadas y no edita registros ni envía mensajes.`,
+  admin: `Herramienta del asistente Admin: ${ROLE_TOOLS.admin.join(', ')}. Consulta únicamente el alcance autorizado por Vértice; no edita registros ni envía mensajes.`,
+  quote: 'Herramienta del asistente de cotización: material_guide, explain_process. Solo consulta la guía de materiales/proceso; no calcula precios, no consulta datos de Admin, no crea solicitudes ni envía mensajes.',
+};
 for (const [index, mode] of assistantModes.entries()) {
   const row = index;
   const y = 430 + row * 250;
@@ -57,7 +62,7 @@ return [{json:{mode,toolCapability:body.toolCapability,toolEndpointUrl:body.tool
     name: agentName, id: `vertice-ai-agent-${mode}`, type: '@n8n/n8n-nodes-langchain.agent', typeVersion: 2.2,
     position: [790, y], parameters: {
       promptType: 'define', text: '={{ $json.agentInput }}',
-      options: { systemMessage: '={{ $json.systemPrompt }}', maxIterations: 4, returnIntermediateSteps: false },
+      options: { systemMessage: '={{ $json.systemPrompt }}', maxIterations: mode === 'quote' ? 3 : 4, returnIntermediateSteps: false },
       hasOutputParser: false,
     },
   });
@@ -67,8 +72,13 @@ return [{json:{mode,toolCapability:body.toolCapability,toolEndpointUrl:body.tool
     position: [790, y + 150], parameters: {
       method: 'POST', url: `={{ $('${prepareName}').first().json.toolEndpointUrl }}`,
       sendHeaders: false,
-      sendBody: true, specifyBody: 'json', jsonBody: `={{ ({ capability: $('${prepareName}').first().json.toolCapability, mode: '${mode}', name: $fromAI('tool_name', 'Nombre exacto de una herramienta permitida para ${mode}: ${ROLE_TOOLS[mode].join(', ')}', 'string'), args: $fromAI('tool_args', 'Argumentos JSON de esa herramienta; usa un objeto vacío cuando no requiera argumentos.', 'json') }) }}`,
-      toolDescription: `Herramienta del asistente ${agentLabels[mode]}: ${ROLE_TOOLS[mode].join(', ')}. Ejecuta consultas/cálculos autorizados por Vértice; no edita registros ni envía mensajes.`,
+      sendBody: true, specifyBody: 'json',
+      jsonBody: `={{ JSON.stringify({ capability: $('${prepareName}').first().json.toolCapability, mode: '${mode}', name: '{tool_name}', args: '__VERTICE_ARGS__' }).replace('"__VERTICE_ARGS__"', '{tool_args}') }}`,
+      placeholderDefinitions: { values: [
+        { name: 'tool_name', description: `Nombre exacto de una herramienta permitida para ${mode}: ${ROLE_TOOLS[mode].join(', ')}`, type: 'string' },
+        { name: 'tool_args', description: 'Argumentos JSON de esa herramienta; usa un objeto vacío cuando no requiera argumentos.', type: 'json' },
+      ] },
+      toolDescription: toolDescriptions[mode],
       options: { timeout: 12000 },
     },
   });
@@ -77,23 +87,27 @@ return [{json:{mode,toolCapability:body.toolCapability,toolEndpointUrl:body.tool
 }
 
 nodes.push({
-  name: 'DeepSeek Chat Model', id: 'deepseek-chat-model', type: '@n8n/n8n-nodes-langchain.lmChatDeepSeek', typeVersion: 1,
+  name: 'OpenRouter Chat Model', id: 'openrouter-chat-model', type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter', typeVersion: 1,
   position: [470, 1160], parameters: {
-    model: 'deepseek-flash',
+    model: 'nvidia/nemotron-3-ultra-550b-a55b:free',
     options: { temperature: 0.2, maxTokens: 1600, timeout: 40000, maxRetries: 1 },
   },
 });
-connections['DeepSeek Chat Model'] = { ai_languageModel: [[...assistantModes.map((mode) => ({ node: `AI Agent — ${agentLabels[mode]}`, type: 'ai_languageModel', index: 0 }))]] };
+connections['OpenRouter Chat Model'] = { ai_languageModel: [[...assistantModes.map((mode) => ({ node: `AI Agent — ${agentLabels[mode]}`, type: 'ai_languageModel', index: 0 }))]] };
 
 const normalizeName = 'Validar respuesta del asistente';
 nodes.push({
   name: normalizeName, id: 'normalize-ai-response', type: 'n8n-nodes-base.code', typeVersion: 2,
   position: [1120, 680], parameters: { mode: 'runOnceForAllItems', jsCode: `const raw = $input.first().json.output ?? $input.first().json.text;
 if (typeof raw !== 'string' || !raw.trim()) throw new Error('El Agent no devolvió una respuesta');
+if (/agent stopped due to max iterations/i.test(raw)) return [{json:{output:{error:'ASSISTANT_ITERATION_LIMIT'}}}];
 let output;
-try { output = JSON.parse(raw); } catch { output = {reply:raw,links:[]}; }
+const normalized = raw.trim().replace(/^\x60\x60\x60(?:json)?\\s*/i,'').replace(/\\s*\x60\x60\x60$/,'');
+try { output = JSON.parse(normalized); } catch { output = {reply:raw,links:[]}; }
+if (output?.error === 'ASSISTANT_ITERATION_LIMIT') return [{json:{output:{error:output.error}}}];
 if (!output || typeof output.reply !== 'string' || !output.reply.trim() || output.reply.length > 5000 || !Array.isArray(output.links)) throw new Error('Formato de respuesta inválido');
-return [{json:{output:{reply:output.reply.trim(),links:output.links.filter(link => link && typeof link.label === 'string' && typeof link.path === 'string').slice(0,4)}}}];` },
+const draft = output.requestDraft && typeof output.requestDraft === 'object' && !Array.isArray(output.requestDraft) ? output.requestDraft : null;
+return [{json:{output:{reply:output.reply.trim(),links:output.links.filter(link => link && typeof link.label === 'string' && typeof link.path === 'string').slice(0,4),requestDraft:draft}}}];` },
 });
 
 const rateWebhook = rates.nodes.find((node) => node.type.endsWith('.webhook'));
@@ -118,7 +132,7 @@ connectMain(emailNames.get('Enviar correo al cliente + copia oculta'), emailName
 
 nodes.push({ name: 'Mapa del flujo', id: 'unified-setup-guide', type: 'n8n-nodes-base.stickyNote', typeVersion: 1, position: [160, 30], parameters: {
   width: 1220, height: 330,
-  content: `# Vértice CR · Automatizaciones conectadas\n\n## Tres asistentes independientes\n**General:** webhook → contexto general → AI Agent público → respuesta. **Admin:** webhook → contexto Admin → AI Agent Admin → respuesta. **Cotización:** webhook → contexto de cotización → AI Agent de cotización → respuesta. Cada agente tiene instrucciones, permisos y herramienta HTTP propios. Comparten solo la conexión de modelo **DeepSeek Chat Model**; el servidor vuelve a validar rol y argumentos. Los botones ya existen en Home/Tienda, Admin protegido y /solicitud.\n\nLa herramienta llama al dispatcher Vértice con una capacidad temporal; no se transmite JWT ni se da acceso directo a JSON Server. El historial lo aporta la app.\n\n## Procesos deterministas\n**Tasas:** webhook → Hacienda → ARESEP → recorte/validación. **Correo:** webhook → validar → Gmail → confirmar messageId. Los agentes no controlan envíos ni inventan tarifas.\n\n## Credenciales y conexión\nSelecciona Header Auth «X-Vertice-Webhook-Token» en los 5 webhooks, credencial **DeepSeek API** en el Chat Model y **Gmail OAuth2** en el nodo Gmail. Configura las 3 URLs de webhook y VERTICE_ASSISTANT_TOOLS_URL en el backend. Si n8n corre en Docker, la URL de callback debe alcanzar el host del backend (por ejemplo host.docker.internal); no uses localhost para salir del contenedor.\n\nWorkflow inactivo al importar. Costos de cotización DEMO; las tasas oficiales no vuelven reales materiales, energía ni mano de obra.`
+  content: `# Vértice CR · Automatizaciones conectadas\n\n## Tres asistentes independientes\n**General:** webhook → contexto general → AI Agent público → respuesta. **Admin:** webhook → contexto Admin → AI Agent Admin → respuesta. **Cotización:** webhook → contexto de cotización → AI Agent de cotización → respuesta. Cada agente tiene instrucciones, permisos y herramienta HTTP propios. Comparten solo la conexión de modelo **OpenRouter Chat Model**; el servidor vuelve a validar rol y argumentos. Los botones ya existen en Home/Tienda, Admin protegido y /solicitud.\n\nLa herramienta llama al dispatcher Vértice con una capacidad temporal; no se transmite JWT ni se da acceso directo a JSON Server. El historial lo aporta la app.\n\n## Procesos deterministas\n**Tasas:** webhook → Hacienda → ARESEP → recorte/validación. **Correo:** webhook → validar → Gmail → confirmar messageId. Los agentes no controlan envíos ni inventan tarifas.\n\n## Credenciales y conexión\nSelecciona Header Auth «X-Vertice-Webhook-Token» en los 5 webhooks, credencial **OpenRouter** en el Chat Model y **Gmail OAuth2** en el nodo Gmail. El modelo guardado es nvidia/nemotron-3-ultra-550b-a55b:free, probado con una llamada a herramienta en el n8n local; el ID de modelo gratuito puede cambiar o dejar de estar disponible. Las credenciales no se incluyen en el JSON. Configura las 3 URLs de webhook y VERTICE_ASSISTANT_TOOLS_URL en el backend. Si n8n corre en Docker, la URL de callback debe alcanzar el host del backend (por ejemplo host.docker.internal); no uses localhost para salir del contenedor.\n\nWorkflow inactivo al importar. Costos de cotización DEMO; las tasas oficiales no vuelven reales materiales, energía ni mano de obra.`
 } });
 
 const unified = { name: 'Vértice CR — Agentes y automatizaciones', nodes, connections, active: false,
@@ -127,4 +141,4 @@ const ids = nodes.map((node) => node.id);
 const names = nodes.map((node) => node.name);
 if (new Set(ids).size !== ids.length || new Set(names).size !== names.length) throw new Error('El workflow debe tener IDs y nombres únicos.');
 await writeFile(resolve(directory, 'vertice-cr-unificado.json'), `${JSON.stringify(unified, null, 2)}\n`);
-console.log(`Generado workflow n8n unificado: ${nodes.length} nodos, Agent nativo, DeepSeek, dispatcher seguro y 5 entradas.`);
+console.log(`Generado workflow n8n unificado: ${nodes.length} nodos, tres Agents, OpenRouter, dispatcher seguro y 5 entradas.`);

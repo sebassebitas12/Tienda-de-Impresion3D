@@ -13,6 +13,7 @@ import { AdminOrderDetailPage, AdminOrdersPage } from '../../features/admin/Admi
 import { AdminCatalogDetailPage, AdminCatalogPage } from '../../features/admin/AdminCatalog.jsx';
 import { AdminCategoriesPage, AdminProductFormPage } from '../../features/admin/AdminCatalogManagement.jsx';
 import { AdminCustomerDetailPage, AdminCustomersPage } from '../../features/admin/AdminCustomers.jsx';
+import { AdminAssistantPage } from '../../features/admin/AdminAssistantPage.jsx';
 import { NotFoundPage } from '../../pages/NotFoundPage.jsx';
 import { RouteErrorPage } from '../../pages/RouteErrorPage.jsx';
 import { CartPage, CatalogPage, ProductPage } from '../../pages/Shop.jsx';
@@ -41,6 +42,7 @@ const adminRoutePages = adminPages.map(([path, titleKey]) => ({
         : path === '/admin/actividad' ? <AdminActivityPage />
         : path === '/admin/clientes' ? <AdminCustomersPage />
         : path === '/admin/clientes/:id' ? <AdminCustomerDetailPage />
+        : path === '/admin/asistente' ? <AdminAssistantPage />
         : path === '/admin/solicitudes' ? <AdminRequestsPage />
       : path === '/admin/solicitudes/:id' ? <AdminRequestDetailPage />
         : <ConstructionPage titleKey={titleKey} />,

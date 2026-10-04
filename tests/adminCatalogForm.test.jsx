@@ -80,6 +80,12 @@ describe('Categorías y bajas confirmadas', () => {
     expect(trigger).toHaveFocus();
     expect(deleteAdminProduct).not.toHaveBeenCalled();
   });
+
+  it('ofrece un acceso directo al cotizador DEMO de la pieza seleccionada', async () => {
+    render(<PreferencesProvider><MemoryRouter initialEntries={['/admin/catalogo/p7']}><Routes><Route path="/admin/catalogo/:id" element={<AdminCatalogDetailPage />} /></Routes></MemoryRouter></PreferencesProvider>);
+    await screen.findByRole('heading', { name: 'Base para control' });
+    expect(screen.getByRole('link', { name: 'Calcular precio DEMO' })).toHaveAttribute('href', '/admin/catalogo/p7/editar#cotizador');
+  });
 });
 afterEach(cleanup);
 
@@ -131,5 +137,28 @@ describe('Fotos y publicación del formulario Admin', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Guardar modelo' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Completa los campos obligatorios');
     expect(updateAdminProduct).not.toHaveBeenCalled();
+  });
+
+  it('calcula precio de catálogo con entradas explícitas y exige confirmar una sugerencia DEMO al publicar', async () => {
+    openForm();
+    await screen.findByRole('heading', { name: 'Nuevo modelo' });
+    fireEvent.change(screen.getByLabelText('Nombre', { exact: true }), { target: { value: 'Soporte de teléfono' } });
+    fireEvent.change(screen.getByLabelText('Categoría', { exact: true }), { target: { value: 'c1' } });
+    fireEvent.change(screen.getByLabelText('Material FDM'), { target: { value: 'PETG' } });
+    fireEvent.change(screen.getByLabelText('Peso (g)'), { target: { value: '45' } });
+    fireEvent.change(screen.getByLabelText('Horas estimadas de producción'), { target: { value: '2' } });
+    fireEvent.click(screen.getByRole('button', { name: /Calcular sugerencia DEMO/ }));
+    expect(await screen.findByText(/RESULTADO DEMO/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Aplicar sugerencia al borrador' }));
+    expect(Number(screen.getByLabelText('Precio publicado (₡)').value)).toBeGreaterThan(0);
+    fireEvent.change(screen.getByLabelText('Publicación'), { target: { value: 'ACTIVE' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar modelo' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Confirmá que revisaste el precio DEMO');
+    fireEvent.click(screen.getByRole('checkbox', { name: /Revisé esta sugerencia DEMO/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar modelo' }));
+    await waitFor(() => expect(createAdminProduct).toHaveBeenCalledWith(expect.objectContaining({
+      status: 'ACTIVE', priceSource: 'DEMO', quotePricing: expect.objectContaining({ mode: 'DEMO' }),
+      priceConfirmation: expect.objectContaining({ mode: 'DEMO' }),
+    })));
   });
 });

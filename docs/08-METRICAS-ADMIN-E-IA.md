@@ -301,6 +301,14 @@ El action de envío confirmado registra `REQUEST_QUOTE_EMAIL_SENT` en
 pago ni ingresos. Sin confirmación del webhook, la solicitud queda `QUOTED` y no
 se registra envío.
 
+La aprobación pertenece a la app, no al correo. Tras aprobar el cliente, el
+comportamiento deseado es enviarle confirmación y notificar al taller con el
+alcance aprobado, indicando si todavía falta pago. Los avances se enviarán al
+cliente solo a partir de cambios de etapa de un pedido persistidos y deduplicados.
+Esto aún no existe en n8n ni en Admin; el correo de prueba `UNKNOWN` no se reintenta
+hasta verificarlo junto con el usuario y usar la cuenta de prueba de cliente que
+él defina.
+
 ## Flujo Admin funcional y tres bots (2026-10-02)
 
 Admin puede cotizar automáticamente perfiles conocidos desde imágenes públicas;
@@ -362,3 +370,83 @@ La revisión local de Activity del 2026-10-03 leyó tres eventos ya persistidos
 desde JSON Server y confirmó su presentación/enlace en Admin (Light, 1280×720).
 No se insertaron filas QA. La matriz visual versionada de `docs/05` no incluye
 una captura adicional de Activity.
+
+### Estado actual de asistentes y correo — 2026-10-03
+
+El workflow publicado usa OpenRouter en los tres Agents. Desde la UI pública se
+comprobaron respuesta normal, consulta autorizada de `material_guide` para PETG
+y rechazo de una instrucción de revelar datos internos. El rol de cotización ya
+tenía esas tres pruebas reales en sus ejecuciones #22–24. Una invocación general
+con argumentos de comparación no admitidos fue rechazada por el validador como
+`TOOL_ARGUMENTS_INVALID`; la llamada válida posterior sí tuvo salida del
+dispatcher. El Admin UI todavía no supera la guarda del servidor (`ROLE_REQUIRED`),
+así que el Agent Admin no se ha probado desde React en este corte.
+
+La vista Admin fallida estaba en `127.0.0.1:5174`, distinta del origen público
+`localhost:5173`; sus sesiones de `localStorage` no se comparten. La causa del
+rechazo no está determinada y no se debe eludir la guarda. También se retiró el
+fallback silencioso a `DEMO_RULES`: el backend diferencia n8n caído, timeout y
+respuesta inválida. Jest prueba los códigos, los mensajes accesibles de
+`AssistantPanel` y HTTP simulado; falta observar esos fallos en navegador real.
+
+Los estados loading sí se observaron durante consultas. Error de proveedor
+caído, timeout y JSON inválido permanecen pendientes de recorrido real de UI;
+los tests locales no sustituyen esas pruebas. Hacienda y ARESEP respondieron en
+ejecuciones de tasas anteriores, sin tarifa exacta para el taller. B2 sigue
+`UNKNOWN`: la búsqueda reciente en Enviados para asuntos `DEMO`/`PRUEBA` no halló
+coincidencia y no se identificó una ejecución de correo; no reenviar hasta
+reconciliar Gmail/n8n. El modelo externo no convierte una estimación DEMO en
+precio real del taller.
+
+## Tres asistentes por contexto y precio de ficha — 2026-10-03
+
+El asistente público, el copiloto Admin y la ayuda de cotización tienen prompts,
+tools y permisos distintos y comparten OpenRouter como proveedor. El copiloto
+Admin vive en una ruta/página del Admin, solo lectura; no reutiliza el drawer de
+Home. `ROLE_REQUIRED` significa que la API rechazó la sesión y debe permanecer
+bloqueado; la UI ofrece reautenticación en el mismo origen sin cambiar guardas.
+
+La ayuda de cotización ya no estima ni guarda una cotización desde el diálogo.
+Devuelve un `requestDraft` limitado por esquema; el usuario edita/revisa campos
+y manda un intake `PENDING_QUOTE` con adjuntos. El agente tiene cuatro
+iteraciones máximas (hasta tres llamadas temporales y una respuesta final) y
+herramientas únicamente de guía de material/proceso; no tiene permisos de
+cálculo, catálogo Admin o envío. Un tope agotado se expone como error
+`ASSISTANT_ITERATION_LIMIT`, no como texto de respuesta al cliente.
+
+El editor de producto Admin añade un calculador separado de precio de catálogo.
+Recibe peso/horas explícitos o análogos marcados DEMO, material y postproceso;
+no deduce los datos de imágenes. Aplica el monto al borrador, conserva desglose y
+exige confirmación antes de publicar una sugerencia DEMO.
+
+OpenRouter es el único proveedor de modelo elegido; no se requiere una clave de
+DeepSeek. El copiloto Admin vive en `/admin/asistente`, separado del widget
+público. Un `ROLE_REQUIRED` conserva el guard y pide reautenticarse en el mismo
+origen; la página de chat no elimina la autorización.
+
+### Regresión UX/lógica observada en navegador — R-H72, 2026-10-03
+
+Enter sí entregó dos instrucciones locales de preparación al intake: la primera
+armó el resumen sin llamar n8n; la siguiente completó largo/ancho/cantidad/
+material en campos. Se corrigió la contaminación del nombre de pieza por la
+frase «para revisarlo». La prueba live de orientación comparativa continuó
+usando el runtime antiguo y agotó iteraciones, por lo que no se considera
+resuelta en la instancia activa. El API local ahora clasifica esa frase de error
+y sirve orientación determinista desde la guía del taller; falta reiniciar el
+proceso API y repetir en navegador.
+
+El copiloto Admin permanece diseñado como página autónoma fuera del shell
+público. En esta sesión el guard redirigió a login antes de poder capturarla; no
+se relajó rol ni se reutilizó el chat flotante. «Cotizar DEMO» se añadió a cada
+fila del Catálogo como acceso directo a su calculador. Ni la página del copiloto
+ni ese CTA fueron visualmente inspeccionados en una sesión Admin en este corte.
+OpenRouter es el único proveedor elegido; no configurar DeepSeek.
+
+Verificación local del corte: lint, Jest (31 suites/177 tests), `check:ui`,
+`check:automation` (248 comprobaciones), `build:n8n`, build y `git diff --check`
+pasan. El build mantiene aviso de chunk >500 kB. En el cotizador se comprobó a
+un viewport de ~1265×710 que Enter actualiza el resumen y las medidas no envían
+la solicitud; no equivale a una matriz responsive ni prueba el render de la
+respuesta de materiales con el API actualizado. La página Admin sigue pendiente
+de captura con sesión válida: su separación respecto del chat Home está
+confirmada en rutas/componentes, no en una auditoría visual autenticada.

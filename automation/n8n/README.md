@@ -4,7 +4,7 @@
 
 Importa **solo `vertice-cr-unificado.json`**. En n8n: **Workflows → Import from File** y selecciona ese JSON. No importes por separado los archivos `vertice-assistant-*.json`, `vertice-rates.json` ni `vertice-quote-email.json`; son componentes internos usados para generar y verificar el workflow unificado.
 
-El canvas trae cinco entradas Webhook dentro del mismo workflow: asistente general, asistente Admin, asistente de cotización, tasas y correo de cotización. Los tres chatbots siguen tres ramas completas: cada una tiene su contexto fijo, su **AI Agent nativo**, sus permisos y su HTTP Request Tool. El chat general corresponde al botón flotante de la tienda, Admin al botón visible dentro del panel protegido y cotización al botón de `/solicitud`. Los tres Agents comparten únicamente el nodo/credencial **DeepSeek Chat Model**; nunca convergen en un solo Agent. La herramienta de cada rama llama a la API Vértice con una capacidad aleatoria y temporal. La API limita el rol, valida el nombre y argumentos de cada herramienta y ejecuta solo lectura/cálculo; no se entrega el JWT académico a n8n ni se habilita acceso directo a JSON Server. El historial viene acotado desde la app, por lo que no se duplica memoria. Tasas y Gmail son ramas deterministas separadas; los Agents no deciden envíos ni fuentes de tarifas.
+El canvas trae cinco entradas Webhook dentro del mismo workflow: asistente general, asistente Admin, asistente de cotización, tasas y correo de cotización. Los tres chatbots siguen tres ramas completas: cada una tiene su contexto fijo, su **AI Agent nativo**, sus permisos y su HTTP Request Tool. El chat general corresponde al botón flotante de la tienda, Admin a una página de asistencia operativa dentro del panel protegido y cotización al flujo de solicitud. Los tres Agents comparten únicamente el nodo/credencial **OpenRouter Chat Model**; nunca convergen en un solo Agent. No se necesita una clave de DeepSeek. La herramienta de cada rama llama a la API Vértice con una capacidad aleatoria y temporal. La API limita el rol, valida el nombre y argumentos de cada herramienta y ejecuta solo lectura/cálculo; no se entrega el JWT académico a n8n ni se habilita acceso directo a JSON Server. El historial viene acotado desde la app, por lo que no se duplica memoria. Tasas y Gmail son ramas deterministas separadas; los Agents no deciden envíos ni fuentes de tarifas.
 
 El JSON no incluye secretos ni permisos de cuentas. Tras importarlo, asigna las credenciales indicadas abajo en los nodos correspondientes. El workflow se importa inactivo; no lo publiques/actives hasta conectar las credenciales y poner las URLs correctas en el `.env` del backend.
 
@@ -23,9 +23,9 @@ node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
 
 Pon ese mismo valor en `VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN` en `.env` y en la credencial Header Auth de n8n. No reutilices el valor de ejemplo ni guardes el secreto en Git, React, capturas o mensajes. Reinicia la API después de guardar `.env`.
 
-## 2. DeepSeek para los tres asistentes
+## 2. OpenRouter para los tres asistentes
 
-Abre el nodo **DeepSeek Chat Model** y crea una credencial de tipo **DeepSeek API** con la API key de tu cuenta. Los tres Agents consumen esta conexión compartida; no hace falta crear tres credenciales. Selecciona un modelo que aparezca disponible para tu cuenta en el selector de n8n. Cada Agent tiene instrucciones, herramientas y un máximo de cuatro iteraciones propios.
+Abre el nodo **OpenRouter Chat Model** y selecciona la credencial OpenRouter que ya configuraste en n8n. Los tres Agents comparten esta credencial. El modelo incluido actualmente es `nvidia/nemotron-3-ultra-550b-a55b:free`; un plan/modelo gratuito puede variar en disponibilidad, límites y compatibilidad con herramientas. El agente de cotización tiene un máximo de dos iteraciones para evitar ciclos de entrevista; general y Admin conservan cuatro. No pegues la API key en este README, el repo, React ni `.env`.
 
 ## 3. Gmail para el correo de cotización
 
@@ -57,9 +57,9 @@ El Webhook de tasas también usa la credencial Header Auth compartida. Hacienda 
 1. Importa el JSON unificado y asigna las tres credenciales anteriores.
 2. Configura `.env`, revisa las cinco URLs y reinicia `npm run api`.
 3. Activa/publica **el único workflow**. Las rutas de producción son las indicadas arriba.
-4. Prueba los tres asistentes desde las áreas de la app que corresponden a cada rol. Revisa la ejecución del Webhook y del nodo DeepSeek en **Executions** de n8n.
+4. Prueba los tres asistentes desde las áreas de la app que corresponden a cada rol. Revisa la ejecución del Webhook y del nodo OpenRouter Chat Model en **Executions** de n8n.
 5. En Admin abre una solicitud demo y calcula la cotización marcada DEMO.
 6. Para probar Gmail, usa **Probar correo conmigo** con tu propia dirección. Esto envía un correo real a esa dirección, identificado como `[DEMO] [PRUEBA]`; no debe enviarse al cliente ni avanzar el estado.
 7. Revisa el correo recibido y la ejecución de **Enviar correo al cliente + copia oculta**. Si la respuesta del proveedor falla, no repitas el envío hasta revisar la ejecución para evitar duplicados.
 
-No uses información privada de clientes durante estas pruebas. Las pruebas automatizadas locales simulan DeepSeek/Gmail y no llaman servicios externos.
+No uses información privada de clientes durante estas pruebas. Las pruebas automatizadas locales simulan OpenRouter/Gmail y no llaman servicios externos.

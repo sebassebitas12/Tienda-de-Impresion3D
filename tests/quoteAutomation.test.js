@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, jest, test } from '@jest/globals';
 import { calculateAutomaticDemoQuote, resolveDemoProfile, DEMO_PROFILES } from '../src/utils/quoteAutomation.js';
 import { normalizeExchange, selectElectricity, createRatesProvider } from '../scripts/quote-rates.js';
 import { prepareOrderTransition, prepareAutomaticRequest } from '../scripts/automation-operations.js';
@@ -72,6 +72,37 @@ describe('roles, herramientas y recorridos', () => {
     });
     expect(result.links.map(link => link.path)).toEqual(['/solicitud/archivo', '/solicitud/ayuda-diseno']);
   });
+  test('el asistente de cotización devuelve solo campos explícitos del resumen, sin repetir preguntas ni calcular precio', async () => {
+    const result = await runAssistant({ mode: 'quote', message: 'Largo 15 y ancho 3' }, { actor: customer, data, getRates: rates }, {
+      fetchImpl: async (_url, options) => {
+        const payload = JSON.parse(options.body);
+        expect(payload.messages[0].content).toContain('No repitas preguntas ya contestadas');
+        return { ok: true, json: async () => ({ output: JSON.stringify({ reply: 'Listo, revisá el resumen y enviá la solicitud.', requestDraft: {
+          description: 'Pieza flexible', intendedUse: 'Juguete personal', dimensions: 'largo 15 cm, ancho 3 cm', material: 'TPU', quantity: 1,
+          needsDesign: true, quotedPrice: 999999, internalNote: 'discard me',
+        } }) }) };
+      },
+    });
+    expect(result.requestDraft).toEqual({ description: 'Pieza flexible', intendedUse: 'Juguete personal', dimensions: 'largo 15 cm, ancho 3 cm', material: 'TPU', quantity: 1, needsDesign: true, referenceUrl: '' });
+    expect(result.requestDraft).not.toHaveProperty('quotedPrice');
+    expect(result.requestDraft).not.toHaveProperty('internalNote');
+  });
+  test('responde comparaciones de materiales desde la guía exacta, no desde las afirmaciones del modelo', async () => {
+    const fetchImpl = jest.fn();
+    const result = await runAssistant({ mode: 'quote', message: 'Compará PETG y PLA para una base rígida de teléfono que usaré en interiores.' }, { actor: customer, data, getRates: rates }, { fetchImpl });
+    expect(result.source).toBe('WORKSHOP_GUIDE');
+    expect(result.reply).toContain('PLA: Piezas decorativas y prototipos de interior; evitar calor elevado.');
+    expect(result.reply).toContain('PETG: Soportes y piezas funcionales de uso general. Compatibilidad final depende del diseño.');
+    expect(result.reply).toMatch(/no da rangos de temperatura/i);
+    expect(result.reply).not.toMatch(/55|60|75|80/);
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+  test('una preferencia flexible sigue al flujo de organización, no se confunde con una consulta de materiales', async () => {
+    const fetchImpl = jest.fn(async () => ({ ok: true, json: async () => ({ output: JSON.stringify({ reply: 'Anoto tu preferencia.', requestDraft: { description: 'Pieza', material: 'TPU' } }) }) }));
+    const result = await runAssistant({ mode: 'quote', message: 'Una unidad, material flexible y tamaño promedio.' }, { actor: customer, data, getRates: rates }, { fetchImpl });
+    expect(result.source).toBe('N8N');
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
   test('rechaza sesión expirada y vuelve a comprobar el rol en la base', () => {
     const token = payload => `Bearer sim.v1.${btoa(JSON.stringify(payload)).replace(/=+$/, '')}`;
     expect(sessionActor(token({ kind: 'SIMULATED_JWT', sub: actor.id, role: 'admin', exp: 9999999999 }), data)?.id).toBe(actor.id);
@@ -82,6 +113,23 @@ describe('roles, herramientas y recorridos', () => {
     expect(validateToolArguments('estimate_quote', { profileId: 'organizador', material: 'PETG', quantity: 2, writeDb: true })).toBe(false);
     expect(await executeAssistantTool('admin_overview', {}, { mode: 'general', data, getRates: rates })).toEqual({ error: 'TOOL_FORBIDDEN' });
     expect(await executeAssistantTool('request_details', { requestId: 'q1' }, { mode: 'quote', actor: { id: 'other' }, data, getRates: rates })).toEqual({ error: 'TOOL_FORBIDDEN' });
+  });
+  test('busca por categoría publicada y devuelve solo coincidencias con su categoría real', async () => {
+    const catalog = {
+      categories: [
+        { id: 'cat3', name: 'Juguetes', slug: 'juguetes', status: 'ACTIVE' },
+        { id: 'cat4', name: 'Decoración', slug: 'decoracion', status: 'ACTIVE' },
+      ],
+      products: [
+        { id: 'p6', name: 'Llavero personalizado base', slug: 'llavero-base', categoryId: 'cat3', status: 'ACTIVE', material: 'PLA', price: 2500, currency: 'CRC' },
+        { id: 'p4', name: 'Maceta geométrica', slug: 'maceta-geometrica', categoryId: 'cat4', status: 'ACTIVE', material: 'PETG', price: 7500, currency: 'CRC' },
+        { id: 'p-draft', name: 'Juguete de prueba', categoryId: 'cat3', status: 'DRAFT', material: 'PLA' },
+      ],
+    };
+    const matching = await executeAssistantTool('search_catalog', { query: 'juguetes' }, { mode: 'general', data: catalog, getRates: rates });
+    expect(matching).toEqual([{ id: 'p6', name: 'Llavero personalizado base', material: 'PLA', price: 2500, currency: 'CRC', category: 'Juguetes', madeToOrder: true, path: '/producto/p6' }]);
+    expect(await executeAssistantTool('search_catalog', { query: 'decoracion' }, { mode: 'general', data: catalog, getRates: rates })).toMatchObject([{ name: 'Maceta geométrica', category: 'Decoración' }]);
+    expect(await executeAssistantTool('search_catalog', { query: '' }, { mode: 'general', data: catalog, getRates: rates })).toEqual([]);
   });
   test('limita capacidades efímeras por rol y número de invocaciones', async () => {
     const capability = issueAssistantToolCapability({ mode: 'admin', actor, data, getRates: rates }, 1000);
@@ -98,9 +146,21 @@ describe('roles, herramientas y recorridos', () => {
     const result = await runAssistant({ mode: 'admin', message: 'Resumen' }, { actor, data, getRates: rates }, { fetchImpl: async (_url, options) => {
       const body = JSON.parse(options.body);
       expect(body.mode).toBe('admin'); expect(body.toolCapability).toHaveLength(43); expect(body.messages.at(-1).content).toBe('Resumen');
-      return { ok: true, json: async () => ({ output: JSON.stringify({ reply: 'Resumen disponible.', links: [{ label: 'Resumen', path: '/admin' }, { label: 'Externo', path: 'https://bad.test' }] }) }) };
+      return { ok: true, json: async () => ({ output: JSON.stringify({ reply: 'Resumen disponible.', links: [{ label: 'Resumen', path: '/admin' }, { label: 'Copiloto', path: '/admin/asistente' }, { label: 'Externo', path: 'https://bad.test' }] }) }) };
     } });
-    expect(result.source).toBe('DEEPSEEK'); expect(result.links).toEqual([{ label: 'Resumen', path: '/admin' }]);
+    expect(result.source).toBe('N8N'); expect(result.links).toEqual([{ label: 'Resumen', path: '/admin' }, { label: 'Copiloto', path: '/admin/asistente' }]);
+  });
+  test('no presenta el tope de iteraciones de n8n como si fuera una respuesta del asistente', async () => {
+    const context = { actor: customer, data, getRates: rates };
+    for (const output of [
+      { error: 'ASSISTANT_ITERATION_LIMIT' },
+      { reply: 'Agent stopped due to max iterations.' },
+    ]) {
+      const result = await runAssistant({ mode: 'quote', message: 'Ya está, prepará el pedido' }, context, {
+        fetchImpl: async () => ({ ok: true, json: async () => ({ output: JSON.stringify(output) }) }),
+      });
+      expect(result).toEqual({ error: 'ASSISTANT_ITERATION_LIMIT' });
+    }
   });
   test('envía cada panel al webhook del agente de su propio contexto', async () => {
     const cases = [
@@ -120,13 +180,18 @@ describe('roles, herramientas y recorridos', () => {
       expect(result.reply).toBe(`Agente ${mode}`);
     }
   });
-  test('permite orientación quote sin sesión y usa respuesta honesta si n8n no está conectado', async () => {
-    const result = await runAssistant({ mode: 'quote', message: 'Quiero una pieza para guardar herramientas' }, { actor: null, data, getRates: rates }, {
-      fetchImpl: async () => { throw new Error('n8n no conectado'); },
-    });
-    expect(result.source).toBe('DEMO_RULES');
-    expect(result.reply).toMatch(/no guarda solicitudes ni emite un precio oficial/i);
-    expect(result.links).toEqual([{ label: 'Ver opciones de cotización', path: '/solicitud' }]);
+  test('distingue n8n caído, timeout y respuesta inválida sin fingir una respuesta local', async () => {
+    const context = { actor: null, data, getRates: rates };
+    const cases = [
+      ['caído', async () => { throw new Error('connection refused'); }, 'ASSISTANT_UNAVAILABLE'],
+      ['HTTP no exitoso', async () => ({ ok: false, status: 503 }), 'ASSISTANT_UNAVAILABLE'],
+      ['timeout', async () => { throw Object.assign(new Error('timed out'), { name: 'TimeoutError' }); }, 'ASSISTANT_TIMEOUT'],
+      ['JSON inválido', async () => ({ ok: true, json: async () => { throw new SyntaxError('Unexpected token'); } }), 'ASSISTANT_INVALID_RESPONSE'],
+      ['salida inválida', async () => ({ ok: true, json: async () => ({ output: 'no es JSON' }) }), 'ASSISTANT_INVALID_RESPONSE'],
+    ];
+    for (const [label, fetchImpl, code] of cases) {
+      await expect(runAssistant({ mode: 'quote', message: `Prueba ${label}` }, context, { fetchImpl })).resolves.toEqual({ error: code });
+    }
   });
   test('no deja saltar etapas de pedidos y exige motivo al cancelar', () => {
     const order = { status: 'PENDING' };

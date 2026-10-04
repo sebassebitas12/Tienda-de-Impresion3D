@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { EmptyState, ErrorState, Skeleton } from '../../components/ui/index.js';
 import { Button } from '../../components/ui/Button.jsx';
@@ -12,6 +12,31 @@ import './admin.css';
 import { FilterChips } from '../../components/ui/FilterChips.jsx';
 import { toggleFacetParams } from '../../utils/facetFilters.js';
 import { RequestNextAction } from './RequestNextAction.jsx';
+import { readQuoteAttachment } from '../../services/automationService.js';
+
+function RequestAttachment({ requestId, attachment, token, language }) {
+  const [url, setUrl] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  useEffect(() => () => { if (url) URL.revokeObjectURL(url); }, [url]);
+  async function openAttachment() {
+    if (url) { window.open(url, '_blank', 'noopener,noreferrer'); return; }
+    setBusy(true); setError('');
+    try {
+      const file = await readQuoteAttachment(requestId, attachment.id, { token });
+      const binary = atob(file.data);
+      const bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
+      const nextUrl = URL.createObjectURL(new Blob([bytes], { type: file.contentType }));
+      setUrl(nextUrl);
+    } catch { setError(language === 'es' ? 'No se pudo abrir el archivo.' : 'Could not open the file.'); }
+    finally { setBusy(false); }
+  }
+  return <li className="admin-request-attachment"><div><strong>{attachment.name}</strong><small>{(attachment.size / 1024 / 1024).toFixed(1)} MB · {attachment.contentType}</small></div>
+    <button className="admin-action-secondary" type="button" onClick={openAttachment} disabled={busy}>{busy ? (language === 'es' ? 'Abriendo…' : 'Opening…') : url ? (language === 'es' ? 'Abrir archivo' : 'Open file') : (language === 'es' ? 'Cargar vista' : 'Load preview')}</button>
+    {error && <p role="alert">{error}</p>}{url && attachment.contentType.startsWith('image/') && <img src={url} alt={`${language === 'es' ? 'Referencia adjunta' : 'Attached reference'}: ${attachment.name}`} />}
+    {url && <a href={url} download={attachment.name}>{language === 'es' ? 'Descargar' : 'Download'} ↗</a>}
+  </li>;
+}
 
 const words = {
   es: {
@@ -244,6 +269,11 @@ export function AdminRequestDetailPage() {
               <div><dt>{text.quantity}</dt><dd>{request.quantity ?? '—'}</dd></div>
               {request.fileName && <div><dt>{text.file}</dt><dd className="admin-detail-file">{request.fileName}</dd></div>}
               {request.description && <div className="admin-detail-description"><dt>{text.description}</dt><dd>{request.description}</dd></div>}
+              {request.intendedUse && <div><dt>{language === 'es' ? 'Uso previsto' : 'Intended use'}</dt><dd>{request.intendedUse}</dd></div>}
+              {request.dimensions && <div><dt>{language === 'es' ? 'Medidas declaradas' : 'Stated dimensions'}</dt><dd>{request.dimensions}</dd></div>}
+              {request.needsDesign && <div><dt>{language === 'es' ? 'Diseño' : 'Design'}</dt><dd>{language === 'es' ? 'Solicita ayuda con el diseño' : 'Design assistance requested'}</dd></div>}
+              {request.referenceUrl && <div><dt>{language === 'es' ? 'Enlace de referencia' : 'Reference link'}</dt><dd><a href={request.referenceUrl} target="_blank" rel="noreferrer">{request.referenceUrl} ↗</a></dd></div>}
+              {request.attachments?.length > 0 && <div className="admin-detail-description"><dt>{language === 'es' ? 'Fotos y archivos recibidos' : 'Received photos and files'}</dt><dd><ul className="admin-request-attachments">{request.attachments.map(attachment => <RequestAttachment key={attachment.id} requestId={request.id} attachment={attachment} token={auth?.token} language={language} />)}</ul></dd></div>}
               <div><dt>{text.received}</dt><dd>{formatDate(request.submittedAt, language)}</dd></div>
             </dl>
           </section>

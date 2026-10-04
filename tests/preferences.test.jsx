@@ -1,11 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { FloatingTools } from '../src/app/layout/FloatingTools.jsx';
 import { PreferencesProvider } from '../src/app/providers/PreferencesProvider.jsx';
 import { automationAction } from '../src/services/automationService.js';
 
-jest.mock('../src/services/automationService.js', () => ({ automationAction: jest.fn(), automationError: () => 'No se pudo responder.' }));
+jest.mock('../src/services/automationService.js', () => ({
+  automationAction: jest.fn(),
+  automationError: code => ({
+    ASSISTANT_UNAVAILABLE: 'n8n no responde.',
+    ASSISTANT_TIMEOUT: 'n8n tardó demasiado.',
+    ASSISTANT_INVALID_RESPONSE: 'n8n devolvió una respuesta inválida.',
+  }[code] || 'No se pudo responder.'),
+}));
 
 function renderReadingPanel() {
   return render(
@@ -134,5 +141,52 @@ describe('Asistencia del taller', () => {
     expect(screen.getByText(/Guía local · proveedor IA no conectado/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Cotizar/ })).toHaveAttribute('href', '/solicitud');
     expect(automationAction).toHaveBeenCalledWith('/assistants/chat', expect.objectContaining({ mode: 'general', message: '¿Qué material me conviene?' }), expect.any(Object));
+  });
+
+  it('envía el mensaje con Enter y reserva Shift+Enter para continuar escribiendo', async () => {
+    automationAction.mockClear();
+    automationAction.mockResolvedValue({ reply: 'Respuesta del asistente.', source: 'DEMO_RULES' });
+    renderChatPanel();
+    const input = document.getElementById('chat-panel-message');
+
+    fireEvent.change(input, { target: { value: 'Hola desde el teclado' } });
+    fireEvent.keyDown(input, { key: 'Enter', shiftKey: false });
+
+    expect(await screen.findByText('Respuesta del asistente.')).toBeInTheDocument();
+    expect(automationAction).toHaveBeenCalledTimes(1);
+    expect(automationAction).toHaveBeenCalledWith('/assistants/chat', expect.objectContaining({ message: 'Hola desde el teclado' }), expect.any(Object));
+
+    fireEvent.change(input, { target: { value: 'Una segunda línea' } });
+    fireEvent.keyDown(input, { key: 'Enter', shiftKey: true });
+
+    expect(input).toHaveValue('Una segunda línea');
+    expect(automationAction).toHaveBeenCalledTimes(1);
+  });
+
+  it('expone el estado de carga mientras espera a n8n', async () => {
+    let resolveAction;
+    automationAction.mockReturnValueOnce(new Promise(resolve => { resolveAction = resolve; }));
+    renderChatPanel();
+    const input = document.getElementById('chat-panel-message');
+    fireEvent.change(input, { target: { value: 'Consulta lenta' } });
+    fireEvent.keyDown(input, { key: 'Enter', shiftKey: false });
+
+    expect(screen.getByRole('status')).toHaveTextContent('Consultando las herramientas');
+    await act(async () => resolveAction({ reply: 'Respuesta lista.' }));
+    expect(await screen.findByText('Respuesta lista.')).toBeInTheDocument();
+  });
+
+  it.each([
+    ['caída de n8n', 'ASSISTANT_UNAVAILABLE', 'n8n no responde.'],
+    ['timeout', 'ASSISTANT_TIMEOUT', 'n8n tardó demasiado.'],
+    ['respuesta inválida', 'ASSISTANT_INVALID_RESPONSE', 'n8n devolvió una respuesta inválida.'],
+  ])('presenta error accesible para %s', async (_label, code, message) => {
+    automationAction.mockRejectedValueOnce(Object.assign(new Error(code), { code }));
+    renderChatPanel();
+    const input = document.getElementById('chat-panel-message');
+    fireEvent.change(input, { target: { value: 'Consulta de prueba' } });
+    fireEvent.keyDown(input, { key: 'Enter', shiftKey: false });
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(message);
   });
 });

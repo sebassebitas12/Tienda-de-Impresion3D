@@ -9,6 +9,7 @@ import { prepareRequestAction } from './request-actions.js';
 import { installAutomationOperations } from './automation-operations.js';
 import { deliverQuote } from './quote-email.js';
 import { sessionActor } from './session-access.js';
+import { multipartBufferMiddleware } from './multipart-form.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const databasePath = resolve(root, process.env.VERTICE_DB_FILE || 'db.json');
@@ -51,6 +52,13 @@ if (!db.data.customPrintRequests || !db.data.activityLog) {
 }
 
 const app = createApp(db);
+const multipartParser = multipartBufferMiddleware(26 * 1024 * 1024);
+const bodyParserEntry = app.middleware.find(entry => entry.type === 'mw' && entry.handler?.toString().includes('checkType(req, type)'));
+if (!bodyParserEntry) throw new Error('No se pudo instalar el parser multipart antes del parser JSON.');
+const parseJsonBody = bodyParserEntry.handler;
+bodyParserEntry.handler = (req, res, next) => /^multipart\/form-data\s*;/i.test(req.headers['content-type'] || '')
+  ? multipartParser(req, res, next)
+  : parseJsonBody(req, res, next);
 let reviewQueue = Promise.resolve();
 
 function serializeReviewAction(action) {
@@ -59,8 +67,8 @@ function serializeReviewAction(action) {
   return result;
 }
 
-function registerAction(path, handler) {
-  app.post(path, handler);
+function registerAction(path, handler, middleware = []) {
+  app.post(path, ...middleware, handler);
   const route = app.middleware.pop();
   const fallbackIndex = app.middleware.findIndex(middleware => middleware.type === 'mw' && middleware.path === '/:name');
   if (!route || fallbackIndex < 0) throw new Error('No se pudo instalar la operación administrativa.');

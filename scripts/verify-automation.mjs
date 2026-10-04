@@ -11,6 +11,7 @@ import { ROLE_TOOLS } from '../src/utils/assistantPolicies.js';
 // Isolated database and mock HTTP provider. Never sends email or calls a paid API.
 const directory = await mkdtemp(join(tmpdir(), 'vertice-automation-'));
 const dbFile = join(directory, 'db.json');
+const attachmentDirectory = join(directory, 'attachments');
 const users = [
   { id: 'admin-test', name: 'Admin QA', email: 'qa-admin@vertice.cr', role: 'admin', status: 'ACTIVE' },
   { id: 'customer-test', name: 'Cliente QA', email: 'qa-customer@vertice.cr', role: 'customer', status: 'ACTIVE' },
@@ -25,8 +26,12 @@ const provider = createServer(async (req, res) => {
   let payload;
   if (req.url === '/rates') payload = { exchange: { venta: { valor: 460, fecha: new Date().toISOString().slice(0, 10) } }, electricity: { value: [] } };
   else if (req.url === '/email') { mails++; payload = { delivered: true, deliveryKey: body.deliveryKey, messageId: 'mock-gmail-1' }; }
+  else if (req.url === '/assistant' && body.messages?.at(-1)?.content === 'QA_PROVIDER_DOWN') {
+    res.writeHead(503, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'provider unavailable' })); return;
+  }
+  else if (req.url === '/assistant' && body.messages?.at(-1)?.content === 'QA_INVALID_RESPONSE') payload = { output: 'not-json' };
   else {
-    const name = body.mode === 'admin' ? 'admin_overview' : body.mode === 'quote' ? 'quote_profiles' : 'search_catalog';
+    const name = body.mode === 'admin' ? 'admin_overview' : body.mode === 'quote' ? 'material_guide' : 'search_catalog';
     const tool = await fetch(`http://127.0.0.1:${port}/assistants/tools`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ capability: body.toolCapability, mode: body.mode, name, args: name === 'search_catalog' ? { query: '' } : {} }) });
     assert.equal(tool.status, 200, `assistant tool callback: ${await tool.clone().text()}`);
@@ -40,6 +45,7 @@ const mockUrl = `http://127.0.0.1:${provider.address().port}`;
 const portProbe = createServer(); await new Promise(resolve => portProbe.listen(0, '127.0.0.1', resolve));
 const port = portProbe.address().port; await new Promise(resolve => portProbe.close(resolve));
 const api = spawn(process.execPath, ['scripts/api-server.js'], { cwd: process.cwd(), env: { ...process.env, PORT: String(port), HOST: '127.0.0.1', VERTICE_DB_FILE: dbFile,
+  VERTICE_ATTACHMENT_DIR: attachmentDirectory,
   VERTICE_QUOTE_EMAIL_WEBHOOK_URL: `${mockUrl}/email`, VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN: 'qa-only-token', VERTICE_RATES_WEBHOOK_URL: `${mockUrl}/rates`,
   VERTICE_ASSISTANT_GENERAL_URL: `${mockUrl}/assistant`, VERTICE_ASSISTANT_ADMIN_URL: `${mockUrl}/assistant`, VERTICE_ASSISTANT_QUOTE_URL: `${mockUrl}/assistant`,
   VERTICE_ASSISTANT_TOOLS_URL: `http://127.0.0.1:${port}/assistants/tools`, VERTICE_WORKSHOP_EMAIL: 'qa-admin@vertice.cr',
@@ -51,42 +57,72 @@ async function post(path, body, id, expected = 200) {
   const response = await fetch(`http://127.0.0.1:${port}${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(id ? { Authorization: `Bearer ${token(id)}` } : {}) }, body: JSON.stringify(body), signal: AbortSignal.timeout(8000) });
   const result = await response.json(); assert.equal(response.status, expected, `${path}: ${JSON.stringify(result)}`); assertions++; return result;
 }
+async function postMultipart(path, payload, attachments = [], id, expected = 200) {
+  const form = new FormData();
+  form.append('payload', JSON.stringify(payload));
+  attachments.forEach(file => form.append('attachments', new Blob([file.data], { type: file.type }), file.name));
+  const response = await fetch(`http://127.0.0.1:${port}${path}`, { method: 'POST', headers: id ? { Authorization: `Bearer ${token(id)}` } : {}, body: form, signal: AbortSignal.timeout(8000) });
+  const responseText = await response.text();
+  let result; try { result = JSON.parse(responseText); } catch { throw new Error(`${path} returned HTTP ${response.status} with non-JSON body: ${responseText}`); }
+  assert.equal(response.status, expected, `${path}: ${JSON.stringify(result)}`); assertions++; return result;
+}
 try {
   for (let attempt = 0; attempt < 100; attempt++) {
     try { const ready = await fetch(`http://127.0.0.1:${port}/users`); if (ready.ok) break; } catch { /* Start-up only. */ }
     if (api.exitCode !== null || attempt === 99) throw new Error(`API did not start: ${output}`);
     await new Promise(resolve => setTimeout(resolve, 100));
   }
-  await post('/quotes/create', {}, undefined, 403);
+  await post('/quotes/create', {}, 'customer-test', 410);
   await post('/assistants/chat', { mode: 'admin', message: 'Resumen' }, 'customer-test', 403);
+  const unavailable = await post('/assistants/chat', { mode: 'general', message: 'QA_PROVIDER_DOWN' }, undefined, 502);
+  assert.equal(unavailable.code, 'ASSISTANT_UNAVAILABLE'); assertions++;
+  const invalidAssistantResponse = await post('/assistants/chat', { mode: 'general', message: 'QA_INVALID_RESPONSE' }, undefined, 502);
+  assert.equal(invalidAssistantResponse.code, 'ASSISTANT_INVALID_RESPONSE'); assertions++;
   const publicQuoteChat = await post('/assistants/chat', { mode: 'quote', message: 'Ayuda', history: [] }, undefined);
-  assert.equal(publicQuoteChat.source, 'DEEPSEEK'); assertions++;
+  assert.equal(publicQuoteChat.source, 'N8N'); assertions++;
   for (const [mode, id] of [['general', undefined], ['admin', 'admin-test'], ['quote', 'customer-test']]) {
     const chat = await post('/assistants/chat', { mode, message: 'Ayuda', history: [] }, id);
-    assert.equal(chat.source, 'DEEPSEEK'); assert.ok(chat.reply.includes('consultada')); assertions += 2;
+    assert.equal(chat.source, 'N8N'); assert.ok(chat.reply.includes('consultada')); assertions += 2;
   }
   await post('/assistants/tools', { mode: 'general', name: 'search_catalog', args: {} }, undefined, 400);
   const form = { profileId: 'organizador', material: 'PETG', quantity: 2, sizeScale: 1, needsDesign: false, description: 'Organizador para escritorio', idempotencyKey: 'qa-quote-one' };
   const preview = await post('/quotes/preview', form); assert.equal(preview.quote.mode, 'DEMO'); assertions++;
-  const created = await post('/quotes/create', { ...form, sendEmail: true }, 'customer-test', 201);
-  assert.equal(created.request.status, 'AWAITING_APPROVAL'); assert.equal(created.email.delivered, true); assert.equal(mails, 1); assertions += 3;
-  const duplicate = await post('/quotes/create', { ...form, sendEmail: true }, 'customer-test'); assert.equal(duplicate.replay, true); assert.equal(mails, 1); assertions += 2;
-  await post('/quotes/approve', { requestId: created.request.id, expectedVersion: 1 }, 'other-test', 409);
-  await post('/quotes/approve', { requestId: created.request.id, expectedVersion: 999 }, 'customer-test', 409);
-  await post('/quotes/approve', { requestId: created.request.id, expectedVersion: 1 }, 'customer-test');
+  const intakePayload = { description: 'Soporte organizador para herramientas de QA', intendedUse: 'Prueba local', dimensions: '12 x 8 cm', material: 'PETG', quantity: 2, needsDesign: false, referenceUrl: 'https://example.org/reference', sourceType: 'FILE_UPLOAD', idempotencyKey: 'qa-intake-one' };
+  const attachment = { name: 'pieza.stl', type: 'model/stl', data: 'solid qa test' };
+  const intake = await postMultipart('/quotes/submit-intake', intakePayload, [attachment], 'customer-test', 201);
+  assert.equal(intake.request.status, 'PENDING_QUOTE'); assert.equal(intake.request.quotedPrice, undefined); assert.equal(intake.request.quotePricing, undefined); assert.equal(mails, 0); assertions += 4;
+  assert.equal(intake.request.attachments[0].name, 'pieza.stl'); assert.equal(intake.request.attachments[0].size, attachment.data.length); assertions += 2;
+  const duplicateIntake = await postMultipart('/quotes/submit-intake', intakePayload, [attachment], 'customer-test');
+  assert.equal(duplicateIntake.replay, true); assert.equal(duplicateIntake.request.id, intake.request.id); assertions += 2;
+  const customerFile = await post('/quotes/attachment/read', { requestId: intake.request.id, attachmentId: intake.request.attachments[0].id }, 'customer-test');
+  assert.equal(Buffer.from(customerFile.data, 'base64').toString(), attachment.data); assertions++;
+  await post('/quotes/attachment/read', { requestId: intake.request.id, attachmentId: intake.request.attachments[0].id }, 'other-test', 404);
+  const adminFile = await post('/quotes/attachment/read', { requestId: intake.request.id, attachmentId: intake.request.attachments[0].id }, 'admin-test');
+  assert.equal(adminFile.name, 'pieza.stl'); assertions++;
+  const afterIntake = JSON.parse(await readFile(dbFile, 'utf8'));
+  assert.equal(afterIntake.customPrintRequests.length, 1); assert.equal(afterIntake.activityLog[0].action, 'REQUEST_SUBMITTED');
+  assert.equal('data' in afterIntake.customPrintRequests[0].attachments[0], false); assertions += 3;
+  const priced = await post('/admin/actions/auto-quote', { requestId: intake.request.id, expectedStatus: 'PENDING_QUOTE', expectedVersion: 0, profileId: 'organizador' }, 'admin-test');
+  assert.equal(priced.request.status, 'QUOTED'); assert.equal(priced.request.quotePricing.mode, 'DEMO'); assert.equal(mails, 0); assertions += 3;
+  const created = await post('/admin/actions/send-quote-email', { requestId: intake.request.id, expectedStatus: 'QUOTED', expectedVersion: 1 }, 'admin-test');
+  assert.equal(created.request.status, 'AWAITING_APPROVAL'); assert.equal(created.messageId, 'mock-gmail-1'); assert.equal(mails, 1); assertions += 3;
+  const duplicate = await post('/admin/actions/send-quote-email', { requestId: intake.request.id, expectedStatus: 'QUOTED', expectedVersion: 1 }, 'admin-test'); assert.equal(duplicate.replay, true); assert.equal(mails, 1); assertions += 2;
+  await post('/quotes/approve', { requestId: intake.request.id, expectedVersion: 1 }, 'other-test', 409);
+  await post('/quotes/approve', { requestId: intake.request.id, expectedVersion: 999 }, 'customer-test', 409);
+  await post('/quotes/approve', { requestId: intake.request.id, expectedVersion: 1 }, 'customer-test');
   const own = await post('/quotes/mine', {}, 'customer-test'); assert.equal(own.requests[0].status, 'APPROVED'); assertions++;
-  await post('/admin/actions/quote-fulfillment', { requestId: created.request.id, expectedVersion: 1, mode: 'DEMO' }, 'customer-test', 403);
-  await post('/admin/actions/quote-fulfillment', { requestId: created.request.id, expectedVersion: 1, mode: 'MANUAL_VERIFIED', reference: 'fake-receipt', confirmed: true }, 'admin-test', 409);
-  const fulfilled = await post('/admin/actions/quote-fulfillment', { requestId: created.request.id, expectedVersion: 1, mode: 'DEMO' }, 'admin-test');
+  await post('/admin/actions/quote-fulfillment', { requestId: intake.request.id, expectedVersion: 1, mode: 'DEMO' }, 'customer-test', 403);
+  await post('/admin/actions/quote-fulfillment', { requestId: intake.request.id, expectedVersion: 1, mode: 'MANUAL_VERIFIED', reference: 'fake-receipt', confirmed: true }, 'admin-test', 409);
+  const fulfilled = await post('/admin/actions/quote-fulfillment', { requestId: intake.request.id, expectedVersion: 1, mode: 'DEMO' }, 'admin-test');
   assert.equal(fulfilled.order.pricingMode, 'DEMO'); assert.equal(fulfilled.order.paymentEvidence.mode, 'DEMO'); assertions += 2;
-  const repeated = await post('/admin/actions/quote-fulfillment', { requestId: created.request.id, expectedVersion: 1, mode: 'DEMO' }, 'admin-test'); assert.equal(repeated.replay, true); assertions++;
+  const repeated = await post('/admin/actions/quote-fulfillment', { requestId: intake.request.id, expectedVersion: 1, mode: 'DEMO' }, 'admin-test'); assert.equal(repeated.replay, true); assertions++;
   const other = await post('/quotes/mine', {}, 'other-test'); assert.equal(other.requests.length, 0); assertions++;
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', nextStatus: 'CONFIRMED' }, 'customer-test', 403);
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', nextStatus: 'READY' }, 'admin-test', 400);
   const advanced = await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', expectedUpdatedAt: null, nextStatus: 'CONFIRMED' }, 'admin-test');
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', nextStatus: 'CONFIRMED' }, 'admin-test', 409);
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'CONFIRMED', expectedUpdatedAt: advanced.order.updatedAt, nextStatus: 'CANCELLED', reason: 'Cierre QA de prueba' }, 'admin-test');
-  const persisted = JSON.parse(await readFile(dbFile, 'utf8')); assert.equal(persisted.quoteDeliveries[0].status, 'SENT'); assert.equal(persisted.activityLog.length, 6); assertions += 2;
+  const persisted = JSON.parse(await readFile(dbFile, 'utf8')); assert.equal(persisted.quoteDeliveries[0].status, 'SENT'); assert.equal(persisted.activityLog.length, 7); assertions += 2;
 
   const files = (await readdir('automation/n8n')).filter(name => name.endsWith('.json') && name !== 'vertice-cr-unificado.json'); assert.equal(files.length, 5); assertions++;
   for (const file of files) {
@@ -96,6 +132,12 @@ try {
     for (const node of workflow.nodes) {
       if (node.type.endsWith('.webhook')) { assert.equal(node.parameters.authentication, 'headerAuth'); assert.equal(node.parameters.responseData, 'firstEntryJson'); assertions += 2; }
       if (node.type.endsWith('.code')) { new Function('$input', '$', node.parameters.jsCode); assertions++; }
+    }
+    if (file.includes('assistant-')) {
+      const providerNode = workflow.nodes.find(node => node.name === 'OpenRouter por rol');
+      assert.equal(providerNode.parameters.url, 'https://openrouter.ai/api/v1/chat/completions');
+      assert.ok(workflow.nodes.find(node => node.type.endsWith('.code'))?.parameters.jsCode.includes('nvidia/nemotron-3-ultra-550b-a55b:free'));
+      assertions += 2;
     }
     for (const output of Object.values(workflow.connections)) for (const connections of output.main) for (const connection of connections) { assert.ok(names.has(connection.node)); assertions++; }
     if (file.includes('quote-email')) {
@@ -118,10 +160,11 @@ try {
   const aiAgents = unified.nodes.filter(node => node.type === '@n8n/n8n-nodes-langchain.agent');
   const aiAgentNames = ['AI Agent — público', 'AI Agent — Admin', 'AI Agent — cotización'];
   assert.deepEqual(aiAgents.map(node => node.name), aiAgentNames); assertions++;
-  assert.ok(aiAgents.every(node => node.parameters.options.maxIterations === 4)); assertions++;
-  const deepSeekNode = unified.nodes.find(node => node.name === 'DeepSeek Chat Model');
-  assert.equal(deepSeekNode.type, '@n8n/n8n-nodes-langchain.lmChatDeepSeek'); assert.equal(deepSeekNode.parameters.model, 'deepseek-flash'); assertions += 2;
-  assert.deepEqual(unified.connections[deepSeekNode.name].ai_languageModel[0].map(connection => connection.node), aiAgentNames); assertions++;
+  assert.deepEqual(aiAgents.map(node => node.parameters.options.maxIterations), [4, 4, 3]); assertions++;
+  const openRouterNode = unified.nodes.find(node => node.name === 'OpenRouter Chat Model');
+  assert.equal(openRouterNode.type, '@n8n/n8n-nodes-langchain.lmChatOpenRouter');
+  assert.equal(openRouterNode.parameters.model, 'nvidia/nemotron-3-ultra-550b-a55b:free'); assertions += 2;
+  assert.deepEqual(unified.connections[openRouterNode.name].ai_languageModel[0].map(connection => connection.node), aiAgentNames); assertions++;
   for (const [index, mode] of ['general', 'admin', 'quote'].entries()) {
     const entryName = `Entrada — asistente ${mode}`;
     const prepareName = `Preparar contexto — ${mode}`;
@@ -139,18 +182,42 @@ try {
     assert.equal(toolNode.typeVersion, 1.1);
     assert.ok(toolNode.parameters.toolDescription.includes(ROLE_TOOLS[mode].join(', ')));
     assert.equal(toolNode.parameters.sendHeaders, false);
-    assert.match(toolNode.parameters.jsonBody, /\$fromAI\('tool_name'/);
-    assert.match(toolNode.parameters.jsonBody, /\$fromAI\('tool_args'/);
-    assert.doesNotMatch(toolNode.parameters.jsonBody, /JSON\.stringify/);
-    assert.equal(agent.parameters.options.maxIterations, 4);
+    assert.match(toolNode.parameters.jsonBody, /JSON\.stringify/);
+    assert.match(toolNode.parameters.jsonBody, /\{tool_name\}/);
+    assert.match(toolNode.parameters.jsonBody, /\{tool_args\}/);
+    assert.deepEqual(toolNode.parameters.placeholderDefinitions.values.map(({ name, type }) => [name, type]), [['tool_name', 'string'], ['tool_args', 'json']]);
+    assert.equal(agent.parameters.options.maxIterations, mode === 'quote' ? 3 : 4);
     const run = new Function('$input', preparer.parameters.jsCode);
     const input = { first: () => ({ json: { body: { mode, language: 'es', toolCapability: 'a'.repeat(43), toolEndpointUrl: 'http://localhost:3000/assistants/tools', messages: [{ role: 'user', content: 'Prueba' }] } } }) };
     const prepared = run(input);
     assert.equal(prepared[0].json.mode, mode);
     assert.ok(prepared[0].json.systemPrompt.includes(ROLE_TOOLS[mode][0]));
+    assert.match(prepared[0].json.systemPrompt, /Trata cada herramienta como fuente de verdad únicamente para los campos que devuelve.*no agregues temperaturas, cifras, propiedades o certificaciones/i);
+    assertions++;
+    if (mode === 'general') {
+      assert.match(prepared[0].json.systemPrompt, /preguntas generales sobre FDM, responde directamente sin llamar herramientas/i);
+      assert.match(toolNode.parameters.toolDescription, /no para definiciones generales, no repitas llamadas/i);
+      assert.match(prepared[0].json.systemPrompt, /PENDING_QUOTE; no crea por sí solo una estimación, precio, correo ni aprobación/);
+      assert.match(prepared[0].json.systemPrompt, /imágenes o archivos STL\/OBJ/);
+      assert.match(prepared[0].json.systemPrompt, /No digas que se aceptan STEP/);
+      assertions += 5;
+    }
+    if (mode === 'quote') {
+      assert.match(toolNode.parameters.toolDescription, /no calcula precios, no consulta datos de Admin/);
+      assert.doesNotMatch(toolNode.parameters.toolDescription, /quote_profiles|estimate_quote/);
+      assertions += 2;
+    }
     assert.throws(() => run({ first: () => ({ json: { body: { ...input.first().json.body, mode: 'otro-rol' } } }) }), /Contexto de asistente inválido/);
-    assertions += 11;
+    assertions += 12;
   }
+  const normalizer = unified.nodes.find(node => node.name === 'Validar respuesta del asistente');
+  const runNormalizer = new Function('$input', normalizer.parameters.jsCode);
+  const fromAgent = output => ({ first: () => ({ json: { output } }) });
+  assert.deepEqual(runNormalizer(fromAgent('```json\n{"reply":"Listo.","links":[],"requestDraft":null}\n```'))[0].json.output,
+    { reply: 'Listo.', links: [], requestDraft: null });
+  assert.deepEqual(runNormalizer(fromAgent('Agent stopped due to max iterations'))[0].json.output,
+    { error: 'ASSISTANT_ITERATION_LIMIT' });
+  assertions += 2;
   assert.equal(unified.nodes.filter(node => node.type.endsWith('.gmail')).length, 1); assertions++;
   for (const [from, output] of Object.entries(unified.connections)) {
     assert.ok(unifiedNames.has(from));

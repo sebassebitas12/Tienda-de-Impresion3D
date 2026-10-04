@@ -1,11 +1,14 @@
 import { randomUUID } from 'node:crypto';
 import process from 'node:process';
 import { DEMO_PROFILES, calculateAutomaticDemoQuote } from '../src/utils/quoteAutomation.js';
+import { FDM_MATERIALS } from '../src/utils/quotePricing.js';
 import { sessionActor } from './session-access.js';
 import { executeAssistantToolCapability, runAssistant } from './assistant-runtime.js';
 import { createRatesProvider } from './quote-rates.js';
-import { deliverQuote } from './quote-email.js';
 import { prepareQuoteFulfillment } from './quote-fulfillment.js';
+import { parseMultipartForm } from './multipart-form.js';
+import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 
 export const ORDER_NEXT = { PENDING: 'CONFIRMED', CONFIRMED: 'IN_PRODUCTION', IN_PRODUCTION: 'READY', READY: 'SHIPPED', SHIPPED: 'DELIVERED' };
 
@@ -28,6 +31,7 @@ export function prepareAutomaticRequest(request, quote, actorId, now) {
 export function installAutomationOperations({ registerAction, db, serialize, persist }) {
   const getRates = createRatesProvider();
   const attempts = new Map();
+  const attachmentRoot = resolve(process.cwd(), process.env.VERTICE_ATTACHMENT_DIR || '.local-data/quote-attachments');
   const actorFor = req => sessionActor(req.headers.authorization, db.data);
   const eventFor = (request, actor, action, fromStatus, now) => ({ id: randomUUID(), entity: 'customPrintRequest', entityId: String(request.id),
     action, fromStatus, toStatus: request.status, actorId: String(actor.id), actorName: actor.name, occurredAt: now });
@@ -44,6 +48,85 @@ export function installAutomationOperations({ registerAction, db, serialize, per
     return quote.error ? failure(res, quote.error) : res.json({ quote });
   });
 
+  registerAction('/quotes/submit-intake', async (req, res) => {
+    const actor = actorFor(req);
+    if (actor?.role !== 'customer') return failure(res, 'CUSTOMER_REQUIRED', 403);
+    const parsed = parseMultipartForm(req.body, req.headers['content-type']);
+    if (parsed.error) return failure(res, parsed.error);
+    let payload;
+    try { payload = JSON.parse(parsed.fields.payload || ''); } catch { return failure(res, 'INVALID_REQUEST'); }
+    const { description, intendedUse, dimensions, material, quantity, needsDesign, referenceUrl, idempotencyKey, sourceType } = payload || {};
+    let safeUrl = !referenceUrl;
+    if (referenceUrl && typeof referenceUrl === 'string' && referenceUrl.length <= 500 && !/\s/.test(referenceUrl)) {
+      try { const parsedUrl = new URL(referenceUrl); safeUrl = parsedUrl.protocol === 'https:' && Boolean(parsedUrl.hostname) && !parsedUrl.username && !parsedUrl.password; } catch { safeUrl = false; }
+    }
+    if (typeof description !== 'string' || description.trim().length < 3 || description.length > 2000 ||
+        (intendedUse !== '' && intendedUse !== null && (typeof intendedUse !== 'string' || intendedUse.length > 500)) ||
+        (dimensions !== '' && dimensions !== null && (typeof dimensions !== 'string' || dimensions.length > 200)) ||
+        (material && !FDM_MATERIALS.includes(String(material).toUpperCase())) ||
+        !Number.isSafeInteger(Number(quantity)) || Number(quantity) < 1 || Number(quantity) > 100 ||
+        (needsDesign !== undefined && typeof needsDesign !== 'boolean') || !safeUrl ||
+        typeof idempotencyKey !== 'string' || idempotencyKey.length < 8 || idempotencyKey.length > 80 ||
+        !['DESIGN_HELP', 'FILE_REFERENCE', 'FILE_UPLOAD'].includes(sourceType) || parsed.files.length > 5 ||
+        parsed.files.some(file => file.field !== 'attachments' || !file.filename || file.data.length === 0 || file.data.length > 5 * 1024 * 1024)) {
+      return failure(res, parsed.files.length > 5 ? 'TOO_MANY_ATTACHMENTS' : 'INVALID_REQUEST');
+    }
+    const allowedExtensions = new Map([['png', 'image/png'], ['jpg', 'image/jpeg'], ['jpeg', 'image/jpeg'], ['webp', 'image/webp'], ['gif', 'image/gif'], ['stl', 'model/stl'], ['obj', 'model/obj']]);
+    const filesValid = parsed.files.every(file => {
+      const extension = file.filename.split('.').pop()?.toLowerCase();
+      const expectedType = allowedExtensions.get(extension);
+      return expectedType && (expectedType.startsWith('model/') || file.contentType === expectedType || file.contentType === 'application/octet-stream');
+    });
+    if (!filesValid) return failure(res, 'ATTACHMENT_TYPE_UNSUPPORTED');
+    try {
+      const result = await serialize(async () => {
+        const duplicate = db.data.customPrintRequests.find(request => request.userId === actor.id && request.idempotencyKey === idempotencyKey);
+        if (duplicate) return { request: duplicate, replay: true };
+        const now = new Date().toISOString();
+        const id = `rq-${randomUUID()}`;
+        const directory = resolve(attachmentRoot, id);
+        const stored = [];
+        try {
+          if (parsed.files.length) await mkdir(directory, { recursive: true });
+          for (const file of parsed.files) {
+            const attachmentId = randomUUID();
+            const extension = file.filename.split('.').pop().toLowerCase();
+            const name = file.filename.replace(/[\\/]/g, '_').replace(/[^a-zA-Z0-9._ -]/g, '_').slice(0, 120) || `archivo.${extension}`;
+            await writeFile(resolve(directory, attachmentId), file.data, { flag: 'wx' });
+            stored.push({ id: attachmentId, name, contentType: file.contentType, size: file.data.length });
+          }
+          const request = { id, userId: actor.id, status: 'PENDING_QUOTE', submittedAt: now, updatedAt: now,
+            description: description.trim(), intendedUse: String(intendedUse || '').trim(), dimensions: String(dimensions || '').trim(),
+            material: material ? String(material).toUpperCase() : null, quantity: Number(quantity), needsDesign: Boolean(needsDesign),
+            referenceUrl: referenceUrl || null, sourceType, attachments: stored, fileName: stored[0]?.name || null, idempotencyKey };
+          const next = structuredClone(db.data);
+          next.customPrintRequests.push(request);
+          next.activityLog.push({ id: randomUUID(), entity: 'customPrintRequest', entityId: id, action: 'REQUEST_SUBMITTED', fromStatus: null,
+            toStatus: 'PENDING_QUOTE', actorId: String(actor.id), actorName: actor.name, occurredAt: now });
+          await persist(next);
+          return { request };
+        } catch (error) {
+          await Promise.all(stored.map(file => unlink(resolve(directory, file.id)).catch(() => undefined)));
+          throw error;
+        }
+      });
+      return res.status(result.replay ? 200 : 201).json(result);
+    } catch { return failure(res, 'ACTION_PERSISTENCE_FAILED', 500); }
+  });
+
+  registerAction('/quotes/attachment/read', async (req, res) => {
+    const actor = actorFor(req);
+    if (!actor) return failure(res, 'AUTH_REQUIRED', 401);
+    const request = db.data.customPrintRequests.find(item => String(item.id) === String(req.body?.requestId));
+    if (!request || (actor.role !== 'admin' && String(request.userId) !== String(actor.id))) return failure(res, 'REQUEST_NOT_FOUND', 404);
+    const attachment = request.attachments?.find(item => item.id === req.body?.attachmentId);
+    if (!attachment || !/^[a-f0-9-]{36}$/i.test(attachment.id) || !/^rq-[a-f0-9-]{36}$/i.test(request.id)) return failure(res, 'ATTACHMENT_NOT_FOUND', 404);
+    try {
+      const data = await readFile(resolve(attachmentRoot, request.id, attachment.id));
+      return res.json({ name: attachment.name, contentType: attachment.contentType, data: data.toString('base64') });
+    } catch { return failure(res, 'ATTACHMENT_NOT_FOUND', 404); }
+  });
+
   registerAction('/assistants/chat', async (req, res) => {
     const actor = actorFor(req);
     const key = actor?.id || req.socket?.remoteAddress || 'local';
@@ -54,7 +137,10 @@ export function installAutomationOperations({ registerAction, db, serialize, per
     if (attempts.size > 1000) for (const [id, value] of attempts) if (value.since < now - 60000) attempts.delete(id);
     try {
       const result = await runAssistant(req.body || {}, { actor, data: db.data, getRates }, { env: process.env });
-      if (result.error) return failure(res, result.error, result.error === 'ROLE_REQUIRED' ? 403 : 422);
+      if (result.error) {
+        const status = { ROLE_REQUIRED: 403, ASSISTANT_UNAVAILABLE: 502, ASSISTANT_TIMEOUT: 504, ASSISTANT_INVALID_RESPONSE: 502 }[result.error] || 422;
+        return failure(res, result.error, status);
+      }
       res.json(result);
     } catch { failure(res, 'ASSISTANT_UNAVAILABLE', 502); }
   });
@@ -75,34 +161,7 @@ export function installAutomationOperations({ registerAction, db, serialize, per
   registerAction('/quotes/create', async (req, res) => {
     const actor = actorFor(req);
     if (actor?.role !== 'customer') return failure(res, 'CUSTOMER_REQUIRED', 403);
-    const { profileId, material, quantity, sizeScale, needsDesign, description, idempotencyKey } = req.body || {};
-    if (typeof description !== 'string' || description.trim().length < 3 || description.length > 2000 || typeof idempotencyKey !== 'string' || idempotencyKey.length > 80 || !idempotencyKey || (needsDesign !== undefined && typeof needsDesign !== 'boolean')) return failure(res, 'INVALID_REQUEST');
-    const rates = await getRates();
-    try {
-      const result = await serialize(async () => {
-        const duplicate = db.data.customPrintRequests.find(r => r.idempotencyKey === idempotencyKey && r.userId === actor.id);
-        if (duplicate) return { request: duplicate, replay: true };
-        const now = new Date().toISOString();
-        const request = { id: `rq-${randomUUID()}`, userId: actor.id, status: 'PENDING_QUOTE', submittedAt: now,
-          profileId, material, quantity: Number(quantity), sizeScale, needsDesign: Boolean(needsDesign), description: description.trim(),
-          sourceType: needsDesign ? 'DESIGN_HELP' : 'PROFILE_REFERENCE', fileName: null, idempotencyKey };
-        const quote = calculateAutomaticDemoQuote(request, rates, now);
-        if (quote.error) return { error: quote.error };
-        const quoted = prepareAutomaticRequest(request, quote, actor.id, now);
-        const next = structuredClone(db.data);
-        next.customPrintRequests.push(quoted);
-        next.activityLog.push(eventFor(quoted, actor, 'REQUEST_AUTO_QUOTED', 'PENDING_QUOTE', now));
-        await persist(next);
-        if (req.body.sendEmail === true) {
-          const operator = db.data.users.find(user => user.role === 'admin' && user.status === 'ACTIVE');
-          if (!operator) return { request: quoted, email: { code: 'ADMIN_REQUIRED' } };
-          const delivery = await deliverQuote({ data: db.data, requestId: quoted.id, actor: operator, expectedVersion: quoted.quoteVersion, persist });
-          return { request: delivery.body.request || quoted, email: delivery.body.code ? { code: delivery.body.code } : { delivered: true } };
-        }
-        return { request: quoted };
-      });
-      return result.error ? failure(res, result.error) : res.status(result.replay ? 200 : 201).json(result);
-    } catch { failure(res, 'ACTION_PERSISTENCE_FAILED', 500); }
+    return failure(res, 'ENDPOINT_RETIRED_USE_SUBMIT_INTAKE', 410);
   });
 
   registerAction('/admin/actions/auto-quote', async (req, res) => {

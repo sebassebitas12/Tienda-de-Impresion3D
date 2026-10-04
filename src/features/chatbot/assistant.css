@@ -11,6 +11,11 @@
 .assistant-message{padding:14px 0;border-top:1px solid var(--line);margin-top:14px}
 .assistant-message--user{padding:14px;background:var(--ink-soft);border:1px solid var(--line);border-radius:8px;margin-left:24px}
 .assistant-message p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;font-size:14px;margin:8px 0}
+.assistant-formatted-text{display:grid;gap:10px;margin-top:8px;overflow-wrap:anywhere;font-size:14px;line-height:1.6}
+.assistant-formatted-text p,.assistant-formatted-text h4{margin:0;white-space:normal;line-height:inherit}
+.assistant-formatted-text h4{font-size:1em;font-weight:650}
+.assistant-formatted-text ul{display:grid;gap:6px;margin:0;padding-left:1.25rem;line-height:inherit}
+.assistant-formatted-text code{padding:1px 4px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 78%,transparent);font: .9em var(--mono)}
 .assistant-message small{display:block;font-size:11px;color:var(--muted)}
 .assistant-message a{display:block;margin-top:10px;color:var(--lava);font-size:13px}
 .assistant-composer{padding:16px 20px;border-top:1px solid var(--line);background:var(--ink-soft);flex-shrink:0}

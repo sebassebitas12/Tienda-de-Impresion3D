@@ -1,6 +1,6 @@
 # Vértice CR — UX, navegación y estados
 
-> Última actualización: **2026-10-02**.
+> Última actualización: **2026-10-03**.
 
 ## Rutas públicas
 
@@ -41,6 +41,10 @@ los datos privados siguen protegidos. No guarda ni envía solicitudes. No afirma
 recepción, medición, cotización
 o envío de un archivo hasta que cada paso tenga implementación y confirmación.
 
+El compositor compartido de los tres asistentes envía con `Enter`; `Shift+Enter`
+inserta una nueva línea. El botón de envío permanece disponible como alternativa
+de puntero y táctil.
+
 ### Recorrido de compra de una pieza personalizada
 
 1. Cliente elige archivo existente o ayuda para definir una pieza.
@@ -48,11 +52,19 @@ o envío de un archivo hasta que cada paso tenga implementación y confirmación
    pedido listo para pagar.
 3. El taller revisa geometría, uso, material, cantidad y costos; Admin guarda
    la cotización final.
-4. Admin envía un único correo al cliente con copia oculta al taller. Solo una
-   aceptación confirmada del proveedor avanza a `AWAITING_APPROVAL`.
-5. El cliente revisa y aprueba o rechaza desde su cuenta. Solo una cotización
-   aprobada puede pasar a checkout/pago; luego el pedido entra al flujo de
-   producción.
+4. Admin envía la cotización al cliente con un enlace para verla en su cuenta y
+   copia oculta al taller. Solo la confirmación de entrega del proveedor avanza
+   a `AWAITING_APPROVAL`; recibir el correo no equivale a aceptar.
+5. El cliente aprueba la cotización vigente desde la app. La app registra la
+   decisión; no se aprueba por responder el email. La confirmación al cliente y
+   el aviso interno al taller son notificaciones posteriores deseadas, aún no
+   implementadas. Rechazar o pedir cambios desde la app sigue pendiente.
+6. Después de la aprobación, el cliente paga por el flujo disponible. El correo
+   interno debe identificar con precisión si se trata de una solicitud aprobada,
+   un pedido creado o un pago verificado; no debe presentar una etapa como otra.
+   Cuando exista un pedido, los cambios de etapa registrados por Admin pueden
+   enviar avances al correo del cliente. Estas notificaciones también están
+   pendientes de implementación.
 
 Hoy están implementadas la preparación/envío de cotización desde Admin y la
 aprobación demo del cliente. Siguen pendientes el intake real de archivo, el
@@ -273,9 +285,54 @@ La conexión técnica mantiene esos tres puntos de entrada: el botón flotante
 público manda `mode: general`, Admin muestra su botón solo dentro de la ruta
 protegida y manda `mode: admin`, y el botón de `/solicitud` manda `mode: quote`.
 Cada webhook llega a su propio AI Agent nativo en n8n, con prompt y herramienta
-HTTP aislados. Comparten el modelo/credencial DeepSeek, no la identidad ni las
-herramientas disponibles.
+HTTP aislados. Comparten OpenRouter como proveedor, no la identidad ni las
+herramientas disponibles. La selección vigente del usuario excluye DeepSeek.
 
 ## Corrección de recorridos y referencias — 2026-10-02
 
 Las cuatro anotaciones del usuario se aplican como reglas de recorrido: /solicitud solo elige intención; /archivo tiene requisitos y comunica recepción pendiente sin mezclar un estimador de otra pieza; /ayuda-diseno integra la conversación en la página, sin modal. La simulación opcional tiene referencias visuales buscables y ninguna preseleccionada. Admin comparte ese selector. Home enlaza directamente al camino de archivo y no promete una carga disponible. No sustituir una función ausente por un enlace a Contacto, que sigue en construcción. Pendiente: recepción/medición del archivo y envío transaccional del brief a Admin.
+
+## Cotización como preparación de solicitud — 2026-10-03
+
+El flujo actual ofrece dos caminos: enviar modelo/fotos/referencias o describir
+una idea con ayuda del asistente. En el segundo, el chat vive dentro de la ruta y
+completa un formulario de revisión; no comparte el drawer del asistente general,
+no estima precio y no envía hasta que el cliente confirme el resumen. Un mismo
+formulario permite adjuntar imágenes y STL/OBJ, dar dimensiones/unidades,
+material/cantidad/uso, pedir diseño y agregar referencia HTTPS. La solicitud
+recibida queda identificada como pendiente de cotización.
+
+El asistente Admin es una pantalla completa bajo `/admin/asistente`, no una
+ventana flotante ni el bot de Home. Es de consulta/orientación y no ejecuta
+mutaciones. Si el backend devuelve `ROLE_REQUIRED`, la UI lo explica, ofrece
+volver a iniciar sesión y conserva la guarda: el diseño no oculta ni resuelve
+por sí mismo un rechazo de sesión.
+
+Cuando la ayuda de cotización recibe un `requestDraft`, muestra «Revisar el
+resumen y adjuntar referencias». El control desplaza y enfoca el título del
+formulario para que el cliente llegue directamente a editar la ficha, subir
+imágenes/modelos y enviar; respeta movimiento reducido.
+
+La orden explícita de preparar/enviar detiene las preguntas opcionales. “Tamaño
+promedio” permanece como aproximación textual, y “largo 15, ancho 3” conserva
+ambos ejes exactamente como fueron declarados; el asistente no lo convierte en
+diámetro ni interpola límites. Si la conversación devuelve un límite de
+iteraciones de n8n, la UI debe anunciar fallo recuperable y mantener el resumen,
+no presentar el texto técnico como respuesta normal.
+
+### R-H72 — Mensajería e intake de cotización — 2026-10-03
+
+Una intención antigua de preparar no debe interceptar una pregunta nueva. La
+misma intención sí permite que el siguiente mensaje sin interrogación y con
+detalles estructurados complete el borrador. La respuesta confirma que no se
+envió nada. Las respuestas del asistente presentan párrafos, énfasis y listas
+como contenido legible, no como asteriscos Markdown literales.
+
+El camino Admin es `/admin/asistente`, una página con composición, navegación y
+alcance propios, fuera de `PublicLayout` y del widget flotante. Ante
+`ROLE_REQUIRED` permanece en esa superficie, explica el rechazo y solo cierra
+sesión si el operador elige volver a autenticarse; no elimina la protección por
+rol. El Catálogo Admin ofrece «Cotizar DEMO» en cada ficha y lleva al calculador
+de esa pieza. Sigue siendo una sugerencia local: no mide imágenes ni cambia un
+precio publicado por sí sola. La validación estática y los tests pasaron; la
+inspección visual del copiloto requiere una sesión Admin en el mismo origen.

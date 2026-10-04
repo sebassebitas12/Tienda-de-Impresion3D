@@ -269,3 +269,189 @@ de entrada de cotizador. Build conserva el warning de chunk mayor de 500 kB.
 4. Importar el workflow en una instancia n8n real, asignar DeepSeek API, Gmail
    OAuth2 y Header Auth, y verificar URLs/callback. CI remoto de este bloque queda
    pendiente después de commit.
+
+## Auditoría lógica y handoff vigente — 2026-10-03
+
+La lista de Claude se contrastó con rutas, componentes, servicios y estados del
+checkout, no se tomó como diagnóstico ya confirmado:
+
+| # | Área | Resultado comprobado | Bloque |
+|---|---|---|---|
+| 1 | Fotos de catálogo | El picker solo elige la biblioteca local; crear producto guarda `images: []`, editar conserva las rutas. No hay upload ni galería. | C-P2 |
+| 2 | Archivo de solicitud | `/solicitud/archivo` aún es informativa; no adjunta STL/OBJ ni crea intake transaccional. | C-P3 |
+| 3 | Prueba de correo | `QuoteEmailTest` está limitada a cuenta propia con `[DEMO][PRUEBA]`; conservar para defensa, rotular y hacer secundaria. | C-P8 |
+| 4 | Compra | Carrito funciona, pero `/checkout/productos` y `/checkout/solicitud` siguen en `ConstructionPage`; no termina en pedido/pago. | C-P4 |
+| 5 | Rutas en construcción | También `/pedidos/:id`, `/nosotros`, `/contacto`, `/faq`, `/materiales`, `/requisitos`, `/terminos`, `/privacidad` y `/envios` siguen usando el placeholder. | C-P4/P7 |
+| 6 | Cotización cliente | Puede aprobar una cotización vigente; no tiene rechazar/pedir cambios y no hay checkout después de aprobación. | C-P5/P4 |
+| 7 | Transiciones Admin | Sí hay transiciones secuenciales, control por rol/estado/versionado, motivo para cierre temprano y evento `ORDER_STATUS_CHANGED`. La frase vieja “Pedidos solo lectura” era obsoleta; corregida en `docs/02`. | Implementado; probar recorrido |
+| 8 | Borradores + bot | No existe todavía asistencia para completar fichas DRAFT ni aceptación por campo. | C-P1 |
+| 9 | Clientes/Actividad | Clientes permite buscar y consultar pedidos/solicitudes asociados; Activity es historial de eventos existentes, no solo una pantalla vacía. Son superficies de consulta, no gestión integral de perfil. | Implementado; límites deliberados |
+| 10 | Cuenta | `/cuenta` muestra cotizaciones/aprobación; carece de pedidos y perfil. `/pedidos/:id` sigue en construcción. | C-P7/P4 |
+
+Estimación de avance global: **55–65% (centro aproximado 60%) del MVP académico**,
+no una métrica calculada. Auth, la base storefront y Admin operativo ya existen;
+checkout, archivos propios, cuenta completa y algunos ciclos de cliente siguen
+sin cerrar. Admin está más avanzado que el recorrido de compra extremo a extremo.
+
+### Bloque C — lógica de producto + Playwright (handoff de Claude)
+
+Empezar **solo después** de cerrar B1/B2 (n8n real + correo) con CI verde. Rama
+`Pruebas`. Leer `AGENTS.md`, `AI_CONTEXT.md`, `docs/02`, `06`, `07`, `08`, `09`.
+Cada punto requiere su propio commit, tests, documentos de dominio,
+`AI_CONTEXT.md` actualizado y CI verde. Origen: auditoría lógica de Claude
+(2026-10-03). No inventar precios, datos ni capacidades.
+
+#### Decisiones ya tomadas
+
+- **Fotos:** guardar en `db.json` como data URL comprimida en navegador (canvas →
+  WebP/JPEG, lado mayor 1200 px, máximo aproximado 300 kB por foto y 6 fotos por
+  producto). Sin dependencias ni cuenta externa. Es una decisión académica
+  offline, no almacenamiento escalable de producción; documentar en `docs/07`.
+- **QuoteEmailTest:** se conserva para la defensa, rotulado como herramienta de
+  **Demostración**.
+
+#### C-P1 — Asistente de cotización para fichas de producto Admin
+
+- En `/admin/catalogo/nuevo` y `/:id/editar`, añadir “Completar con asistente”.
+- Reutilizar `AutomaticQuote`/servicio existente; no duplicar cálculo. Extraer
+  función pura si se necesita para compartir la lógica.
+- Entrada: nombre, descripción, categoría, dimensiones o foto ya elegida.
+- Salida: propuestas de material, precio, gramos, horas, colores y descripción,
+  mostradas campo por campo con Aceptar/Descartar. Nada se guarda sin aceptación
+  explícita; indicar propuesta/DEMO donde corresponda.
+- Incluir loading, error de n8n caído, timeout y respuesta inválida.
+- Completar un DRAFT existente de punta a punta; permanece DRAFT hasta publicación
+  manual.
+
+#### C-P2 — Subir fotos de producto
+
+- Añadir Subir foto con `FileDropzone` existente (JPG/PNG/WebP), galería
+  reordenable y selección de portada; `ImagePicker` actual queda como pestaña
+  secundaria.
+- Crear utilidad pura `compressImage(file) → dataURL`, con tests de tamaño,
+  tipo inválido y archivo enorme.
+- Validar y explicar tipo, tamaño tras compresión y máximo de fotos.
+- Corregir el `onChange` del picker para derivar de `current`, no de `product`.
+- Tienda, ficha y listas deben mostrar `images[0]`, tanto si es ruta local como
+  data URL.
+
+#### C-P3 — `/solicitud/archivo` recibe el archivo
+
+- Sustituir el aviso pendiente por formulario con `FileDropzone` STL/OBJ y límite
+  definido en `docs/07`; pedir uso, cantidad, material deseado, dimensiones y
+  unidades.
+- Guardar nombre/tamaño/tipo y data URL solo para archivos de hasta 5 MB. Para
+  archivos mayores, conservar metadatos y pedir un enlace (Drive/WeTransfer);
+  decidir/documentar privacidad y validación de enlace antes de implementar.
+- Crear solicitud `PENDING_QUOTE` visible en Admin y permitir descarga autorizada.
+- Reactivar el asistente general en `/solicitud/archivo`; `FloatingTools` debe
+  ocultarlo solo en `/solicitud/ayuda-diseno`, donde ya está integrado.
+
+#### C-P4 — Checkout de productos
+
+- `/checkout/productos`: resumen del carrito → contacto/entrega (requiere sesión)
+  → SINPE mediante `SinpePaymentBlock` y comprobante → pedido.
+- `/pedidos/:id`: estado/detalle visible solo al dueño y enlace desde `/cuenta`.
+- `/checkout/solicitud`: checkout para cotización aprobada con el mismo bloque
+  SINPE.
+- No hay pasarela real; documentar que Admin verifica manualmente el comprobante.
+
+#### C-P5 — El cliente puede rechazar o pedir cambios
+
+- En `CustomerQuotesPage`, junto a Aprobar, añadir Rechazar y Pedir cambios; el
+  comentario es obligatorio.
+- Definir transiciones en `docs/02`; Admin ve el comentario y puede recalcular una
+  nueva versión sin reescribir la anterior.
+
+#### C-P6 — Cotizar una variante
+
+En `/producto/:id`, añadir acción que abra el asistente con producto como contexto
+(nombre, material y dimensiones) para pedir otro tamaño/color/material.
+
+#### C-P7 — Contenido faltante
+
+- `/cuenta`: pestañas Cotizaciones/Pedidos/Perfil. Perfil permite editar nombre y
+  teléfono; email solo lectura.
+- Crear contenido informativo sobrio para nosotros, contacto, FAQ, materiales,
+  requisitos, términos, privacidad y envíos, usando únicamente información
+  respaldada por el proyecto. Políticas/plazos/precios sin respaldo quedan
+  pendientes; si no hay contenido útil, quitar el enlace en vez de “En construcción”.
+
+#### C-P8 — Etiquetar la demostración de correo
+
+Rotular “Demostración: prueba de correo”, aclarar que no avanza la solicitud y
+ubicarlo al final como acción secundaria.
+
+#### C-P9 — Playwright E2E y regresión visual
+
+- Añadir `@playwright/test` como devDependency con justificación en `docs/09`:
+  Jest no comprueba recorridos completos/render real; reemplaza capturas manuales.
+- `playwright.config.js` levanta `npm run api` y `npm run dev` sobre copia temporal
+  de fixture; nunca usa ni altera el `db.json` real.
+- Simular n8n con `page.route` (respuesta correcta, error, timeout y JSON inválido);
+  CI no llama modelos de pago ni Gmail.
+- Flujos mínimos: login Admin + guard; crear borrador → subir foto → asistente
+  simulado → publicar; archivo cliente → cotización Admin → aprobación/rechazo;
+  carrito → checkout → pedido.
+- Capturas `toHaveScreenshot` de Home, Catálogo, Producto, Resumen Admin y
+  formulario producto a 375/768/1280 en Dark/Light. Baselines Linux/CI para reducir
+  diferencias de fuente.
+- Añadir `npm run test:e2e` y job en `.github/workflows/verify.yml`; subir reporte y
+  trace como artifact si falla.
+
+#### Orden y DoD de C
+
+Orden acordado: **B1/B2 → P1 → P2 → P3 → P5 → P4 → P6 → P8 → P7 → P9**. P9 puede
+prepararse en paralelo después de P3 usando recorridos ya existentes.
+
+Cada punto debe pasar lint, tests, `check:ui`, `check:automation`, build y CI
+verde; actualizar dominio y `AI_CONTEXT.md`; completar auditoría visual a
+375/768/1280 Dark/Light con evidencia real.
+
+**Estado del gate:** C está documentado, no iniciado. B1 sigue abierto por
+autorización Admin y recorridos UI pendientes; B2 sigue abierto por entrega
+`UNKNOWN`. No tratar el workflow publicado, el correo ambiguo ni el CI del HEAD
+anterior como cierre de estos gates.
+
+### Repriorización de Bloque C por el usuario — 2026-10-03
+
+No iniciar C hasta cerrar B1/B2 en vivo. Cuando se abra, el orden acordado es:
+**C-P2 → C-P3 → C-P5 → C-P4 → C-P8 → C-P7 → C-P9**. C-P9 queda al final para
+cubrir los flujos construidos. **C-P1** (asistente en el formulario de producto)
+se aparca hasta que el usuario decida retomarlo y B1/B2 estén cerrados en vivo;
+ya no depende de una clave de DeepSeek. **C-P6** no fue priorizado en este orden y queda diferido, sin
+insertarlo por inferencia. Esta instrucción reemplaza el orden anterior de C, no
+el gate de B1/B2.
+
+El usuario también confirmó para el flujo de cotización: aceptación en la app;
+correo como aviso y seguimiento, con confirmación al cliente y aviso al taller
+después de aceptar, y avances al cliente conforme cambien etapas reales del
+pedido. Esos avisos todavía no están implementados. El envío de prueba B2 queda
+aparte hasta verificar el intento `UNKNOWN` junto al usuario y escoger su cuenta
+alternativa de cliente; no repetir ni duplicar ese envío.
+
+### Ajuste puntual pedido por el usuario — 2026-10-03
+
+El usuario aclaró que DeepSeek ya no se usará: OpenRouter es el único proveedor
+de modelo. Antes del cierre live de B1/B2 pidió corregir el comportamiento del
+asistente de cotización, terminar el cotizador DEMO por producto en Admin y
+separar/rediseñar el copiloto administrativo. Esta es una re-priorización
+puntual del árbol local, no cierre de B1/B2 ni inicio general de Bloque C.
+El asistente de solicitud organiza y devuelve un resumen editable con
+referencias; no cotiza ni crea la solicitud hasta la confirmación del cliente.
+El precio por producto es una sugerencia DEMO que requiere datos explícitos y
+confirmación para publicar. El export n8n debe actualizarse en la instancia
+existente sin crear un duplicado activo; su prueba con OpenRouter y la prueba
+B2 de correo siguen pendientes.
+
+### Estado del corte local — intake quote / precio de catálogo / copiloto Admin (2026-10-03)
+
+Esta corrección puntual no abre ni completa B1/B2. La ayuda de diseño prepara
+una solicitud editable con adjuntos y no calcula; el formulario de cada producto
+Admin tiene su propia sugerencia de precio DEMO, y el copiloto Admin cuenta con
+una página de consulta separada del popup Home. El export oficial captura
+OpenRouter y normaliza el texto exacto `Agent stopped due to max iterations` a
+un error recuperable. El navegador comprobó solamente el intake quote Light a
+~720 px. Admin volvió a `/login`, así que su revisión visual sigue bloqueada por
+la sesión y no se declara cerrada. Los gates locales del árbol sucio y el CI
+remoto del HEAD anterior no equivalen a CI verde de este corte.

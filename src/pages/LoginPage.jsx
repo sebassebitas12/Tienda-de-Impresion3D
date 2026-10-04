@@ -16,7 +16,7 @@ function messageFor(error, copy) {
 }
 
 export function LoginPage() {
-  const { copy } = usePreferences();
+  const { copy, language } = usePreferences();
   const auth = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,6 +39,12 @@ export function LoginPage() {
         <h1>{copy.authLoginTitle}</h1>
         <p>{copy.authLoginIntro}</p>
       </div>
+
+      {location.state?.reason === 'admin-session-rejected' && <p className="auth-context-notice" role="status">
+        {language === 'en'
+          ? 'The local API rejected the previous Admin session. Sign in again with an active Admin account on this same address; access checks remain enabled.'
+          : 'La API local rechazó la sesión anterior de Administración. Volvé a iniciar sesión con una cuenta Admin activa en esta misma dirección; la protección sigue habilitada.'}
+      </p>}
 
       <form className="auth-form" onSubmit={onSubmit} noValidate>
         <Input

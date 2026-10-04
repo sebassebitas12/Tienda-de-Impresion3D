@@ -13,6 +13,29 @@ const GUIDE = {
 const toolCapabilities = new Map();
 const PROCESS = { path: '/solicitud', steps: ['Definir pieza, material y cantidad', 'Calcular simulación demo y guardar solicitud', 'Enviar oferta al cliente', 'Cliente aprueba', 'Pago verificado antes de fabricación'], mode: 'DEMO', stock: 'Fabricación bajo pedido' };
 
+function quoteMaterialGuidance(message, language) {
+  const text = String(message || '');
+  const normalized = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const mentioned = [...new Set([...text.matchAll(/\b(PLA|PETG|ASA|ABS|TPU)\b/gi)].map(match => match[1].toUpperCase()))];
+  const asksGuidance = /\b(?:compar\w*|diferenc\w*|convien\w*|recomend\w*|suger\w*|eleg\w*|mejor)\b/.test(normalized)
+    || (/\bmaterial(?:es)?\b/.test(normalized) && /[¿?]/.test(text));
+  const comparesNamedMaterials = mentioned.length > 1 && (/[¿?]/.test(text) || /\b(?:vs|versus|y|o)\b/.test(normalized));
+  if (!asksGuidance && !comparesNamedMaterials) return null;
+
+  if (!mentioned.length) {
+    return language === 'en'
+      ? 'The workshop guide does not rank materials or provide safety, temperature, or price specifications. Tell me what the part will be used for and whether it should be rigid or flexible; you can also leave material undecided in your request.'
+      : 'La guía del taller no establece un material ganador ni incluye especificaciones de seguridad, temperatura o precio. Contame para qué se usará la pieza y si debe ser rígida o flexible; también podés dejar el material sin definir en la solicitud.';
+  }
+
+  const guidance = mentioned.map(material => `${material}: ${GUIDE[material]}`);
+  const lead = language === 'en' ? 'Workshop material guide (orientation only):' : 'Guía de materiales del taller (orientativa):';
+  const boundary = language === 'en'
+    ? 'The guide does not provide temperature ranges, price comparisons, or safety certifications. You can record a preference or leave the material undecided.'
+    : 'La guía no da rangos de temperatura, comparaciones de precio ni certificaciones de seguridad. Podés registrar una preferencia o dejar el material sin definir.';
+  return `${lead}\n${guidance.map(item => `• ${item}`).join('\n')}\n\n${boundary}`;
+}
+
 export function issueAssistantToolCapability(context, now = Date.now()) {
   for (const [key, value] of toolCapabilities) if (value.expiresAt <= now) toolCapabilities.delete(key);
   const capability = randomBytes(32).toString('base64url');
@@ -52,10 +75,20 @@ export async function executeAssistantTool(name, args, { mode, actor, data, getR
   if (!ROLE_TOOLS[mode]?.includes(name) || (mode === 'admin' && actor?.role !== 'admin') || (name === 'request_details' && !actor)) return { error: 'TOOL_FORBIDDEN' };
   if (!validateToolArguments(name, args)) return { error: 'TOOL_ARGUMENTS_INVALID' };
   if (name === 'search_catalog') {
-    const query = String(args.query || '').toLowerCase();
-    return (data.products || []).filter(p => p.status === 'ACTIVE' && FDM_MATERIALS.includes(p.material)
-      && `${p.name} ${p.material} ${p.description}`.toLowerCase().includes(query)).slice(0, 12)
-      .map(({ id, name: label, material, price, currency }) => ({ id, name: label, material, price, currency, madeToOrder: true, path: `/producto/${id}` }));
+    const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const query = normalize(args.query);
+    if (!query) return [];
+    const categories = new Map((data.categories || []).map(category => [String(category.id), category]));
+    return (data.products || []).filter(product => {
+      if (product.status !== 'ACTIVE' || !FDM_MATERIALS.includes(product.material)) return false;
+      const category = categories.get(String(product.categoryId));
+      const searchable = [product.name, product.slug, product.material, product.description, category?.name, category?.slug]
+        .map(normalize).filter(Boolean).join(' ');
+      return searchable.includes(query);
+    }).slice(0, 12).map(({ id, name: label, material, price, currency, categoryId }) => ({
+      id, name: label, material, price, currency, category: categories.get(String(categoryId))?.name || null,
+      madeToOrder: true, path: `/producto/${id}`,
+    }));
   }
   if (name === 'material_guide') return Object.entries(GUIDE).filter(([key]) => !args.material || key === args.material).map(([material, guidance]) => ({ material, guidance }));
   if (name === 'explain_process') return PROCESS;
@@ -80,13 +113,17 @@ export async function executeAssistantTool(name, args, { mode, actor, data, getR
 
 function safeLinks(links, mode) {
   if (!Array.isArray(links)) return [];
-  const allowed = mode === 'admin' ? /^\/admin(?:\/(?:pedidos|solicitudes|catalogo|clientes|actividad)(?:\/[a-zA-Z0-9_-]+){0,2})?$/ : /^\/(?:catalogo|solicitud(?:\/(?:archivo|ayuda-diseno))?|cuenta|producto\/[a-zA-Z0-9_-]+)$/;
+  const allowed = mode === 'admin' ? /^\/admin(?:\/(?:pedidos|solicitudes|catalogo|clientes|actividad|asistente)(?:\/[a-zA-Z0-9_-]+){0,2})?$/ : /^\/(?:catalogo|solicitud(?:\/(?:archivo|ayuda-diseno))?|cuenta|producto\/[a-zA-Z0-9_-]+)$/;
   return links.filter(link => link && typeof link.label === 'string' && allowed.test(link.path)).slice(0, 4).map(link => ({ label: link.label.slice(0, 80), path: link.path }));
 }
 
 export async function runAssistant({ mode, message, history = [], language = 'es' }, context, { fetchImpl = globalThis.fetch, env = {} } = {}) {
   if (!ROLE_TOOLS[mode] || typeof message !== 'string' || !message.trim() || message.length > 2000 || !Array.isArray(history) || history.length > 12) return { error: 'INVALID_CHAT' };
   if (mode === 'admin' && context.actor?.role !== 'admin') return { error: 'ROLE_REQUIRED' };
+  if (mode === 'quote') {
+    const guidance = quoteMaterialGuidance(message, language);
+    if (guidance) return { reply: guidance, links: [], requestDraft: null, source: 'WORKSHOP_GUIDE' };
+  }
   const messages = [
     { role: 'system', content: `${ASSISTANT_PROMPTS[mode]}\n${ASSISTANT_COMMON_PROMPT}\nIdioma: ${language === 'en' ? 'English' : 'español'}.` },
     ...history.filter(item => ['user', 'assistant'].includes(item?.role) && typeof item.content === 'string').slice(-10).map(({ role, content }) => ({ role, content: content.slice(0, 3000) })),
@@ -98,23 +135,36 @@ export async function runAssistant({ mode, message, history = [], language = 'es
     const toolEndpointUrl = env.VERTICE_ASSISTANT_TOOLS_URL || 'http://localhost:3000/assistants/tools';
     const response = await fetchImpl(webhook, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Vertice-Webhook-Token': env.VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN || '' },
       body: JSON.stringify({ mode, language, messages, toolCapability: capability, toolEndpointUrl }), signal: AbortSignal.timeout(90000) });
-    if (!response.ok) throw new Error('provider');
-    const body = await response.json();
+    if (!response.ok) return { error: 'ASSISTANT_UNAVAILABLE' };
+    let body;
+    try { body = await response.json(); } catch { return { error: 'ASSISTANT_INVALID_RESPONSE' }; }
     const result = Array.isArray(body) ? body[0] : body;
-    const agentOutput = result.output;
-    const output = typeof agentOutput === 'string' ? JSON.parse(agentOutput) : agentOutput;
-    if (result.error || !output || typeof output.reply !== 'string' || !output.reply.trim() || output.reply.length > 5000) throw new Error('provider');
-    return { reply: output.reply, links: safeLinks(output.links, mode), source: 'DEEPSEEK' };
-  } catch {
-    // Useful local, explicitly labeled rule-based fallback before provider credentials are configured.
-    if (mode === 'admin') {
-      const overview = await executeAssistantTool('admin_overview', {}, { ...context, mode });
-      return { source: 'DEMO_RULES', reply: language === 'en' ? `There are ${overview.activeOrders} active orders and ${overview.workshopRequests} requests to review. Open Requests to calculate a demo quote. Catalog manages published models and drafts. Choose a section below.` : `Hay ${overview.activeOrders} pedidos activos y ${overview.workshopRequests} solicitudes por revisar. Abrí Solicitudes para calcular una cotización demo; Catálogo organiza publicación y borradores. Elegí una sección abajo para recorrerla.`, links: ADMIN_GUIDE.map(({ label, path }) => ({ label, path })) };
+    let output;
+    try {
+      const agentOutput = result?.output;
+      output = typeof agentOutput === 'string' ? JSON.parse(agentOutput) : agentOutput;
+    } catch { return { error: 'ASSISTANT_INVALID_RESPONSE' }; }
+    const iterationLimit = output?.error === 'ASSISTANT_ITERATION_LIMIT'
+      || (typeof output?.reply === 'string' && /^agent stopped due to max iterations\.?$/i.test(output.reply.trim()));
+    if (iterationLimit) return { error: 'ASSISTANT_ITERATION_LIMIT' };
+    if (result?.error || !output || typeof output.reply !== 'string' || !output.reply.trim() || output.reply.length > 5000) {
+      return { error: 'ASSISTANT_INVALID_RESPONSE' };
     }
-    if (mode === 'quote') return { source: 'DEMO_RULES', reply: language === 'en' ? 'I can help clarify the intended use, approximate dimensions, material and quantity. This local guide cannot measure a file, save a request or issue an official price; the workshop must review and confirm the quote.' : 'Puedo ayudarte a definir el uso, las dimensiones aproximadas, el material y la cantidad. Esta guía local no mide archivos, no guarda solicitudes ni emite un precio oficial; el taller debe revisar y confirmar la cotización.', links: [{ label: language === 'en' ? 'Quote options' : 'Ver opciones de cotización', path: '/solicitud' }] };
-    const rows = await executeAssistantTool('search_catalog', { query: message.length < 80 ? message : '' }, { ...context, mode });
-    return { source: 'DEMO_RULES', reply: language === 'en' ? (rows.length ? `I found ${rows.length} published model(s). They are made to order. You can calculate a demo estimate for a custom piece.` : 'We offer made-to-order FDM with PLA, PETG, ASA, ABS and TPU. Compare materials or use the quote page to try an analogue profile and see its demo breakdown.') : (rows.length ? `Encontré ${rows.length} modelo(s) publicados que coinciden. Se fabrican bajo pedido. Para un encargo propio podés calcular una simulación en Cotizar.` : 'Trabajamos FDM bajo pedido con PLA, PETG, ASA, ABS y TPU. Para decoración interior suele servir PLA; para un soporte general podés comparar PETG. En Cotizar podés probar un perfil de pieza y ver su cálculo demo.'), links: rows.slice(0, 3).map(({ name, path }) => ({ label: name, path })).concat({ label: language === 'en' ? 'Get a quote' : 'Cotizar', path: '/solicitud' }) };
+    return { reply: output.reply, links: safeLinks(output.links, mode), ...(mode === 'quote' ? { requestDraft: safeRequestDraft(output.requestDraft) } : {}), source: 'N8N' };
+  } catch (error) {
+    if (error?.name === 'TimeoutError' || error?.name === 'AbortError') return { error: 'ASSISTANT_TIMEOUT' };
+    return { error: 'ASSISTANT_UNAVAILABLE' };
   } finally {
     revokeAssistantToolCapability(capability);
   }
+}
+
+function safeRequestDraft(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const field = (key, limit) => typeof value[key] === 'string' ? value[key].trim().slice(0, limit) : '';
+  const quantity = Number.isSafeInteger(value.quantity) && value.quantity >= 1 && value.quantity <= 100 ? value.quantity : null;
+  const material = FDM_MATERIALS.includes(String(value.material || '').toUpperCase()) ? String(value.material).toUpperCase() : null;
+  const needsDesign = typeof value.needsDesign === 'boolean' ? value.needsDesign : null;
+  const draft = { description: field('description', 2000), intendedUse: field('intendedUse', 500), dimensions: field('dimensions', 200), material, quantity, needsDesign, referenceUrl: field('referenceUrl', 500) };
+  return Object.values(draft).some(Boolean) ? draft : null;
 }

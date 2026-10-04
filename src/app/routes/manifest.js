@@ -12,5 +12,5 @@ export const adminPages = [
   ['/admin/solicitudes', 'requests'], ['/admin/solicitudes/:id', 'requestDetail'],
   ['/admin/catalogo', 'products'], ['/admin/catalogo/:id', 'productDetail'], ['/admin/catalogo/nuevo', 'productNew'], ['/admin/catalogo/:id/editar', 'productEdit'],
   ['/admin/catalogo/categorias', 'categories'], ['/admin/clientes', 'customers'],
-  ['/admin/clientes/:id', 'customerDetail'], ['/admin/actividad', 'activity'],
+  ['/admin/clientes/:id', 'customerDetail'], ['/admin/actividad', 'activity'], ['/admin/asistente', 'copilot'],
 ];

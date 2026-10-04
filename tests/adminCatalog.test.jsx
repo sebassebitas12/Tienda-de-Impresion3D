@@ -41,15 +41,17 @@ describe('administración del catálogo', () => {
     expect(await screen.findByText(/1 registro\(s\) usan un material fuera de la capacidad vigente/)).toBeInTheDocument();
     await waitFor(() => expect(document.querySelectorAll('.admin-catalog-row')).toHaveLength(2));
     expect(screen.queryByText(/stock|existencias/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Calcular precio DEMO para Organizador modular' })).toHaveAttribute('href', '/admin/catalogo/p1/editar#cotizador');
+    expect(screen.getByRole('link', { name: 'Calcular precio DEMO para Dragón articulado' })).toHaveAttribute('href', '/admin/catalogo/p2/editar#cotizador');
     fireEvent.change(screen.getByRole('searchbox', { name: 'Buscar modelo' }), { target: { value: 'organizador' } });
     await waitFor(() => expect(document.querySelectorAll('.admin-catalog-row')).toHaveLength(1));
-    expect(screen.getByRole('link', { name: /Organizador modular/ })).toHaveAttribute('href', '/admin/catalogo/p1');
+    expect(screen.getByRole('link', { name: 'Organizador modular Organización' })).toHaveAttribute('href', '/admin/catalogo/p1');
   });
 
   it('reemplaza una URL de foto rota por una señal legible', async () => {
     getAdminCatalogData.mockResolvedValue(rawData);
     const { container } = renderAdmin();
-    await screen.findByRole('link', { name: /Organizador modular/ });
+    await screen.findByRole('link', { name: 'Organizador modular Organización' });
     const images = [...container.querySelectorAll('img')];
     images.forEach(image => fireEvent.error(image));
     expect(await screen.findAllByText('Sin foto')).toHaveLength(2);
@@ -81,7 +83,7 @@ describe('administración del catálogo', () => {
     const draftData = { products: [rawData.products[0], draft], categories: [{ id: 'c1', name: 'Gadgets' }] };
     getAdminCatalogData.mockResolvedValue(draftData);
     renderAdmin();
-    expect(await screen.findByRole('link', { name: /Base para control/ })).toHaveAttribute('href', '/admin/catalogo/p7');
+    expect(await screen.findByRole('link', { name: 'Base para control Gadgets' })).toHaveAttribute('href', '/admin/catalogo/p7');
     expect(screen.getByText(/Los borradores siguen ocultos/)).toBeInTheDocument();
     const reviewLink = screen.getByRole('link', { name: 'Revisar borradores (1) ↗' });
     expect(reviewLink).toHaveAttribute('href', '/admin/catalogo?estado=DRAFT');

@@ -98,14 +98,16 @@ export function AdminCatalogPage() {
       </div>
       <p className="admin-orders__results" role="status" aria-live="polite">{text.results(filtered.length)}</p>
       {filtered.length === 0 ? <EmptyState title={query || publication !== 'all' || material !== 'all' ? text.noMatch : text.noProducts} /> : <div className="admin-catalog__list" aria-label={text.title}>
-        {filtered.map((product, index) => <Link className="admin-catalog-row" key={product.id} to={`/admin/catalogo/${encodeURIComponent(product.id)}`} style={{ '--row-index': index }}>
+        {filtered.map((product, index) => <article className="admin-catalog-row" key={product.id} style={{ '--row-index': index }}>
           <ProductImage product={product} label={text.imageFallback} className="admin-catalog-row__image" />
-          <span className="admin-catalog-row__main"><strong>{product.name}</strong><small>{product.category?.name || product.slug || product.id}</small></span>
+          <Link className="admin-catalog-row__main" to={`/admin/catalogo/${encodeURIComponent(product.id)}`}><strong>{product.name}</strong><small>{product.category?.name || product.slug || product.id}</small></Link>
           <span className="admin-catalog-row__material">{product.material || '—'}</span>
           <span className="admin-catalog-row__price">{formatCRC(product.price) || '—'}</span>
           <span className="admin-catalog-row__status" data-status={product.status}>{publicationLabel(product.status, language, text)}<small>{product.featured ? text.featured : text.regular}</small></span>
-          <span className="admin-catalog-row__arrow" aria-hidden="true">↗</span>
-        </Link>)}
+          <Link className="admin-catalog-row__quote" aria-label={language === 'es' ? `Calcular precio DEMO para ${product.name}` : `Calculate DEMO price for ${product.name}`} to={`/admin/catalogo/${encodeURIComponent(product.id)}/editar#cotizador`}>
+            {language === 'es' ? 'Cotizar DEMO' : 'Quote DEMO'} <span aria-hidden="true">↗</span>
+          </Link>
+        </article>)}
       </div>}
     </>}
   </section>;
@@ -135,6 +137,7 @@ export function AdminCatalogDetailPage() {
         <div><span className="admin-eyebrow">{text.detail} / {product.id}</span><h1 id="admin-catalog-detail-title">{product.name}</h1><p>{product.category?.name || product.slug}</p></div>
         <div className="admin-catalog-detail__actions">
           <span className="admin-catalog-row__status" data-status={product.status}>{publicationLabel(product.status, language, text)}<small>{product.featured ? text.featured : text.regular}</small></span>
+          <Link className="admin-action-secondary" to={`/admin/catalogo/${encodeURIComponent(product.id)}/editar#cotizador`}>{language === 'es' ? 'Calcular precio DEMO' : 'Calculate DEMO price'}</Link>
           <Link className="admin-action-primary" to={`/admin/catalogo/${encodeURIComponent(product.id)}/editar`}>{language === 'es' ? 'Editar' : 'Edit'}</Link>
           <button className="admin-action-secondary" disabled={busy || (String(product.status).toUpperCase() !== 'ACTIVE' && !canPublish)} title={String(product.status).toUpperCase() !== 'ACTIVE' && !canPublish ? text.incompleteDraft : undefined} onClick={async () => { setBusy(true); setMutationError(''); try { await updateAdminProduct(product.id, { status: String(product.status).toUpperCase() === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE', updatedAt: new Date().toISOString() }); retry(); } catch (error) { setMutationError(error instanceof AdminCatalogMutationError ? error.message : text.error); } finally { setBusy(false); } }}>{String(product.status).toUpperCase() === 'ACTIVE' ? (language === 'es' ? 'Ocultar' : 'Hide') : (language === 'es' ? 'Publicar' : 'Publish')}</button>
 <button ref={deleteTriggerRef} className="admin-action-secondary" disabled={busy} onClick={async () => { setBusy(true); setMutationError(''); try { const refs = await getAdminCatalogReferences(); if (refs.some(item => String(item.productId) === String(product.id))) { setMutationError(language === 'es' ? 'Este modelo forma parte del historial de pedidos. Ocúltalo en lugar de eliminarlo.' : 'This model is in order history. Hide it instead of deleting it.'); return; } setConfirmDelete(true); } catch (error) { setMutationError(error instanceof AdminCatalogMutationError ? error.message : text.error); } finally { setBusy(false); } }}>{language === 'es' ? 'Eliminar' : 'Delete'}</button>

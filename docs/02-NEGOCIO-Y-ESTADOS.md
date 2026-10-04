@@ -88,10 +88,14 @@ PENDING → CONFIRMED → IN_PRODUCTION → READY → SHIPPED → DELIVERED
 
 Alternativos: CANCELLED, REJECTED.
 
-La pantalla Admin de pedidos actual es de lectura. Presenta los estados, líneas
-de `orderItems`, datos de cliente y montos registrados sin convertir `total` en
-prueba de pago. No ofrecer cambios de estado hasta acordar los permisos,
-transiciones terminales/alternativas y su escritura auditada.
+Admin permite avanzar una etapa por vez con `expectedStatus` y `expectedUpdatedAt`:
+`PENDING → CONFIRMED → IN_PRODUCTION → READY → SHIPPED → DELIVERED`. Desde
+`PENDING` o `CONFIRMED` se puede cerrar como `CANCELLED` o `REJECTED`, con motivo
+obligatorio. Cada transición exige rol Admin, valida el estado/versionado y
+registra `ORDER_STATUS_CHANGED` en `activityLog`. No se permite saltar etapas ni
+alterar pedidos desde los asistentes. El total registrado sigue sin ser prueba
+de pago; el modelo no tiene evidencia de cobro comercial automáticamente
+confirmada. Contrato técnico en `docs/07`.
 
 ## Cotización
 
@@ -135,6 +139,17 @@ dominio reservado de ejemplo (`example.*`, `.test`, `.invalid`, `.localhost`)
 bloquea el envío. Si el proveedor no está configurado/falla, la cotización sigue
 en `QUOTED` para poder corregir configuración y reintentar. El envío de correo no
 calcula ni modifica el precio.
+
+**Decisión del usuario (2026-10-03):** el correo informa la cotización y lleva al
+cliente a su cuenta; no aprueba la oferta por responder o pulsar una acción en el
+email. La decisión vinculante se registra dentro de la app en la cotización
+vigente. La aprobación debe confirmar al cliente y avisar al taller con una
+instantánea de la solicitud y la cotización aceptada; mientras no exista pago
+verificado, ese aviso no debe decir que el pedido está pagado ni que ya entró a
+producción. Una vez exista un pedido, los cambios reales de etapa pueden generar
+correos de avance al cliente. El aviso al taller y los correos de avance todavía
+no están implementados. Rechazo y solicitud de cambios desde la app siguen
+pendientes según C-P5.
 
 ## IA
 
@@ -220,3 +235,40 @@ referencia `SIMULATED-NO-REAL-PAYMENT`; no acredita SINPE, no mueve dinero ni
 inicia producción. Idempotencia de solicitud→pedido evita duplicar el encargo en
 reintentos. Los asistentes no ejecutan mutaciones; herramientas de cotización
 calculan y el servidor aplica roles al invocarlas.
+
+## Intake de solicitud y cotizador de catálogo — 2026-10-03
+
+El asistente de `/solicitud/ayuda-diseno` prepara un resumen editable; no es el
+cotizador ni envía la solicitud por el cliente. Debe conservar medidas tal como
+las expresa la persona, no repetir preguntas contestadas y permitir dejar datos
+desconocidos vacíos. Después de revisar, una persona con sesión de cliente envía
+el intake: el estado inicial es `PENDING_QUOTE`, sin monto, envío de correo ni
+aprobación implícitos. Adjuntos y enlace de referencia explican el encargo; no
+son mediciones de laminador.
+
+La cotización de una pieza nueva del catálogo es un flujo distinto y pertenece
+al formulario Admin del producto. Allí peso, horas y postprocesado se ingresan
+o parten de un perfil análogo explícitamente DEMO; el motor guarda procedencia y
+desglose. El operador debe revisar y confirmar antes de publicar un precio DEMO.
+No se infieren costos de una foto ni se actualiza automáticamente el precio del
+cliente por una respuesta del bot.
+
+En la ayuda de diseño, una orden explícita de preparar/enviar la solicitud
+termina la entrevista y genera un borrador con los datos disponibles; los
+campos opcionales desconocidos no bloquean el intake. «Flexible» puede guardarse
+como preferencia TPU y «tamaño promedio» como descripción aproximada, nunca como
+medidas inventadas ni garantía de seguridad. El cliente revisa, adjunta sus
+referencias y confirma el envío.
+
+**Ajuste de continuidad — 2026-10-03:** solo una instrucción reciente y
+explícita puede iniciar la preparación. Una intención vieja no debe interceptar
+una pregunta nueva; sí permite que el siguiente mensaje sin interrogación y con
+detalles estructurados complete el borrador. La guía determinista del taller es
+la única fuente para comparar materiales en la conversación: no se agregan
+temperaturas, precios ni claims de seguridad que no estén en ella. No se
+interpreta una imagen/STL como medición; fotos, modelos y referencias se adjuntan
+desde el formulario y quedan para revisión del taller.
+
+Para fichas del catálogo, el operador llega al cálculo DEMO desde «Cotizar DEMO»
+en la lista de modelos. El resultado no se considera precio confirmado hasta
+que el operador lo revise y lo guarde explícitamente.

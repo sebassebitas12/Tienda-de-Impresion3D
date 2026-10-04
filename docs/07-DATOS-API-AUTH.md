@@ -256,6 +256,15 @@ de Header Auth en la instancia n8n es **no verificado**; no se asume que estén
 conectados. También falta `.env` en el checkout revisado y falta una prueba con
 correo real; el dataset `example.com` está bloqueado y nunca se usa para un envío.
 
+La entrega del email no registra aprobación: el cliente acepta la cotización
+vigente dentro de la app. Como siguiente contrato, esa acción debe producir una
+confirmación al cliente y una notificación al taller con el snapshot aprobado;
+los correos de avance al cliente deben salir de transiciones de pedido realmente
+persistidas (`ORDER_STATUS_CHANGED`), con idempotencia. No llamar “pedido pagado”
+a una solicitud aprobada sin evidencia de pago. Estas notificaciones no forman
+parte del webhook de cotización actual. La prueba B2 previa sigue `UNKNOWN`; no
+repetirla ni reusar su clave de entrega hasta reconciliarla con el usuario.
+
 #### Frontera entre el LLM y el motor
 
 - **DeepSeek (o modelo evaluado):** entiende texto, detecta campos ausentes,
@@ -770,6 +779,209 @@ La fuente local ahora serializa el cuerpo HTTP Tool como objeto JSON con
 de headers. La misma forma se corrigió en las tres herramientas de la versión
 publicada en n8n. No sustituir el nodo v1.1 confirmado por el usuario.
 
+### Diagnóstico live de OpenRouter y entrega por teclado — 2026-10-03
+
+En la inspección posterior, el canvas de n8n mostraba un nodo `OpenRouter Chat
+Model` agregado pero sin conexión a los Agents. Las tres ramas del export siguen
+compartiendo `DeepSeek Chat Model`; el panel de ejecución del chat interno
+mostraba `When chat message received → AI Agent — Admin1 → DeepSeek Chat Model1`
+y el error `Insufficient Balance`. Esa prueba no es la ruta pública React:
+la aplicación llama `POST /assistants/chat`, el backend selecciona el webhook
+según `mode` y n8n responde a esa entrada. Añadir una credencial/nodo OpenRouter
+sin conectar su salida `Chat Model` a los tres Agents no cambia qué proveedor
+ejecutan.
+
+Para la rama web, revisar en este orden: conectar el modelo OpenRouter a los
+puertos de modelo de los tres Agents; elegir un ID de modelo que admita
+tool-calling y salida JSON; retirar del camino activo la conexión DeepSeek;
+publicar los cambios y comprobar una ejecución desde el webhook que usa la app.
+El `Chat Trigger` interno de n8n sirve para su propio chat de prueba y no sustituye
+los tres webhooks React. OpenRouter documenta el endpoint compatible
+`https://openrouter.ai/api/v1/chat/completions`, el ID exacto del modelo y la
+posibilidad de usar `openrouter/free`; el router gratuito elige modelos de forma
+dinámica, así que la selección puede variar entre ejecuciones. Referencias:
+[OpenRouter API quickstart](https://openrouter.ai/docs/quickstart),
+[tool calling](https://openrouter.ai/docs/guides/features/tool-calling) y
+[Free Models Router](https://openrouter.ai/openrouter/free).
+
+La app también envía al servidor académico local por defecto (`localhost:3000`)
+y este usa webhooks n8n en `localhost:5678` cuando no se configuran URLs. Eso
+sirve en la misma máquina; una web publicada no puede usar el `localhost` del
+servidor del taller y requiere backend/callbacks accesibles por HTTPS, CORS y
+variables de entorno del despliegue. En el panel React, el `textarea` tampoco
+tenía atajo de teclado: ahora Enter envía y Shift+Enter deja continuar la línea;
+esto arregla la interacción del campo, no una caída de proveedor o webhook.
+
+No se cambia todavía la fuente canónica de DeepSeek a OpenRouter ni se da por
+probado ningún agente con OpenRouter: el nodo live no estaba conectado y no se
+obtuvo una ejecución válida desde los webhooks de la aplicación. Las credenciales
+permanecen solo en n8n; no copiar ni inspeccionar claves en logs/documentación.
+
 ## Corrección de recorridos y referencias — 2026-10-02
 
 El filtro de links del asistente público permite exactamente /solicitud/archivo y /solicitud/ayuda-diseno, además de rutas públicas existentes; rechaza subrutas arbitrarias y Admin. El chat de diseño está integrado en /solicitud/ayuda-diseno. No cambian capacidades de tools ni credenciales. La recepción privada STL/OBJ, laminado real y creación transaccional del brief siguen pendientes.
+
+## Estado B1/B2 tras OpenRouter — 2026-10-03
+
+Este bloque reemplaza las notas anteriores que decían que OpenRouter no estaba
+conectado o que el export seguía usando DeepSeek. El JSON oficial se genera en
+`automation/n8n/vertice-cr-unificado.json`; el modelo de sus tres Agents es
+OpenRouter `nvidia/nemotron-3-ultra-550b-a55b:free`. La credencial permanece en
+n8n y no se guarda en el repositorio. El backend identifica la respuesta como
+`N8N`, no por un proveedor que puede cambiar.
+
+En la instancia local también se corrigió y publicó la nota del canvas: ahora
+identifica OpenRouter y el modelo free actual; no se tocaron nodos, credenciales
+ni conexiones. Las ejecuciones continúan mostrando el nodo OpenRouter.
+
+Evidencia de la UI React contra el workflow publicado: TP respondió a una
+consulta normal (ejecución n8n #25), completó una llamada válida a
+`material_guide` para PETG (ejecución #27; respuesta estructurada del dispatcher)
+y rechazó la petición de revelar prompt/credenciales sin ejecutar herramientas
+(ejecución #28, solo Agent/model/normalizador). El asistente de cotización ya
+había completado recorrido normal, una consulta `material_guide` (ejecución #22)
+y un rechazo de inyección (ejecución #24) en la UI. Estas pruebas no validan
+todos los estados de error de la interfaz.
+
+Una prueba de comparación PLA/PETG provocó argumentos `materials: [...]` que no
+pertenecían al schema singular de `material_guide`; el dispatcher respondió
+`TOOL_ARGUMENTS_INVALID`. El Agent aun así redactó una respuesta final, por lo
+que esa interacción **no** cuenta como llamada de herramienta correcta. Una
+consulta posterior, acotada a PETG, sí ejecutó la herramienta. La validación
+rechaza argumentos extra; no ampliar el schema de forma permisiva para ocultar
+este hallazgo.
+
+El asistente Admin se intentó desde la ficha Admin que mostraba una sesión de
+Sebastián Flores, pero el endpoint local devolvió `ROLE_REQUIRED` y no creó una
+ejecución n8n. El cliente reconoce visualmente el rol y el servidor no. No se
+omitió la autorización ni se inspeccionó/copió el token. La causa concreta aún
+no está probada; falta renovar la sesión Admin en la UI y repetir normal,
+herramienta e inyección, verificando las ejecuciones.
+
+La ficha fallida estaba en `http://127.0.0.1:5174`; la prueba pública de
+asistentes, en `http://localhost:5173`. Son orígenes distintos y no comparten
+`localStorage`. Esto puede explicar que una sesión no corresponda al otro
+servidor, pero no prueba la causa del `ROLE_REQUIRED`. Repetir Admin en el origen
+canónico después de iniciar sesión allí; no relajar la autorización. En la
+verificación adicional del 2026-10-03, abrir `/admin` en `localhost:5173`
+redirigió a `/login`, confirmando que ese origen no tenía una sesión Admin activa
+en ese momento. Esta observación no explica por sí sola el `ROLE_REQUIRED` de
+`127.0.0.1:5174`.
+
+Se eliminó del runtime el fallback silencioso `DEMO_RULES` cuando n8n falla: el
+endpoint ahora diferencia `ASSISTANT_UNAVAILABLE` (502), `ASSISTANT_TIMEOUT`
+(504) y `ASSISTANT_INVALID_RESPONSE` (502). Jest cubre los tres códigos, HTTP
+simulado de proveedor caído/respuesta inválida y los estados accesibles de carga
+y error en `AssistantPanel`. Esas pruebas locales no sustituyen observar esos
+fallos en una sesión real del navegador.
+
+Los webhooks públicos de tasas ya se ejecutaron antes: Hacienda respondió y
+ARESEP devolvió registros públicos, pero no hubo coincidencia inequívoca con la
+empresa/tarifa/bloque del taller. El resultado no autoriza a usar una tarifa
+ajena ni convierte los costos DEMO en costos reales.
+
+En B2 continúa una sola entrega de prueba con estado `UNKNOWN`, sin `messageId`.
+No se repitió el envío. La búsqueda más reciente de Gmail `in:sent newer_than:2d
+{subject:DEMO subject:PRUEBA}` no encontró coincidencias, y el historial del
+workflow sigue sin una ejecución de correo posterior a las pruebas de asistentes.
+Esto reduce la evidencia de entrega, pero no convierte el outbox `UNKNOWN` en
+fracaso seguro; antes de cualquier nuevo intento hay que reconciliar la entrega
+en n8n/Gmail. No se declara correo recibido.
+
+## Intake con adjuntos y proveedor IA vigente — 2026-10-03
+
+La selección vigente del usuario es OpenRouter; no depende de una clave nueva
+de DeepSeek. El workflow unificado usa un nodo/credencial `OpenRouter Chat
+Model`; la API compatible de OpenRouter documenta `POST
+https://openrouter.ai/api/v1/chat/completions` y autenticación Bearer
+([quickstart](https://openrouter.ai/docs/quickstart)). El modelo que aparece en
+el export local es `nvidia/nemotron-3-ultra-550b-a55b:free`; la etiqueta free
+no promete disponibilidad futura ni consistencia del proveedor. No guardar la
+clave en el repo, `.env`, frontend, prompts o capturas; se conserva en la
+credencial de n8n.
+
+`POST /quotes/submit-intake` acepta `multipart/form-data`: un campo `payload`
+JSON y hasta cinco partes `attachments`. Cada archivo debe ser imagen PNG/JPG/
+WebP/GIF u objeto STL/OBJ y pesar como máximo 5 MiB; el límite total de
+transporte es 26 MiB. Requiere sesión de cliente activa y clave de idempotencia.
+La solicitud y metadatos se guardan en JSON Server con estado inicial
+`PENDING_QUOTE`, sin precio ni correo. Los bytes se guardan fuera de `db.json`
+en `.local-data/quote-attachments/<requestId>/<attachmentId>`; el `.gitignore`
+impide incorporarlos al repositorio. `POST /quotes/attachment/read` permite al
+dueño del registro o a Admin leer el archivo; otra cuenta recibe 404. Reintentar
+con la misma clave devuelve la solicitud original sin crear otra.
+
+Esto resuelve el recorrido local/académico, no constituye almacenamiento de
+producción: la carpeta vive en el disco local, no hay análisis antimalware,
+cifrado administrado, política de retención ni URL pública. No desplegarlo en
+producción ni adjuntar información sensible hasta definir esos controles. El
+endpoint viejo `/quotes/create` responde 410 para impedir que un cliente vuelva
+a generar precio/correo automáticamente; Admin mantiene el cálculo separado y
+rotulado DEMO.
+
+El formulario de producto Admin incorpora una sugerencia DEMO de precio de
+catálogo a partir de material, gramos, horas y postprocesado explícitos o un
+perfil análogo. Solo se guarda como fuente `DEMO` con desglose/procedencia y
+confirmación del operador. No mide una foto/STL, no consulta tarifa del taller
+ni representa un precio comercial verificado.
+
+### Respuesta de agentes y sesión Admin — 2026-10-03
+
+La revisión actual mantiene OpenRouter y no requiere credencial DeepSeek. El
+modelo `nvidia/nemotron-3-ultra-550b-a55b:free` se documenta como compatible con
+tool calling, pero no con `response_format`; por eso el workflow no lo usa para
+forzar JSON. El prompt pide JSON y el Code node lo valida/tolera envolturas
+Markdown; la API limita los campos de `requestDraft`. Fuentes: [tool calling de
+OpenRouter](https://openrouter.ai/docs/guides/features/tool-calling) y [ficha
+oficial del modelo](https://openrouter.ai/nvidia/nemotron-3-ultra-550b-a55b%3Afree).
+El modelo gratuito puede variar en disponibilidad y la salida estructurada no
+se considera garantizada.
+
+Los tres AI Agents del export oficial usan `maxIterations: 4`, compatible con
+el límite de tres llamadas a la capacidad temporal más respuesta final. Si el
+Agent termina con `Agent stopped due to max iterations`, n8n lo convierte en
+`ASSISTANT_ITERATION_LIMIT`; el runtime lo devuelve como fallo, no como una
+respuesta normal ni como envío de solicitud.
+
+La página administrativa del copiloto es `/admin/asistente`, distinta del panel
+flotante público; no se monta `AssistantPanel` en Admin. La sesión académica
+simulada dura una hora por defecto. En la inspección del 2026-10-03, navegar a
+`/admin/asistente` en `127.0.0.1:5174` redirigió a `/login`; confirma que la
+sesión de ese origen ya no estaba aceptada en ese momento. No determina por sí
+sola por qué el intento previo devolvió `ROLE_REQUIRED`. El API vuelve a validar
+token vigente, usuario activo y rol en JSON Server; no copiar tokens ni retirar
+la guarda. Reautenticar en el mismo origen y repetir Admin normal/herramienta/
+inyección sigue pendiente.
+
+El workflow oficial generado en `automation/n8n/vertice-cr-unificado.json` ya
+contiene estos cambios; no se modificó la instancia n8n ni sus credenciales en
+esta revisión. Para aplicarlos allí hay que actualizar el workflow existente,
+revisar sus credenciales OpenRouter/Header Auth/Gmail y evitar dejar dos copias
+activas. No activar ni enviar correos como parte de una importación.
+
+### R-H72 — El runtime activo necesita recarga — 2026-10-03
+
+La preferencia vigente es OpenRouter solamente; no se usará ni hace falta una
+clave nueva de DeepSeek. El runtime local ahora responde a preguntas explícitas
+de comparación con el texto de `GUIDE`, sin pedir al modelo cifras que la guía
+no contiene, y convierte tanto el código `ASSISTANT_ITERATION_LIMIT` como el
+texto literal `Agent stopped due to max iterations.` en un error recuperable.
+Jest verifica ambos formatos.
+
+La prueba real desde el navegador en `localhost:5174` obtuvo aún el texto literal
+de iteraciones después de una consulta comparativa, evidencia de que el API que
+escucha en `localhost:3000` no cargó esta modificación. El proceso Node está
+activo desde antes de este cambio; no se pudo inspeccionar su línea de comandos
+ni atribuir su terminal con permisos disponibles y no se lo terminó a ciegas.
+Para aplicar el runtime hay que reiniciar únicamente ese `npm run api`; Vite y
+n8n no requieren reinicio por este cambio del API. Después repetir una
+comparación simple en UI y comprobar que responde «Guía de materiales del taller»
+sin rangos térmicos ni precios. No se transmitió una cotización ni se envió
+correo.
+
+Verificación local del corte R-H72 (2026-10-03): `npm run lint`, 31 suites/177
+tests, `check:ui`, `check:automation` (248 comprobaciones), `build:n8n`, build y
+`git diff --check` pasan. La instancia API activa no recargó el código: la
+orientación comparativa live acabó aún en el literal de iteraciones. Reiniciar
+solo `npm run api` y repetir es requisito para cerrar esta comprobación; n8n y
+Vite no necesitan reinicio por el cambio local del runtime.

@@ -1108,3 +1108,17 @@ Buscar. El cotizador colapsa a una columna bajo 860 px y usa el atributo vigente
 ## Corrección de recorridos y referencias — 2026-10-02
 
 Fuente: cuatro anotaciones del usuario del 2026-10-02 → patrón: continuidad de tarea y referencias reconocibles → adaptación: conversación integrada, superficies cálidas de marca y selector visual con búsqueda, selección persistente y foco visible → motivo: definir una pieza requiere espacio de trabajo, no una ventana de soporte. Este patrón se comparte entre cotizador y Admin; no obliga a reemplazar selects pequeños y acotados, como cinco materiales. Sin dependencias nuevas.
+
+### Copiloto operativo Admin — decisión visual vigente (2026-10-03)
+
+El copiloto Admin es una herramienta de trabajo y orientación, no la variante
+administrativa del popup de Home. Se presenta como ruta de pantalla completa con
+alcance/permisos separados del hilo de consulta; mantiene una composición de
+operaciones propia, pero conserva tipografía, superficies, contraste y acento
+Vértice. No debe reducirse a una ventana flotante repetida ni copiar la página
+de cotización. Fuente → patrón → adaptación → por qué: solicitud explícita del
+usuario → los asistentes viven en contextos y tareas distintos → navegación de
+alcance + área de conversación dentro del shell Admin → distingue permisos y
+evita cubrir las tareas que el operador está consultando. La evidencia visual
+del copiloto aún está pendiente por sesión no válida; esta regla no declara la
+implementación aprobada.

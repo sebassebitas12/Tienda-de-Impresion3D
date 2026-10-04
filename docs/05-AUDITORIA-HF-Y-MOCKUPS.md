@@ -1417,3 +1417,52 @@ publicación en n8n. Activity continúa en el bloque que el usuario reservó.
 ## Corrección de recorridos y referencias — 2026-10-02
 
 Defectos confirmados en React: mezcla de intenciones/DEMO con archivo no recibido, chat modal que cubría la tarea y dropdown largo sin búsqueda, repetido en Admin. Corregidos. Evidencia de navegador: diseño Dark en 1280/768/375, diseño Light en 375, archivo Light en 375 y selector Admin Light en 1280 con búsqueda soporte. Chat integrado sin dialog; diseño móvil sin overflow horizontal (375 de viewport/360 de contenido). No se verificó en esta pasada todo Admin móvil ni Gmail/n8n real. No se reaudita HF-01.
+
+## R-H71 — Intake de cotización y copiloto Admin independiente — 2026-10-03
+
+El usuario pidió explícitamente que el copiloto administrativo no reutilice el
+chat flotante de Home ni parezca otra ventana emergente. La pantalla se separó
+en `/admin/asistente`: encabezado de tarea, rail de alcance/permisos y área de
+conversación de solo lectura. El widget flotante público no ofrece `mode: admin`.
+La ayuda de cotización se mantiene integrada en su página, junto a un resumen
+editable y el control para adjuntar referencias; no es una cotización automática.
+
+**Evidencia visual disponible:** captura del navegador real en Light, ancho
+aproximado 720 px, en `/solicitud/ayuda-diseno`. Se vieron el chat integrado,
+el compositor y el inicio del formulario; el árbol accesible confirmó resumen,
+medidas, material, cantidad, adjuntos y confirmación. No se observó overflow
+horizontal en el viewport visible. No equivale a recorrer el formulario completo
+ni confirma 375/768/1280. El CTA de revisión/foco fue añadido después de esa
+captura y no quedó inspeccionado visualmente en navegador.
+
+**Admin pendiente:** la navegación real a `/admin/asistente` en el mismo origen
+`127.0.0.1:5174` redirigió a `/login`; por ello no hay captura del nuevo copiloto
+ni del cotizador por producto en esta sesión. CSS/JSX confirman que son
+superficies propias, pero eso es evidencia estática, no aprobación visual. No se
+leyó ni alteró el token para recuperar acceso. Retomar tras iniciar sesión en
+ese mismo origen y revisar Dark/Light, 1280/768/375, incluida la navegación Admin.
+
+## R-H72 — Regresión de cotización y Admin — 2026-10-03
+
+En una sesión anónima limpia de localhost:5174, viewport aproximado 1265×710,
+el formulario mantiene la conversación y la ficha editable en paralelo. Probé
+con una pieza inocua: Enter con «prepará el resumen» creó un borrador local, sin
+enviar ni llamar al agente; un segundo mensaje con largo, ancho, cantidad y PETG
+actualizó las casillas correctas y dejó la solicitud sin enviar. La primera
+prueba reveló que «para revisarlo» contaminaba el nombre; se corrigió y el
+recorrido repetido mostró el nombre limpio. Solo se inspeccionó esta anchura y
+la apariencia que devolvió esa sesión; no equivale a una matriz 375/768/1280.
+
+La siguiente consulta live de orientación de materiales reveló que el proceso
+`npm run api` activo todavía servía lógica anterior: la UI mostró literalmente
+«Agent stopped due to max iterations» como respuesta. El runtime local se
+actualizó para detectar esa salida y usar la guía controlada, pero la instancia
+activa no se reinició ni se volvió a verificar; el resultado correcto en
+navegador sigue pendiente. No se envió solicitud ni correo.
+
+Admin: código y tests confirman que `/admin/asistente` usa una página propia y no
+`AssistantPanel`/widget público. No hubo sesión Admin en el origen del navegador
+para inspeccionar el render real, así que el diseño no se declara aprobado
+visualmente. Se requiere inicio de sesión válido en el mismo origen y capturas
+Light/Dark en 1280/768/375. Tampoco se inspeccionó visualmente el CTA «Cotizar
+DEMO» de las filas del catálogo.
