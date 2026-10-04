@@ -103,6 +103,27 @@ describe('roles, herramientas y recorridos', () => {
     expect(result.source).toBe('N8N');
     expect(fetchImpl).toHaveBeenCalledTimes(1);
   });
+  test('autocompleta ficha por Agent general solo con rol Admin y valida el JSON de producto', async () => {
+    const productDraft = { description: 'Soporte compacto para mantener el teléfono elevado sobre el escritorio.', material: 'PETG', colors: ['Negro', 'Gris'], weightGrams: 45, estimatedProductionHours: 2.5, estimateBasis: 'Estimación gruesa para una pieza compacta; confirmar con el laminador.' };
+    const result = await runAssistant({ mode: 'general', task: 'catalog_product_draft', message: 'Soporte de teléfono' }, { actor, data, getRates: rates }, {
+      fetchImpl: async (_url, options) => {
+        const payload = JSON.parse(options.body);
+        expect(payload.task).toBe('catalog_product_draft');
+        expect(payload.mode).toBe('general');
+        expect(payload.messages[0].content).toContain('estimación numérica MUY básica');
+        expect(payload.messages.at(-1).content).toBe('Soporte de teléfono');
+        expect(await executeAssistantToolCapability(payload.toolCapability, { mode: 'general', name: 'search_catalog', args: { query: 'teléfono' } })).toEqual({ error: 'TOOL_FORBIDDEN' });
+        return { ok: true, json: async () => ({ output: JSON.stringify({ reply: 'Propuesta básica lista para revisar.', links: [], requestDraft: null, productDraft }) }) };
+      },
+    });
+    expect(result).toEqual({ reply: 'Propuesta básica lista para revisar.', productDraft, source: 'N8N' });
+  });
+  test('rechaza tarea de catálogo sin Admin o con respuesta estructurada inválida', async () => {
+    const fetchImpl = jest.fn(async () => ({ ok: true, json: async () => ({ output: JSON.stringify({ reply: 'Propuesta.', links: [], productDraft: { description: 'Pieza', material: 'RESIN', colors: [], weightGrams: -1, estimatedProductionHours: 'muchas', estimateBasis: '' } }) }) }));
+    await expect(runAssistant({ mode: 'general', task: 'catalog_product_draft', message: 'Soporte' }, { actor: null, data, getRates: rates }, { fetchImpl })).resolves.toEqual({ error: 'ROLE_REQUIRED' });
+    expect(fetchImpl).not.toHaveBeenCalled();
+    await expect(runAssistant({ mode: 'general', task: 'catalog_product_draft', message: 'Soporte' }, { actor, data, getRates: rates }, { fetchImpl })).resolves.toEqual({ error: 'ASSISTANT_INVALID_RESPONSE' });
+  });
   test('rechaza sesión expirada y vuelve a comprobar el rol en la base', () => {
     const token = payload => `Bearer sim.v1.${btoa(JSON.stringify(payload)).replace(/=+$/, '')}`;
     expect(sessionActor(token({ kind: 'SIMULATED_JWT', sub: actor.id, role: 'admin', exp: 9999999999 }), data)?.id).toBe(actor.id);

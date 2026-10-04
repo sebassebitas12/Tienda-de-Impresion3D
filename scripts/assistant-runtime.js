@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import { ASSISTANT_COMMON_PROMPT, ASSISTANT_PROMPTS, ASSISTANT_TOOLS, ROLE_TOOLS, ADMIN_GUIDE } from '../src/utils/assistantPolicies.js';
+import { ASSISTANT_COMMON_PROMPT, ASSISTANT_PROMPTS, ASSISTANT_TOOLS, ROLE_TOOLS, ADMIN_GUIDE, CATALOG_PRODUCT_DRAFT_PROMPT, CATALOG_PRODUCT_DRAFT_TASK } from '../src/utils/assistantPolicies.js';
 import { calculateAutomaticDemoQuote, DEMO_PROFILES } from '../src/utils/quoteAutomation.js';
 import { FDM_MATERIALS } from '../src/utils/quotePricing.js';
 
@@ -54,6 +54,7 @@ export async function executeAssistantToolCapability(capability, { mode, name, a
     return { error: 'TOOL_CAPABILITY_INVALID' };
   }
   context.calls += 1;
+  if (context.allowTools === false) return { error: 'TOOL_FORBIDDEN' };
   const result = await executeAssistantTool(name, args, context);
   if (result.error) return { error: result.error };
   return { result };
@@ -117,24 +118,26 @@ function safeLinks(links, mode) {
   return links.filter(link => link && typeof link.label === 'string' && allowed.test(link.path)).slice(0, 4).map(link => ({ label: link.label.slice(0, 80), path: link.path }));
 }
 
-export async function runAssistant({ mode, message, history = [], language = 'es' }, context, { fetchImpl = globalThis.fetch, env = {} } = {}) {
+export async function runAssistant({ mode, message, history = [], language = 'es', task }, context, { fetchImpl = globalThis.fetch, env = {} } = {}) {
   if (!ROLE_TOOLS[mode] || typeof message !== 'string' || !message.trim() || message.length > 2000 || !Array.isArray(history) || history.length > 12) return { error: 'INVALID_CHAT' };
+  if (task !== undefined && (mode !== 'general' || task !== CATALOG_PRODUCT_DRAFT_TASK)) return { error: 'INVALID_CHAT' };
+  if (task === CATALOG_PRODUCT_DRAFT_TASK && context.actor?.role !== 'admin') return { error: 'ROLE_REQUIRED' };
   if (mode === 'admin' && context.actor?.role !== 'admin') return { error: 'ROLE_REQUIRED' };
   if (mode === 'quote') {
     const guidance = quoteMaterialGuidance(message, language);
     if (guidance) return { reply: guidance, links: [], requestDraft: null, source: 'WORKSHOP_GUIDE' };
   }
   const messages = [
-    { role: 'system', content: `${ASSISTANT_PROMPTS[mode]}\n${ASSISTANT_COMMON_PROMPT}\nIdioma: ${language === 'en' ? 'English' : 'español'}.` },
+    { role: 'system', content: `${ASSISTANT_PROMPTS[mode]}\n${ASSISTANT_COMMON_PROMPT}${task === CATALOG_PRODUCT_DRAFT_TASK ? `\n${CATALOG_PRODUCT_DRAFT_PROMPT}` : ''}\nIdioma: ${language === 'en' ? 'English' : 'español'}.` },
     ...history.filter(item => ['user', 'assistant'].includes(item?.role) && typeof item.content === 'string').slice(-10).map(({ role, content }) => ({ role, content: content.slice(0, 3000) })),
     { role: 'user', content: message.trim() },
   ];
-  const capability = issueAssistantToolCapability({ mode, actor: context.actor, data: context.data, getRates: context.getRates });
+  const capability = issueAssistantToolCapability({ mode, actor: context.actor, data: context.data, getRates: context.getRates, allowTools: task !== CATALOG_PRODUCT_DRAFT_TASK });
   try {
     const webhook = env[`VERTICE_ASSISTANT_${mode.toUpperCase()}_URL`] || `http://localhost:5678/webhook/vertice-assistant-${mode}`;
     const toolEndpointUrl = env.VERTICE_ASSISTANT_TOOLS_URL || 'http://localhost:3000/assistants/tools';
     const response = await fetchImpl(webhook, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Vertice-Webhook-Token': env.VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN || '' },
-      body: JSON.stringify({ mode, language, messages, toolCapability: capability, toolEndpointUrl }), signal: AbortSignal.timeout(90000) });
+      body: JSON.stringify({ mode, task: task || null, language, messages, toolCapability: capability, toolEndpointUrl }), signal: AbortSignal.timeout(90000) });
     if (!response.ok) return { error: 'ASSISTANT_UNAVAILABLE' };
     let body;
     try { body = await response.json(); } catch { return { error: 'ASSISTANT_INVALID_RESPONSE' }; }
@@ -150,6 +153,11 @@ export async function runAssistant({ mode, message, history = [], language = 'es
     if (result?.error || !output || typeof output.reply !== 'string' || !output.reply.trim() || output.reply.length > 5000) {
       return { error: 'ASSISTANT_INVALID_RESPONSE' };
     }
+    if (task === CATALOG_PRODUCT_DRAFT_TASK) {
+      const productDraft = safeCatalogProductDraft(output.productDraft);
+      if (!productDraft) return { error: 'ASSISTANT_INVALID_RESPONSE' };
+      return { reply: output.reply, productDraft, source: 'N8N' };
+    }
     return { reply: output.reply, links: safeLinks(output.links, mode), ...(mode === 'quote' ? { requestDraft: safeRequestDraft(output.requestDraft) } : {}), source: 'N8N' };
   } catch (error) {
     if (error?.name === 'TimeoutError' || error?.name === 'AbortError') return { error: 'ASSISTANT_TIMEOUT' };
@@ -157,6 +165,23 @@ export async function runAssistant({ mode, message, history = [], language = 'es
   } finally {
     revokeAssistantToolCapability(capability);
   }
+}
+
+function safeCatalogProductDraft(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const description = typeof value.description === 'string' ? value.description.trim().slice(0, 800) : '';
+  const material = FDM_MATERIALS.includes(String(value.material || '').toUpperCase()) ? String(value.material).toUpperCase() : null;
+  const colors = Array.isArray(value.colors)
+    ? [...new Set(value.colors.filter(color => typeof color === 'string').map(color => color.trim().slice(0, 48)).filter(Boolean))].slice(0, 6)
+    : [];
+  const weightGrams = value.weightGrams === null ? null : value.weightGrams;
+  const estimatedProductionHours = value.estimatedProductionHours === null ? null : value.estimatedProductionHours;
+  const estimateBasis = typeof value.estimateBasis === 'string' ? value.estimateBasis.trim().slice(0, 400) : '';
+  if (description.length < 12 || !material || !colors.length ||
+      (weightGrams !== null && (!Number.isFinite(weightGrams) || weightGrams <= 0 || weightGrams > 5000)) ||
+      (estimatedProductionHours !== null && (!Number.isFinite(estimatedProductionHours) || estimatedProductionHours <= 0 || estimatedProductionHours > 300)) ||
+      !estimateBasis) return null;
+  return { description, material, colors, weightGrams, estimatedProductionHours, estimateBasis };
 }
 
 function safeRequestDraft(value) {

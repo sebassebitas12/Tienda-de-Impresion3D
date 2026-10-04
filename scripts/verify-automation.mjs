@@ -200,7 +200,11 @@ try {
       assert.match(prepared[0].json.systemPrompt, /PENDING_QUOTE; no crea por sí solo una estimación, precio, correo ni aprobación/);
       assert.match(prepared[0].json.systemPrompt, /imágenes o archivos STL\/OBJ/);
       assert.match(prepared[0].json.systemPrompt, /No digas que se aceptan STEP/);
-      assertions += 5;
+      const catalogDraft = run({ first: () => ({ json: { body: { ...input.first().json.body, task: 'catalog_product_draft' } } }) });
+      assert.equal(catalogDraft[0].json.task, 'catalog_product_draft');
+      assert.match(catalogDraft[0].json.systemPrompt, /weightGrams.*estimatedProductionHours.*estimateBasis/s);
+      assert.match(catalogDraft[0].json.systemPrompt, /Herramientas permitidas: ninguna/);
+      assertions += 8;
     }
     if (mode === 'quote') {
       assert.match(toolNode.parameters.toolDescription, /no calcula precios, no consulta datos de Admin/);
@@ -214,10 +218,13 @@ try {
   const runNormalizer = new Function('$input', normalizer.parameters.jsCode);
   const fromAgent = output => ({ first: () => ({ json: { output } }) });
   assert.deepEqual(runNormalizer(fromAgent('```json\n{"reply":"Listo.","links":[],"requestDraft":null}\n```'))[0].json.output,
-    { reply: 'Listo.', links: [], requestDraft: null });
+    { reply: 'Listo.', links: [], requestDraft: null, productDraft: null });
+  const suggestedProduct = { description: 'Soporte compacto para escritorio.', material: 'PETG', colors: ['Negro'], weightGrams: 35, estimatedProductionHours: 2, estimateBasis: 'Estimación orientativa.' };
+  assert.deepEqual(runNormalizer(fromAgent(JSON.stringify({ reply: 'Ficha propuesta.', links: [], requestDraft: null, productDraft: suggestedProduct })))[0].json.output.productDraft,
+    suggestedProduct);
   assert.deepEqual(runNormalizer(fromAgent('Agent stopped due to max iterations'))[0].json.output,
     { error: 'ASSISTANT_ITERATION_LIMIT' });
-  assertions += 2;
+  assertions += 3;
   assert.equal(unified.nodes.filter(node => node.type.endsWith('.gmail')).length, 1); assertions++;
   for (const [from, output] of Object.entries(unified.connections)) {
     assert.ok(unifiedNames.has(from));

@@ -310,18 +310,25 @@ Cada punto requiere su propio commit, tests, documentos de dominio,
 - **QuoteEmailTest:** se conserva para la defensa, rotulado como herramienta de
   **Demostración**.
 
-#### C-P1 — Asistente de cotización para fichas de producto Admin
+#### C-P1 — Autocompletar ficha de producto con IA
 
-- En `/admin/catalogo/nuevo` y `/:id/editar`, añadir “Completar con asistente”.
-- Reutilizar `AutomaticQuote`/servicio existente; no duplicar cálculo. Extraer
-  función pura si se necesita para compartir la lógica.
-- Entrada: nombre, descripción, categoría, dimensiones o foto ya elegida.
-- Salida: propuestas de material, precio, gramos, horas, colores y descripción,
-  mostradas campo por campo con Aceptar/Descartar. Nada se guarda sin aceptación
-  explícita; indicar propuesta/DEMO donde corresponda.
-- Incluir loading, error de n8n caído, timeout y respuesta inválida.
-- Completar un DRAFT existente de punta a punta; permanece DRAFT hasta publicación
-  manual.
+**Implementado localmente — 2026-10-04.** En crear/editar producto, el botón
+«✨ Autocompletar ficha con IA» envía únicamente el nombre a
+`/assistants/chat` como tarea Admin `catalog_product_draft` por el agente general.
+El prompt devuelve descripción, material y colores sugeridos, gramos/horas muy
+básicos y sus supuestos; el backend exige Admin, desactiva las tools y valida la
+salida. La respuesta rellena campos editables, sin guardar ni publicar.
+
+No hay precio de IA. Los gramos/horas del modelo se señalan como estimación y no
+se usan en el cálculo hasta que el operador los contraste con el laminador y lo
+confirme; elegir un perfil análogo DEMO sigue siendo una acción separada. La
+calculadora existente se conserva.
+
+Pruebas locales dirigidas: `adminCatalogForm` (13) y `quoteAutomation` (24),
+lint, `check:ui` y build del export n8n pasan. **La prueba real del botón contra
+n8n queda pendiente de importar/publicar este export actualizado**; el usuario
+confirmó que B1/B2 (los tres agentes OpenRouter y correo) funcionan en vivo, lo
+cual no prueba por sí solo este nuevo formato `productDraft`.
 
 #### C-P2 — Subir fotos de producto
 

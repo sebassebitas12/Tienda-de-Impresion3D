@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ErrorState, Skeleton } from '../../components/ui/index.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
+import { useAuth } from '../../hooks/useAuth.js';
 import { useAdminCatalog } from './useAdminCatalog.js';
 import { ImagePicker } from './ImagePicker.jsx';
 import { DEMO_PROFILES } from '../../utils/quoteAutomation.js';
 import { calculateProductDemoPrice } from '../../utils/productDemoPricing.js';
+import { automationAction, automationError } from '../../services/automationService.js';
 import { CatalogDeleteDialog } from './CatalogDeleteDialog.jsx';
 import {
   createAdminCategory, createAdminProduct, deleteAdminCategory, updateAdminCategory, updateAdminProduct,
@@ -23,6 +25,7 @@ const copy = {
 
 export function AdminProductFormPage() {
   const { language } = usePreferences();
+  const { token } = useAuth();
   const t = copy[language] || copy.es;
   const { id } = useParams();
   const location = useLocation();
@@ -36,13 +39,16 @@ export function AdminProductFormPage() {
   const [postProcessMinutes, setPostProcessMinutes] = useState(0);
   const [pricingPreview, setPricingPreview] = useState(null);
   const [confirmDemoPrice, setConfirmDemoPrice] = useState(false);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiReply, setAiReply] = useState('');
+  const [pricingDemoProfileApplied, setPricingDemoProfileApplied] = useState(false);
   const product = values || (existing ? {
     name: existing.name || '', slug: existing.slug || '', description: existing.description || '', categoryId: existing.categoryId || '',
     price: existing.price ?? '', material: String(existing.material || '').toUpperCase(), colors: (existing.availableColors || []).join(', '),
     dimensions: existing.dimensions || '', weightGrams: existing.weightGrams ?? '', estimatedProductionHours: existing.estimatedProductionHours ?? '',
     status: existing.status || 'ACTIVE', featured: Boolean(existing.featured), images: existing.images || [],
-    priceSource: existing.priceSource || 'MANUAL', quotePricing: existing.quotePricing || null,
-  } : { name: '', slug: '', description: '', categoryId: '', price: '', material: '', colors: '', dimensions: '', weightGrams: '', estimatedProductionHours: '', status: 'DRAFT', featured: false, images: [], priceSource: 'MANUAL', quotePricing: null });
+    priceSource: existing.priceSource || 'MANUAL', quotePricing: existing.quotePricing || null, aiProductionEstimate: existing.aiProductionEstimate || null,
+  } : { name: '', slug: '', description: '', categoryId: '', price: '', material: '', colors: '', dimensions: '', weightGrams: '', estimatedProductionHours: '', status: 'DRAFT', featured: false, images: [], priceSource: 'MANUAL', quotePricing: null, aiProductionEstimate: null });
   const isEdit = Boolean(id);
   const availableCategories = categories.filter(category => String(category.status || 'ACTIVE').toUpperCase() === 'ACTIVE');
   useEffect(() => {
@@ -59,8 +65,10 @@ export function AdminProductFormPage() {
       else if (['material', 'weightGrams', 'estimatedProductionHours'].includes(name) && next.priceSource === 'DEMO') {
         next.priceSource = 'NEEDS_RECALCULATION'; next.quotePricing = null;
       }
+      if (['weightGrams', 'estimatedProductionHours'].includes(name) && next.aiProductionEstimate) next.aiProductionEstimate = { ...next.aiProductionEstimate, verifiedWithSlicer: false };
       return next;
     });
+    if (['weightGrams', 'estimatedProductionHours'].includes(name)) setPricingDemoProfileApplied(false);
     if (name === 'price' || ['material', 'weightGrams', 'estimatedProductionHours'].includes(name)) {
       setPricingPreview(null); setConfirmDemoPrice(false);
     }
@@ -69,14 +77,44 @@ export function AdminProductFormPage() {
     const profile = DEMO_PROFILES.find(item => item.id === pricingProfileId);
     if (!profile) return;
     setValues(current => ({ ...product, ...current, weightGrams: profile.weightGrams, estimatedProductionHours: profile.printHours }));
+    setPricingDemoProfileApplied(true);
     setPostProcessMinutes(profile.postProcessMinutes);
     setPricingPreview(null); setError('');
   };
   const calculatePrice = () => {
+    if (product.aiProductionEstimate && !product.aiProductionEstimate.verifiedWithSlicer && !pricingDemoProfileApplied) {
+      setError(language === 'es' ? 'La IA solo estimó gramos y horas. Confirmá los valores contrastados con el laminador o elegí explícitamente un perfil análogo DEMO.' : 'AI only estimated grams and time. Confirm slicer-verified values or explicitly choose an analogue DEMO profile.');
+      return;
+    }
     const quote = calculateProductDemoPrice({ material: product.material, weightGrams: product.weightGrams, printHours: product.estimatedProductionHours, postProcessMinutes });
     if (!quote) { setError(language === 'es' ? 'Elegí material y completá gramos y horas de impresión mayores que cero.' : 'Choose a material and enter weight and print hours greater than zero.'); return; }
     setPricingPreview(quote); setError('');
   };
+  const completeProductWithAi = async () => {
+    const name = product.name.trim();
+    if (!name) { setError(language === 'es' ? 'Escribí primero el nombre del producto.' : 'Enter the product name first.'); return; }
+    setAiBusy(true); setError(''); setAiReply('');
+    try {
+      const result = await automationAction('/assistants/chat', { mode: 'general', task: 'catalog_product_draft', message: name, language }, { token });
+      if (!result?.productDraft) throw Object.assign(new Error('ASSISTANT_INVALID_RESPONSE'), { code: 'ASSISTANT_INVALID_RESPONSE' });
+      const draft = result.productDraft;
+      const generatedAt = new Date().toISOString();
+      setValues(current => ({ ...product, ...current,
+        description: draft.description,
+        material: draft.material,
+        colors: draft.colors.join(', '),
+        weightGrams: draft.weightGrams ?? '',
+        estimatedProductionHours: draft.estimatedProductionHours ?? '',
+        aiProductionEstimate: { source: 'N8N', generatedAt, estimateBasis: draft.estimateBasis, estimatedWeightGrams: draft.weightGrams, estimatedProductionHours: draft.estimatedProductionHours, verifiedWithSlicer: false },
+        ...(product.priceSource === 'DEMO' ? { priceSource: 'NEEDS_RECALCULATION', quotePricing: null } : {}),
+      }));
+      setPricingDemoProfileApplied(false); setPricingPreview(null); setConfirmDemoPrice(false);
+      setAiReply(result.reply || (language === 'es' ? 'Ficha propuesta. Revisá cada campo antes de guardar.' : 'Draft suggested. Review each field before saving.'));
+    } catch (actionError) {
+      setError(automationError(actionError.code || actionError.message, language));
+    } finally { setAiBusy(false); }
+  };
+  const confirmSlicerValues = checked => setValues(current => ({ ...product, ...current, aiProductionEstimate: { ...product.aiProductionEstimate, verifiedWithSlicer: checked } }));
   const applyDemoPrice = () => {
     if (!pricingPreview) return;
     setValues(current => ({ ...product, ...current, price: String(pricingPreview.breakdown.amountCrc), priceSource: 'DEMO', quotePricing: pricingPreview }));
@@ -104,6 +142,7 @@ export function AdminProductFormPage() {
       status: product.status, featured: Boolean(product.featured), updatedAt: now,
       priceSource: product.priceSource || 'MANUAL', quotePricing: product.priceSource === 'DEMO' ? product.quotePricing : null,
       priceConfirmation: product.priceSource === 'DEMO' && confirmDemoPrice ? { mode: 'DEMO', confirmedAt: now } : null,
+      ...(product.aiProductionEstimate ? { aiProductionEstimate: product.aiProductionEstimate } : {}),
       images: product.images,
       ...(existing ? {} : { createdAt: now }),
     };
@@ -123,13 +162,20 @@ export function AdminProductFormPage() {
     <Link className="admin-request-back" to="/admin/catalogo">← {t.catalog}</Link>
     <header className="admin-page-heading"><div><span className="admin-eyebrow">{isEdit ? `PRODUCTO / ${id}` : 'NUEVO PRODUCTO'}</span><h1 id="admin-product-form-title">{isEdit ? t.edit : t.new}</h1></div></header>
     <form className="admin-catalog-form__surface" onSubmit={save} noValidate>
+      <section className="admin-product-ai" aria-labelledby="admin-product-ai-title">
+        <div><span className="admin-eyebrow">{language === 'es' ? 'ASISTENCIA DE FICHA · PROPUESTA' : 'PRODUCT DRAFT · SUGGESTION'}</span><h2 id="admin-product-ai-title">{language === 'es' ? 'Partí del nombre, revisá el resto.' : 'Start with a name, review the rest.'}</h2><p>{language === 'es' ? 'La IA sugiere descripción, material, colores y una referencia muy aproximada de peso/tiempo. No consulta stock ni mide la pieza.' : 'AI suggests a description, material, colors and a very rough weight/time reference. It does not check stock or measure the part.'}</p></div>
+        <button className="admin-action-primary" type="button" onClick={completeProductWithAi} disabled={aiBusy || busy}>{aiBusy ? (language === 'es' ? 'Preparando propuesta…' : 'Preparing suggestion…') : '✨ Autocompletar ficha con IA'}</button>
+        {aiBusy && <p className="admin-product-ai__status" role="status" aria-live="polite">{language === 'es' ? 'Consultando el agente general…' : 'Asking the general assistant…'}</p>}
+        {aiReply && <p className="admin-product-ai__reply" role="status">{aiReply}</p>}
+        {product.aiProductionEstimate && <p className="admin-product-ai__caveat" role="note">{language === 'es' ? `Estimación IA, no medición. ${product.aiProductionEstimate.estimateBasis}` : `AI estimate, not a measurement. ${product.aiProductionEstimate.estimateBasis}`}</p>}
+      </section>
       <div className="admin-catalog-form__grid">
         <label>{t.name}<input name="name" value={product.name} onChange={onChange} required autoComplete="off" /></label>
         <label>{t.slug}<input name="slug" value={product.slug} onChange={onChange} placeholder={slugify(product.name)} autoComplete="off" /></label>
         <label>{t.category}<select name="categoryId" value={product.categoryId} onChange={onChange} required><option value="">{t.noCategory}</option>{availableCategories.map(category => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
         <label>{t.material}<select name="material" value={materials.includes(product.material) ? product.material : ''} onChange={onChange} required={product.status !== 'DRAFT'}><option value="">{language === 'es' ? 'Seleccionar material' : 'Select material'}</option>{materials.map(material => <option key={material}>{material}</option>)}</select></label>
         <label>{t.price}<input name="price" type="number" min="0" step="1" value={product.price} onChange={onChange} required={product.status !== 'DRAFT'} /></label>
-        <label>{t.colors}<input name="colors" value={product.colors} onChange={onChange} /></label>
+        <label>{language === 'es' ? 'Colores sugeridos (confirmá disponibilidad)' : 'Suggested colors (confirm availability)'}<input name="colors" value={product.colors} onChange={onChange} /></label>
         <label>{t.dimensions}<input name="dimensions" value={product.dimensions} onChange={onChange} /></label>
         <label>{t.weight}<input name="weightGrams" type="number" min="0" step="1" value={product.weightGrams} onChange={onChange} /></label>
         <label>{t.hours}<input name="estimatedProductionHours" type="number" min="0" step="0.5" value={product.estimatedProductionHours} onChange={onChange} /></label>
@@ -146,6 +192,7 @@ export function AdminProductFormPage() {
           <label>{language === 'es' ? 'Postprocesado por unidad (min)' : 'Post-processing per unit (min)'}<input type="number" min="0" step="1" value={postProcessMinutes} onChange={event => { setPostProcessMinutes(event.target.value); setPricingPreview(null); }} /></label>
           <button className="admin-action-primary" type="button" onClick={calculatePrice}>{language === 'es' ? 'Calcular sugerencia DEMO' : 'Calculate DEMO suggestion'} ↗</button>
         </div>
+        {product.aiProductionEstimate && <label className="admin-product-pricing__confirm"><input type="checkbox" checked={Boolean(product.aiProductionEstimate.verifiedWithSlicer)} onChange={event => confirmSlicerValues(event.target.checked)} />{language === 'es' ? 'Ya contrasté y actualicé los gramos y las horas con el laminador. La propuesta de IA por sí sola no sirve como dato final.' : 'I checked and updated grams and hours against the slicer. The AI estimate alone is not final data.'}</label>}
         {product.priceSource === 'NEEDS_RECALCULATION' && <p className="admin-product-pricing__warning" role="status">{language === 'es' ? 'Cambiaste material, peso u horas después del cálculo. Recalculá antes de publicar.' : 'Material, weight or time changed after the calculation. Recalculate before publishing.'}</p>}
         {pricingPreview && <div className="admin-product-pricing__result" aria-live="polite"><div><span className="admin-eyebrow">RESULTADO DEMO · CRC</span><strong>{new Intl.NumberFormat(language === 'es' ? 'es-CR' : 'en-CR', { style: 'currency', currency: 'CRC', maximumFractionDigits: 0 }).format(pricingPreview.breakdown.amountCrc)}</strong><p>{language === 'es' ? 'Sugerencia con los gramos/horas ingresados y supuestos internos DEMO. Verificá el laminador y los costos reales antes de decidir el precio.' : 'Suggested from entered grams/hours and internal DEMO assumptions. Verify slicer output and actual costs before setting a price.'}</p></div><dl>{[['Material', 'materialCrc'], [language === 'es' ? 'Desgaste' : 'Wear', 'wearCrc'], [language === 'es' ? 'Electricidad' : 'Electricity', 'electricityCrc'], [language === 'es' ? 'Postprocesado' : 'Post-processing', 'postProcessCrc']].map(([label, key]) => <div key={key}><dt>{label}</dt><dd>{new Intl.NumberFormat(language === 'es' ? 'es-CR' : 'en-CR', { style: 'currency', currency: 'CRC', maximumFractionDigits: 0 }).format(pricingPreview.breakdown[key])}</dd></div>)}</dl><button className="admin-action-primary" type="button" onClick={applyDemoPrice}>{language === 'es' ? 'Aplicar sugerencia al borrador' : 'Apply suggestion to draft'}</button></div>}
         {product.priceSource === 'DEMO' && product.status === 'ACTIVE' && <label className="admin-product-pricing__confirm"><input type="checkbox" checked={confirmDemoPrice} onChange={event => setConfirmDemoPrice(event.target.checked)} />{language === 'es' ? 'Revisé esta sugerencia DEMO y decido publicarla como precio del catálogo.' : 'I reviewed this DEMO suggestion and choose to publish it as the catalog price.'}</label>}

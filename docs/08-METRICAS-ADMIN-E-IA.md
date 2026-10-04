@@ -424,6 +424,15 @@ DeepSeek. El copiloto Admin vive en `/admin/asistente`, separado del widget
 público. Un `ROLE_REQUIRED` conserva el guard y pide reautenticarse en el mismo
 origen; la página de chat no elimina la autorización.
 
+La ficha de producto tiene además una acción contextual, fuera de los tres
+chatbots: «✨ Autocompletar ficha con IA». Es una tarea puntual sobre el agente
+general, reservada al rol Admin; envía solo el nombre, desactiva las herramientas
+y devuelve campos de producto estructurados. La UI muestra estados de carga y
+error, rellena el formulario sin guardar y distingue colores sugeridos de stock.
+El peso/tiempo que estima el modelo no son mediciones ni precios y requieren
+validación en el laminador antes del cálculo normal. No sustituye ni fusiona el
+Copiloto Admin con el asistente público.
+
 ### Regresión UX/lógica observada en navegador — R-H72, 2026-10-03
 
 Enter sí entregó dos instrucciones locales de preparación al intake: la primera

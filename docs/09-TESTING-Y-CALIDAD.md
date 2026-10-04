@@ -158,6 +158,24 @@ La instalación del parser multipart antes del parser JSON queda cubierta por el
 endpoint de integración; si un test devuelve texto de error del parser, detener
 la validación y no afirmar que la subida está lista.
 
+### C-P1 — autocompletado asistido de producto — 2026-10-04
+
+`adminCatalogForm.test.jsx` cubre que el formulario envíe solo nombre/idioma con
+`mode: general`, `task: catalog_product_draft` y token; aplique description,
+material, colores y estimaciones sin guardar; impida calcular con gramos/horas
+no verificados; conserve el calculador después de confirmar y muestre error de
+timeout sin modificar ficha. `quoteAutomation.test.js` cubre autorización Admin,
+payload/prompt de tarea, tools deshabilitadas y rechazo de JSON inválido.
+Resultado dirigido actual: 13 pruebas de formulario y 24 de runtime aprobadas.
+El contrato n8n se comprueba en el export local; probar el nuevo formato desde
+UI contra el workflow publicado requiere importar/publicar el JSON actualizado.
+
+La auditoría visual local inspeccionó el formulario real en Dark y Light en una
+ventana de escritorio aproximada de 1344×625. El CTA vive dentro de la ficha,
+se ve en ambos temas y no reutiliza el chat flotante. La verificación responsive
+con viewport dedicado de 768/375 px permanece pendiente: `agent-browser` no está
+instalado y no se añadió una dependencia solo para capturar tamaños.
+
 ### R-H72 — regresiones de cotización y respuestas — 2026-10-03
 
 Se añadieron pruebas para que una intención antigua de preparar el resumen no

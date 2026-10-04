@@ -2,6 +2,21 @@
 
 > Última actualización: **2026-10-03**.
 
+## Ficha de producto Admin con asistencia IA — 2026-10-04
+
+Captura real de `/admin/catalogo/nuevo` con sesión Admin en Dark y Light,
+ventana aproximada 1344×625. El CTA «✨ Autocompletar ficha con IA» se presenta
+dentro de la ficha, alineado con el texto de alcance; no reutiliza el panel
+flotante ni duplica el Copiloto Admin. En Light el botón habilitado conserva
+contraste con el naranja de marca; para el nombre vacío sigue disponible y
+explica la validación al activarlo. La estimación se comunica como propuesta,
+antes de los campos de edición y del calculador.
+
+Pendiente: verificar la composición en viewports dedicados 768/375 px. `agent-
+browser` no está instalado en el entorno y no se añadió como dependencia para
+esta auditoría. La captura de escritorio no se presenta como evidencia
+responsive ni como prueba de respuesta real del workflow actualizado.
+
 ## Auditoría Admin A3 con render real — 2026-10-03
 
 Se inspeccionaron 78 vistas: 13 rutas/estados en 375, 768 y 1280 px, Dark y Light. Para mantener evidencia útil sin versionar decenas de variantes, el repositorio conserva una captura representativa por pantalla/estado y tema en `automation/evidence/a3-{vista}-1280-{dark,light}.png` (26 archivos). Las capturas de 375/768 px y estados auxiliares quedan en `automation/evidence/_local_archive/`, carpeta local ignorada por Git; no se borraron.

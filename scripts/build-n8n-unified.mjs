@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ASSISTANT_COMMON_PROMPT, ASSISTANT_PROMPTS, ROLE_TOOLS } from '../src/utils/assistantPolicies.js';
+import { ASSISTANT_COMMON_PROMPT, ASSISTANT_PROMPTS, ROLE_TOOLS, CATALOG_PRODUCT_DRAFT_PROMPT, CATALOG_PRODUCT_DRAFT_TASK } from '../src/utils/assistantPolicies.js';
 
 const directory = fileURLToPath(new URL('../automation/n8n/', import.meta.url));
 const load = async (file) => JSON.parse(await readFile(resolve(directory, file), 'utf8'));
@@ -51,11 +51,14 @@ for (const [index, mode] of assistantModes.entries()) {
     position: [470, y], parameters: { mode: 'runOnceForAllItems', jsCode: `const body = $input.first().json.body || {};
 const mode = ${JSON.stringify(mode)};
 if (body.mode !== mode || !Array.isArray(body.messages) || body.messages.length > 12 || typeof body.toolCapability !== 'string' || body.toolCapability.length < 40 || typeof body.toolEndpointUrl !== 'string' || !/^https?:\\/\\//.test(body.toolEndpointUrl)) throw new Error('Contexto de asistente inválido');
+const task = body.task || null;
+if (task !== null && !(mode === 'general' && task === ${JSON.stringify(CATALOG_PRODUCT_DRAFT_TASK)})) throw new Error('Tarea de asistente inválida');
 const turns = body.messages.filter(m => ['user','assistant'].includes(m?.role) && typeof m.content === 'string').slice(-11).map(m => ({role:m.role,content:m.content.slice(0,3000)}));
 if (!turns.length || turns.at(-1).role !== 'user') throw new Error('Falta el mensaje actual');
 const transcript = turns.map(m => (m.role === 'user' ? 'Cliente' : 'Asistente') + ': ' + m.content).join('\\n\\n');
-const systemPrompt = ${JSON.stringify(ASSISTANT_PROMPTS[mode] + '\n' + ASSISTANT_COMMON_PROMPT)} + '\\nIdioma: ' + (body.language === 'en' ? 'English' : 'español de Costa Rica') + '\\nHerramientas permitidas: ' + ${JSON.stringify(ROLE_TOOLS[mode].join(', '))};
-return [{json:{mode,toolCapability:body.toolCapability,toolEndpointUrl:body.toolEndpointUrl,systemPrompt,agentInput:transcript+'\\n\\nDevuelve exclusivamente el JSON solicitado por el sistema.'}}];` },
+const isCatalogDraft = task === ${JSON.stringify(CATALOG_PRODUCT_DRAFT_TASK)};
+const systemPrompt = ${JSON.stringify(ASSISTANT_PROMPTS[mode] + '\n' + ASSISTANT_COMMON_PROMPT)} + (isCatalogDraft ? '\\n' + ${JSON.stringify(CATALOG_PRODUCT_DRAFT_PROMPT)} : '') + '\\nIdioma: ' + (body.language === 'en' ? 'English' : 'español de Costa Rica') + '\\nHerramientas permitidas: ' + (isCatalogDraft ? 'ninguna' : ${JSON.stringify(ROLE_TOOLS[mode].join(', '))});
+return [{json:{mode,task,toolCapability:body.toolCapability,toolEndpointUrl:body.toolEndpointUrl,systemPrompt,agentInput:transcript+'\\n\\nDevuelve exclusivamente el JSON solicitado por el sistema.'}}];` },
   });
   connectMain(entryName, prepareName);
   nodes.push({
@@ -107,7 +110,8 @@ try { output = JSON.parse(normalized); } catch { output = {reply:raw,links:[]}; 
 if (output?.error === 'ASSISTANT_ITERATION_LIMIT') return [{json:{output:{error:output.error}}}];
 if (!output || typeof output.reply !== 'string' || !output.reply.trim() || output.reply.length > 5000 || !Array.isArray(output.links)) throw new Error('Formato de respuesta inválido');
 const draft = output.requestDraft && typeof output.requestDraft === 'object' && !Array.isArray(output.requestDraft) ? output.requestDraft : null;
-return [{json:{output:{reply:output.reply.trim(),links:output.links.filter(link => link && typeof link.label === 'string' && typeof link.path === 'string').slice(0,4),requestDraft:draft}}}];` },
+const productDraft = output.productDraft && typeof output.productDraft === 'object' && !Array.isArray(output.productDraft) ? output.productDraft : null;
+return [{json:{output:{reply:output.reply.trim(),links:output.links.filter(link => link && typeof link.label === 'string' && typeof link.path === 'string').slice(0,4),requestDraft:draft,productDraft}}}];` },
 });
 
 const rateWebhook = rates.nodes.find((node) => node.type.endsWith('.webhook'));

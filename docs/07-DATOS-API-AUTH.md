@@ -925,6 +925,25 @@ perfil análogo. Solo se guarda como fuente `DEMO` con desglose/procedencia y
 confirmación del operador. No mide una foto/STL, no consulta tarifa del taller
 ni representa un precio comercial verificado.
 
+### Autocompletado de fichas de catálogo con IA — 2026-10-04
+
+`POST /assistants/chat` admite para una sesión Admin `mode: "general"` y la
+tarea acotada `catalog_product_draft`. La UI envía únicamente el nombre del
+producto y el idioma; no adjunta foto, ficha previa, clientes ni datos del
+catálogo. El prompt exige un objeto estructurado con descripción comercial,
+material FDM sugerido, hasta seis colores sugeridos, gramos/horas orientativos
+y la base/supuestos de esa estimación. No permite herramientas en esta tarea.
+
+El servidor vuelve a validar y limitar todos los campos antes de responder; la
+UI los coloca en el formulario como borrador editable, sin guardar, publicar ni
+proponer precio. Los colores no afirman stock. La procedencia se conserva como
+`aiProductionEstimate`; gramos y horas no se habilitan como insumo de precio
+hasta que el operador confirme haberlos contrastado/actualizado con el
+laminador. Alternativamente puede escoger explícitamente un perfil análogo
+DEMO. El flujo depende de que el workflow oficial importado en n8n incluya la
+tarea y preserve `productDraft`; el JSON del repo es la fuente de actualización,
+no evidencia de que la instancia local ya se haya actualizado.
+
 ### Respuesta de agentes y sesión Admin — 2026-10-03
 
 La revisión actual mantiene OpenRouter y no requiere credencial DeepSeek. El

@@ -272,3 +272,11 @@ desde el formulario y quedan para revisión del taller.
 Para fichas del catálogo, el operador llega al cálculo DEMO desde «Cotizar DEMO»
 en la lista de modelos. El resultado no se considera precio confirmado hasta
 que el operador lo revise y lo guarde explícitamente.
+
+En el formulario de producto, Admin puede pedir al agente general una propuesta
+de ficha usando únicamente el nombre escrito. La respuesta incluye descripción,
+material y colores sugeridos, además de gramos/horas muy aproximados; no consulta
+stock, no mide la pieza, no propone precio ni publica/guarda por sí sola. El
+operador revisa y edita cada campo. Antes de usar peso/horas estimados en el
+calculador debe contrastarlos con el laminador; el perfil análogo DEMO continúa
+siendo una alternativa explícita distinta.

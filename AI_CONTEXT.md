@@ -1,11 +1,21 @@
 # AI_CONTEXT.md — Vértice CR
 
-> **Última actualización:** 2026-10-03
+> **Última actualización:** 2026-10-04
 > **Estado:** SNAPSHOT ACTIVO  
 > **Rama:** `Pruebas`  
 > **No es un diario:** este archivo resume el presente. El historial detallado vive en los documentos de dominio.
 
-## Estado vigente para continuar (2026-10-03)
+## Estado vigente para continuar (2026-10-04)
+
+- El usuario confirmó en vivo los tres asistentes con OpenRouter y el correo con tabla formateada: **Bloque B cerrado por validación del usuario**. No reenviar correos ni cambiar credenciales.
+- Rama de trabajo `Pruebas`. `automation/n8n/vertice-cr-unificado.json` es la fuente oficial y `scripts/build-n8n-unified.mjs` la genera; se conserva `toolHttpRequest` v1.1.
+- P1 local: «✨ Autocompletar ficha con IA» en Admin envía solo nombre/idioma al agente general con tarea Admin sin tools; backend valida los campos. Rellena sin guardar ni publicar. Gramos/horas no pasan al cálculo hasta validar con laminador; perfil análogo sigue siendo DEMO.
+- Pruebas dirigidas P1: 13 de formulario y 24 de runtime pasan; lint, `check:ui` y `build:n8n` pasan. Captura real Dark/Light en ventana aproximada 1344×625; viewport responsive dedicado 768/375 pendiente.
+- El workflow abierto/publicado en n8n aún tiene el contrato previo a `productDraft`. Importar/publicar el export actualizado sobre el existente, conservando credenciales, antes de la prueba live del botón. No crear una segunda copia ni tocar credenciales.
+- Próximos bloques: commit local de P1; después C-P2 fotos (dataURL comprimida de imagen, según `docs/10`) y C-P3 STL/OBJ (almacenamiento privado `.local-data`, según el contrato vigente de `docs/07`; no insertar STL grande en `db.json`).
+- No afirmar que la integración P1 live, responsive, uploads o CI estén verificados sin su evidencia. Consultar `docs/07`, `docs/09` y `docs/10` al retomar.
+
+## Registro anterior para continuar (2026-10-03; superado)
 
 - Rama `Pruebas`, HEAD `5972088`; GitHub Actions está verde solo para ese commit (run `37149033364`), no para el árbol local. Los cambios locales de este corte no están committeados; no hacer stage/commit/push automático. `db.json` conserva una entrega de correo `UNKNOWN`; no modificar ni reenviar.
 - B0 local: `automation/n8n/vertice-cr-unificado.json` es la fuente oficial; `scripts/build-n8n-unified.mjs` genera el export. Se conserva `@n8n/n8n-nodes-langchain.toolHttpRequest` v1.1 y los payloads/placeholder fixes documentados en `docs/08`.
@@ -23,7 +33,7 @@
 - Verificación local del corte actual: `npm run lint`, Jest (31 suites/177 tests), `check:ui`, `check:automation` (248 comprobaciones), `build:n8n`, `build` y `git diff --check` pasan. Build conserva aviso de bundle principal >500 kB. El proceso API live no se reinició y mostró el error de iteraciones sin clasificar. El CI remoto verde se limita al HEAD `5972088`; no hay commit ni cambios enviados a CI.
 - Continuación inmediata: reiniciar solo `npm run api` en el puerto 3000 y probar orientación desde el cotizador con OpenRouter; no enviar solicitudes ni correos. Después auditar el copiloto Admin con rol válido, confirmar que se ve la página completa y probar agente/herramienta/inyección. B2 sigue `UNKNOWN`, no reintentar; reconciliarlo con el usuario y usar la cuenta cliente que elija.
 
-Este estado vigente prevalece sobre los cortes históricos que aparecen más abajo.
+Este registro anterior fue superado por el snapshot vigente del 2026-10-04.
 
 ## 1. Misión del proyecto
 
