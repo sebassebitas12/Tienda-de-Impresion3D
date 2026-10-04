@@ -198,11 +198,7 @@ export function AdminProductFormPage() {
         {product.priceSource === 'DEMO' && product.status === 'ACTIVE' && <label className="admin-product-pricing__confirm"><input type="checkbox" checked={confirmDemoPrice} onChange={event => setConfirmDemoPrice(event.target.checked)} />{language === 'es' ? 'Revisé esta sugerencia DEMO y decido publicarla como precio del catálogo.' : 'I reviewed this DEMO suggestion and choose to publish it as the catalog price.'}</label>}
         <p className="admin-product-pricing__footnote">{language === 'es' ? 'DEMO: tipo de cambio, filamento, desgaste, energía y mano de obra son supuestos orientativos, no una tarifa vigente del taller. Podés escribir un precio manual en el campo superior.' : 'DEMO: exchange rate, filament, wear, electricity and labor are assumptions, not current workshop rates. You can enter a manual price above.'}</p>
       </section>
-      <ImagePicker value={product.images[0] || ''} language={language} disabled={busy} onChange={image => setValues(current => {
-        const draft = current || product;
-        const images = draft.images || [];
-        return { ...draft, images: image ? [image, ...images.slice(1).filter(path => path !== image)] : images.slice(1) };
-      })} />
+      <ImagePicker images={product.images || []} language={language} disabled={busy} onChange={images => setValues(current => ({ ...product, ...current, images }))} />
       <p className="admin-catalog-form__note">{language === 'es' ? 'Se fabrica bajo pedido. Guardá como borrador mientras confirmás material, precio y especificaciones. Elegir una foto no publica el modelo.' : 'Made to order. Save as a draft while confirming material, price and specifications. Selecting a photo does not publish the model.'}</p>
       {error && <p className="admin-catalog-form__error" role="alert">{error}</p>}
       <div className="admin-catalog-form__actions"><Link className="admin-action-secondary" to="/admin/catalogo">{t.cancel}</Link><button className="admin-action-primary" type="submit" disabled={busy}>{busy ? t.saving : t.save}</button></div>

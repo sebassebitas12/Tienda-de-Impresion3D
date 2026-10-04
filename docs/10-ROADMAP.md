@@ -1,6 +1,6 @@
 # Vértice CR — Roadmap
 
-> **Última actualización:** 2026-10-02
+> **Última actualización:** 2026-10-04
 > **Estado:** ACTIVO  
 > **Fase actual:** 4 — Fundaciones React.  
 > **React:** DESBLOQUEADO (Gate abierto 2026-09-30).
@@ -277,14 +277,14 @@ checkout, no se tomó como diagnóstico ya confirmado:
 
 | # | Área | Resultado comprobado | Bloque |
 |---|---|---|---|
-| 1 | Fotos de catálogo | El picker solo elige la biblioteca local; crear producto guarda `images: []`, editar conserva las rutas. No hay upload ni galería. | C-P2 |
-| 2 | Archivo de solicitud | `/solicitud/archivo` aún es informativa; no adjunta STL/OBJ ni crea intake transaccional. | C-P3 |
+| 1 | Fotos de catálogo | Admin permite cargar hasta seis fotos comprimidas, ordenarlas y elegir portada; JSON Server persiste data URLs en `images`. | C-P2 implementado localmente; revisión visual autenticada pendiente |
+| 2 | Archivo de solicitud | `/solicitud/archivo` recibe hasta cinco referencias (imagen/STL/OBJ), crea intake idempotente `PENDING_QUOTE` y mantiene los bytes fuera de `db.json`. | C-P3 implementado localmente; inspección visual autenticada pendiente |
 | 3 | Prueba de correo | `QuoteEmailTest` está limitada a cuenta propia con `[DEMO][PRUEBA]`; conservar para defensa, rotular y hacer secundaria. | C-P8 |
 | 4 | Compra | Carrito funciona, pero `/checkout/productos` y `/checkout/solicitud` siguen en `ConstructionPage`; no termina en pedido/pago. | C-P4 |
 | 5 | Rutas en construcción | También `/pedidos/:id`, `/nosotros`, `/contacto`, `/faq`, `/materiales`, `/requisitos`, `/terminos`, `/privacidad` y `/envios` siguen usando el placeholder. | C-P4/P7 |
 | 6 | Cotización cliente | Puede aprobar una cotización vigente; no tiene rechazar/pedir cambios y no hay checkout después de aprobación. | C-P5/P4 |
 | 7 | Transiciones Admin | Sí hay transiciones secuenciales, control por rol/estado/versionado, motivo para cierre temprano y evento `ORDER_STATUS_CHANGED`. La frase vieja “Pedidos solo lectura” era obsoleta; corregida en `docs/02`. | Implementado; probar recorrido |
-| 8 | Borradores + bot | No existe todavía asistencia para completar fichas DRAFT ni aceptación por campo. | C-P1 |
+| 8 | Borradores + bot | La ficha Admin puede pedir propuestas de descripción/material/colores y estimaciones básicas al agente general; requiere revisión y confirmación del operador. | C-P1 implementado localmente; prueba live con export actualizado pendiente |
 | 9 | Clientes/Actividad | Clientes permite buscar y consultar pedidos/solicitudes asociados; Activity es historial de eventos existentes, no solo una pantalla vacía. Son superficies de consulta, no gestión integral de perfil. | Implementado; límites deliberados |
 | 10 | Cuenta | `/cuenta` muestra cotizaciones/aprobación; carece de pedidos y perfil. `/pedidos/:id` sigue en construcción. | C-P7/P4 |
 
@@ -332,27 +332,38 @@ cual no prueba por sí solo este nuevo formato `productDraft`.
 
 #### C-P2 — Subir fotos de producto
 
-- Añadir Subir foto con `FileDropzone` existente (JPG/PNG/WebP), galería
-  reordenable y selección de portada; `ImagePicker` actual queda como pestaña
-  secundaria.
-- Crear utilidad pura `compressImage(file) → dataURL`, con tests de tamaño,
-  tipo inválido y archivo enorme.
-- Validar y explicar tipo, tamaño tras compresión y máximo de fotos.
-- Corregir el `onChange` del picker para derivar de `current`, no de `product`.
-- Tienda, ficha y listas deben mostrar `images[0]`, tanto si es ruta local como
-  data URL.
+**Implementado localmente — 2026-10-04.** `ImagePicker` ahora combina subida
+real JPG/PNG/WebP con la biblioteca del taller y presenta una galería con
+reordenamiento, portada y eliminación. El navegador procesa con canvas, limita
+el lado mayor a 1200 px y comprime cada foto a <=300 KiB; el producto admite
+hasta seis fotos. El formato persistido sigue siendo `products.images` con
+data URLs, `images[0]` conserva la portada y los componentes de tienda existentes
+la leen sin un formato paralelo. El API local permite un JSON de hasta 3 MiB
+(seis data URLs codificadas); esta decisión es académica/local, aumenta `db.json`
+y no debe presentarse como almacenamiento de producción.
+
+Pruebas añadidas: tamaño/dimensiones/tipo, compresión, galería y formulario; el
+check HTTP aislado persiste seis imágenes de 300 KiB sin modificar el `db.json`
+real. La autenticación del navegador se redirigió a `/login`, por lo que queda
+pendiente capturar Admin Dark/Light y breakpoints estrechos antes de afirmar una
+auditoría visual completa.
 
 #### C-P3 — `/solicitud/archivo` recibe el archivo
 
-- Sustituir el aviso pendiente por formulario con `FileDropzone` STL/OBJ y límite
-  definido en `docs/07`; pedir uso, cantidad, material deseado, dimensiones y
-  unidades.
-- Guardar nombre/tamaño/tipo y data URL solo para archivos de hasta 5 MB. Para
-  archivos mayores, conservar metadatos y pedir un enlace (Drive/WeTransfer);
-  decidir/documentar privacidad y validación de enlace antes de implementar.
-- Crear solicitud `PENDING_QUOTE` visible en Admin y permitir descarga autorizada.
-- Reactivar el asistente general en `/solicitud/archivo`; `FloatingTools` debe
-  ocultarlo solo en `/solicitud/ayuda-diseno`, donde ya está integrado.
+**Implementado localmente — contrato en `docs/07`.** El formulario pide
+descripción/uso, dimensiones con unidad explícita mm/cm/in, material/cantidad,
+enlace HTTPS opcional y hasta cinco fotos PNG/JPG/WebP/GIF o archivos STL/OBJ
+de 5 MiB máximo cada uno. Tras revisión y envío con sesión de cliente, crea
+`PENDING_QUOTE` con idempotencia; metadatos van a JSON Server y bytes a
+`.local-data/quote-attachments/`, nunca a `db.json`. Admin y dueño pueden leer
+adjuntos por el endpoint autorizado; otra cuenta recibe 404. No hay medición de
+STL, cotización, precio ni correo automático.
+
+Se habilitó el asistente general flotante en `/solicitud/archivo`; queda oculto
+solo en `/solicitud/ayuda-diseno` para no mostrar dos asistentes en esa ruta.
+Tests de UI cubren el asistente, las unidades y el envío de PNG+STL; `check:automation`
+prueba multipart, autenticación, idempotencia y lectura autorizada sobre una
+base/almacenamiento temporal. La captura visual Admin autenticada sigue pendiente.
 
 #### C-P4 — Checkout de productos
 

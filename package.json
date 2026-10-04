@@ -39,6 +39,7 @@
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
     "json-server": "^1.0.0-beta.15",
+    "milliparsec": "^5.1.2",
     "vite": "^8.2.2"
   }
 }

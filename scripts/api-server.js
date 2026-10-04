@@ -5,6 +5,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { createApp } from 'json-server/lib/app.js';
+import { json as parseJson } from 'milliparsec';
 import { prepareRequestAction } from './request-actions.js';
 import { installAutomationOperations } from './automation-operations.js';
 import { deliverQuote } from './quote-email.js';
@@ -17,8 +18,14 @@ const db = { data: null };
 let persistQueue = Promise.resolve();
 
 db.read = async () => {
-  await persistQueue;
-  db.data = JSON.parse(await readFile(databasePath, 'utf8'));
+  while (true) {
+    const currentWrites = persistQueue;
+    await currentWrites;
+    const snapshot = await readFile(databasePath, 'utf8');
+    if (currentWrites !== persistQueue) continue;
+    db.data = JSON.parse(snapshot);
+    return;
+  }
 };
 
 db.write = () => {
@@ -55,7 +62,9 @@ const app = createApp(db);
 const multipartParser = multipartBufferMiddleware(26 * 1024 * 1024);
 const bodyParserEntry = app.middleware.find(entry => entry.type === 'mw' && entry.handler?.toString().includes('checkType(req, type)'));
 if (!bodyParserEntry) throw new Error('No se pudo instalar el parser multipart antes del parser JSON.');
-const parseJsonBody = bodyParserEntry.handler;
+// La galería limita cada data URL a 300 KiB y admite hasta seis fotos; el
+// parser predeterminado de JSON Server solo admite 100 KiB por solicitud.
+const parseJsonBody = parseJson({ payloadLimit: 3 * 1024 * 1024 });
 bodyParserEntry.handler = (req, res, next) => /^multipart\/form-data\s*;/i.test(req.headers['content-type'] || '')
   ? multipartParser(req, res, next)
   : parseJsonBody(req, res, next);

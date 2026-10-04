@@ -139,25 +139,25 @@ describe('Fotos y publicación del formulario Admin', () => {
     expect(createAdminProduct).toHaveBeenCalledWith(expect.objectContaining({ status: 'DRAFT', material: null, price: null, images: ['/images/producto-soporte-celular.jpg'] }));
   });
 
-  it('reemplaza la foto principal y conserva fotos secundarias al editar', async () => {
+  it('promueve una foto de biblioteca a portada y conserva el resto de la galería', async () => {
     openForm('/admin/catalogo/p7/editar');
     await screen.findByRole('heading', { name: 'Editar modelo' });
     expect(screen.getByRole('button', { name: 'Usar foto: Base para control' })).toHaveAttribute('aria-pressed', 'true');
-    fireEvent.change(screen.getByLabelText('Buscar foto'), { target: { value: 'llavero' } });
+    fireEvent.change(screen.getByLabelText(/buscar en la biblioteca/i), { target: { value: 'llavero' } });
     fireEvent.click(screen.getByRole('button', { name: 'Usar foto: Llavero', exact: true }));
     fireEvent.click(screen.getByRole('button', { name: 'Guardar modelo' }));
-    await waitFor(() => expect(updateAdminProduct).toHaveBeenCalledWith('p7', expect.objectContaining({ images: ['/images/producto-llavero-charm.jpg', '/images/hero-soporte.jpg'], status: 'DRAFT' })));
+    await waitFor(() => expect(updateAdminProduct).toHaveBeenCalledWith('p7', expect.objectContaining({ images: ['/images/producto-llavero-charm.jpg', '/images/producto-base-control.jpg', '/images/hero-soporte.jpg'], status: 'DRAFT' })));
   });
 
   it('usa el borrador más reciente al elegir dos fotos seguidas', async () => {
     openForm('/admin/catalogo/p7/editar');
     await screen.findByRole('heading', { name: 'Editar modelo' });
-    fireEvent.change(screen.getByLabelText('Buscar foto'), { target: { value: 'llavero' } });
+    fireEvent.change(screen.getByLabelText(/buscar en la biblioteca/i), { target: { value: 'llavero' } });
     fireEvent.click(screen.getByRole('button', { name: 'Usar foto: Llavero', exact: true }));
-    fireEvent.change(screen.getByLabelText('Buscar foto'), { target: { value: 'engranaje' } });
+    fireEvent.change(screen.getByLabelText(/buscar en la biblioteca/i), { target: { value: 'engranaje' } });
     fireEvent.click(screen.getByRole('button', { name: 'Usar foto: Engranaje', exact: true }));
     fireEvent.click(screen.getByRole('button', { name: 'Guardar modelo' }));
-    await waitFor(() => expect(updateAdminProduct).toHaveBeenCalledWith('p7', expect.objectContaining({ images: ['/images/producto-engranaje.jpg', '/images/hero-soporte.jpg'] })));
+    await waitFor(() => expect(updateAdminProduct).toHaveBeenCalledWith('p7', expect.objectContaining({ images: ['/images/producto-engranaje.jpg', '/images/producto-llavero-charm.jpg', '/images/producto-base-control.jpg', '/images/hero-soporte.jpg'] })));
   });
 
   it('preserva todas las fotos registradas cuando solo cambian datos del modelo', async () => {

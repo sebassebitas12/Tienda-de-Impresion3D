@@ -1,6 +1,6 @@
 # Vértice CR — Datos, API externa, JWT y N8N
 
-> Última actualización: **2026-10-02**.
+> Última actualización: **2026-10-04**.
 
 ## Propósito
 
@@ -12,6 +12,23 @@ db.json es la fuente académica local.
 
 Recursos:
 users, products, categories, orders, orderItems, customPrintRequests, reviews, coupons, notifications, activityLog, settings.
+
+### Galería de fotos de catálogo — 2026-10-04
+
+El formulario Admin puede guardar hasta seis fotos por producto en `products.images`,
+como data URLs comprimidas en el navegador. Se admiten JPEG/PNG/WebP como
+entrada; canvas normaliza a WebP o JPEG, reduce el lado mayor a 1200 px y exige
+un resultado de hasta 300 KiB por foto. La primera entrada es portada (`images[0]`);
+la galería permite reordenar/eliminar y elegir otra portada. Las rutas existentes
+de `public/images` siguen siendo válidas y la biblioteca se conserva.
+
+El servidor local aumenta el tope del parser JSON de 100 KiB a 3 MiB, acotado
+para transportar como máximo seis imágenes codificadas además de los campos del
+producto. `check:automation` prueba una escritura de seis imágenes en una base
+aislada. Esto es almacenamiento académico local, no CDN/almacenamiento
+escalable: JSON Server duplica los bytes como base64 y cada fotografía aumenta
+`db.json`; no usarlo como backend de producción ni versionar pruebas manuales de
+catálogo.
 
 ## API externa
 
@@ -910,6 +927,13 @@ en `.local-data/quote-attachments/<requestId>/<attachmentId>`; el `.gitignore`
 impide incorporarlos al repositorio. `POST /quotes/attachment/read` permite al
 dueño del registro o a Admin leer el archivo; otra cuenta recibe 404. Reintentar
 con la misma clave devuelve la solicitud original sin crear otra.
+
+En `/solicitud/archivo`, el formulario presenta dimensiones numéricas y selector
+de unidad mm/cm/in; la unidad elegida se incorpora al campo textual `dimensions`
+que persiste el contrato existente. El formulario puede además adjuntar fotos,
+STL u OBJ y un enlace HTTPS. La ruta dispone del asistente general; el widget se
+oculta solo en `/solicitud/ayuda-diseno` para no duplicar el asistente de
+cotización integrado.
 
 Esto resuelve el recorrido local/académico, no constituye almacenamiento de
 producción: la carpeta vive en el disco local, no hay análisis antimalware,

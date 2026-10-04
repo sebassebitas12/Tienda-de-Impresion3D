@@ -80,6 +80,11 @@ try {
   assert.equal(invalidAssistantResponse.code, 'ASSISTANT_INVALID_RESPONSE'); assertions++;
   const publicQuoteChat = await post('/assistants/chat', { mode: 'quote', message: 'Ayuda', history: [] }, undefined);
   assert.equal(publicQuoteChat.source, 'N8N'); assertions++;
+  const compressedPhoto = `data:image/webp;base64,${Buffer.alloc(300 * 1024).toString('base64')}`;
+  const catalogWithGallery = await post('/products', { name: 'Galería QA', status: 'DRAFT', images: Array(6).fill(compressedPhoto) }, 'admin-test', 201);
+  assert.equal(catalogWithGallery.images.length, 6);
+  assert.equal(catalogWithGallery.images[0], compressedPhoto);
+  assertions += 2;
   for (const [mode, id] of [['general', undefined], ['admin', 'admin-test'], ['quote', 'customer-test']]) {
     const chat = await post('/assistants/chat', { mode, message: 'Ayuda', history: [] }, id);
     assert.equal(chat.source, 'N8N'); assert.ok(chat.reply.includes('consultada')); assertions += 2;
