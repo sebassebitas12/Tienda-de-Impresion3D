@@ -8,7 +8,7 @@ import { AssistantPanel } from '../features/chatbot/AssistantPanel.jsx';
 import './quotes.css';
 import './quote-intake.css';
 
-const emptyDraft = { description: '', intendedUse: '', dimensions: '', material: '', quantity: 1, needsDesign: false, referenceUrl: '' };
+const emptyDraft = { description: '', intendedUse: '', dimensions: '', dimensionsUnit: 'cm', material: '', quantity: 1, needsDesign: false, referenceUrl: '' };
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export function QuoteRequestPage() {
@@ -76,7 +76,8 @@ export function QuoteRequestPage() {
     setBusy(true);
     if (!idempotencyKey.current) idempotencyKey.current = globalThis.crypto?.randomUUID?.() || `rq-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     try {
-      const result = await submitQuoteIntake({ ...draft, description: draft.description.trim(), referenceUrl: draft.referenceUrl.trim(), sourceType: intent === 'file' ? 'FILE_UPLOAD' : 'DESIGN_HELP', idempotencyKey: idempotencyKey.current }, files, { token: auth?.token });
+      const dimensions = intent === 'file' && draft.dimensions.trim() ? `${draft.dimensions.trim()} ${draft.dimensionsUnit}` : draft.dimensions.trim();
+      const result = await submitQuoteIntake({ ...draft, dimensions, description: draft.description.trim(), referenceUrl: draft.referenceUrl.trim(), sourceType: intent === 'file' ? 'FILE_UPLOAD' : 'DESIGN_HELP', idempotencyKey: idempotencyKey.current }, files, { token: auth?.token });
       setSubmitted(result.request);
     } catch (failure) { setError(automationError(failure.code, language)); }
     finally { setBusy(false); }
@@ -104,7 +105,7 @@ export function QuoteRequestPage() {
         {submitted ? <div className="quote-intake-success" role="status"><span>✓</span><div><h3>{es ? 'Solicitud enviada al taller' : 'Request sent to the workshop'}</h3><p>{es ? `Referencia ${submitted.id}. No se generó un precio ni se envió un correo.` : `Reference ${submitted.id}. No price was created and no email was sent.`}</p><Link to="/cuenta">{es ? 'Ver mis solicitudes' : 'View my requests'} ↗</Link></div></div> : <>
           <label>{es ? '¿Qué querés fabricar?' : 'What do you want to make?'}<textarea rows="4" maxLength="2000" required value={draft.description} onChange={event => updateDraft('description', event.target.value)} placeholder={es ? 'Describí la pieza, qué forma tiene o qué problema resuelve.' : 'Describe the part, its shape or what problem it solves.'} /></label>
           <label>{es ? '¿Para qué la vas a usar?' : 'What will you use it for?'}<input maxLength="500" value={draft.intendedUse} onChange={event => updateDraft('intendedUse', event.target.value)} placeholder={es ? 'Uso previsto (si ya lo sabés)' : 'Intended use (if known)'} /></label>
-          <div className="quote-intake-form__grid"><label>{es ? 'Medidas aproximadas' : 'Approximate dimensions'}<input maxLength="200" value={draft.dimensions} onChange={event => updateDraft('dimensions', event.target.value)} placeholder={es ? 'Ej.: largo 15 cm, ancho 3 cm' : 'e.g. 15 cm long, 3 cm wide'} /></label>
+          <div className="quote-intake-form__grid">{intent === 'file' ? <div className="quote-intake-dimensions"><label htmlFor="quote-intake-dimensions">{es ? 'Medidas aproximadas' : 'Approximate dimensions'}</label><div><input id="quote-intake-dimensions" maxLength="180" value={draft.dimensions} onChange={event => updateDraft('dimensions', event.target.value)} placeholder={es ? 'Ej.: 15 × 3 × 2' : 'e.g. 15 × 3 × 2'} /><label className="quote-intake-dimensions__unit-label" htmlFor="quote-intake-dimensions-unit">{es ? 'Unidad' : 'Unit'}</label><select id="quote-intake-dimensions-unit" aria-label={es ? 'Unidad de medida' : 'Measurement unit'} value={draft.dimensionsUnit} onChange={event => updateDraft('dimensionsUnit', event.target.value)}><option value="mm">mm</option><option value="cm">cm</option><option value="in">in</option></select></div><small>{es ? 'Largo × ancho × alto. La unidad elegida se agrega al resumen.' : 'Length × width × height. The selected unit is included in the summary.'}</small></div> : <label>{es ? 'Medidas aproximadas' : 'Approximate dimensions'}<input maxLength="200" value={draft.dimensions} onChange={event => updateDraft('dimensions', event.target.value)} placeholder={es ? 'Ej.: largo 15 cm, ancho 3 cm' : 'e.g. 15 cm long, 3 cm wide'} /></label>}
             <label>{es ? 'Material deseado' : 'Preferred material'}<select value={draft.material} onChange={event => updateDraft('material', event.target.value)}><option value="">{es ? 'Aún no definido' : 'Not decided'}</option>{FDM_MATERIALS.map(material => <option key={material}>{material}</option>)}</select></label>
             <label>{es ? 'Cantidad' : 'Quantity'}<input type="number" min="1" max="100" step="1" value={draft.quantity} onChange={event => updateDraft('quantity', Number(event.target.value))} /></label>
             <label className="quote-intake-check"><input type="checkbox" checked={draft.needsDesign} onChange={event => updateDraft('needsDesign', event.target.checked)} />{es ? 'Necesito ayuda con el diseño' : 'I need design help'}</label></div>

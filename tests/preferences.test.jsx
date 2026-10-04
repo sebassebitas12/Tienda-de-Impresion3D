@@ -25,9 +25,9 @@ function renderReadingPanel() {
   );
 }
 
-function renderChatPanel() {
+function renderChatPanel(path = '/') {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[path]}>
       <PreferencesProvider>
         <FloatingTools active="chat" onActiveChange={() => {}} />
       </PreferencesProvider>
@@ -130,6 +130,15 @@ describe('Asistencia del taller', () => {
     expect(screen.getByText(/No cambio pedidos ni envío correos por mi cuenta/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Qué material me conviene/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Enviar pregunta' })).toBeDisabled();
+  });
+
+  it('mantiene el asistente general en la ruta para enviar un archivo, pero no duplica el de ayuda de diseño', () => {
+    const { unmount } = renderChatPanel('/solicitud/archivo');
+    expect(screen.getByRole('button', { name: 'Abrir asistencia técnica' })).toBeInTheDocument();
+    unmount();
+
+    renderChatPanel('/solicitud/ayuda-diseno');
+    expect(screen.queryByRole('button', { name: 'Abrir asistencia técnica' })).not.toBeInTheDocument();
   });
 
   it('consulta un tema sugerido y distingue la guía local del proveedor IA', async () => {

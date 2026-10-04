@@ -1,21 +1,33 @@
 # Vértice CR — Auditoría HF y mockups
 
-> Última actualización: **2026-10-03**.
+> Última actualización: **2026-10-04**.
 
-## Ficha de producto Admin con asistencia IA — 2026-10-04
+## P1 — Asistencia IA en ficha de producto — 2026-10-04
 
-Captura real de `/admin/catalogo/nuevo` con sesión Admin en Dark y Light,
-ventana aproximada 1344×625. El CTA «✨ Autocompletar ficha con IA» se presenta
-dentro de la ficha, alineado con el texto de alcance; no reutiliza el panel
-flotante ni duplica el Copiloto Admin. En Light el botón habilitado conserva
-contraste con el naranja de marca; para el nombre vacío sigue disponible y
-explica la validación al activarlo. La estimación se comunica como propuesta,
-antes de los campos de edición y del calculador.
+La implementación separa el botón «✨ Autocompletar ficha con IA» del panel
+flotante y del Copiloto Admin. No pude hacer una captura nueva de la ficha real:
+al abrir `/admin/catalogo/nuevo`, el sitio redirigió a `/login` porque la sesión
+Admin había expirado. Por tanto, no declaro inspección visual autenticada de P1,
+P2 ni de otras superficies Admin en este corte.
 
-Pendiente: verificar la composición en viewports dedicados 768/375 px. `agent-
-browser` no está instalado en el entorno y no se añadió como dependencia para
-esta auditoría. La captura de escritorio no se presenta como evidencia
-responsive ni como prueba de respuesta real del workflow actualizado.
+Pendiente: recuperar la sesión en el mismo origen y revisar Admin en Dark/Light
+y 1280/768/375 px. La prueba de pantalla del formulario no sustituye el test
+live del botón contra la versión `productDraft` del workflow publicada.
+
+## C-P2/C-P3 — fotos y adjuntos de solicitud — 2026-10-04
+
+En el navegador real inspeccioné `/solicitud/archivo` a aproximadamente
+1344×625, primero Dark y luego Light. La tarjeta explicativa y el formulario se
+mantienen alineados; el campo de medidas, selector de unidad, material, cantidad,
+enlace y adjuntador son distinguibles en ambos temas. El árbol accesible expone
+los nombres de controles, las opciones mm/cm/in, los límites de archivos y el
+requisito de sesión para enviar. No elegí/subí archivos ni envié la solicitud.
+No hay captura guardada en el repositorio.
+
+El viewport visible es de escritorio; no equivale a validación visual de 768 o
+375 px. `check:ui`, tests responsive/estructurales y revisión de CSS pasan, pero
+las capturas Admin móvil/Light y el recorrido con una sesión Admin/cliente siguen
+pendientes. No declarar P2/P3 visualmente aprobados hasta esa revisión.
 
 ## Auditoría Admin A3 con render real — 2026-10-03
 

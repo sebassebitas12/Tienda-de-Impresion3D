@@ -107,10 +107,13 @@ checkout. En este MVP Admin conserva la emisión de la cotización final; el bot
 puede asistir, pero no decide ni envía un monto como oferta.
 
 La calculadora de perfiles en `/solicitud` es una DEMO. No mide archivos ni debe
-mandarse como cotización final. Antes de una automatización real por archivo se
-requiere almacenamiento privado, lectura/laminado STL/OBJ y costos calibrados.
-La ruta del chatbot necesita una acción confirmada para guardar los requisitos
-como solicitud; su conversación por sí sola no crea un encargo.
+mandarse como cotización final. `/solicitud/archivo` ya acepta referencias y
+adjuntos con sesión activa y confirmación, y crea `PENDING_QUOTE`; los bytes se
+guardan en `.local-data` fuera de `db.json` con lectura autorizada. Esta solución
+local no es almacenamiento de producción. Cotizar automáticamente un archivo
+sigue requiriendo análisis/laminado verificable y costos calibrados. En la ruta
+de ayuda de diseño, una acción explícita de revisión/envío crea el intake; la
+conversación por sí sola no crea un encargo.
 
 Conservar requestId, monto, moneda, vigencia, notas, tiempo estimado, fecha y admin emisor.
 El Admin calcula el costo con datos técnicos por pieza y tarifas vigentes introducidos

@@ -1,6 +1,6 @@
 # Vértice CR — Testing y calidad
 
-> Última actualización: **2026-10-03**.
+> Última actualización: **2026-10-04**.
 
 ## Verificación del handoff A — 2026-10-03
 
@@ -170,11 +170,36 @@ Resultado dirigido actual: 13 pruebas de formulario y 24 de runtime aprobadas.
 El contrato n8n se comprueba en el export local; probar el nuevo formato desde
 UI contra el workflow publicado requiere importar/publicar el JSON actualizado.
 
-La auditoría visual local inspeccionó el formulario real en Dark y Light en una
-ventana de escritorio aproximada de 1344×625. El CTA vive dentro de la ficha,
-se ve en ambos temas y no reutiliza el chat flotante. La verificación responsive
-con viewport dedicado de 768/375 px permanece pendiente: `agent-browser` no está
-instalado y no se añadió una dependencia solo para capturar tamaños.
+La inspección visual autenticada de la ficha Admin quedó pendiente: al abrirla,
+la sesión había expirado y el navegador redirigió a `/login`. No se declara una
+captura Dark/Light de esa página ni validación responsive 768/375.
+
+### C-P2 — fotos propias en galería — 2026-10-04
+
+`compressProductImage.test.js` y `imagePicker.test.jsx` verifican tipo/tamaño,
+dimensiones, compresión y acciones de galería; `adminCatalogForm.test.jsx` cubre
+las actualizaciones sucesivas de imágenes a partir del estado vigente. El
+escenario HTTP de `check:automation` guarda seis data URLs de 300 KiB en una base
+aislada, sin escribir el `db.json` real.
+
+### C-P3 — adjuntos en solicitudes — 2026-10-04
+
+`quoteRequest.test.jsx` comprueba selección de unidad mm/cm/in y envío de PNG+STL;
+`preferences.test.jsx` comprueba que el asistente general esté disponible en
+`/solicitud/archivo` y no duplique el integrado de ayuda de diseño. `check:automation`
+valida multipart, autenticación, idempotencia y lectura privada autorizada.
+La captura real de `/solicitud/archivo` en escritorio confirma Dark/Light y árbol
+accesible; no se subieron archivos en navegador. Admin requiere reautenticación
+antes de sus capturas visuales y recorridos reales.
+
+### Verificación local C-P2/P3 — 2026-10-04
+
+`npm test`: 33 suites/187 tests; `npm run lint`; `npm run check:ui` (48 módulos);
+`npm run check:automation` (255 comprobaciones HTTP/permisos/idempotencia/correo
+mock/tools/workflows/assets); `npm run build:n8n` (23 nodos, tres agentes, cinco
+entradas); `npm run build` (161 módulos) y `git diff --check` pasan. Son checks
+locales: no equivalen a CI verde ni a pruebas live de Admin, n8n o subida en un
+navegador autenticado.
 
 ### R-H72 — regresiones de cotización y respuestas — 2026-10-03
 

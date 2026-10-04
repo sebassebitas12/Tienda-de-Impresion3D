@@ -1,6 +1,6 @@
 # Vértice CR — UX, navegación y estados
 
-> Última actualización: **2026-10-03**.
+> Última actualización: **2026-10-04**.
 
 ## Rutas públicas
 
@@ -31,15 +31,20 @@ La entrada `/solicitud` ahora presenta dos caminos explícitos y no los mezcla:
 2. **Quiero ayuda para crearla:** el chatbot conversa para aclarar uso,
    dimensiones, material y cantidad, orienta el diseño y prepara la cotización.
 
-La implementación React ahora muestra las dos opciones en `/solicitud`, separa
-la ruta de ayuda (`/solicitud/ayuda-diseno`) y rotula la calculadora de perfiles
-como DEMO, sin guardado ni correo. La ruta de archivo (`/solicitud/archivo`)
-explica que el upload seguro aún no está conectado y no acepta archivos. El
-Agent de cotización orienta sobre creación de piezas y consulta perfiles DEMO.
-Está disponible para visitantes porque sus herramientas son públicas; Admin y
-los datos privados siguen protegidos. No guarda ni envía solicitudes. No afirmar
-recepción, medición, cotización
-o envío de un archivo hasta que cada paso tenga implementación y confirmación.
+La implementación React muestra ambas opciones y separa la ruta de ayuda
+(`/solicitud/ayuda-diseno`) del intake de archivo (`/solicitud/archivo`). En la
+ruta de archivo el cliente puede adjuntar hasta cinco imágenes PNG/JPG/WebP/GIF
+o archivos STL/OBJ de hasta 5 MiB cada uno; indica dimensiones con unidad
+seleccionable (mm/cm/in), uso, material deseado y cantidad. Con sesión de cliente
+y confirmación explícita, crea una solicitud `PENDING_QUOTE`, no un pedido ni un
+precio. Admin puede leer los adjuntos solo con acceso autorizado; no se laminan
+ni se miden automáticamente. El asistente general está disponible en esta ruta;
+el chat flotante se oculta únicamente en `/solicitud/ayuda-diseno`, que tiene su
+asistente de cotización integrado.
+
+El asistente de cotización ordena la idea y puede preparar un borrador editable;
+la persona lo revisa, agrega referencias y confirma el envío. La calculadora de
+perfiles sigue rotulada DEMO y no envía montos como oferta.
 
 El compositor compartido de los tres asistentes envía con `Enter`; `Shift+Enter`
 inserta una nueva línea. El botón de envío permanece disponible como alternativa
@@ -66,9 +71,10 @@ de puntero y táctil.
    enviar avances al correo del cliente. Estas notificaciones también están
    pendientes de implementación.
 
-Hoy están implementadas la preparación/envío de cotización desde Admin y la
-aprobación demo del cliente. Siguen pendientes el intake real de archivo, el
-guardado de requisitos recopilados por el bot y el pago real. El botón de correo
+Hoy están implementadas la preparación/envío de cotización desde Admin, la
+aprobación demo del cliente, el intake de requisitos y la recepción local de
+adjuntos privados. Siguen pendientes el procesamiento/laminado real de archivos,
+el pago real y las notificaciones de avance. El botón de correo
 del cliente no debe enviar una cotización demo directamente como precio final.
 
 ### Admin
@@ -84,11 +90,15 @@ actor antes de sumar acciones.
 detalle de solicitud puede abrir el historial filtrado con `?solicitud=<id>`.
 
 **Catálogo:** `/admin/catalogo` lista modelos de `products` enriquecidos con la
-categoría, con búsqueda y filtros por publicación/material. Cada fila abre
+categoría, con búsqueda y filtros por publicación/material. El formulario de
+producto permite subir hasta seis fotos comprimidas, elegir la portada y ordenar
+la galería; la primera imagen es la que se muestra en listas y fichas. También
+conserva la biblioteca local del taller como fuente alternativa. Cada fila abre
 `/admin/catalogo/:id`, desde donde se edita el modelo. `/admin/catalogo/nuevo`
 crea, `/admin/catalogo/:id/editar` actualiza y `/admin/catalogo/categorias`
 gestiona las categorías. `ACTIVE` publica y `INACTIVE` oculta; un modelo ligado
-a pedido se oculta, no se borra. No se edita la imagen ni inventario. El material
+a pedido se oculta, no se borra. La galería vive en el `db.json` académico y no
+es almacenamiento de producción. El material
 fuera de ASA/PLA/PETG/ABS/TPU se señala para revisión.
 
 **Slice actual de solicitudes:** `/admin` ofrece acceso directo al KPI de
@@ -96,8 +106,9 @@ solicitudes que requieren atención (`/admin/solicitudes?fase=workshop`). La
 bandeja admite filtros de etapa/búsqueda y cada fila lleva a
 `/admin/solicitudes/:id`. En una solicitud `PENDING_QUOTE`, Admin puede iniciar
 revisión técnica; el mismo comando cambia a `IN_REVIEW` y registra actor/fecha en
-`activityLog`. Estado desactualizado o rol inválido se rechazan. Archivo visible
-es solo `fileName` y no descarga hasta conectar almacenamiento privado. El
+`activityLog`. Estado desactualizado o rol inválido se rechazan. El intake guarda
+metadatos en JSON Server y bytes fuera de `db.json`; Admin autorizado puede
+consultarlos desde el almacenamiento privado local. El
 registro `SUBMITTED` y estados desconocidos se revisan aparte sin recodificarlos.
 
 En `IN_REVIEW`, el operador prepara y guarda el costeo/cotización. En `QUOTED`,

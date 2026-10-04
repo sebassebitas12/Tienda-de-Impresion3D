@@ -9,11 +9,13 @@
 
 - El usuario confirmó en vivo los tres asistentes con OpenRouter y el correo con tabla formateada: **Bloque B cerrado por validación del usuario**. No reenviar correos ni cambiar credenciales.
 - Rama de trabajo `Pruebas`. `automation/n8n/vertice-cr-unificado.json` es la fuente oficial y `scripts/build-n8n-unified.mjs` la genera; se conserva `toolHttpRequest` v1.1.
-- P1 local: «✨ Autocompletar ficha con IA» en Admin envía solo nombre/idioma al agente general con tarea Admin sin tools; backend valida los campos. Rellena sin guardar ni publicar. Gramos/horas no pasan al cálculo hasta validar con laminador; perfil análogo sigue siendo DEMO.
-- Pruebas dirigidas P1: 13 de formulario y 24 de runtime pasan; lint, `check:ui` y `build:n8n` pasan. Captura real Dark/Light en ventana aproximada 1344×625; viewport responsive dedicado 768/375 pendiente.
-- El workflow abierto/publicado en n8n aún tiene el contrato previo a `productDraft`. Importar/publicar el export actualizado sobre el existente, conservando credenciales, antes de la prueba live del botón. No crear una segunda copia ni tocar credenciales.
-- Próximos bloques: commit local de P1; después C-P2 fotos (dataURL comprimida de imagen, según `docs/10`) y C-P3 STL/OBJ (almacenamiento privado `.local-data`, según el contrato vigente de `docs/07`; no insertar STL grande en `db.json`).
-- No afirmar que la integración P1 live, responsive, uploads o CI estén verificados sin su evidencia. Consultar `docs/07`, `docs/09` y `docs/10` al retomar.
+- P1 quedó en el commit local `a66c328 feat(admin): autocompletar fichas de producto con IA`. Envía nombre/idioma al agente general con tarea Admin sin tools; rellena campos editables sin guardar/publicar. Gramos/horas no pasan al cálculo hasta validarlos con laminador; perfil análogo sigue siendo DEMO. B1/B2 están cerrados por la prueba live comunicada por el usuario.
+- C-P2: galería Admin admite hasta 6 fotos reales comprimidas a <=300 KiB, reordenables, con portada; `products.images[0]` sigue siendo la imagen principal. Se persisten como data URLs en JSON Server local, decisión académica, no apta para producción.
+- C-P3: `/solicitud/archivo` incorpora medidas con unidad mm/cm/in, asistente general y envío autenticado/idempotente de hasta 5 adjuntos de 5 MiB. Metadatos en JSON Server y bytes en `.local-data/quote-attachments`; no mide STL ni calcula/envía cotización automáticamente.
+- Verificación local actual: 33 suites/187 tests, lint, `check:ui` (48 módulos), `check:automation` (255), `build:n8n` (23 nodos/3 agentes/5 entradas), build (161 módulos) y `git diff --check` pasan. No es CI ni prueba live de cada flujo.
+- Navegador: formulario público `/solicitud/archivo` inspeccionado en Dark/Light a ~1344×625; árbol accesible confirma campos, unidad y requisito de sesión. No se seleccionó archivo ni se envió solicitud. Admin redirigió a `/login` por sesión expirada: faltan capturas reales Admin Dark/Light y 1280/768/375, además del recorrido autenticado de la galería.
+- Próximo orden C: cerrar y verificar commits locales P2 y P3 por separado; luego P5 → P4 → P8 → P7 → P9 según `docs/10`. El export actualizado de P1 requiere importar/publicar el workflow existente antes de probarlo live, conservando credenciales y sin crear duplicados. No hacer push hasta tener autorización; CI del nuevo SHA no está observado.
+- Preservar cambios de usuario ajenos a estos bloques (AGENTS.md y fotografías del catálogo modificadas durante la sesión); no incluirlos en commits. Consultar `docs/07`, `docs/09` y `docs/10` al retomar.
 
 ## Registro anterior para continuar (2026-10-03; superado)
 

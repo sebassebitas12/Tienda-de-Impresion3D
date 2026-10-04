@@ -144,11 +144,14 @@ describe('intake de solicitudes personalizadas', () => {
     submitQuoteIntake.mockResolvedValue({ request: { id: 'rq-test', status: 'PENDING_QUOTE' } });
     renderPage('/solicitud/archivo', { user: { id: 'customer-1', name: 'Cliente', email: 'customer@vertice.test', role: 'customer', status: 'ACTIVE' }, token: 'session-token' });
     fireEvent.change(screen.getByLabelText(/¿qué querés fabricar/i), { target: { value: 'Soporte personalizado para teléfono' } });
+    fireEvent.change(screen.getByLabelText(/medidas aproximadas/i), { target: { value: '15 × 3 × 2' } });
+    fireEvent.change(screen.getByLabelText(/unidad de medida/i), { target: { value: 'cm' } });
     const file = new File(['png-data'], 'referencia.png', { type: 'image/png' });
-    fireEvent.change(screen.getByLabelText(/fotos o archivos 3D/i), { target: { files: [file] } });
+    const model = new File(['solid vertice'], 'pieza.stl', { type: 'model/stl' });
+    fireEvent.change(screen.getByLabelText(/fotos o archivos 3D/i), { target: { files: [file, model] } });
     await waitFor(() => expect(screen.queryByText(/Necesitás iniciar sesión/i)).not.toBeInTheDocument());
     fireEvent.click(screen.getByRole('button', { name: /revisé el resumen.*enviar al taller/i }));
-    await waitFor(() => expect(submitQuoteIntake).toHaveBeenCalledWith(expect.objectContaining({ description: 'Soporte personalizado para teléfono', sourceType: 'FILE_UPLOAD' }), [file], { token: 'session-token' }));
+    await waitFor(() => expect(submitQuoteIntake).toHaveBeenCalledWith(expect.objectContaining({ description: 'Soporte personalizado para teléfono', dimensions: '15 × 3 × 2 cm', sourceType: 'FILE_UPLOAD' }), [file, model], { token: 'session-token' }));
     expect(await screen.findByText(/Solicitud enviada al taller/i)).toBeInTheDocument();
     expect(screen.getByText(/No se generó un precio/i)).toBeInTheDocument();
   });

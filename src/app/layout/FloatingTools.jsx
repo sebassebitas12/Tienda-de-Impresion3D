@@ -10,6 +10,7 @@ export function FloatingTools({ active, onActiveChange }) {
   const location = useLocation();
   const preferences = usePreferences();
   const { copy } = preferences;
+  const hasEmbeddedQuoteAssistant = location.pathname === '/solicitud/ayuda-diseno';
   const [scrolling, setScrolling] = useState(false);
   const [speechStatus, setSpeechStatus] = useState('idle');
   const speechRun = useRef(0);
@@ -84,7 +85,7 @@ export function FloatingTools({ active, onActiveChange }) {
   return (
     <>
       <div className="floating-tools" role="group" aria-label={copy.tools} data-scrolling={scrolling && !active} data-panel-open={Boolean(active)}>
-        {!location.pathname.startsWith('/solicitud') && <IconButton
+        {!hasEmbeddedQuoteAssistant && <IconButton
           ref={chatTrigger}
           className="chat-trigger"
           variant="floating-button"
@@ -103,7 +104,7 @@ export function FloatingTools({ active, onActiveChange }) {
         >♿</IconButton>
       </div>
 
-      <AssistantPanel key={auth?.user?.id || 'guest'} mode="general" open={active === 'chat' && !location.pathname.startsWith('/solicitud')} onClose={() => onActiveChange(null)} triggerRef={chatTrigger} />
+      <AssistantPanel key={auth?.user?.id || 'guest'} mode="general" open={active === 'chat' && !hasEmbeddedQuoteAssistant} onClose={() => onActiveChange(null)} triggerRef={chatTrigger} />
 
       <Panel
         id="accessibility-panel"
