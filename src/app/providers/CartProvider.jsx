@@ -28,5 +28,6 @@ export function CartProvider({ children }) {
     return true;
   };
   const remove = (productId, color) => commit(lines.filter(line => line.productId !== productId || line.color !== color));
-  return <CartContext.Provider value={{ lines, add, update, remove, storageError, count: lines.reduce((sum, line) => sum + line.quantity, 0) }}>{children}</CartContext.Provider>;
+  const clear = () => commit([]);
+  return <CartContext.Provider value={{ lines, add, update, remove, clear, storageError, count: lines.reduce((sum, line) => sum + line.quantity, 0) }}>{children}</CartContext.Provider>;
 }

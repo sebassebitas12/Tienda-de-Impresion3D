@@ -1,10 +1,12 @@
-import { useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { useRef, useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { EmptyState, ErrorState, ProductCard, Skeleton } from '../components/ui/index.js';
 import { FilterChips } from '../components/ui/FilterChips.jsx';
 import { useCatalog } from '../hooks/useCatalog.js';
 import { useCart } from '../hooks/useCart.js';
+import { useAuth } from '../hooks/useAuth.js';
 import { usePreferences } from '../hooks/usePreferences.js';
+import { createCatalogOrderIdempotencyKey, submitCatalogOrder } from '../services/commerceService.js';
 import { isOrderableProduct, reconcileCart } from '../utils/cart.js';
 import { matchesFacet, toggleFacetParams } from '../utils/facetFilters.js';
 import { formatCRC } from '../utils/money.js';
@@ -64,9 +66,49 @@ export function ProductPage() {
 export function CartPage() {
   const { language } = usePreferences(); const es = language === 'es';
   const cart = useCart(); const { status, products, retry } = useCatalog();
+  const { user, token } = useAuth(); const navigate = useNavigate();
   const lines = reconcileCart(cart.lines, products);
   const subtotal = lines.reduce((sum, line) => sum + (line.subtotal || 0), 0);
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
+  const idempotencyRef = useRef(null);
+  const canConfirm = status === 'success' && lines.length > 0 && lines.every(line => line.available && line.subtotal !== null)
+    && Number.isFinite(subtotal) && Number.isSafeInteger(Math.round(subtotal * 100));
+  async function confirmOrder() {
+    if (submittingRef.current || !canConfirm) return;
+    if (!user) { navigate('/login', { state: { from: '/carrito' } }); return; }
+    if (user.role !== 'customer' || !token) {
+      setError(es ? 'Para confirmar un encargo necesitás una sesión activa de cliente.' : 'An active customer account is required to confirm an order.');
+      return;
+    }
+    const fingerprint = JSON.stringify(cart.lines);
+    if (idempotencyRef.current?.fingerprint !== fingerprint) {
+      idempotencyRef.current = { fingerprint, key: createCatalogOrderIdempotencyKey() };
+    }
+    submittingRef.current = true;
+    setSubmitting(true);
+    setError('');
+    try {
+      const result = await submitCatalogOrder({
+        items: lines.map(line => ({ productId: line.productId, color: line.color, quantity: line.quantity })),
+        idempotencyKey: idempotencyRef.current.key,
+      }, { token });
+      cart.clear();
+      idempotencyRef.current = null;
+      navigate('/cuenta', { state: { orderConfirmation: { id: result.order.id, subtotalCrc: result.order.subtotalCrc } } });
+    } catch (failure) {
+      const messages = {
+        PRODUCT_UNAVAILABLE: es ? 'Un modelo o color dejó de estar publicado. Actualizá el carrito antes de reintentar.' : 'A model or color is no longer published. Refresh the cart before trying again.',
+        IDEMPOTENCY_CONFLICT: es ? 'El encargo anterior no se pudo confirmar con esta selección. Revisá el estado antes de volver a intentar.' : 'The earlier attempt conflicts with this selection. Check its status before retrying.',
+        CUSTOMER_REQUIRED: es ? 'Tu sesión de cliente ya no está activa. Iniciá sesión y volvé a confirmar.' : 'Your customer session is no longer active. Sign in and retry.',
+      };
+      setError(messages[failure.code] || (es ? 'No se pudo guardar el encargo. El carrito sigue intacto; podés reintentar.' : 'The order could not be saved. Your cart is unchanged; you can retry.'));
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
+    }
+  }
   return <section className="shop-page"><header className="shop-heading"><span>{es ? 'Tu selección' : 'Your selection'}</span><h1>{es ? 'Carrito' : 'Cart'}</h1><p>{es ? 'Piezas para imprimir bajo pedido. Podés ajustar tu selección antes de continuar.' : 'Parts printed to order. Adjust your selection before continuing.'}</p></header>
     {cart.storageError && <p role="alert">{es ? 'Tu navegador no permite guardar el carrito. La selección se conserva mientras esta pestaña siga abierta.' : 'Your browser cannot save this cart. Your selection remains while this tab stays open.'}</p>}
     {!cart.lines.length ? <div className="shop-empty"><EmptyState title={es ? 'Tu próxima pieza empieza aquí.' : 'Your next part starts here.'} description={es ? 'Todavía no agregaste modelos al carrito.' : 'You have not added any models yet.'} /><Link className="v-button v-button--primary v-button--pill" to="/catalogo">{es ? 'Explorar modelos' : 'Explore models'} ↗</Link></div> : <>
@@ -76,7 +118,9 @@ export function CartPage() {
         {line.available && <p>{formatCRC(line.product.price)} {es ? 'por unidad' : 'each'}</p>}</div>
         <label>{es ? 'Cantidad de ' : 'Quantity of '}{line.product?.name || line.productId}<input type="number" min="1" step="1" value={line.quantity} onChange={event => { const value = Number(event.target.value); setError(cart.update(line.productId, line.color, value) ? '' : (es ? 'La cantidad debe ser un número entero mayor que cero.' : 'Quantity must be a positive whole number.')); }} /></label>
         <strong>{line.available ? formatCRC(line.subtotal) : '—'}</strong><button className="v-button v-button--ghost" aria-label={`${es ? 'Quitar' : 'Remove'} ${line.product?.name || line.productId}, ${line.color}`} onClick={() => cart.remove(line.productId, line.color)}>{es ? 'Quitar' : 'Remove'}</button></article>)}</div>
-        <aside className="shop-cart-summary"><h2>{es ? 'Resumen de piezas' : 'Parts summary'}</h2><p>{es ? 'Subtotal de piezas publicadas' : 'Published parts subtotal'}</p><strong className="shop-price">{formatCRC(subtotal)}</strong><p>{es ? 'Este subtotal no incluye entrega. El pago en línea todavía no está habilitado.' : 'This subtotal excludes delivery. Online payment is not available yet.'}</p>
+        <aside className="shop-cart-summary"><h2>{es ? 'Resumen de piezas' : 'Parts summary'}</h2><p>{es ? 'Subtotal de piezas publicadas' : 'Published parts subtotal'}</p><strong className="shop-price">{formatCRC(subtotal)}</strong><p>{es ? 'Este encargo no procesa un pago ni incluye entrega o impuestos. El taller revisará el pedido y coordinará los siguientes pasos.' : 'This request does not take payment or include delivery or taxes. The workshop will review the order and coordinate next steps.'}</p>
+          <button className="v-button v-button--primary v-button--pill" type="button" onClick={confirmOrder} disabled={!canConfirm || submitting}>{submitting ? (es ? 'Guardando encargo…' : 'Saving order…') : (es ? 'Confirmar encargo' : 'Confirm order')}</button>
+          {!user && <p>{es ? 'Vas a iniciar sesión antes de enviar el encargo.' : 'You will sign in before submitting the order.'}</p>}
           <Link className="v-link-text" to="/catalogo">{es ? 'Seguir eligiendo piezas' : 'Keep choosing parts'} ↗</Link></aside></div>}
       {error && <p role="alert">{error}</p>}</>}
   </section>;

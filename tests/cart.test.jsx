@@ -6,7 +6,7 @@ import { cleanCart, reconcileCart } from '../src/utils/cart.js';
 
 function Controls() {
   const cart = useCart();
-  return <><output>{cart.count}</output><button onClick={() => cart.add('p1', 'Negro', 2)}>Agregar</button><button onClick={() => cart.update('p1', 'Negro', 0)}>Inválido</button><button onClick={() => cart.remove('p1', 'Negro')}>Quitar</button>{cart.storageError && <span role="alert">No se pudo guardar</span>}</>;
+  return <><output>{cart.count}</output><button onClick={() => cart.add('p1', 'Negro', 2)}>Agregar</button><button onClick={() => cart.update('p1', 'Negro', 0)}>Inválido</button><button onClick={() => cart.remove('p1', 'Negro')}>Quitar</button><button onClick={cart.clear}>Vaciar</button>{cart.storageError && <span role="alert">No se pudo guardar</span>}</>;
 }
 describe('carrito de catálogo bajo pedido', () => {
   afterEach(() => { cleanup(); localStorage.clear(); jest.restoreAllMocks(); });
@@ -31,5 +31,12 @@ describe('carrito de catálogo bajo pedido', () => {
     jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('unavailable'); });
     render(<CartProvider><Controls /></CartProvider>); fireEvent.click(screen.getByText('Agregar'));
     expect(screen.getByText('2')).toBeInTheDocument(); expect(screen.getByRole('alert')).toHaveTextContent('No se pudo guardar');
+  });
+  it('limpia y persiste el carrito después de confirmar un encargo', () => {
+    render(<CartProvider><Controls /></CartProvider>);
+    fireEvent.click(screen.getByText('Agregar'));
+    fireEvent.click(screen.getByText('Vaciar'));
+    expect(screen.getByText('0')).toBeInTheDocument();
+    expect(localStorage.getItem('vertice-cart-v1')).toBe('[]');
   });
 });
