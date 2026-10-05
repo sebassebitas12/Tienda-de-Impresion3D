@@ -243,9 +243,9 @@ describe('Auth route guards', () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByRole('status')).toHaveTextContent('para ver el carrito y continuar');
+    expect(await screen.findByRole('status')).toHaveTextContent('para ver tu carrito y continuar');
     await userEvent.click(screen.getByRole('link', { name: 'Crear cuenta' }));
-    expect(await screen.findByRole('status')).toHaveTextContent('Creá una cuenta de cliente para ver el carrito');
+    expect(await screen.findByRole('status')).toHaveTextContent('Creá una cuenta de cliente para ver tu carrito y continuar');
   });
 
   test('RequireAuth redirige invitado a login', async () => {

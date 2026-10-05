@@ -4,79 +4,49 @@ import { automationAction, automationError } from '../../services/automationServ
 import '../../pages/quotes.css';
 
 const NEXT = { PENDING: 'CONFIRMED', CONFIRMED: 'IN_PRODUCTION', IN_PRODUCTION: 'READY', READY: 'SHIPPED', SHIPPED: 'DELIVERED' };
-const LABEL = { CONFIRMED: 'Confirmar pedido', IN_PRODUCTION: 'Iniciar producción', READY: 'Marcar listo', SHIPPED: 'Marcar enviado', DELIVERED: 'Confirmar entrega', CANCELLED: 'Cancelar pedido', REJECTED: 'Rechazar pedido' };
-const LABEL_EN = { CONFIRMED: 'Confirm order', IN_PRODUCTION: 'Start production', READY: 'Mark ready', SHIPPED: 'Mark shipped', DELIVERED: 'Confirm delivery', CANCELLED: 'Cancel order', REJECTED: 'Reject order' };
+const LABEL = { CONFIRMED: 'Confirmar pedido', IN_PRODUCTION: 'Iniciar producción', READY: 'Marcar listo', SHIPPED: 'Marcar enviado', DELIVERED: 'Confirmar entrega', CANCELLED: 'Cancelar pedido' };
+const LABEL_EN = { CONFIRMED: 'Confirm order', IN_PRODUCTION: 'Start production', READY: 'Mark ready', SHIPPED: 'Mark shipped', DELIVERED: 'Confirm delivery', CANCELLED: 'Cancel order' };
 
 export function OrderActions({ order, onSaved, language }) {
   const auth = useAuth();
   const [confirm, setConfirm] = useState('');
   const [reason, setReason] = useState('');
-  const [rejectProof, setRejectProof] = useState(false);
-  const [verifyProof, setVerifyProof] = useState(false);
-  const [rejectReason, setRejectReason] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const actionsRef = useRef(null);
   const confirmControl = useRef(null);
-  const verifyControl = useRef(null);
   const rejectionField = useRef(null);
   const focusAfterClose = useRef('');
   const es = language === 'es';
-  const closure = ['CANCELLED', 'REJECTED'].includes(confirm);
+  const closure = confirm === 'CANCELLED';
 
   useEffect(() => {
-    if (rejectProof) {
-      rejectionField.current?.focus();
-      return;
-    }
-    if (verifyProof) {
-      verifyControl.current?.focus();
-      return;
-    }
     if (confirm) {
       (closure ? rejectionField : confirmControl).current?.focus();
       return;
     }
-    const target = focusAfterClose.current && actionsRef.current?.querySelector(`[data-order-action="${focusAfterClose.current}"]`);
+    const selector = '[data-order-action="' + focusAfterClose.current + '"]';
+    const target = focusAfterClose.current && actionsRef.current?.querySelector(selector);
     target?.focus?.();
     focusAfterClose.current = '';
-  }, [closure, confirm, rejectProof, verifyProof]);
+  }, [closure, confirm]);
 
   useEffect(() => {
-    if (!confirm && !rejectProof && !verifyProof) return undefined;
+    if (!confirm) return undefined;
     function handleEscape(event) {
       if (event.key !== 'Escape' || busy) return;
       event.preventDefault();
-      if (rejectProof) {
-        focusAfterClose.current = 'proof';
-        setRejectProof(false);
-        setRejectReason('');
-      } else if (verifyProof) {
-        focusAfterClose.current = 'proof-confirm';
-        setVerifyProof(false);
-      } else {
-        focusAfterClose.current = closure ? 'cancel' : 'advance';
-        setConfirm('');
-        setReason('');
-      }
+      focusAfterClose.current = closure ? 'cancel' : 'advance';
+      setConfirm('');
+      setReason('');
     }
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [busy, confirm, closure, rejectProof, verifyProof]);
+  }, [busy, confirm, closure]);
 
   function openTransition(nextStatus, action) {
     focusAfterClose.current = action;
     setConfirm(nextStatus);
-  }
-
-  function openProofRejection() {
-    focusAfterClose.current = 'proof';
-    setRejectProof(true);
-  }
-
-  function openProofVerification() {
-    focusAfterClose.current = 'proof-confirm';
-    setVerifyProof(true);
   }
 
   if (auth?.user?.role !== 'admin' || !NEXT[order.status]) return null;
@@ -89,103 +59,31 @@ export function OrderActions({ order, onSaved, language }) {
     } catch (failure) { setError(automationError(failure.code)); }
     finally { setBusy(false); }
   }
-  async function handleVerify(decision) {
-    setBusy(true); setError('');
-    try {
-      await automationAction('/admin/actions/verify-payment', {
-        orderId: String(order.id),
-        decision,
-        expectedProofSubmittedAt: order.paymentProof?.submittedAt || null,
-        ...(decision === 'REJECT' ? { notes: rejectReason } : {}),
-      }, { token: auth.token });
-      focusAfterClose.current = '';
-      setRejectProof(false); setVerifyProof(false); setRejectReason(''); onSaved();
-    } catch (failure) { setError(automationError(failure.code)); }
-    finally { setBusy(false); }
-  }
-  return <section className="admin-order-actions" ref={actionsRef}><span className="admin-eyebrow">{es ? 'Acción operativa · con historial' : 'Operational action · audited'}</span>
-    {order.paymentProof && (
-      <div className="admin-order-payment-proof-box">
-        <span className="admin-eyebrow">{es ? 'Comprobante SINPE reportado por el cliente' : 'SINPE payment proof reported by customer'}</span>
-        <div className="admin-order-payment-proof-grid">
-          <div><strong>{es ? 'Referencia:' : 'Reference:'}</strong> #{order.paymentProof.referenceNumber}</div>
-          <div><strong>{es ? 'Teléfono emisor:' : 'Sender phone:'}</strong> {order.paymentProof.sinpePhone}</div>
-          {order.paymentProof.submittedAt && (
-            <div><strong>{es ? 'Fecha reporte:' : 'Reported date:'}</strong> {order.paymentProof.submittedAt.slice(0, 16).replace('T', ' ')}</div>
-          )}
-          <div><strong>{es ? 'Estado comprobante:' : 'Proof status:'}</strong> <span className="customer-proof-status-pill">{order.paymentProof.status || 'SUBMITTED'}</span></div>
-        </div>
-        {order.paymentProof.proofNotes && (
-          <p className="admin-order-payment-proof-notes"><strong>{es ? 'Notas del cliente:' : 'Customer notes:'}</strong> {order.paymentProof.proofNotes}</p>
-        )}
-        {order.status === 'PENDING' && order.paymentProof?.status === 'SUBMITTED' && (
-          <div className="admin-order-payment-proof-actions" style={{ marginTop: '10px' }}>
-            {!rejectProof && !verifyProof ? (
-              <div className="admin-next-action__buttons">
-                <button type="button" className="v-button v-button--primary" data-order-action="proof-confirm" disabled={busy} onClick={openProofVerification}>
-                  {es ? 'Confirmar pago y pedido' : 'Confirm payment and order'}
-                </button>
-                <button type="button" className="v-button v-button--ghost" data-order-action="proof" disabled={busy} onClick={openProofRejection}>
-                  {es ? 'Observar / Rechazar comprobante' : 'Reject payment proof'}
-                </button>
-              </div>
-            ) : rejectProof ? (
-              <form onSubmit={(e) => { e.preventDefault(); handleVerify('REJECT'); }} style={{ display: 'grid', gap: '8px' }}>
-                <label style={{ display: 'grid', gap: '4px', font: '12px var(--mono)' }}>
-                  <span>{es ? 'Motivo de rechazo del comprobante (se mostrará al cliente):' : 'Rejection reason:'}</span>
-                  <textarea ref={rejectionField} required minLength={3} maxLength={500} placeholder={es ? 'Ej: Monto no acreditado en cuenta bancaria.' : 'e.g. Funds not found'} value={rejectReason} onChange={e => setRejectReason(e.target.value)} />
-                </label>
-                <div className="admin-next-action__buttons">
-                  <button type="submit" className="v-button v-button--primary" ref={confirmControl} disabled={busy}>
-                    {es ? 'Confirmar rechazo' : 'Confirm rejection'}
-                  </button>
-                  <button type="button" className="v-button v-button--ghost" disabled={busy} onClick={() => { focusAfterClose.current = 'proof'; setRejectProof(false); setRejectReason(''); }}>
-                    {es ? 'Cancelar' : 'Cancel'}
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div className="admin-payment-confirmation" role="group" aria-label={es ? 'Confirmación manual del comprobante' : 'Manual payment proof confirmation'}>
-                <p>{es ? 'Confirmá solo después de comprobar que el monto y la referencia coinciden con el movimiento recibido. Esta acción se registra manualmente; no consulta el banco.' : 'Confirm only after checking that the amount and reference match the received transaction. This is a manual record; it does not contact the bank.'}</p>
-                <div className="admin-next-action__buttons">
-                  <button ref={verifyControl} type="button" className="v-button v-button--primary" disabled={busy} onClick={() => handleVerify('CONFIRM')}>
-                    {es ? 'Registrar verificación' : 'Record verification'}
-                  </button>
-                  <button type="button" className="v-button v-button--ghost" disabled={busy} onClick={() => { focusAfterClose.current = 'proof-confirm'; setVerifyProof(false); }}>
-                    {es ? 'Volver' : 'Back'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    )}
+
+  return <section className="admin-order-actions" ref={actionsRef}>
+    <span className="admin-eyebrow">{es ? 'Acción operativa · con historial' : 'Operational action · audited'}</span>
     <h2>{es ? 'Avanzar el pedido' : 'Advance this order'}</h2>
-    {order.status === 'PENDING' && order.paymentStatus !== 'PAID' ? (
-      <p className="admin-order-payment-warning">
-        {es ? 'Verificación requerida: Validá el comprobante de pago SINPE antes de poder confirmar el pedido.' : 'Verification required: Validate the SINPE payment proof before confirming the order.'}
-      </p>
-    ) : (
-      <p>{es ? 'Actualizá solo después de completar la etapa. Esto no registra un cobro ni envía correos.' : 'Update only after completing the stage. This does not record payment or send emails.'}</p>
-    )}
+    {order.status === 'PENDING' && order.paymentStatus !== 'PAID'
+      ? <p className="admin-order-payment-warning">{es ? 'Pago DEMO pendiente: el cliente lo registra desde su cuenta. No se revisan comprobantes ni transferencias aquí.' : 'DEMO payment pending: the customer records it from their account. No receipts or bank transfers are reviewed here.'}</p>
+      : <p>{es ? 'Actualizá la etapa después de completarla. Este cambio deja historial; no cobra dinero ni envía correos.' : 'Update the stage after completing it. This change is recorded; it does not charge money or send email.'}</p>}
     {!confirm ? (
       <div className="admin-next-action__buttons">
-        {!(order.status === 'PENDING' && order.paymentStatus !== 'PAID') && (
-          <button className="v-button v-button--primary" data-order-action="advance" onClick={() => openTransition(NEXT[order.status], 'advance')}>
-            {(es ? LABEL : LABEL_EN)[NEXT[order.status]]}
-          </button>
-        )}
-        {['PENDING', 'CONFIRMED'].includes(order.status) && (
-          <button className="v-button v-button--ghost" data-order-action="cancel" onClick={() => openTransition('CANCELLED', 'cancel')}>
-            {es ? 'Cancelar pedido' : 'Cancel order'}
-          </button>
-        )}
+        {!(order.status === 'PENDING' && order.paymentStatus !== 'PAID') && <button className="v-button v-button--primary" data-order-action="advance" disabled={busy} onClick={() => openTransition(NEXT[order.status], 'advance')}>
+          {(es ? LABEL : LABEL_EN)[NEXT[order.status]]}
+        </button>}
+        {['PENDING', 'CONFIRMED'].includes(order.status) && <button className="v-button v-button--ghost" data-order-action="cancel" disabled={busy} onClick={() => openTransition('CANCELLED', 'cancel')}>
+          {es ? 'Cancelar pedido' : 'Cancel order'}
+        </button>}
       </div>
     ) : (
-      <form onSubmit={save}><p>{(es ? LABEL : LABEL_EN)[confirm]} · {es ? 'Se guardará en el historial con tu usuario.' : 'This will be recorded in your name.'}</p>
-        {closure && <label>{es ? 'Motivo del cierre' : 'Closure reason'}<textarea ref={rejectionField} required minLength={3} maxLength={500} value={reason} onChange={event => setReason(event.target.value)} /></label>}
-        <div className="admin-next-action__buttons"><button type="submit" className="v-button v-button--primary" ref={confirmControl} disabled={busy}>{es ? 'Confirmar cambio' : 'Confirm change'}</button><button type="button" className="v-button v-button--ghost" disabled={busy} onClick={() => { focusAfterClose.current = closure ? 'cancel' : 'advance'; setConfirm(''); setReason(''); }}>{es ? 'Volver' : 'Back'}</button></div></form>
+      <form onSubmit={save}>
+        <p>{(es ? LABEL : LABEL_EN)[confirm]} · {es ? 'Se guardará en el historial con tu usuario.' : 'This will be recorded in your name.'}</p>
+        {closure && <label>{es ? 'Motivo de cancelación' : 'Cancellation reason'}<textarea ref={rejectionField} required minLength={3} maxLength={500} value={reason} onChange={event => setReason(event.target.value)} /></label>}
+        <div className="admin-next-action__buttons">
+          <button type="submit" className="v-button v-button--primary" ref={confirmControl} disabled={busy}>{busy ? (es ? 'Guardando…' : 'Saving…') : (es ? 'Confirmar cambio' : 'Confirm change')}</button>
+          <button type="button" className="v-button v-button--ghost" disabled={busy} onClick={() => { focusAfterClose.current = closure ? 'cancel' : 'advance'; setConfirm(''); setReason(''); }}>{es ? 'Volver' : 'Back'}</button>
+        </div>
+      </form>
     )}
     {error && <p role="alert">{error}</p>}
   </section>;

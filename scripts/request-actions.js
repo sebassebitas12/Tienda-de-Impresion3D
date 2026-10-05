@@ -6,6 +6,24 @@ export function prepareRequestAction(request, payload, occurredAt) {
   if (payload.action === 'incorporate-request' && request.status === 'SUBMITTED') {
     return { patch: { status: 'PENDING_QUOTE', originalStatus: request.status }, event: 'REQUEST_INCORPORATED' };
   }
+  if (payload.action === 'save-custom-quote' && ['IN_REVIEW', 'QUOTED', 'CHANGES_REQUESTED'].includes(request.status)) {
+    if (payload.expectedVersion !== (request.quoteVersion || 0)) return { error: 'STATUS_CONFLICT' };
+    const { validUntil, notes } = payload;
+    const parsedDate = Date.parse(`${validUntil}T00:00:00-06:00`);
+    const validDate = typeof validUntil === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(validUntil)
+      && Number.isFinite(parsedDate) && new Date(parsedDate).toISOString().slice(0, 10) === validUntil;
+    if (!Number.isSafeInteger(payload.quotedPrice) || payload.quotedPrice < 1 || payload.quotedPrice > 1000000000
+      || !validDate || Date.parse(`${validUntil}T23:59:59-06:00`) <= Date.parse(occurredAt)
+      || typeof notes !== 'string' || !notes.trim() || notes.length > 2000) return { error: 'INVALID_QUOTE' };
+    const quoteCalculation = { mode: 'DEMO', provenance: 'ADMIN_CUSTOM_QUOTE_DEMO' };
+    return { patch: { status: 'QUOTED', quotedPrice: payload.quotedPrice, currency: 'CRC', quoteValidUntil: `${validUntil}T23:59:59-06:00`,
+      quoteNotes: notes.trim(), quotePricing: quoteCalculation, quotedAt: occurredAt, quotedBy: payload.actorId, quoteVersion: (request.quoteVersion || 0) + 1,
+      ...(request.quoteVersion ? { quoteHistory: [...(request.quoteHistory || []), {
+        quoteVersion: request.quoteVersion, quotedPrice: request.quotedPrice, currency: request.currency,
+        quoteValidUntil: request.quoteValidUntil, quoteNotes: request.quoteNotes, quotePricing: request.quotePricing,
+        quotedAt: request.quotedAt, customerDecisionReason: request.customerDecisionReason,
+      }] } : {}) }, event: 'REQUEST_CUSTOM_QUOTE_SAVED' };
+  }
   if (payload.action === 'save-quote' && ['IN_REVIEW', 'QUOTED', 'CHANGES_REQUESTED'].includes(request.status)) {
     if (payload.expectedVersion !== (request.quoteVersion || 0)) return { error: 'STATUS_CONFLICT' };
     const { validUntil, notes, pricingInputs } = payload;
@@ -17,7 +35,7 @@ export function prepareRequestAction(request, payload, occurredAt) {
       || Date.parse(`${validUntil}T23:59:59-06:00`) <= Date.parse(occurredAt)
       || typeof notes !== 'string' || !notes.trim() || notes.length > 2000) return { error: 'INVALID_QUOTE' };
     return { patch: { status: 'QUOTED', quotedPrice: quoteCalculation.breakdown.amountCrc, currency: 'CRC', quoteValidUntil: `${validUntil}T23:59:59-06:00`,
-      quoteNotes: notes.trim(), quotePricing: quoteCalculation, quotedAt: occurredAt, quotedBy: payload.actorId, quoteVersion: (request.quoteVersion || 0) + 1,
+      quoteNotes: notes.trim(), quotePricing: { ...quoteCalculation, mode: 'DEMO', provenance: 'ADMIN_INPUT_DEMO' }, quotedAt: occurredAt, quotedBy: payload.actorId, quoteVersion: (request.quoteVersion || 0) + 1,
       ...(request.quoteVersion ? { quoteHistory: [...(request.quoteHistory || []), {
         quoteVersion: request.quoteVersion, quotedPrice: request.quotedPrice, currency: request.currency,
         quoteValidUntil: request.quoteValidUntil, quoteNotes: request.quoteNotes, quotePricing: request.quotePricing,

@@ -6,38 +6,35 @@ import { LoginPage } from '../src/pages/LoginPage.jsx';
 import { RegisterPage } from '../src/pages/RegisterPage.jsx';
 
 const mockCustomer = { id: 'customer-1', name: 'Cliente', role: 'customer' };
-const mockImportGuestCart = jest.fn();
 const mockAuth = { login: jest.fn(), register: jest.fn() };
 
 jest.mock('../src/hooks/useAuth.js', () => ({ useAuth: () => mockAuth }));
-jest.mock('../src/hooks/useCart.js', () => ({ useOptionalCart: () => ({ importGuestCart: mockImportGuestCart }) }));
 
 function PathProbe() {
   return <output data-testid="path">{useLocation().pathname}</output>;
 }
 
 function renderAuthPage(Page, path) {
-  return render(<MemoryRouter initialEntries={[{ pathname: path, state: { from: '/carrito' } }]}><PreferencesProvider>
-    <Routes><Route path={path} element={<Page />} /><Route path="/carrito" element={<PathProbe />} /></Routes>
+  return render(<MemoryRouter initialEntries={[{ pathname: path, state: { from: '/producto/p1?material=PLA', reason: 'catalog-customer-required' } }]}><PreferencesProvider>
+    <Routes><Route path={path} element={<Page />} /><Route path="/producto/:id" element={<PathProbe />} /></Routes>
   </PreferencesProvider></MemoryRouter>);
 }
 
-describe('continuidad del carrito después de autenticarse', () => {
+describe('regreso a la pieza después de autenticarse', () => {
   afterEach(() => { cleanup(); jest.clearAllMocks(); });
 
-  it('incorpora la selección visitante al iniciar sesión desde /carrito', async () => {
+  it('inicia sesión, vuelve al producto y exige que el cliente agregue la pieza', async () => {
     mockAuth.login.mockResolvedValue(mockCustomer);
     renderAuthPage(LoginPage, '/login');
+    expect(screen.getByRole('status')).toHaveTextContent('Después volverás a la ficha del producto.');
     fireEvent.submit(screen.getByRole('button', { name: /iniciar sesión/i }).closest('form'));
-    expect(await screen.findByTestId('path')).toHaveTextContent('/carrito');
-    expect(mockImportGuestCart).toHaveBeenCalledWith(mockCustomer);
+    expect(await screen.findByTestId('path')).toHaveTextContent('/producto/p1');
   });
 
-  it('incorpora la selección visitante al crear cuenta desde /carrito', async () => {
+  it('crea una cuenta y vuelve al producto sin transferir artículos de un carrito visitante', async () => {
     mockAuth.register.mockResolvedValue(mockCustomer);
     renderAuthPage(RegisterPage, '/registro');
     fireEvent.submit(screen.getByRole('button', { name: /crear cuenta/i }).closest('form'));
-    expect(await screen.findByTestId('path')).toHaveTextContent('/carrito');
-    expect(mockImportGuestCart).toHaveBeenCalledWith(mockCustomer);
+    expect(await screen.findByTestId('path')).toHaveTextContent('/producto/p1');
   });
 });

@@ -17,4 +17,10 @@ describe('sugerencia DEMO para precio de catálogo', () => {
     expect(calculateProductDemoPrice({ material: 'PETG', weightGrams: '', printHours: 2 })).toBeNull();
     expect(calculateProductDemoPrice({ material: 'TPU', weightGrams: 25, printHours: 0 })).toBeNull();
   });
+
+  it('reutiliza el perfil base de PLA para la variante PLA Silk', () => {
+    const quote = calculateProductDemoPrice({ material: 'PLA Silk', weightGrams: 100, printHours: 2 });
+    expect(quote?.mode).toBe('DEMO');
+    expect(quote?.inputs.material).toBe('PLA SILK');
+  });
 });

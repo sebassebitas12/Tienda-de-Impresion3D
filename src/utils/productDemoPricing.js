@@ -6,7 +6,8 @@ export function calculateProductDemoPrice({ material, weightGrams, printHours, p
   if (!FDM_MATERIALS.includes(normalized) || !Number.isFinite(Number(weightGrams)) || Number(weightGrams) <= 0
     || !Number.isFinite(Number(printHours)) || Number(printHours) <= 0
     || !Number.isFinite(Number(postProcessMinutes)) || Number(postProcessMinutes) < 0) return null;
-  const costs = DEMO_COSTS.materials[normalized];
+  const costProfile = normalized === 'PLA SILK' ? 'PLA' : normalized;
+  const costs = DEMO_COSTS.materials[costProfile];
   const quote = calculateManualQuote({
     material: normalized, weightGrams: Number(weightGrams), printHours: Number(printHours), ...costs,
     usdToCrc: rates.usdToCrc, electricityCrcPerKwh: rates.electricityCrcPerKwh,

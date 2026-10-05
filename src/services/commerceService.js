@@ -1,11 +1,7 @@
 import { automationAction } from './automationService.js';
 
-export function submitOrderPaymentProof({ orderId, referenceNumber, sinpePhone, proofNotes }, { token, signal } = {}) {
-  return automationAction('/orders/submit-payment-proof', { orderId, referenceNumber, sinpePhone, proofNotes }, { token, signal });
-}
-
-export function verifyOrderPaymentProof({ orderId, decision, notes }, { token, signal } = {}) {
-  return automationAction('/admin/actions/verify-payment', { orderId, decision, notes }, { token, signal });
+export function submitDemoOrderPayment({ orderId }, { token, signal } = {}) {
+  return automationAction('/orders/pay-demo', { orderId }, { token, signal });
 }
 
 export function fetchMyOrders({ token, signal } = {}) {

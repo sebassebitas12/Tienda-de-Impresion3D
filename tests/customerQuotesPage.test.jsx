@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom';
 import { CustomerQuotesPage } from '../src/pages/CustomerQuotesPage.jsx';
 import { useAuth } from '../src/hooks/useAuth.js';
 import { usePreferences } from '../src/hooks/usePreferences.js';
@@ -17,12 +17,17 @@ const offer = {
   quotePricing: { mode: 'DEMO', breakdown: { materialCrc: 2000, wearCrc: 200, electricityCrc: 300, postProcessCrc: 500, designCrc: 0, otherCostsCrc: 0, costSubtotalCrc: 3000, markupPercent: 50, amountCrc: 4500 } },
 };
 
-function setup(request = offer, entry = '/cuenta', user = { id: 'c1', name: 'Ana', role: 'customer' }) {
+function setup(request = offer, entry = '/cuenta', user = { id: 'c1', name: 'Ana', role: 'customer' }, actionImplementation) {
   useAuth.mockReturnValue({ user, token: 'sim-token' });
   usePreferences.mockReturnValue({ language: 'es' });
-  automationAction.mockResolvedValue({ requests: request ? [request] : [] });
-  return render(<MemoryRouter initialEntries={[entry]}><CustomerQuotesPage /></MemoryRouter>);
+  automationAction.mockImplementation(actionImplementation || (async () => ({ requests: request ? [request] : [] })));
+  return render(<MemoryRouter initialEntries={[entry]}><Routes>
+    <Route path="/cuenta" element={<CustomerQuotesPage />} />
+    <Route path="/pedidos/:id" element={<ReceiptProbe />} />
+  </Routes></MemoryRouter>);
 }
+
+function ReceiptProbe() { const { id } = useParams(); return <output>recibo:{id}</output>; }
 
 describe('vista de cotizaciones del cliente', () => {
   afterEach(() => { cleanup(); jest.clearAllMocks(); });
@@ -59,8 +64,17 @@ describe('vista de cotizaciones del cliente', () => {
 
   it('presenta el acuse de encargo recibido al volver a /cuenta', async () => {
     setup(null, { pathname: '/cuenta', state: { orderConfirmation: { id: 'ord-44', subtotalCrc: 5000 } } });
-    expect(await screen.findByText(/Encargo ord-44 recibido/)).toBeInTheDocument();
-    expect(screen.getByText(/no se ha cobrado/)).toBeInTheDocument();
+    expect(await screen.findByText(/Comprobante DEMO ord-44 registrado/)).toBeInTheDocument();
+    expect(screen.getByText(/No se transfirió dinero real/)).toBeInTheDocument();
+  });
+
+  it('aprueba la cotización y luego paga el cliente para abrir su comprobante', async () => {
+    setup({ ...offer, status: 'APPROVED' }, '/cuenta', undefined, async path => path === '/quotes/mine'
+      ? { requests: [{ ...offer, status: 'APPROVED' }] }
+      : { order: { id: 'ord-quote-1' } });
+    fireEvent.click(await screen.findByRole('button', { name: /Pagar .*DEMO/ }));
+    expect(await screen.findByText('recibo:ord-quote-1')).toBeInTheDocument();
+    expect(automationAction).toHaveBeenCalledWith('/quotes/pay-demo', { requestId: 'r1', expectedVersion: 2 }, { token: 'sim-token' });
   });
 
   it('orienta al administrador a su panel en vez de dejar un enlace suelto en /cuenta', async () => {

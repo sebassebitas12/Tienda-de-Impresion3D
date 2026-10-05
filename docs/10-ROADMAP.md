@@ -1,5 +1,57 @@
 # Vértice CR — Roadmap
 
+## Presentación de 15 minutos — alcance confirmado 2026-10-05
+
+Este bloque supersede restricciones históricas que impiden pagos DEMO o CRUD
+asistido por IA. Es un MVP académico persistente con JSON Server, DeepSeek y
+n8n/Gmail. Trabajo exclusivo en Pruebas. Main queda fuera del alcance.
+
+### Matriz de preparación inicial (estimación, no auditoría completa)
+
+Cada recorrido vale 10 puntos. Parciales reconocen implementación/evidencia
+existente; se alcanza 10 solo con recorrido real coherente y verificable.
+
+| Bloque | Puntos iniciales / 10 | Problema y resultado esperado |
+|---|---:|---|
+| Arranque y sesión Admin | 3 | Resolver login clásico al iniciar API desde VS; app y API usan la misma base y configuración. |
+| Visitante y navegación | 8 | Explorar sin cuenta, conservar filtros; autenticarse para comprar conservando la tarea. |
+| Compra de catálogo | 8 | Una variante, carrito útil, pago DEMO único, recibo y seguimiento. |
+| Cliente + IA | 5 | Conversación autocompleta campos desde texto y referencias, conserva borrador y permite editar/enviar. |
+| Cotización automática | 3 | Propuesta desde la solicitud independiente del catálogo; Admin revisa/aprueba; cliente recibe, paga y nace pedido. |
+| CRUD por IA en Admin | 0 | IA consulta, prepara altas/ediciones/bajas y ejecuta después de confirmar; cambios reales y auditables. |
+| Alta sencilla de piezas | 5 | Descripción del Admin -> ficha y cálculo propuesto -> revisar -> guardar/publicar; pocas decisiones necesarias. |
+| DeepSeek + n8n/Gmail | 5 | Modelo real con credenciales locales, correo de solicitud al taller y cotización validada al cliente, acuses y reintentos seguros. |
+| Pantallas y casos extremos | 8 | Revisar rutas faltantes, duplicados, navegación cruzada, errores, feedback, textos/datos extensos y zonas táctiles 44px. |
+| Ensayo de 15 minutos | 0 | Ejecución completa sin pasos técnicos improvisados, datos adecuados y guion breve. |
+
+Total inicial: 45/100. Es una estimación de preparación para la exposición,
+no un porcentaje de código terminado ni garantía de calidad absoluta.
+
+### Orden y criterios de cierre
+
+1. Guardar checkpoint local, corregir documentación, estabilizar arranque/login.
+2. Conectar DeepSeek y facilitar alta de piezas con precio DEMO calculado,
+   conservando identificación de supuestos y revisión humana.
+3. CRUD Admin por lenguaje natural: consultar catálogo, crear/editar/eliminar
+   productos y categorías con vista previa, confirmación y protección de referencias.
+4. Cliente + IA recoge datos y referencias; autocompleta y prepara propuesta;
+   taller recibe registro/correo; Admin revisa, ajusta y aprueba; cliente recibe
+   cotización validada y paga DEMO; pedido pasa al flujo de fabricación.
+5. Completar pantallas faltantes y todos los cinco radares de Gemini: recuperación
+   de errores, navegación cruzada, casos extremos, feedback y ergonomía móvil.
+6. Verificar recorridos autenticados y correo real solo cuando el usuario autorice
+   el envío; documentar configuración manual imprescindible y ensayo de 15 minutos.
+
+Los hallazgos nuevos se añaden a esta matriz. No reemplazan lo acordado.
+La IA no afirma haber interpretado imágenes si el proveedor no admite esa entrada.
+El análisis de referencias debe verificarse como capacidad real; mientras esté
+pendiente, los adjuntos se conservan para revisión del taller.
+
+Guion objetivo: 2 min visitante/catálogo, 3 min cliente+IA, 4 min Admin y CRUD,
+3 min aprobación/pago/seguimiento y 3 min arquitectura/automatizaciones/preguntas.
+Se usará una solicitud preexistente para mostrar aprobación sin esperar al correo
+en vivo; también se demostrará crear una solicitud nueva.
+
 ## R-H85 — Cierre de experiencia y gates (2026-10-05)
 
 Las rutas informativas, legacy checkout, detalle de pedido propio, handoff de

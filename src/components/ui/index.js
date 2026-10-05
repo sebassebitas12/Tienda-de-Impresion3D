@@ -32,5 +32,4 @@ export { FileDropzone } from './FileDropzone.jsx';
 export { ProductCard } from './ProductCard.jsx';
 export { CartItem } from './CartItem.jsx';
 export { QuoteSummaryPanel } from './QuoteSummaryPanel.jsx';
-export { SinpePaymentBlock } from './SinpePaymentBlock.jsx';
 export { Toast as Notification } from './Toast.jsx';

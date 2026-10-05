@@ -42,7 +42,10 @@ function eventTitle(event, text) {
   if (event.action === 'REQUEST_QUOTE_PUBLISHED') return es ? 'Cotización disponible para aprobación' : 'Quote available for approval';
   if (event.action === 'REQUEST_AUTO_QUOTED') return es ? 'Cotización DEMO calculada automáticamente' : 'DEMO quote calculated automatically';
   if (event.action === 'REQUEST_DEMO_FULFILLED') return es ? 'Pago simulado y pedido DEMO creado' : 'Payment simulated and DEMO order created';
-  if (event.action === 'REQUEST_PAYMENT_RECORDED') return es ? 'Comprobante de pago verificado y pedido creado' : 'Payment evidence verified and order created';
+  if (event.action === 'REQUEST_PAYMENT_RECORDED') return es ? 'Registro de pago del flujo anterior (sin validar)' : 'Payment entry from the previous flow (unverified)';
+  if (event.action === 'REQUEST_DEMO_PAYMENT_RECORDED') return es ? 'El cliente registró el pago simulado de la cotización' : 'Customer recorded the simulated quote payment';
+  if (event.action === 'ORDER_DEMO_PAYMENT_RECORDED') return es ? 'Pago DEMO de pedido de catálogo registrado' : 'Catalog order DEMO payment recorded';
+  if (event.action === 'CATALOG_DEMO_PURCHASE_COMPLETED') return es ? 'Compra de catálogo DEMO completada' : 'Catalog DEMO purchase completed';
   if (event.action === 'REQUEST_CUSTOMER_APPROVED') return es ? 'El cliente aprobó el alcance' : 'Customer approved the scope';
   if (event.action === 'ORDER_STATUS_CHANGED') return es ? 'Etapa del pedido actualizada' : 'Order stage updated';
   if (event.action === 'REQUEST_QUOTE_EMAIL_SENT') return es ? 'Cotización enviada por correo' : 'Quote emailed';

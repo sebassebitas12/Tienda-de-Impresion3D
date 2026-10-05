@@ -64,14 +64,14 @@ describe('creación de encargos de catálogo', () => {
     const user = { id: 'empty', role: 'customer', status: 'ACTIVE' };
     expect(mineFixture([user]).invoke(tokenFor(user)).body).toEqual({ orders: [] });
   });
-  it('recalcula el precio, crea el pedido y refleja items/actividad en una persistencia', () => {
+  it('recalcula el precio, registra el pago DEMO y crea recibo/items/actividad en una persistencia', () => {
     let sequence = 0;
     const result = prepareCatalogOrder(fixture(), actor, payload, now, () => `id-${++sequence}`);
-    expect(result.order).toMatchObject({ id: 'ord-id-2', userId: 'c1', status: 'PENDING', currency: 'CRC', createdAt: now, subtotalCrc: 5000, total: 5000, pricingScope: 'CATALOG_SUBTOTAL_ONLY' });
+    expect(result.order).toMatchObject({ id: 'ord-id-2', userId: 'c1', status: 'CONFIRMED', paymentStatus: 'PAID', paymentMode: 'DEMO', paidAt: now, currency: 'CRC', createdAt: now, subtotalCrc: 5000, total: 5000, pricingScope: 'CATALOG_SUBTOTAL_ONLY' });
     expect(result.order.orderItems[0]).toMatchObject({ productId: 'p1', color: 'Negro', quantity: 2, unitPrice: 2500, subtotal: 5000 });
     expect(result.nextData.orders).toEqual([result.order]);
     expect(result.nextData.orderItems[0]).toMatchObject({ orderId: result.order.id, productId: 'p1', quantity: 2 });
-    expect(result.nextData.activityLog[0]).toMatchObject({ action: 'CATALOG_ORDER_CREATED', entityId: result.order.id, actorId: 'c1', toStatus: 'PENDING' });
+    expect(result.nextData.activityLog[0]).toMatchObject({ action: 'CATALOG_DEMO_PURCHASE_COMPLETED', entityId: result.order.id, actorId: 'c1', toStatus: 'CONFIRMED', metadata: { paymentMode: 'DEMO', reference: 'SIMULATED-NO-REAL-PAYMENT' } });
     expect(buildAdminOrders(result.nextData)[0]).toMatchObject({ id: result.order.id, customer: actor, total: 5000, items: [{ productId: 'p1', quantity: 2, product }] });
   });
 
@@ -109,7 +109,7 @@ describe('creación de encargos de catálogo', () => {
     const first = await invoke();
     const replay = await invoke();
     expect(first.status).toBe(200);
-    expect(first.body.order).toMatchObject({ userId: actor.id, status: 'PENDING', subtotalCrc: 5000 });
+    expect(first.body.order).toMatchObject({ userId: actor.id, status: 'CONFIRMED', paymentStatus: 'PAID', paymentMode: 'DEMO', subtotalCrc: 5000 });
     expect(replay.body).toEqual({ order: first.body.order, replay: true });
     expect(persist).toHaveBeenCalledTimes(1);
   });

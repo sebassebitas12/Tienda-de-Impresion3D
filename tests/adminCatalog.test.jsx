@@ -27,10 +27,10 @@ function renderAdmin(path = '/admin/catalogo') {
 describe('administración del catálogo', () => {
   afterEach(() => { cleanup(); jest.clearAllMocks(); localStorage.clear(); });
 
-  it('enriquece el catálogo con categoría y detecta materiales fuera de FDM vigente', () => {
+  it('enriquece el catálogo y reconoce PLA Silk como variante del catálogo FDM', () => {
     const products = buildAdminCatalog(rawData);
     expect(products.find(product => product.id === 'p1').category.name).toBe('Organización');
-    expect(summarizeAdminCatalog(products)).toMatchObject({ all: 2, needsReview: 1, statuses: { ACTIVE: 2 }, materials: { PLA: 1, 'PLA SILK': 1 } });
+    expect(summarizeAdminCatalog(products)).toMatchObject({ all: 2, needsReview: 0, statuses: { ACTIVE: 2 }, materials: { PLA: 1, 'PLA SILK': 1 } });
     expect(filterAdminCatalog(products, { material: 'PLA' }).map(product => product.id)).toEqual(['p1']);
     expect(filterAdminCatalog(products, { query: 'colección' }).map(product => product.id)).toEqual(['p2']);
   });
@@ -38,7 +38,8 @@ describe('administración del catálogo', () => {
   it('muestra modelos, permite filtrar y nunca presenta los campos heredados de inventario', async () => {
     getAdminCatalogData.mockResolvedValue(rawData);
     renderAdmin();
-    expect(await screen.findByText(/1 registro\(s\) usan un material fuera de la capacidad vigente/)).toBeInTheDocument();
+    await screen.findByRole('link', { name: 'Organizador modular Organización' });
+    expect(screen.queryByText(/usan un material fuera de la capacidad vigente/)).not.toBeInTheDocument();
     await waitFor(() => expect(document.querySelectorAll('.admin-catalog-row')).toHaveLength(2));
     expect(screen.queryByText(/stock|existencias/i)).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Calcular precio DEMO para Organizador modular' })).toHaveAttribute('href', '/admin/catalogo/p1/editar#cotizador');
@@ -58,11 +59,11 @@ describe('administración del catálogo', () => {
     expect(container.querySelector('img')).not.toBeInTheDocument();
   });
 
-  it('muestra ficha informativa y permite corregir un material antiguo', async () => {
+  it('muestra la ficha PLA Silk sin marcarlo como material legado', async () => {
     getAdminCatalogData.mockResolvedValue(rawData);
     renderAdmin('/admin/catalogo/p2');
     expect(await screen.findByRole('heading', { name: 'Dragón articulado' })).toBeInTheDocument();
-    expect(screen.getByText(/Material fuera de la capacidad vigente/)).toBeInTheDocument();
+    expect(screen.queryByText(/Material fuera de la capacidad vigente/)).not.toBeInTheDocument();
     expect(screen.getByText(/se fabrica después de recibir el pedido/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Editar|Edit/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Ocultar|Hide/ })).toBeInTheDocument();
@@ -115,5 +116,7 @@ describe('administración del catálogo', () => {
     expect(screen.getByText(/sigue en borrador/i)).toBeInTheDocument();
     expect(isCatalogProductReadyToPublish(draft)).toBe(false);
     expect(isCatalogProductReadyToPublish({ ...draft, price: 1200, material: 'PLA' })).toBe(true);
+    expect(isCatalogProductReadyToPublish({ ...draft, price: 1200, material: 'PLA Silk' })).toBe(true);
+    expect(isOrderableProduct({ ...rawData.products[1], currency: 'CRC', availableColors: ['Rojo'] })).toBe(true);
   });
 });

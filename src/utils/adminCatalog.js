@@ -1,5 +1,5 @@
 import { matchesFacet } from './facetFilters.js';
-export const CATALOG_MATERIALS = new Set(['ASA', 'PLA', 'PETG', 'ABS', 'TPU']);
+export const CATALOG_MATERIALS = new Set(['ASA', 'PLA', 'PLA SILK', 'PETG', 'ABS', 'TPU']);
 
 export function buildAdminCatalog({ products = [], categories = [] } = {}) {
   const categoriesById = new Map(categories.map(category => [String(category.id), category]));

@@ -1,5 +1,15 @@
 # Vértice CR — Métricas, Admin e IA operativa
 
+## Requisito vigente del usuario — 2026-10-05
+
+La IA de Admin debe hacer CRUD real, con propuesta visible y confirmación antes
+de persistir. No basta responder con instrucciones o enlaces. Debe facilitar
+crear/editar piezas y categorías, y preparar cotizaciones de solicitudes nuevas
+independientes del catálogo. DeepSeek es el proveedor solicitado. Cliente+IA
+inicia la cotización; Admin revisa/aprueba, cliente paga DEMO, luego fabricación.
+Las restricciones históricas de solo consulta son deuda por resolver, no requisito.
+El orden de bloques y porcentaje de preparación están en docs/10.
+
 > Última actualización: **2026-10-03**.
 
 ## Cierre del handoff A — 2026-10-03

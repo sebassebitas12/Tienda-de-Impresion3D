@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { EmptyState, ErrorState, ProductCard, Skeleton } from '../components/ui/index.js';
 import { FilterChips } from '../components/ui/FilterChips.jsx';
 import { useCatalog } from '../hooks/useCatalog.js';
@@ -7,7 +7,7 @@ import { useCart } from '../hooks/useCart.js';
 import { useAuth } from '../hooks/useAuth.js';
 import { usePreferences } from '../hooks/usePreferences.js';
 import { createCatalogOrderIdempotencyKey, submitCatalogOrder } from '../services/commerceService.js';
-import { isOrderableProduct, reconcileCart } from '../utils/cart.js';
+import { isOrderableProduct, MAX_CATALOG_ORDER_QUANTITY, reconcileCart } from '../utils/cart.js';
 import { matchesFacet, toggleFacetParams } from '../utils/facetFilters.js';
 import { formatCRC } from '../utils/money.js';
 import { ProductReviews } from '../features/products/ProductReviews.jsx';
@@ -36,6 +36,7 @@ function ProductMedia({ product, es }) {
 export function CatalogPage() {
   const { language } = usePreferences(); const es = language === 'es';
   const { status, products, retry } = useCatalog();
+  const location = useLocation();
   const [params, setParams] = useSearchParams();
   const materials = params.getAll('material'); const categories = params.getAll('categoria'); const query = params.get('buscar') || '';
   const orderable = products.filter(isOrderableProduct);
@@ -48,7 +49,7 @@ export function CatalogPage() {
       <p className="shop-facet-label">{es ? 'Material' : 'Material'}</p>
       <FilterChips label={es ? 'Materiales' : 'Materials'} selected={materials} onToggle={value => setParams(toggleFacetParams(params, 'material', value))} options={[{ value: 'all', label: es ? 'Todos' : 'All' }, ...[...new Set(orderable.map(product => product.material))].map(value => ({ value, label: value }))]} />
       <p role="status">{filtered.length} {es ? 'modelos' : 'models'}</p>
-      {filtered.length ? <div className="shop-grid">{filtered.map(product => <ProductCard key={product.id} product={{ ...product, categoryName: product.category?.name }} linkAs={Link} to={`/producto/${encodeURIComponent(product.id)}`} showPrice showMadeToOrder viewLabel={es ? 'Elegir pieza' : 'Choose part'} imageUnavailableLabel={es ? 'Imagen de producto próximamente' : 'Product image coming soon'} />)}</div> : <EmptyState title={es ? 'No hay modelos con esos filtros' : 'No models match these filters'} />}</>}
+      {filtered.length ? <div className="shop-grid">{filtered.map(product => <ProductCard key={product.id} product={{ ...product, categoryName: product.category?.name }} linkAs={Link} to={`/producto/${encodeURIComponent(product.id)}${location.search}`} showPrice showMadeToOrder viewLabel={es ? 'Elegir pieza' : 'Choose part'} imageUnavailableLabel={es ? 'Imagen de producto próximamente' : 'Product image coming soon'} />)}</div> : <EmptyState title={es ? 'No hay modelos con esos filtros' : 'No models match these filters'} />}</>}
   </section>;
 }
 
@@ -68,10 +69,17 @@ const FILAMENT_SWATCHES = {
 function ProductSelection({ product, es }) {
   const cart = useCart();
   const { user } = useAuth();
+  const location = useLocation();
   const [color, setColor] = useState(''); const [quantity, setQuantity] = useState(1); const [notice, setNotice] = useState('');
-  const valid = (product.availableColors || []).includes(color) && Number.isSafeInteger(Number(quantity)) && Number(quantity) >= 1;
-  const canShop = !user || user.role === 'customer';
-  return <form className="shop-selection" onSubmit={event => { event.preventDefault(); if (valid && cart.add(product.id, color, Number(quantity))) setNotice(es ? 'Pieza agregada a tu carrito.' : 'Part added to your cart.'); }}>
+  const valid = (product.availableColors || []).includes(color) && Number.isSafeInteger(Number(quantity)) && Number(quantity) >= 1 && Number(quantity) <= MAX_CATALOG_ORDER_QUANTITY;
+  const canShop = user?.role === 'customer' && cart.ready;
+  const returnToProduct = `${location.pathname}${location.search}`;
+  return <form className="shop-selection" onSubmit={event => {
+    event.preventDefault();
+    if (!canShop) return;
+    if (valid && cart.add(product.id, color, Number(quantity))) setNotice(es ? 'Pieza agregada a tu carrito.' : 'Part added to your cart.');
+    else setNotice(es ? `La cantidad máxima por pieza es ${MAX_CATALOG_ORDER_QUANTITY}.` : `The maximum quantity per part is ${MAX_CATALOG_ORDER_QUANTITY}.`);
+  }}>
     <span>{product.category?.name} · {product.material}</span><h1>{product.name}</h1><p>{product.description}</p><strong className="shop-price">{formatCRC(product.price)}</strong>
     {product.priceSource === 'DEMO' && (
       <p className="shop-product-demo-note">
@@ -115,26 +123,29 @@ function ProductSelection({ product, es }) {
       </div>
     )}
     {product.availableColors?.length > 0 && !color && <p className="shop-selection-hint">{es ? 'Seleccioná un color para agregar la pieza.' : 'Select a color to add this part.'}</p>}
-    <label>{es ? 'Cantidad' : 'Quantity'}<input required type="number" min="1" step="1" value={quantity} onChange={event => { setQuantity(event.target.value); setNotice(''); }} /></label>
+    <label>{es ? 'Cantidad' : 'Quantity'}<input required type="number" min="1" max={MAX_CATALOG_ORDER_QUANTITY} step="1" value={quantity} aria-describedby="shop-quantity-help" onChange={event => { setQuantity(event.target.value); setNotice(''); }} /></label>
+    <small id="shop-quantity-help" className="shop-selection-hint">{es ? `Máximo ${MAX_CATALOG_ORDER_QUANTITY} unidades por pieza en este encargo.` : `Maximum ${MAX_CATALOG_ORDER_QUANTITY} units per part in this order.`}</small>
     {!product.availableColors?.length && <p>{es ? 'Este modelo necesita que el taller registre sus colores antes de poder pedirlo.' : 'The workshop needs to list this model’s colors before you can order it.'}</p>}
-    {user?.role === 'admin' && <p role="status">{es ? 'El carrito y los encargos están disponibles para cuentas de cliente.' : 'The cart and orders are available to customer accounts.'}</p>}
-    <button className="v-button v-button--primary v-button--pill" disabled={!valid || !canShop}>{es ? 'Agregar al carrito' : 'Add to cart'} ↗</button>
-    {notice && (user?.role === 'customer'
-      ? <p role="status">{notice} <Link to="/carrito">{es ? 'Ver carrito' : 'View cart'} →</Link></p>
-      : <div role="status" className="shop-cart-guest-notice shop-cart-session-state shop-cart-session-state--guest">
-        <p>{cart.storageError
-          ? (es ? 'La selección se mantiene mientras esta pestaña esté abierta. Iniciá sesión o creá una cuenta para ver el carrito y continuar.' : 'Your selection remains while this tab stays open. Sign in or create an account to view the cart and continue.')
-          : (es ? 'La pieza quedó guardada en este navegador. Iniciá sesión o creá una cuenta para ver el carrito y continuar.' : 'This part is saved in this browser. Sign in or create an account to view the cart and continue.')}</p>
-        <p><Link to="/login" state={{ from: '/carrito' }}>{es ? 'Iniciar sesión' : 'Sign in'} →</Link><span aria-hidden="true"> · </span><Link to="/registro" state={{ from: '/carrito' }}>{es ? 'Crear cuenta' : 'Create account'} →</Link></p>
-      </div>)}
+    {user?.role === 'admin' && <p role="status">{es ? 'La compra pertenece a una cuenta de cliente. Podés seguir explorando o volver a Administración.' : 'Purchases belong to customer accounts. Keep browsing or return to Admin.'} <Link to="/admin">{es ? 'Abrir Administración' : 'Open Admin'} ↗</Link></p>}
+    {canShop
+      ? <button className="v-button v-button--primary v-button--pill" disabled={!valid}>{es ? 'Agregar al carrito' : 'Add to cart'} ↗</button>
+      : user?.role !== 'admin' && <div className="shop-cart-session-state shop-cart-session-state--guest">
+        <p>{es ? 'Para agregar esta pieza necesitás iniciar sesión con una cuenta de cliente.' : 'Sign in with a customer account to add this part.'}</p>
+        <div className="shop-cart-auth-actions">
+          <Link className="v-button v-button--primary v-button--pill shop-cart-auth-btn" to="/login" state={{ from: returnToProduct, reason: 'catalog-customer-required' }}>{es ? 'Iniciar sesión para agregar' : 'Sign in to add'} ↗</Link>
+          <Link className="v-link-text" to="/registro" state={{ from: returnToProduct, reason: 'catalog-customer-required' }}>{es ? 'Crear cuenta' : 'Create account'} →</Link>
+        </div>
+      </div>}
+    {notice && user?.role === 'customer' && <p role="status">{notice} <Link to="/carrito">{es ? 'Ver carrito' : 'View cart'} →</Link></p>}
   </form>;
 }
 
 export function ProductPage() {
   const { id } = useParams(); const { language } = usePreferences(); const es = language === 'es';
+  const location = useLocation();
   const { status, products, retry } = useCatalog();
   const product = products.find(item => String(item.id) === id && isOrderableProduct(item));
-  return <section className="shop-page"><Link className="v-link-text" to="/catalogo">← {es ? 'Volver al catálogo' : 'Back to catalog'}</Link><CatalogState status={status} retry={retry} es={es} />
+  return <section className="shop-page"><Link className="v-link-text" to={`/catalogo${location.search}`}>← {es ? 'Volver al catálogo' : 'Back to catalog'}</Link><CatalogState status={status} retry={retry} es={es} />
     {status === 'success' && (product ? (
       <>
         <div className="shop-product">
@@ -179,7 +190,7 @@ export function CartPage() {
       }, { token });
       cart.clear();
       idempotencyRef.current = null;
-      navigate('/cuenta', { state: { orderConfirmation: { id: result.order.id, subtotalCrc: result.order.subtotalCrc } } });
+      navigate(`/pedidos/${encodeURIComponent(result.order.id)}`);
     } catch (failure) {
       const messages = {
         PRODUCT_UNAVAILABLE: es ? 'Un modelo o color dejó de estar publicado. Actualizá el carrito antes de reintentar.' : 'A model or color is no longer published. Refresh the cart before trying again.',
@@ -202,10 +213,10 @@ export function CartPage() {
         <div className="shop-cart-info"><h2>{line.product?.name || line.productId}</h2><p className="shop-cart-meta">{line.color} · {line.product?.material}</p>
         {!line.available && <p role="alert">{es ? 'Este modelo o color ya no está publicado. Quitalo o elegí otro desde el catálogo.' : 'This model or color is no longer published. Remove it or choose another from the catalog.'}</p>}
         {line.available && <p>{formatCRC(line.product.price)} {es ? 'por unidad' : 'each'}</p>}</div>
-        <div className="shop-cart-controls"><label><span className="v-sr-only">{es ? 'Cantidad de ' : 'Quantity of '}{line.product?.name || line.productId}</span><span className="shop-cart-qty-label">{es ? 'Cantidad' : 'Qty'}</span><input type="number" min="1" step="1" value={line.quantity} onChange={event => { const value = Number(event.target.value); setError(cart.update(line.productId, line.color, value) ? '' : (es ? 'La cantidad debe ser un número entero mayor que cero.' : 'Quantity must be a positive whole number.')); }} /></label>
+        <div className="shop-cart-controls"><label><span className="v-sr-only">{es ? 'Cantidad de ' : 'Quantity of '}{line.product?.name || line.productId}</span><span className="shop-cart-qty-label">{es ? 'Cantidad' : 'Qty'}</span><input type="number" min="1" max={MAX_CATALOG_ORDER_QUANTITY} step="1" value={line.quantity} onChange={event => { const value = Number(event.target.value); setError(cart.update(line.productId, line.color, value) ? '' : (es ? `La cantidad debe ser un entero entre 1 y ${MAX_CATALOG_ORDER_QUANTITY}.` : `Quantity must be a whole number from 1 to ${MAX_CATALOG_ORDER_QUANTITY}.`)); }} /></label>
         <strong className="shop-cart-subtotal">{line.available ? formatCRC(line.subtotal) : '—'}</strong><button className="v-button v-button--ghost shop-cart-remove" aria-label={`${es ? 'Quitar' : 'Remove'} ${line.product?.name || line.productId}, ${line.color}`} onClick={() => cart.remove(line.productId, line.color)}>{es ? 'Quitar' : 'Remove'}</button></div></article>)}</div>
         <aside className="shop-cart-summary"><h2>{es ? 'Tu encargo' : 'Your order'}</h2><p>{es ? 'Subtotal de piezas' : 'Parts subtotal'}</p><strong className="shop-price">{formatCRC(subtotal)}</strong>
-          <p className="shop-cart-fabrication-note">{es ? 'Confirmar registra tu encargo; no cobra ni inicia producción. El taller debe verificar el pago y confirmar entrega, costos adicionales y fecha. Este subtotal corresponde únicamente a las piezas.' : 'Confirmation records your order; it does not charge you or start production. The workshop must verify payment and confirm delivery, additional costs and date. This subtotal covers parts only.'}</p>
+          <p className="shop-cart-fabrication-note">{es ? 'Pago simulado · DEMO. Al continuar se registra el pago en la base académica y recibirás el comprobante del pedido. No se transfiere ni cobra dinero real. El total mostrado cubre las piezas; entrega y fecha se coordinan aparte con el taller.' : 'Simulated payment · DEMO. Continuing records the payment in the academic database and creates your order receipt. No real money is transferred or charged. The displayed total covers the parts; delivery and date are arranged separately with the workshop.'}</p>
           {!canConfirm && <p className="shop-cart-error" role="status">{es ? 'Hay piezas o variantes no disponibles. Quitalas o elegí otra opción en la tienda para confirmar el encargo; no se incluyen en el subtotal.' : 'Some parts or variants are unavailable. Remove them or select another option in the shop to confirm; they are excluded from the subtotal.'}</p>}
           {!user && (
             <div className="shop-cart-session-state shop-cart-session-state--guest">
@@ -245,19 +256,19 @@ export function CartPage() {
           )}
           {user?.role === 'admin' ? (
             <div className="shop-cart-admin-cta">
-              <button className="v-button v-button--secondary v-button--pill" type="button" onClick={confirmOrder} aria-label={es ? 'Confirmar encargo' : 'Confirm order'} disabled={true} title={es ? 'Acción reservada para cuentas de cliente' : 'Action reserved for customer accounts'}>
-                {es ? 'Confirmar encargo (Solo clientes)' : 'Confirm order (Customers only)'}
+              <button className="v-button v-button--secondary v-button--pill" type="button" aria-label={es ? 'Pago reservado para clientes' : 'Payment reserved for customers'} disabled={true} title={es ? 'Acción reservada para cuentas de cliente' : 'Action reserved for customer accounts'}>
+                {es ? 'Pagar · DEMO (solo clientes)' : 'Pay · DEMO (customers only)'}
               </button>
               <p className="shop-cart-admin-hint">
-                {es ? 'Ingresá con una cuenta de cliente para confirmar un encargo.' : 'Sign in with a customer account to confirm an order.'}
+                {es ? 'Ingresá con una cuenta de cliente para comprar y recibir su comprobante DEMO.' : 'Sign in with a customer account to purchase and receive its DEMO receipt.'}
               </p>
             </div>
           ) : (
-            <button className="v-button v-button--primary v-button--pill" type="button" onClick={confirmOrder} disabled={!canConfirm || submitting} aria-label={es ? 'Confirmar encargo' : 'Confirm order'}>
-              {submitting ? (es ? 'Guardando encargo…' : 'Saving order…') : (es ? 'Confirmar encargo' : 'Confirm order')}
+            <button className="v-button v-button--primary v-button--pill" type="button" onClick={confirmOrder} disabled={!canConfirm || submitting || user?.role !== 'customer'} aria-label={es ? `Pagar ${formatCRC(subtotal)} · DEMO` : `Pay ${formatCRC(subtotal)} · DEMO`}>
+              {submitting ? (es ? 'Registrando pago…' : 'Recording payment…') : (es ? `Pagar ${formatCRC(subtotal)} · DEMO` : `Pay ${formatCRC(subtotal)} · DEMO`)}
             </button>
           )}
-          {!user && <p className="shop-cart-guest-note">{es ? 'Al pulsar Confirmar encargo se te solicitará iniciar sesión para continuar.' : 'Clicking Confirm order will prompt you to sign in to continue.'}</p>}
+          {!user && <p className="shop-cart-guest-note">{es ? 'Iniciá sesión o creá una cuenta para elegir productos y pagarlos en modo DEMO.' : 'Sign in or create an account to choose products and pay in DEMO mode.'}</p>}
           {error && <p className="shop-cart-error" role="alert">{error}</p>}
           <Link className="v-link-text" to="/catalogo">{es ? 'Seguir eligiendo piezas' : 'Keep choosing parts'} ↗</Link></aside></div>}
       </>}

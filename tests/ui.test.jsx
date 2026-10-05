@@ -189,12 +189,6 @@ describe('Separación de catálogo y cotización', () => {
     expect(screen.getByText('Cotización caducada')).toBeVisible();
   });
 
-  test('SINPE no habilita comprobantes sin destino; no confirma al seleccionar un archivo', () => {
-    render(<UI.SinpePaymentBlock receipt={new File(['a'], 'receipt.pdf')} />);
-    expect(screen.getByLabelText('Comprobante SINPE')).toBeDisabled();
-    expect(screen.queryByText('Pago confirmado.')).not.toBeInTheDocument();
-  });
-
   test('ProductCard ignora stock heredado y conserva el estado de imagen', () => {
     render(<UI.ProductCard product={{ ...product, stock: 0 }} href="/producto/test-only" showPrice />);
     expect(screen.queryByText('Sin stock')).not.toBeInTheDocument();

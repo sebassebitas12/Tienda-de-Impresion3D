@@ -1,4 +1,4 @@
-export const FDM_MATERIALS = ['ASA', 'PLA', 'PETG', 'ABS', 'TPU'];
+export const FDM_MATERIALS = ['ASA', 'PLA', 'PLA SILK', 'PETG', 'ABS', 'TPU'];
 
 const roundMoney = value => Math.round((value + Number.EPSILON) * 100) / 100;
 

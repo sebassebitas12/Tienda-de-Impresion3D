@@ -26,7 +26,7 @@ const words = {
     description: 'Descripción', colors: 'Colores registrados', dimensions: 'Dimensiones', weight: 'Peso registrado', production: 'Producción estimada',
     madeToOrder: 'Se fabrica después de recibir el pedido. Este panel no registra inventario ni promete entrega inmediata.',
     imageUnavailable: 'Este modelo no tiene una imagen registrada.', notFound: 'No encontramos este modelo.',
-    legacyMaterial: 'Material fuera de la capacidad vigente (FDM): ASA, PLA, PETG, ABS y TPU. Revisá este registro antes de mostrarlo en tienda.',
+    legacyMaterial: 'Material fuera de la capacidad vigente (FDM): ASA, PLA (incluye PLA Silk), PETG, ABS y TPU. Revisá este registro antes de mostrarlo en tienda.',
     legacyStatus: status => `Publicación registrada como «${status}». No hay una acción de cambio de estado definida.`,
   },
   en: {
@@ -43,7 +43,7 @@ const words = {
     description: 'Description', colors: 'Recorded colors', dimensions: 'Dimensions', weight: 'Recorded weight', production: 'Estimated production',
     madeToOrder: 'Made after an order is received. This panel does not track inventory or promise immediate delivery.',
     imageUnavailable: 'No image is recorded for this model.', notFound: 'We could not find this model.',
-    legacyMaterial: 'Material is outside the current FDM capabilities: ASA, PLA, PETG, ABS and TPU. Review this record before showing it in the store.',
+    legacyMaterial: 'Material is outside the current FDM capabilities: ASA, PLA (including PLA Silk), PETG, ABS and TPU. Review this record before showing it in the store.',
     legacyStatus: status => `Publication is recorded as “${status}”. No status change action is defined.`,
   },
 };

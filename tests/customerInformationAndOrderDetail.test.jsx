@@ -26,7 +26,7 @@ describe('rutas informativas y detalle de pedido del cliente', () => {
     usePreferences.mockReturnValue({ language: 'es' });
     render(<MemoryRouter><CustomerInformationPage pageKey="faq" /></MemoryRouter>);
     expect(screen.getByRole('heading', { level: 1, name: /respuestas para seguir/i })).toBeInTheDocument();
-    expect(screen.getByText(/no transfieras dinero/i)).toBeInTheDocument();
+    expect(screen.getByText(/no cobra dinero/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /catálogo de piezas/i })).toHaveAttribute('href', '/catalogo');
   });
 
@@ -51,6 +51,20 @@ describe('rutas informativas y detalle de pedido del cliente', () => {
     expect(screen.getAllByText(/₡6\s?800/)).toHaveLength(3);
     expect(screen.getByRole('link', { name: /volver a mis pedidos/i })).toHaveAttribute('href', '/cuenta?tab=orders');
     expect(fetchMyOrders).toHaveBeenCalledWith(expect.objectContaining({ token: 'sim-customer', signal: expect.any(AbortSignal) }));
+  });
+
+  it('incluye el alcance del diseño personalizado en el comprobante DEMO', async () => {
+    useAuth.mockReturnValue({ token: 'sim-customer' });
+    usePreferences.mockReturnValue({ language: 'es' });
+    fetchMyOrders.mockResolvedValue({ orders: [{ id: 'quote-paid-1', status: 'CONFIRMED', total: 15000,
+      paymentStatus: 'PAID', paymentMode: 'DEMO', scopeSnapshot: { name: 'Soporte especial', fileName: 'soporte.stl', material: 'PETG', dimensions: '12 x 8 cm', quantity: 2, notes: 'Sin envío.' } }] });
+    render(<MemoryRouter initialEntries={['/pedidos/quote-paid-1']}><PreferencesProvider><Routes>
+      <Route path="/pedidos/:id" element={<CustomerOrderDetailPage />} />
+    </Routes></PreferencesProvider></MemoryRouter>);
+    expect(await screen.findByText('Soporte especial')).toBeInTheDocument();
+    expect(screen.getByText(/Archivo de referencia: soporte\.stl/)).toBeInTheDocument();
+    expect(screen.getByText(/Pago simulado registrado · DEMO/)).toBeInTheDocument();
+    expect(screen.getByText('Sin envío.')).toBeInTheDocument();
   });
 
   it('no muestra un pedido que no pertenece a la colección entregada por el servicio', async () => {

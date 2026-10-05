@@ -19,7 +19,7 @@ const content = {
         ] },
         { title: 'Cuenta y pago académico', items: [
           ['¿Por qué debo iniciar sesión para ver el carrito?', 'La cuenta permite asociar el encargo a una persona y separar sus pedidos. La selección previa puede conservarse en ese navegador hasta iniciar sesión.'],
-          ['¿Puedo transferir al número que aparece?', 'No. El SINPE mostrado es un dato de demostración del prototipo académico; no transfieras dinero ni ingreses datos bancarios reales.'],
+          ['¿El pago se realiza de verdad?', 'No. El botón registra un pago DEMO en la base académica para completar el recorrido; no cobra dinero ni recibe información bancaria.'],
         ] },
       ],
       actions: [['Catálogo de piezas', '/catalogo'], ['Enviar una solicitud', '/solicitud'], ['Ver mi cuenta', '/cuenta']],
@@ -53,7 +53,7 @@ const content = {
       sections: [
         { title: 'Cotizaciones y catálogo', body: 'Los precios, perfiles y estimaciones identificados como DEMO son orientativos. La disponibilidad, materiales, acabados, cargos y precio final requieren confirmación del taller antes de fabricar.' },
         { title: 'Pedidos y producción', body: 'Confirmar un encargo en esta versión no acredita un pago ni garantiza una fecha de entrega. Los estados representan el flujo de demostración y seguimiento del taller.' },
-        { title: 'Pagos', body: 'No hay una pasarela bancaria conectada. La referencia SINPE de ejemplo no es un destino de pago: no transfieras dinero ni introduzcas información de tarjetas.' },
+        { title: 'Pagos', body: 'El pago se simula dentro de la base académica para completar el recorrido y emitir un comprobante DEMO. No se conecta a bancos, no cobra dinero ni solicita datos de pago reales.' },
         { title: 'Uso responsable', body: 'El cliente debe compartir archivos que tenga derecho a utilizar. La fabricación depende de la revisión de viabilidad y del uso declarado.' },
       ],
       notice: 'Esta demostración no debe usarse para realizar una compra o un pago real.',
@@ -98,7 +98,7 @@ const content = {
         ] },
         { title: 'Account and academic payment', items: [
           ['Why sign in to open the cart?', 'An account associates an order with a customer. A selection may remain in that browser until you sign in.'],
-          ['Can I transfer to the number shown?', 'No. The SINPE number is demonstration data for an academic prototype; do not transfer money or enter real banking details.'],
+          ['Is the payment real?', 'No. The button records a DEMO payment in the academic database to complete the flow; it does not charge money or collect banking information.'],
         ] },
       ],
       actions: [['Parts catalog', '/catalogo'], ['Send a request', '/solicitud'], ['My account', '/cuenta']],
@@ -132,7 +132,7 @@ const content = {
       sections: [
         { title: 'Quotes and catalog', body: 'Prices, profiles and estimates marked DEMO are illustrative. Availability, materials, finish, charges and final price require workshop confirmation before production.' },
         { title: 'Orders and production', body: 'Confirming an order in this version does not record payment or guarantee a delivery date. Statuses represent a workshop tracking demonstration.' },
-        { title: 'Payments', body: 'No banking gateway is connected. The sample SINPE reference is not a payment destination: do not transfer money or enter card information.' },
+        { title: 'Payments', body: 'Payment is simulated in the academic database to complete the flow and issue a DEMO receipt. It is not connected to banks, does not charge money and does not request real payment details.' },
         { title: 'Responsible use', body: 'Customers should share files they are entitled to use. Production depends on feasibility review and the stated intended use.' },
       ],
       notice: 'Do not use this demonstration to make a real purchase or payment.',

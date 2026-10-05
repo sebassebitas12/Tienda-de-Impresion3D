@@ -7,6 +7,18 @@ const pricingInputs = { material: 'PETG', weightGrams: 100, printHours: 1, filam
   laborCrcPerHour: 3000, designHours: 2, designCrcPerHour: 5000, otherCostsCrc: 1000, markupPercent: 20, ratesCheckedAt: '2026-09-30' };
 const payload = { action: 'save-quote', actorId: 'u1', expectedStatus: 'IN_REVIEW', expectedVersion: 0, pricingInputs, validUntil: '2026-10-10', notes: 'Cuatro piezas en PETG, entrega por coordinar.' };
 describe('transiciones administrativas de cotización', () => {
+  it('permite cotizar una idea o archivo sin asociarlo al catálogo usando monto y condiciones DEMO', () => {
+    const request = { id: 'custom-rq', status: 'IN_REVIEW', quoteVersion: 0, description: 'Diseño para herramienta especial', quantity: 2 };
+    const result = prepareRequestAction(request, { action: 'save-custom-quote', actorId: 'u1', expectedStatus: 'IN_REVIEW', expectedVersion: 0,
+      quotedPrice: 15000, validUntil: '2026-10-10', notes: 'Dos piezas; retiro a coordinar.' }, time);
+    expect(result.patch).toMatchObject({ status: 'QUOTED', quotedPrice: 15000, currency: 'CRC', quoteVersion: 1,
+      quotePricing: { mode: 'DEMO', provenance: 'ADMIN_CUSTOM_QUOTE_DEMO' }, quoteNotes: 'Dos piezas; retiro a coordinar.' });
+    expect(result.patch).not.toHaveProperty('productId');
+    expect(result.event).toBe('REQUEST_CUSTOM_QUOTE_SAVED');
+    expect(prepareRequestAction(request, { action: 'save-custom-quote', expectedStatus: 'IN_REVIEW', expectedVersion: 0,
+      quotedPrice: 0, validUntil: '2026-10-10', notes: 'Cotización' }, time).error).toBe('INVALID_QUOTE');
+  });
+
   it('revisa cambios, conserva la oferta anterior y exige nueva versión antes de enviar', () => {
     const request = { status: 'CHANGES_REQUESTED', quantity: 4, quoteVersion: 2, quotedPrice: 10000, quoteNotes: 'Anterior', customerDecisionReason: 'Cambiar material' };
     const revised = prepareRequestAction(request, { ...payload, expectedStatus: 'CHANGES_REQUESTED', expectedVersion: 2 }, time);

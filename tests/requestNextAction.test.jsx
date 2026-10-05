@@ -37,6 +37,7 @@ describe('paso de envío de cotización', () => {
   it('explica el cambio de estado y exige confirmación antes de guardar una cotización DEMO', async () => {
     const onSaved = jest.fn();
     render(<MemoryRouter><RequestNextAction request={{ ...request, status: 'IN_REVIEW' }} user={user} language="es" onSaved={onSaved} /></MemoryRouter>);
+    fireEvent.click(screen.getByText('Probar cálculo automático de una pieza estándar (opcional)'));
     const prepare = await screen.findByRole('button', { name: 'Preparar cotización DEMO' });
     await waitFor(() => expect(prepare).toBeEnabled());
     fireEvent.click(prepare);
@@ -56,9 +57,11 @@ describe('paso de envío de cotización', () => {
     renderAction({ status: 'CHANGES_REQUESTED', customerDecisionReason: 'Necesito un acabado distinto' });
     expect(screen.getByText('Necesito un acabado distinto')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Enviar al cliente y copiarme' })).not.toBeInTheDocument();
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Monto total de la cotización (CRC)' }), { target: { value: '15000' } });
     fireEvent.change(screen.getByRole('textbox', { name: 'Alcance y condiciones para el cliente' }), { target: { value: 'Nuevo acabado acordado.' } });
-    fireEvent.submit(screen.getByRole('button', { name: 'Guardar cotización' }).closest('form'));
-    await waitFor(() => expect(transitionRequest).toHaveBeenCalledWith(expect.objectContaining({ action: 'save-quote', expectedStatus: 'CHANGES_REQUESTED', expectedVersion: 2, notes: 'Nuevo acabado acordado.' }), { token: undefined }));
+    fireEvent.change(screen.getByLabelText('Cotización válida hasta'), { target: { value: '2099-10-10' } });
+    fireEvent.submit(screen.getByRole('button', { name: 'Guardar cotización del encargo' }).closest('form'));
+    await waitFor(() => expect(transitionRequest).toHaveBeenCalledWith(expect.objectContaining({ action: 'save-custom-quote', quotedPrice: 15000, expectedStatus: 'CHANGES_REQUESTED', expectedVersion: 2, notes: 'Nuevo acabado acordado.' }), { token: undefined }));
     expect(sendQuoteEmail).not.toHaveBeenCalled();
   });
   afterEach(() => { cleanup(); jest.clearAllMocks(); });

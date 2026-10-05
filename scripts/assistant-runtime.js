@@ -82,7 +82,7 @@ export async function executeAssistantTool(name, args, { mode, actor, data, getR
     const terms = query.split(/\s+/).filter(Boolean);
     const categories = new Map((data.categories || []).map(category => [String(category.id), category]));
     return (data.products || []).filter(product => {
-      if (product.status !== 'ACTIVE' || !FDM_MATERIALS.includes(product.material)) return false;
+      if (product.status !== 'ACTIVE' || !FDM_MATERIALS.includes(String(product.material || '').toUpperCase())) return false;
       const category = categories.get(String(product.categoryId));
       const searchable = [product.name, product.slug, product.material, product.description, category?.name, category?.slug]
         .map(normalize).filter(Boolean).join(' ');
@@ -102,7 +102,7 @@ export async function executeAssistantTool(name, args, { mode, actor, data, getR
     drafts: (data.products || []).filter(p => p.status === 'DRAFT').length, collectedSales: null, reason: 'No existe evidencia de cobros', path: '/admin' };
   if (name === 'list_requests') return (data.customPrintRequests || []).filter(r => !args.status || r.status === args.status).slice(0, 12).map(({ id, status, quantity, material, description }) => ({ id, status, quantity, material, description, path: `/admin/solicitudes/${id}` }));
   if (name === 'list_orders') return (data.orders || []).filter(o => !args.status || o.status === args.status).slice(0, 12).map(({ id, status, total }) => ({ id, status, totalRecorded: total, path: `/admin/pedidos/${id}` }));
-  if (name === 'catalog_quality') return (data.products || []).filter(p => p.status === 'DRAFT' || !FDM_MATERIALS.includes(p.material) || !Number.isFinite(p.price)).map(({ id, name: label, status, material, price }) => ({ id, name: label, status, missing: [!material && 'material', !Number.isFinite(price) && 'price'].filter(Boolean), unsupportedMaterial: Boolean(material && !FDM_MATERIALS.includes(material)), path: `/admin/catalogo/${id}/editar` }));
+  if (name === 'catalog_quality') return (data.products || []).filter(p => p.status === 'DRAFT' || !FDM_MATERIALS.includes(String(p.material || '').toUpperCase()) || !Number.isFinite(p.price)).map(({ id, name: label, status, material, price }) => ({ id, name: label, status, missing: [!material && 'material', !Number.isFinite(price) && 'price'].filter(Boolean), unsupportedMaterial: Boolean(material && !FDM_MATERIALS.includes(String(material).toUpperCase())), path: `/admin/catalogo/${id}/editar` }));
   if (name === 'request_details') {
     if (!actor) return { error: 'TOOL_FORBIDDEN' };
     const request = data.customPrintRequests?.find(r => String(r.id) === args.requestId && (actor?.role === 'admin' || String(r.userId) === String(actor?.id)));

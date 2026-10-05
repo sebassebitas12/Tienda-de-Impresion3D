@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import { isOrderableProduct } from '../src/utils/cart.js';
+import { isOrderableProduct, MAX_CATALOG_ORDER_QUANTITY } from '../src/utils/cart.js';
 import { productSubtotal } from '../src/utils/money.js';
 import { sessionActor } from './session-access.js';
-import { installOrderPaymentOperation } from './order-payment-operations.js';
+import { installDemoOrderPaymentOperation } from './order-payment-operations.js';
 
 function normalizeRequestedItems(items) {
   if (!Array.isArray(items) || items.length === 0) return null;
@@ -11,7 +11,7 @@ function normalizeRequestedItems(items) {
   for (const item of items) {
     if (typeof item?.productId !== 'string' || !item.productId.trim()
       || typeof item.color !== 'string' || !item.color.trim()
-      || !Number.isSafeInteger(item.quantity) || item.quantity < 1) return null;
+      || !Number.isSafeInteger(item.quantity) || item.quantity < 1 || item.quantity > MAX_CATALOG_ORDER_QUANTITY) return null;
     const productId = item.productId.trim();
     const color = item.color.trim();
     const key = JSON.stringify([productId, color]);
@@ -61,13 +61,15 @@ export function prepareCatalogOrder(data, actor, payload, now, idFactory = rando
   const order = {
     id: orderId, userId: String(actor.id), orderItems: lineItems,
     subtotalCrc, subtotal: subtotalCrc, total: subtotalCrc, currency: 'CRC',
-    pricingScope: 'CATALOG_SUBTOTAL_ONLY', status: 'PENDING', createdAt: now,
+    pricingScope: 'CATALOG_SUBTOTAL_ONLY', status: 'CONFIRMED', paymentStatus: 'PAID', paymentMode: 'DEMO', paidAt: now, createdAt: now,
+    paymentEvidence: { mode: 'DEMO', reference: 'SIMULATED-NO-REAL-PAYMENT', recordedBy: String(actor.id), recordedAt: now },
     idempotencyKey: payload.idempotencyKey, idempotencyFingerprint: fingerprint,
   };
   const event = {
     id: `evt-${idFactory()}`, entity: 'order', entityId: orderId,
-    action: 'CATALOG_ORDER_CREATED', fromStatus: null, toStatus: 'PENDING',
+    action: 'CATALOG_DEMO_PURCHASE_COMPLETED', fromStatus: null, toStatus: 'CONFIRMED',
     actorId: String(actor.id), actorName: actor.name, occurredAt: now,
+    metadata: { paymentMode: 'DEMO', reference: 'SIMULATED-NO-REAL-PAYMENT' },
   };
   const nextData = structuredClone(data);
   nextData.orders = [...(nextData.orders || []), order];
@@ -77,7 +79,7 @@ export function prepareCatalogOrder(data, actor, payload, now, idFactory = rando
 }
 
 export function installCatalogOrderOperations({ registerAction, db, serialize, persist }) {
-  installOrderPaymentOperation({ registerAction, db, serialize, persist });
+  installDemoOrderPaymentOperation({ registerAction, db, serialize, persist });
   const failure = (res, code, status = 400) => res.status(status).json({ code });
   registerAction('/orders/mine', (req, res) => {
     const actor = sessionActor(req.headers.authorization, db.data);

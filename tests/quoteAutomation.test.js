@@ -144,13 +144,17 @@ describe('roles, herramientas y recorridos', () => {
       ],
       products: [
         { id: 'p6', name: 'Llavero personalizado base', slug: 'llavero-base', categoryId: 'cat3', status: 'ACTIVE', material: 'PLA', price: 2500, currency: 'CRC' },
+        { id: 'p8', name: 'Figura decorativa PLA Silk', slug: 'figura-pla-silk', categoryId: 'cat3', status: 'ACTIVE', material: 'PLA Silk', price: 12000, currency: 'CRC' },
         { id: 'p7', name: 'Organizador modular de escritorio', slug: 'organizador-modular-escritorio', categoryId: 'cat5', status: 'ACTIVE', material: 'PETG', price: 8000, currency: 'CRC' },
         { id: 'p4', name: 'Maceta geométrica', slug: 'maceta-geometrica', categoryId: 'cat4', status: 'ACTIVE', material: 'PETG', price: 7500, currency: 'CRC' },
         { id: 'p-draft', name: 'Juguete de prueba', categoryId: 'cat3', status: 'DRAFT', material: 'PLA' },
       ],
     };
     const matching = await executeAssistantTool('search_catalog', { query: 'juguetes' }, { mode: 'general', data: catalog, getRates: rates });
-    expect(matching).toEqual([{ id: 'p6', name: 'Llavero personalizado base', material: 'PLA', price: 2500, currency: 'CRC', category: 'Juguetes', madeToOrder: true, path: '/producto/p6' }]);
+    expect(matching).toEqual([
+      { id: 'p6', name: 'Llavero personalizado base', material: 'PLA', price: 2500, currency: 'CRC', category: 'Juguetes', madeToOrder: true, path: '/producto/p6' },
+      { id: 'p8', name: 'Figura decorativa PLA Silk', material: 'PLA Silk', price: 12000, currency: 'CRC', category: 'Juguetes', madeToOrder: true, path: '/producto/p8' },
+    ]);
     expect(await executeAssistantTool('search_catalog', { query: 'organizador de escritorio' }, { mode: 'general', data: catalog, getRates: rates })).toMatchObject([{ id: 'p7', name: 'Organizador modular de escritorio' }]);
     expect(await executeAssistantTool('search_catalog', { query: 'decoracion' }, { mode: 'general', data: catalog, getRates: rates })).toMatchObject([{ name: 'Maceta geométrica', category: 'Decoración' }]);
     expect(await executeAssistantTool('search_catalog', { query: '' }, { mode: 'general', data: catalog, getRates: rates })).toEqual([]);

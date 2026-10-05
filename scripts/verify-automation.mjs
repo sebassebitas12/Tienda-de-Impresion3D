@@ -119,20 +119,23 @@ try {
   await post('/quotes/approve', { requestId: intake.request.id, expectedVersion: 1 }, 'customer-test');
   const own = await post('/quotes/mine', {}, 'customer-test'); assert.equal(own.requests[0].status, 'APPROVED'); assertions++;
   await post('/admin/actions/quote-fulfillment', { requestId: intake.request.id, expectedVersion: 1, mode: 'DEMO' }, 'customer-test', 403);
-  await post('/admin/actions/quote-fulfillment', { requestId: intake.request.id, expectedVersion: 1, mode: 'MANUAL_VERIFIED', reference: 'fake-receipt', confirmed: true }, 'admin-test', 409);
-  const fulfilled = await post('/admin/actions/quote-fulfillment', { requestId: intake.request.id, expectedVersion: 1, mode: 'DEMO' }, 'admin-test');
+  await post('/admin/actions/quote-fulfillment', { requestId: intake.request.id, expectedVersion: 1, mode: 'DEMO' }, 'admin-test', 409);
+  const fulfilled = await post('/quotes/pay-demo', { requestId: intake.request.id, expectedVersion: 1 }, 'customer-test');
   assert.equal(fulfilled.order.pricingMode, 'DEMO'); assert.equal(fulfilled.order.paymentEvidence.mode, 'DEMO'); assertions += 2;
-  const repeated = await post('/admin/actions/quote-fulfillment', { requestId: intake.request.id, expectedVersion: 1, mode: 'DEMO' }, 'admin-test'); assert.equal(repeated.replay, true); assertions++;
+  assert.equal(fulfilled.order.scopeSnapshot.fileName, 'pieza.stl'); assertions++;
+  const repeated = await post('/quotes/pay-demo', { requestId: intake.request.id, expectedVersion: 1 }, 'customer-test'); assert.equal(repeated.replay, true); assertions++;
   const other = await post('/quotes/mine', {}, 'other-test'); assert.equal(other.requests.length, 0); assertions++;
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', nextStatus: 'CONFIRMED' }, 'customer-test', 403);
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', nextStatus: 'READY' }, 'admin-test', 400);
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', expectedUpdatedAt: null, nextStatus: 'CONFIRMED' }, 'admin-test', 409);
-  const proof = await post('/orders/submit-payment-proof', { orderId: 'qa-order', referenceNumber: 'QA-NO-REAL-PAYMENT', sinpePhone: '88881234' }, 'customer-test');
-  const advanced = await post('/admin/actions/verify-payment', { orderId: 'qa-order', decision: 'CONFIRM', expectedProofSubmittedAt: proof.order.paymentProof.submittedAt }, 'admin-test');
-  assert.equal(advanced.order.paymentStatus, 'PAID'); assertions++;
+  const paidCatalog = await post('/orders/pay-demo', { orderId: 'qa-order' }, 'customer-test');
+  assert.equal(paidCatalog.order.paymentMode, 'DEMO'); assert.equal(paidCatalog.order.status, 'CONFIRMED'); assertions += 2;
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', nextStatus: 'CONFIRMED' }, 'admin-test', 409);
-  await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'CONFIRMED', expectedUpdatedAt: advanced.order.updatedAt, nextStatus: 'CANCELLED', reason: 'Cierre QA de prueba' }, 'admin-test');
-  const persisted = JSON.parse(await readFile(dbFile, 'utf8')); assert.equal(persisted.quoteDeliveries[0].status, 'SENT'); assert.ok(persisted.activityLog.some(event => event.action === 'ORDER_PAYMENT_CONFIRMED')); assertions += 2;
+  const advanced = await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'CONFIRMED', expectedUpdatedAt: paidCatalog.order.updatedAt, nextStatus: 'IN_PRODUCTION' }, 'admin-test');
+  assert.equal(advanced.order.status, 'IN_PRODUCTION'); assertions++;
+  const persisted = JSON.parse(await readFile(dbFile, 'utf8')); assert.equal(persisted.quoteDeliveries[0].status, 'SENT');
+  assert.ok(persisted.activityLog.some(event => event.action === 'ORDER_DEMO_PAYMENT_RECORDED'));
+  assert.ok(persisted.activityLog.some(event => event.action === 'REQUEST_DEMO_PAYMENT_RECORDED')); assertions += 3;
 
   const files = (await readdir('automation/n8n')).filter(name => name.endsWith('.json') && name !== 'vertice-cr-unificado.json'); assert.equal(files.length, 5); assertions++;
   for (const file of files) {

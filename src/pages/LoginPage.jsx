@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Input } from '../components/ui/index.js';
 import { useAuth } from '../hooks/useAuth.js';
-import { useOptionalCart } from '../hooks/useCart.js';
 import { usePreferences } from '../hooks/usePreferences.js';
 
 function messageFor(error, copy) {
@@ -19,7 +18,6 @@ function messageFor(error, copy) {
 export function LoginPage() {
   const { copy, language } = usePreferences();
   const auth = useAuth();
-  const cart = useOptionalCart();
   const navigate = useNavigate();
   const location = useLocation();
   const [form, setForm] = useState({ email: '', password: '' });
@@ -29,7 +27,6 @@ export function LoginPage() {
     try {
       const user = await auth.login(form);
       const requested = location.state?.from;
-      if (requested?.split('?')[0] === '/carrito' && user.role === 'customer') cart?.importGuestCart(user);
       navigate(requested || (user.role === 'admin' ? '/admin' : '/cuenta'), { replace: true });
     } catch {
       // Provider exposes the normalized error state to the UI.
@@ -57,8 +54,11 @@ export function LoginPage() {
 
       {location.state?.reason === 'customer-cart-required' && <p className="auth-context-notice" role="status">
         {language === 'en'
-          ? 'Sign in or create a customer account to view your cart and continue. Any selection saved in this browser will be linked to your account.'
-          : 'Iniciá sesión o creá una cuenta de cliente para ver el carrito y continuar. La selección guardada en este navegador se vincula a tu cuenta.'}
+          ? 'Sign in or create a customer account to view your customer cart and continue.'
+          : 'Iniciá sesión o creá una cuenta de cliente para ver tu carrito y continuar.'}
+      </p>}
+      {location.state?.reason === 'catalog-customer-required' && <p className="auth-context-notice" role="status">
+        {language === 'en' ? 'Sign in with a customer account to add this part. You will return to the product page.' : 'Iniciá sesión con una cuenta de cliente para agregar esta pieza. Después volverás a la ficha del producto.'}
       </p>}
 
       <form className="auth-form" onSubmit={onSubmit} noValidate>

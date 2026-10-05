@@ -215,10 +215,10 @@ installAutomationOperations({ registerAction, db, serialize: serializeReviewActi
 installCustomerQuoteOperations({ registerAction, db, serialize: serializeReviewAction, persist: persistData });
 installCatalogOrderOperations({ registerAction, db, serialize: serializeReviewAction, persist: persistData });
 installProductReviewOperations({ registerAction, registerRead, db, serialize: serializeReviewAction, persist: persistData });
-const host = process.env.HOST || 'localhost';
-app.listen(port, host, () => {
+const host = process.env.HOST || '127.0.0.1';
+app.listen(port, () => {
   console.log(`JSON Server + operaciones Vértice en http://${host}:${port}`);
-});
+}, host);
 
 watch(dirname(databasePath), (event, filename) => {
   if (filename && String(filename) === basename(databasePath)) {

@@ -2,128 +2,79 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { installCatalogOrderOperations } from '../scripts/catalog-order-operations.js';
 import { installAutomationOperations } from '../scripts/automation-operations.js';
+import { prepareQuoteFulfillment } from '../scripts/quote-fulfillment.js';
 
-function fixture(status = 'PENDING') {
-  const customer = { id: 'c1', name: 'Cliente', role: 'customer', status: 'ACTIVE' };
-  const other = { ...customer, id: 'c2' };
-  const admin = { id: 'a1', name: 'Taller', role: 'admin', status: 'ACTIVE' };
-  const db = { data: { users: [customer, other, admin], orders: [{ id: 'o1', userId: 'c1', status }], activityLog: [] } };
+const customer = { id: 'c1', name: 'Cliente', role: 'customer', status: 'ACTIVE' };
+const other = { ...customer, id: 'c2' };
+const admin = { id: 'a1', name: 'Taller', role: 'admin', status: 'ACTIVE' };
+const now = '2026-10-04T12:00:00.000Z';
+const token = user => 'Bearer sim.v1.' + btoa(JSON.stringify({ kind: 'SIMULATED_JWT', sub: user.id, role: user.role, exp: 9999999999 }));
+
+function fixture({ order = { id: 'o1', userId: 'c1', status: 'PENDING', total: 5000 }, request = null } = {}) {
+  const db = { data: { users: [customer, other, admin], orders: [order], customPrintRequests: request ? [request] : [], activityLog: [] } };
   const handlers = new Map();
   const persist = jest.fn(async next => { db.data = next; });
   const options = { registerAction: (path, handler) => handlers.set(path, handler), db, serialize: task => task(), persist };
-  installCatalogOrderOperations(options); installAutomationOperations(options);
-  return { db, persist, customer, other, admin, async invoke(path, payload, actor = customer) {
-    const authorization = actor ? `Bearer sim.v1.${btoa(JSON.stringify({ kind: 'SIMULATED_JWT', sub: actor.id, role: actor.role, exp: 9999999999 }))}` : '';
-    let body; let code = 200;
-    const res = { status(value) { code = value; return this; }, json(value) { body = value; return this; } };
-    await handlers.get(path)({ body: payload, headers: { authorization } }, res);
-    return { status: code, body };
+  installCatalogOrderOperations(options);
+  installAutomationOperations(options);
+  return { db, handlers, persist, async invoke(path, payload, actor = customer) {
+    let body; let status = 200;
+    const res = { status(value) { status = value; return this; }, json(value) { body = value; return this; } };
+    await handlers.get(path)({ headers: { authorization: actor ? token(actor) : '' }, body: payload }, res);
+    return { status, body };
   } };
 }
-const submit = '/orders/submit-payment-proof';
-const verify = '/admin/actions/verify-payment';
-const proof = { orderId: 'o1', referenceNumber: ' 12345678 ', sinpePhone: ' 8888-8888 ', proofNotes: ' Depósito realizado ' };
 
-describe('comprobante SINPE y verificación del taller', () => {
-  it('reporta sin confirmar pago y luego Admin confirma con auditoría', async () => {
-    const { db, persist, invoke, admin } = fixture();
-    const result = await invoke(submit, proof);
-    expect(result.status).toBe(200);
-    expect(result.body.order).toMatchObject({ status: 'PENDING', paymentProof: { referenceNumber: '12345678', sinpePhone: '8888-8888', proofNotes: 'Depósito realizado', status: 'SUBMITTED', submittedAt: expect.any(String) } });
-    expect(db.data.activityLog[0]).toMatchObject({ action: 'ORDER_PAYMENT_PROOF_SUBMITTED', actorId: 'c1', fromStatus: 'PENDING', toStatus: 'PENDING', metadata: { referenceNumber: '12345678', sinpePhone: '8888-8888' } });
-    const confirmed = await invoke(verify, { orderId: 'o1', decision: 'CONFIRM' }, admin);
-    expect(confirmed.body.order).toMatchObject({ status: 'CONFIRMED', paymentStatus: 'PAID', paidAt: expect.any(String), paymentProof: { status: 'CONFIRMED' } });
-    expect(db.data.activityLog[1]).toMatchObject({ action: 'ORDER_PAYMENT_CONFIRMED', actorId: 'a1', toStatus: 'CONFIRMED' });
-    expect(persist).toHaveBeenCalledTimes(2);
-    expect((await invoke(verify, { orderId: 'o1', decision: 'CONFIRM' }, admin)).status).toBe(409);
-  });
-  it('rechaza con motivo, permite corregir y elimina el rechazo anterior al reportar otra vez', async () => {
-    const { db, invoke, admin } = fixture();
-    await invoke(submit, proof);
-    expect((await invoke(verify, { orderId: 'o1', decision: 'REJECT', notes: 'No coincide con depósito' }, admin)).body.order).toMatchObject({ status: 'PENDING', paymentProof: { status: 'REJECTED', rejectionReason: 'No coincide con depósito' } });
-    expect(db.data.activityLog[1]).toMatchObject({ action: 'ORDER_PAYMENT_PROOF_REJECTED', reason: 'No coincide con depósito' });
-    expect((await invoke(verify, { orderId: 'o1', decision: 'CONFIRM' }, admin)).status).toBe(409);
-    const corrected = await invoke(submit, { ...proof, referenceNumber: '87654321' });
-    expect(corrected.body.order.paymentProof.status).toBe('SUBMITTED');
-    expect(corrected.body.order.paymentProof.rejectionReason).toBeUndefined();
-  });
-  it('bloquea propiedad, roles y pedidos inexistentes sin persistir', async () => {
-    const { invoke, persist, other, admin } = fixture();
-    expect((await invoke(submit, proof, other)).status).toBe(404);
-    expect((await invoke(submit, proof, admin)).status).toBe(403);
-    expect((await invoke(submit, proof, null)).status).toBe(403);
-    expect((await invoke(verify, { orderId: 'o1', decision: 'CONFIRM' })).status).toBe(403);
-    expect((await invoke(verify, { orderId: 'missing', decision: 'CONFIRM' }, admin)).status).toBe(404);
-    expect((await invoke(verify, { orderId: 'o1', decision: 'CONFIRM' }, admin)).status).toBe(409);
-    expect(persist).not.toHaveBeenCalled();
-  });
-  it.each(['CONFIRMED', 'IN_PRODUCTION', 'READY', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REJECTED'])('no reporta en %s', async status => {
-    const { invoke, persist } = fixture(status);
-    expect(await invoke(submit, proof)).toEqual({ status: 409, body: { code: 'STATUS_CONFLICT' } });
-    expect(persist).not.toHaveBeenCalled();
-  });
-  it('valida referencia, teléfono, notas y decisión', async () => {
-    const { invoke, admin, persist } = fixture();
-    for (const referenceNumber of ['', '123', 'x'.repeat(101), 1234]) expect((await invoke(submit, { ...proof, referenceNumber })).body.code).toBe('INVALID_REFERENCE');
-    for (const sinpePhone of ['', '1234567', 'x'.repeat(26), 88888888]) expect((await invoke(submit, { ...proof, sinpePhone })).body.code).toBe('INVALID_PHONE');
-    expect((await invoke(submit, { ...proof, proofNotes: 'x'.repeat(501) })).body.code).toBe('INVALID_NOTES');
-    expect(persist).not.toHaveBeenCalled();
-    await invoke(submit, proof);
-    expect((await invoke(verify, { orderId: 'o1', decision: 'REJECT', notes: ' ' }, admin)).body.code).toBe('REASON_REQUIRED');
-    expect((await invoke(verify, { orderId: 'o1', decision: 'OTHER' }, admin)).body.code).toBe('INVALID_DECISION');
+describe('pago simulado de pedidos de catálogo', () => {
+  it('convierte el pendiente propio en confirmado y pago DEMO en una operación idempotente', async () => {
+    const { db, persist, invoke } = fixture();
+    const first = await invoke('/orders/pay-demo', { orderId: 'o1' });
+    expect(first.status).toBe(200);
+    expect(first.body.order).toMatchObject({ id: 'o1', status: 'CONFIRMED', paymentStatus: 'PAID', paymentMode: 'DEMO', paidAt: expect.any(String), paymentEvidence: { mode: 'DEMO', reference: 'SIMULATED-NO-REAL-PAYMENT', recordedBy: 'c1' } });
+    expect(db.data.activityLog[0]).toMatchObject({ action: 'ORDER_DEMO_PAYMENT_RECORDED', fromStatus: 'PENDING', toStatus: 'CONFIRMED', actorId: 'c1' });
+    const replay = await invoke('/orders/pay-demo', { orderId: 'o1' });
+    expect(replay.body.replay).toBe(true);
     expect(persist).toHaveBeenCalledTimes(1);
   });
-  it('no registra éxito si falla persistencia', async () => {
-    const { invoke, persist, db } = fixture();
-    persist.mockRejectedValueOnce(new Error('disk'));
-    expect((await invoke(submit, proof)).status).toBe(500);
-    expect(db.data.orders[0].paymentProof).toBeUndefined();
-    expect(db.data.activityLog).toEqual([]);
-  });
-  it('E03: pedido originado desde cotización aprobada nace CONFIRMED con paymentStatus PAID', async () => {
-    const { prepareQuoteFulfillment } = await import('../scripts/quote-fulfillment.js');
-    const now = '2026-10-04T12:00:00.000Z';
-    const request = {
-      id: 'rq-1',
-      userId: 'c1',
-      status: 'APPROVED',
-      quoteVersion: 1,
-      quotedPrice: 15000,
-      quantity: 1,
-      quotePricing: { mode: 'DEMO', inputs: { material: 'PLA' } },
-    };
-    const initialData = { orders: [], customPrintRequests: [request], activityLog: [] };
-    const actor = { id: 'a1', name: 'Taller', role: 'admin' };
-    const result = prepareQuoteFulfillment(initialData, request, { mode: 'DEMO', expectedVersion: 1 }, actor, now);
-    expect(result.order).toMatchObject({
-      status: 'CONFIRMED',
-      paymentStatus: 'PAID',
-      paidAt: now,
-      subtotal: 15000,
-      total: 15000,
-    });
-  });
-  it('E04: bloquea transición genérica a CONFIRMED si el pago no está verificado', async () => {
-    const { invoke, admin } = fixture();
-    const transition = await invoke('/admin/actions/order-transition', {
-      orderId: 'o1',
-      expectedStatus: 'PENDING',
-      nextStatus: 'CONFIRMED',
-    }, admin);
-    expect(transition.status).toBe(409);
-    expect(transition.body.code).toBe('PAYMENT_VERIFICATION_REQUIRED');
-  });
-  it('E05: rechaza verificación si el comprobante fue reemplazado por el cliente con timestamp más reciente', async () => {
-    const { invoke, admin } = fixture();
-    await invoke(submit, proof);
-    const staleSubmittedAt = '2026-10-04T10:00:00.000Z';
-    const res = await invoke(verify, {
-      orderId: 'o1',
-      decision: 'CONFIRM',
-      expectedProofSubmittedAt: staleSubmittedAt,
-    }, admin);
 
-    expect(res.status).toBe(409);
-    expect(res.body.code).toBe('PAYMENT_PROOF_OUTDATED');
+  it('limita pago al cliente activo propietario y a pedidos de catálogo pendientes', async () => {
+    const { persist, invoke } = fixture();
+    expect((await invoke('/orders/pay-demo', { orderId: 'o1' }, other)).status).toBe(404);
+    expect((await invoke('/orders/pay-demo', { orderId: 'o1' }, admin)).status).toBe(403);
+    expect((await invoke('/orders/pay-demo', { orderId: 'o1' }, null)).status).toBe(403);
+    expect((await invoke('/orders/pay-demo', { orderId: 'missing' })).status).toBe(404);
+    expect(persist).not.toHaveBeenCalled();
+  });
+
+  it('rechaza pedido no pendiente o ligado a cotización, y no instala rutas de comprobante bancario', async () => {
+    const settled = fixture({ order: { id: 'o1', userId: 'c1', status: 'CONFIRMED', paymentStatus: 'UNPAID' } });
+    expect((await settled.invoke('/orders/pay-demo', { orderId: 'o1' })).status).toBe(409);
+    const quoteOrder = fixture({ order: { id: 'o1', userId: 'c1', status: 'PENDING', customPrintRequestId: 'rq-1' } });
+    expect((await quoteOrder.invoke('/orders/pay-demo', { orderId: 'o1' })).status).toBe(409);
+    expect(settled.handlers.has('/orders/submit-payment-proof')).toBe(false);
+    expect(settled.handlers.has('/admin/actions/verify-payment')).toBe(false);
+  });
+
+  it('impide que el Admin cree un pedido de cotización antes del pago del cliente', async () => {
+    const { db, persist, invoke } = fixture();
+    const request = { id: 'rq-1', userId: 'c1', status: 'APPROVED', quoteVersion: 1, quotedPrice: 15000, quoteValidUntil: '2026-10-10T23:59:59-06:00', quotePricing: { mode: 'DEMO' } };
+    db.data.customPrintRequests.push(request);
+    expect(await invoke('/admin/actions/quote-fulfillment', { requestId: 'rq-1', expectedVersion: 1, mode: 'DEMO' }, admin)).toEqual({ status: 409, body: { code: 'CUSTOMER_PAYMENT_REQUIRED' } });
+    expect(db.data.orders).toHaveLength(1);
+    expect(persist).not.toHaveBeenCalled();
+  });
+
+  it('cliente paga cotización aprobada y el recibo conserva el alcance personalizado fuera del catálogo', () => {
+    const request = { id: 'rq-1', userId: 'c1', status: 'APPROVED', quoteVersion: 2, quotedPrice: 15000,
+      quoteValidUntil: '2026-10-10T23:59:59-06:00', description: 'Soporte a medida', fileName: 'soporte.stl', dimensions: '12 x 8 cm', material: 'PETG', quantity: 2,
+      quoteNotes: 'Sin envío.', quotePricing: { mode: 'DEMO' } };
+    const result = prepareQuoteFulfillment({ orders: [], customPrintRequests: [request], activityLog: [] }, request,
+      { mode: 'DEMO', expectedVersion: 2 }, customer, now);
+    expect(result.order).toMatchObject({ status: 'CONFIRMED', paymentStatus: 'PAID', paymentMode: 'DEMO', total: 15000,
+      scopeSnapshot: { name: 'Soporte a medida', fileName: 'soporte.stl', dimensions: '12 x 8 cm', material: 'PETG', quantity: 2, quoteVersion: 2, notes: 'Sin envío.' } });
+    expect(result.request).toMatchObject({ status: 'PAID', orderId: result.order.id, paymentMode: 'DEMO' });
+    expect(result.next.activityLog[0]).toMatchObject({ action: 'REQUEST_DEMO_PAYMENT_RECORDED', fromStatus: 'APPROVED', toStatus: 'PAID' });
+    expect(prepareQuoteFulfillment({ orders: [], customPrintRequests: [request], activityLog: [] }, request,
+      { mode: 'DEMO', expectedVersion: 2 }, admin, now).error).toBe('REQUEST_NOT_FOUND');
   });
 });

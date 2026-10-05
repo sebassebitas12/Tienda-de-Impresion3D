@@ -5,7 +5,59 @@
 > **Rama:** `Pruebas`  
 > **No es un diario:** este archivo resume el presente. El historial detallado vive en los documentos de dominio.
 
-## Estado vigente para continuar (2026-10-05)
+## Estado vigente para continuar (2026-10-05, revisión de flujo)
+
+### Corrección de alcance del usuario: presentación de 15 minutos
+
+La decisión vigente es cliente + IA preparan la cotización personalizada desde
+mensajes y referencias; Admin revisa/aprueba la propuesta; n8n/Gmail entrega
+la cotización validada; cliente paga DEMO; comienza el pedido de fabricación.
+La propuesta es independiente del catálogo. La IA debe realizar CRUD de Admin
+con revisión del cambio antes de confirmar, requisito de graduación. DeepSeek
+es el proveedor solicitado. Las frases históricas de "solo lectura" describen
+limitaciones por resolver, no el alcance aprobado. Roadmap y criterios de cierre
+en docs/10, bloque "Presentación de 15 minutos". Comentarios nuevos se agregan
+a esos requisitos. Trabajo exclusivamente en Pruebas; main no se modifica.
+Preparación estimada inicial: 45/100 según esa matriz; no es auditoría completa.
+
+- Esta sección reemplaza las descripciones anteriores de compra y pago que
+  aparecen más abajo en los apuntes históricos. La entrega es un MVP frontend
+  con JSON Server: `DEMO` simula persistencia/recibo, no cobra dinero real.
+- Catálogo: visitantes pueden explorar; solo `customer` puede agregar, abrir
+  carrito y pagar. Login/registro devuelve a la ficha del producto; no existe
+  carrito anónimo. `Pagar · DEMO` crea una compra idempotente `CONFIRMED`/`PAID`
+  y navega al recibo `/pedidos/:id`.
+- Cotización personalizada: Admin dispone de una opción simple para guardar
+  monto, alcance/condiciones y vigencia sin exigir producto del catálogo. El
+  correo sigue por el workflow n8n/Gmail vigente. El cliente aprueba y paga
+  DEMO desde su cuenta; el pedido con snapshot del alcance se crea al pagar y
+  el cliente recibe el recibo.
+- Admin no verifica comprobantes ficticios ni paga/crea pedidos en nombre del
+  cliente. Las órdenes avanzan a producción después del pago DEMO. Eventos
+  antiguos relacionados con SINPE se consideran datos de flujo anterior.
+- El catálogo reconoce `PLA Silk` como variante `PLA`: un producto activo
+  tenía estado publicado pero no aparecía ni se podía pedir porque varias
+  listas de materiales no coincidían entre Tienda, Admin y el asistente. Se
+  alinearon las reglas y el perfil de costo DEMO usa el perfil base PLA sin
+  cambiar datos del producto.
+- La base contiene 25 productos (6 `ACTIVE`, 19 `DRAFT`), no 25 publicados. Al
+  alinear `PLA Silk`, los seis activos aparecen en la tienda. La tabla
+  `reviews` está vacía en `db.json` y en la copia preservada del stash; la
+  ficha sí conserva el bloque de opiniones, su estado vacío y el acceso para
+  opinar. Esta revisión no eliminó reseñas ni alteró la base.
+- No se editó `db.json` ni se alteró/publicó/envió el workflow Gmail/n8n. Para
+  ejecutar pruebas manuales se usa copia temporal de `db.json` vía
+  `VERTICE_DB_FILE`, con Vite en `127.0.0.1:5174` y JSON Server en
+  `127.0.0.1:3217`. Los procesos anteriores 5173/3000 no fueron alterados.
+- Gates de esta revisión: 49 suites / 292 tests, lint, `check:ui` (47 módulos),
+  `check:automation` (264 comprobaciones), build de producción y `git diff
+  --check` pasan. En navegador se comprobaron Home, seis productos visibles,
+  ficha con un solo selector de color, descripción, reseñas/estado vacío, el
+  bloqueo de invitado hacia carrito y el enlace de retorno con filtros.
+  Administración y pagos autenticados se comprobaron por tests de componentes
+  y API; Gmail real no se envió ni el workflow se modificó.
+
+## Snapshot histórico anterior (no describe el flujo vigente de compra/pago)
 
 - R-H85: se implementaron FAQ, Materiales, Requisitos, Términos, Privacidad y
   Envíos bilingües; checkout legacy redirige a flujos útiles; detalle de pedido

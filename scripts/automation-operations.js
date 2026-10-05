@@ -1,12 +1,10 @@
 import { randomUUID } from 'node:crypto';
-import { installOrderPaymentOperation } from './order-payment-operations.js';
 import process from 'node:process';
 import { DEMO_PROFILES, calculateAutomaticDemoQuote } from '../src/utils/quoteAutomation.js';
 import { FDM_MATERIALS } from '../src/utils/quotePricing.js';
 import { sessionActor } from './session-access.js';
 import { executeAssistantToolCapability, runAssistant } from './assistant-runtime.js';
 import { createRatesProvider } from './quote-rates.js';
-import { prepareQuoteFulfillment } from './quote-fulfillment.js';
 import { prepareCustomerQuoteDecision } from './customer-quote-operations.js';
 import { parseMultipartForm } from './multipart-form.js';
 import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
@@ -34,7 +32,6 @@ export function prepareAutomaticRequest(request, quote, actorId, now) {
 }
 
 export function installAutomationOperations({ registerAction, db, serialize, persist }) {
-  installOrderPaymentOperation({ registerAction, db, serialize, persist }, true);
   const getRates = createRatesProvider();
   const attempts = new Map();
   const attachmentRoot = resolve(process.cwd(), process.env.VERTICE_ATTACHMENT_DIR || '.local-data/quote-attachments');
@@ -323,17 +320,7 @@ export function installAutomationOperations({ registerAction, db, serialize, per
   registerAction('/admin/actions/quote-fulfillment', async (req, res) => {
     const actor = actorFor(req);
     if (actor?.role !== 'admin') return failure(res, 'ADMIN_REQUIRED', 403);
-    try {
-      const result = await serialize(async () => {
-        const request = db.data.customPrintRequests.find(row => row.id === req.body?.requestId);
-        if (!request) return { error: 'REQUEST_NOT_FOUND' };
-        const action = prepareQuoteFulfillment(db.data, request, req.body, actor, new Date().toISOString());
-        if (action.error || action.replay) return action;
-        await persist(action.next);
-        return { request: action.request, order: action.order };
-      });
-      return result.error ? failure(res, result.error, 409) : res.json(result);
-    } catch { failure(res, 'ACTION_PERSISTENCE_FAILED', 500); }
+    return failure(res, 'CUSTOMER_PAYMENT_REQUIRED', 409);
   });
 
 }

@@ -13,7 +13,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 function initialInputs(request) {
   const saved = request.quotePricing?.inputs || {};
   return {
-    material: saved.material || (FDM_MATERIALS.includes(request.material) ? request.material : ''),
+    material: saved.material || (FDM_MATERIALS.includes(String(request.material || '').toUpperCase()) ? String(request.material).toUpperCase() : ''),
     weightGrams: saved.weightGrams ?? '',
     printHours: saved.printHours ?? '',
     filamentUsdPerKg: saved.filamentUsdPerKg ?? '',
@@ -53,6 +53,8 @@ export function RequestNextAction({ request, user, language, onSaved }) {
   const [inputs, setInputs] = useState(() => initialInputs(request));
   const [validUntil, setValidUntil] = useState(request.quoteValidUntil?.slice(0, 10) || '');
   const [notes, setNotes] = useState(request.quoteNotes || '');
+  const [customPrice, setCustomPrice] = useState(request.quotedPrice || '');
+  const [showAutomatic, setShowAutomatic] = useState(false);
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
   const busy = status === 'loading';
@@ -104,12 +106,32 @@ export function RequestNextAction({ request, user, language, onSaved }) {
     }
   }
 
+  async function saveCustomQuote(event) {
+    event.preventDefault();
+    if (busy) return;
+    setStatus('loading'); setMessage('');
+    try {
+      await transitionRequest({ requestId: request.id, actorId: user.id, expectedStatus: request.status,
+        expectedVersion: request.quoteVersion || 0, action: 'save-custom-quote', quotedPrice: Number(customPrice), validUntil, notes }, { token: auth?.token });
+      setStatus('success');
+      setMessage(es ? 'Cotización del encargo guardada. Revisá el resumen y luego enviala al cliente.' : 'Custom job quote saved. Review the summary, then send it to the customer.');
+      onSaved();
+    } catch (error) {
+      setStatus('error');
+      setMessage(error.code === 'INVALID_QUOTE'
+        ? (es ? 'Ingresá un monto entero mayor que cero, condiciones claras y una fecha de vigencia futura.' : 'Enter a positive whole amount, clear terms and a future validity date.')
+        : error.code === 'STATUS_CONFLICT' ? (es ? 'La solicitud cambió. Recargala antes de continuar.' : 'This request changed. Reload it before continuing.')
+          : (es ? 'No se pudo guardar la cotización. Revisá la conexión y volvé a intentar.' : 'The quote could not be saved. Check the connection and retry.'));
+    }
+  }
+
   const editable = ['IN_REVIEW', 'QUOTED', 'CHANGES_REQUESTED'].includes(request.status);
   if (user?.role !== 'admin') return null;
+  const simpleQuote = request.quotePricing?.provenance === 'ADMIN_CUSTOM_QUOTE_DEMO';
   const canSendQuote = isDeliverableEmail(request.customerEmail) && isDeliverableEmail(user.email)
     && Number.isSafeInteger(request.quotedPrice) && request.quotedPrice > 0 && request.currency === 'CRC'
     && Boolean(request.quoteNotes?.trim())
-    && !costingChanged && (!request.quotePricing || String(quote?.breakdown.amountCrc) === String(request.quotedPrice))
+    && (simpleQuote || (!costingChanged && (!request.quotePricing || String(quote?.breakdown.amountCrc) === String(request.quotedPrice))))
     && validUntil === request.quoteValidUntil?.slice(0, 10) && notes === (request.quoteNotes || '');
   const update = key => event => setInputs(current => ({ ...current, [key]: event.target.value }));
 
@@ -118,12 +140,15 @@ export function RequestNextAction({ request, user, language, onSaved }) {
       {request.status === 'QUOTED'
         ? (es ? 'Cotización registrada · Lista para enviar' : 'Quote recorded · Ready to send')
         : editable
-          ? (es ? 'Calculá el costo del encargo' : 'Calculate the job cost')
+          ? (es ? 'Prepará la cotización del encargo' : 'Prepare the job quote')
           : request.status === 'SUBMITTED'
             ? (es ? 'Incorporar solicitud recibida' : 'Register received request')
             : (es ? 'Seguimiento del encargo' : 'Job follow-up')}
     </h2></header>
-    {['PENDING_QUOTE', 'IN_REVIEW'].includes(request.status) && <AutomaticQuote request={request} onSaved={onSaved} language={language} />}
+    {['PENDING_QUOTE', 'IN_REVIEW'].includes(request.status) && <details className="admin-quote-optional-tool" onToggle={event => setShowAutomatic(event.currentTarget.open)}>
+      <summary>{es ? 'Probar cálculo automático de una pieza estándar (opcional)' : 'Try an automatic estimate for a standard part (optional)'}</summary>
+      {showAutomatic && <AutomaticQuote request={request} onSaved={onSaved} language={language} />}
+    </details>}
     {request.status === 'SUBMITTED' && <><p>{es ? 'Esta solicitud se recibió con una etiqueta antigua. Registrala como pendiente para poder iniciar su revisión. Se conservará el estado original en el historial.' : 'This request used an old label. Register it as pending to begin reviewing it. The original status will remain in its history.'}</p>
       <button className="v-button v-button--primary" disabled={busy} onClick={() => act('incorporate-request')}>{es ? 'Registrar como pendiente' : 'Register as pending'}</button></>}
     {request.status === 'QUOTED' && <div className="admin-quote-send">
@@ -141,8 +166,18 @@ export function RequestNextAction({ request, user, language, onSaved }) {
       </div>
     </div>}
     {request.status === 'CHANGES_REQUESTED' && <aside className="admin-quote-send__summary"><h3>{es ? 'Cambios solicitados por el cliente' : 'Customer requested changes'}</h3><p>{request.customerDecisionReason || (es ? 'No se registró un motivo.' : 'No reason recorded.')}</p><p>{es ? `Revisá el alcance y guardá la versión ${(request.quoteVersion || 0) + 1}. Después podrás enviarla para una nueva aprobación.` : 'Review the scope and save a new version, then send it for approval.'}</p></aside>}
-    {editable && <form onSubmit={event => { event.preventDefault(); act('save-quote'); }}>
-      <details open={['IN_REVIEW', 'CHANGES_REQUESTED'].includes(request.status) || request.quotePricing?.mode === 'MANUAL'}><summary>{request.status === 'QUOTED' ? (es ? 'Ajustar cálculo o parámetros técnicos' : 'Adjust calculation or technical parameters') : (es ? 'Costeo avanzado · datos reales o ajuste manual' : 'Advanced costing · real data or manual adjustment')}</summary>
+    {editable && <>
+      <form className="admin-custom-quote-form" onSubmit={saveCustomQuote}>
+        <span className="admin-eyebrow">{es ? 'COTIZACIÓN PERSONALIZADA · DEMO' : 'CUSTOM QUOTE · DEMO'}</span>
+        <p>{es ? 'Cotizá esta idea o archivo directamente. No necesita existir como producto del catálogo.' : 'Quote this idea or uploaded file directly. It does not need to exist in the catalog.'}</p>
+        <label>{es ? 'Monto total de la cotización (CRC)' : 'Total quote amount (CRC)'}<input type="number" inputMode="numeric" min="1" max="1000000000" step="1" required value={customPrice} onChange={event => setCustomPrice(event.target.value)} disabled={busy} /></label>
+        <label className="admin-quote-notes">{es ? 'Alcance y condiciones para el cliente' : 'Scope and terms for the customer'}<textarea required maxLength="2000" rows={3} value={notes} onChange={event => setNotes(event.target.value)} disabled={busy} /></label>
+        <label className="admin-quote-validity">{es ? 'Cotización válida hasta' : 'Quote valid until'}<input type="date" required value={validUntil} onChange={event => setValidUntil(event.target.value)} disabled={busy} /></label>
+        <div className="admin-next-action__buttons"><button className="v-button v-button--primary" disabled={busy} type="submit">{busy ? (es ? 'Guardando…' : 'Saving…') : (es ? 'Guardar cotización del encargo' : 'Save custom quote')}</button></div>
+      </form>
+      <details className="admin-quote-optional-tool">
+        <summary>{es ? 'Costear por componentes técnicos (opcional)' : 'Estimate technical costs (optional)'}</summary>
+        <form onSubmit={event => { event.preventDefault(); act('save-quote'); }}>
       <p>{es ? `Usá los datos del laminador por pieza y costos actuales del taller. La cantidad solicitada es ${request.quantity}; el diseño se calcula una vez por pedido.` : `Use slicer data per piece and current shop costs. Requested quantity is ${request.quantity}; design is calculated once per order.`}</p>
       <div className="admin-quote-material"><label>{es ? 'Material confirmado' : 'Confirmed material'}<select required value={inputs.material} onChange={update('material')} disabled={busy}>
         <option value="">{es ? 'Seleccioná un material' : 'Select a material'}</option>{FDM_MATERIALS.map(material => <option key={material} value={material}>{material}</option>)}
@@ -161,18 +196,18 @@ export function RequestNextAction({ request, user, language, onSaved }) {
         <dl>{[[es ? 'Material' : 'Material', quote.breakdown.materialCrc], [es ? 'Desgaste del material' : 'Material wear', quote.breakdown.wearCrc], [es ? 'Electricidad' : 'Electricity', quote.breakdown.electricityCrc], [es ? 'Postprocesado' : 'Post-processing', quote.breakdown.postProcessCrc], [es ? 'Diseño' : 'Design', quote.breakdown.designCrc], [es ? 'Otros costos' : 'Other costs', quote.breakdown.otherCostsCrc], [es ? 'Costo calculado' : 'Calculated cost', quote.breakdown.costSubtotalCrc]].map(([label, amount]) => <div key={label}><dt>{label}</dt><dd>{formatCRC(amount)}</dd></div>)}</dl>
         <p>{es ? `Recargo ${quote.breakdown.markupPercent}% · total propuesto ${formatCRC(quote.breakdown.amountCrc)}. No incluye impuestos, envío ni gastos que no hayas agregado en “Otros costos”.` : `Markup ${quote.breakdown.markupPercent}% · proposed total ${formatCRC(quote.breakdown.amountCrc)}. Taxes, shipping and costs not entered under “Other costs” are excluded.`}</p>
       </section>}
-      <label className="admin-quote-notes">{es ? 'Alcance y condiciones para el cliente' : 'Scope and terms for the customer'}<textarea required maxLength={2000} rows={3} value={notes} onChange={event => setNotes(event.target.value)} disabled={busy} /></label>
-      <label className="admin-quote-validity">{es ? 'Cotización válida hasta' : 'Quote valid until'}<input type="date" required value={validUntil} onChange={event => setValidUntil(event.target.value)} disabled={busy} /></label>
-      <div className="admin-next-action__buttons"><button className="v-button v-button--primary" disabled={busy || !quote} type="submit">{busy ? (es ? 'Guardando…' : 'Saving…') : (es ? 'Guardar cotización' : 'Save quote')}</button></div>
+
+          <div className="admin-next-action__buttons"><button className="v-button v-button--primary" disabled={busy || !quote || !validUntil || !notes.trim()} type="submit">{busy ? (es ? 'Guardando…' : 'Saving…') : (es ? 'Guardar cotización con este cálculo' : 'Save quote with this estimate')}</button></div>
+          <p className="admin-quote-formula">{es ? 'El cálculo usa los gramos, tiempo y tarifas ingresados por pieza; no depende del catálogo.' : 'The estimate uses the entered weight, time and rates per piece; it does not depend on the catalog.'}</p>
+        </form>
       </details>
-      <p className="admin-quote-formula">{es ? 'Fórmula: gramos × (precio + desgaste) USD/kg × cambio + horas × potencia media (kW) × tarifa eléctrica + postprocesado + diseño + otros costos; luego recargo explícito. Valores guardados como una instantánea del cálculo.' : 'Formula: grams × (filament + wear) USD/kg × exchange rate + print hours × average power (kW) × electricity tariff + post-processing + design + other costs; then explicit markup. Inputs are saved as a calculation snapshot.'}</p>
-    </form>}
-    <QuoteFulfillment request={request} onSaved={onSaved} language={language} />
+    </>}
+    <QuoteFulfillment request={request} language={language} />
     {request.status === 'AWAITING_APPROVAL' && <p>{request.quoteEmailSentAt
       ? (es ? `Correo enviado a ${request.quoteEmailSentTo || 'cliente'} con copia a ${request.quoteEmailCopiedTo || 'taller'}. Ahora corresponde al cliente aprobar la cotización; no la apruebes en su nombre.` : `Email sent to ${request.quoteEmailSentTo || 'customer'} with a copy to ${request.quoteEmailCopiedTo || 'workshop'}. The customer must now approve the quote; do not approve it on their behalf.`)
       : (es ? 'Cotización publicada. Ahora corresponde al cliente aprobarla; el administrador no aprueba en su nombre.' : 'Quote published. Customer approval is the next step; the administrator cannot approve on their behalf.')}</p>}
-    {request.status === 'APPROVED' && <p>{request.quotePricing?.mode === 'DEMO' ? (es ? 'El cliente aprobó la cotización técnica. Podés inicializar la orden de taller para programar la producción.' : 'The customer approved the technical quote. You can initialize the workshop order to schedule production.') : (es ? 'El cliente aprobó el encargo. El pago debe confirmarse con su comprobante antes de iniciar fabricación.' : 'The customer approved the job. Confirm payment against its receipt before starting production.')}</p>}
-    {request.status === 'PAID' && <p>{request.paymentMode === 'DEMO' ? (es ? 'Orden de fabricación inicializada. El seguimiento de producción continúa en la sección de pedidos.' : 'Manufacturing order initialized. Production tracking continues in the orders section.') : (es ? 'Pago registrado. Coordiná la fabricación según el alcance acordado.' : 'Payment recorded. Coordinate production according to the agreed scope.')}</p>}
+    {request.status === 'APPROVED' && <p>{es ? 'El cliente aprobó el monto y las condiciones. El siguiente paso es que registre el pago DEMO desde su cuenta; todavía no se crea el pedido de taller.' : 'The customer approved the amount and terms. They must now record the DEMO payment from their account; no workshop order exists yet.'}</p>}
+    {request.status === 'PAID' && <p>{es ? 'Pago DEMO registrado por el cliente. El pedido vinculado está disponible para seguimiento de taller.' : 'Customer DEMO payment recorded. The linked order is ready for workshop tracking.'}</p>}
     {status !== 'idle' && message && <p role={status === 'error' ? 'alert' : 'status'}>{message}</p>}
     <Link className="admin-action-secondary" to={`/admin/actividad?solicitud=${encodeURIComponent(request.id)}`}>{es ? 'Ver historial del encargo' : 'View job history'} ↗</Link>
   </section>;

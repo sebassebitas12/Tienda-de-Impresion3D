@@ -1,26 +1,33 @@
 # Vértice CR — Negocio, entidades y estados
 
-> Última actualización: **2026-10-04**.
+> Última actualización: **2026-10-05**.
+
+> **Flujo vigente del MVP:** simulación académica con persistencia en JSON
+> Server; no hay cobros reales. Las secciones antiguas de SINPE que contradigan
+> el estado `DEMO` descrito aquí son historial de diseño reemplazado.
 
 ## Entidades
 
-### Reporte SINPE por pedido (2026-10-04)
+### Pago DEMO — flujo vigente (2026-10-05)
 
-Cliente activo reporta referencia/teléfono/notas para un pedido PENDING propio.
-El reporte no acredita dinero: conserva PENDING con paymentProof SUBMITTED.
-Admin comprueba el depósito externamente y confirma (CONFIRMED, paymentStatus
-PAID, paidAt) o rechaza con motivo (PENDING, proof REJECTED). Tras rechazo se
-puede reportar de nuevo; cada reporte y decisión registra actividad en la misma
-persistencia. Solo se verifica un proof SUBMITTED para evitar repetir decisiones.
-No integra el banco, no sube una imagen ni valida automáticamente el número SINPE.
-Este bloque añade endpoints/servicios; no modifica el recorrido previo de
-quote-fulfillment ni añade formulario de comprobante en UI.
+El pago solo es un evento simulado guardado por JSON Server: no consulta bancos,
+no mueve dinero, no valida comprobantes y no dispara un correo de pago. Las
+operaciones exigen sesión `customer` activa y propiedad del registro; Admin no
+puede pagar ni generar pedidos por el cliente. La respuesta es idempotente y
+guarda evento de actividad con `paymentMode: 'DEMO'` y referencia explícita de
+simulación.
 
-### Consistencia de pago y concurrencia SINPE (E03–E05, 2026-10-04)
-
-- **E03 (Liquidación de cotización aprobada):** Todo pedido originado a partir de una cotización aprobada (`prepareQuoteFulfillment`) nace inmediatamente en estado de taller `CONFIRMED` con estado financiero `paymentStatus: 'PAID'` y marca de tiempo `paidAt`. En el portal del cliente (`/cuenta`), estos pedidos muestran el estado de pago acreditado y no solicitan un segundo depósito ni despliegan instrucciones de SINPE Móvil.
-- **E04 (Separación de estado de producción y pago):** Un pedido en estado `PENDING` no puede avanzar directamente a `CONFIRMED` mediante la acción operativa genérica de transición (`/admin/actions/order-transition`) si su estado de pago no está liquidado (`paymentStatus !== 'PAID'`). En caso de intento, la operación devuelve `409 PAYMENT_VERIFICATION_REQUIRED`. La interfaz de Admin desactiva la opción de avance genérico e instruye revisar y validar el comprobante primero.
-- **E05 (Concurrencia de comprobantes SINPE):** La verificación del taller (`/admin/actions/verify-payment`) recibe `expectedProofSubmittedAt`. Si el cliente actualizó o reemplazó su comprobante con un nuevo reporte mientras el taller tenía la pantalla abierta, la API rechaza la validación con `409 PAYMENT_PROOF_OUTDATED`, evitando confirmar una referencia obsoleta y exigiendo recargar la vista.
+- **Catálogo:** `Pagar · DEMO` crea pedido `CONFIRMED`/`PAID`, muestra el recibo
+  en `/pedidos/:id` y aclara que no se cobró dinero real. El servidor vuelve a
+  validar producto, variante, cantidad y precio desde catálogo. Envío, impuestos
+  y fecha se coordinan aparte y no se presentan como incluidos o gratuitos.
+- **Cotización personalizada:** Admin puede guardar monto, vigencia y alcance
+  aunque la pieza no exista en catálogo. La oferta publicada se envía por el
+  flujo de correo existente; el cliente la aprueba en `/cuenta`, paga DEMO desde
+  su propia sesión y recibe el pedido/recibo con snapshot del alcance.
+- **Producción:** solo un pedido pagado en el modelo DEMO puede avanzar a
+  producción. El cliente no puede pagar cotizaciones vencidas ni órdenes de
+  otro usuario. Reintentar no duplica pago, pedido ni evento.
 
 ### Preservación de solicitud personalizada durante autenticación (E01, 2026-10-04)
 
@@ -28,7 +35,11 @@ El formulario de solicitud personalizada (`/solicitud`) guarda de forma reactiva
 
 ### Procedencia y benchmarks demo del catálogo (2026-10-04)
 
-Los productos `p7` a `p25` corresponden a ítems de benchmark y demostración académica. Están identificados explícitamente en el modelo con `priceSource: 'DEMO'`, `priceConfirmation.mode: 'DEMO'`, y `aiProductionEstimate: { source: 'DEMO', verifiedWithSlicer: false }`. No se presentan como medidas certificadas por laminador ni precios confirmados por el taller. En la vista de tienda (`/catalogo`) se exhiben con una advertencia discreta y sobria indicando su naturaleza de referencia académica, manteniéndose activos y disponibles para pruebas operativas.
+Los productos `p7` a `p25` corresponden a ítems de benchmark y demostración académica. Están identificados explícitamente en el modelo con `priceSource: 'DEMO'`, `priceConfirmation.mode: 'DEMO'`, y `aiProductionEstimate: { source: 'DEMO', verifiedWithSlicer: false }`. No se presentan como medidas certificadas por laminador ni precios confirmados por el taller. Que su precio sea DEMO no significa que estén publicados: el estado `ACTIVE` controla la aparición en `/catalogo` y los `DRAFT` siguen ocultos hasta completar sus datos y publicarlos.
+
+`PLA Silk` es una variante de acabado incluida bajo la familia PLA en la lista
+de materiales del catálogo. El perfil de costo del producto la aproxima con la
+referencia DEMO de PLA; no declara una calibración de taller específica.
 
 ### Reseñas y revisión de ofertas (2026-10-04)
 
@@ -137,18 +148,18 @@ alterar pedidos desde los asistentes. El total registrado sigue sin ser prueba
 de pago; el modelo no tiene evidencia de cobro comercial automáticamente
 confirmada. Contrato técnico en `docs/07`.
 
-### Encargo de productos de catálogo — C-P4 (2026-10-04)
+### Compra de productos de catálogo — C-P4 (2026-10-05)
 
-`Confirmar encargo` desde `/carrito` crea un pedido `PENDING` solo para una
+`Pagar · DEMO` desde `/carrito` completa la compra simulada solo para una
 sesión `customer`. El servidor valida producto publicado, variante y cantidad,
 ignora precios enviados por el navegador y recalcula cada precio unitario,
 subtotal y subtotal CRC con el catálogo vigente. Guarda el snapshot tanto en
 `orders[].orderItems` como en `orderItems`, registra `CATALOG_ORDER_CREATED` y
-usa una clave idempotente para que reintentar la misma confirmación no duplique
-el pedido. No valida ni reserva stock. `pricingScope: CATALOG_SUBTOTAL_ONLY`
-indica que no incluye envío, impuestos, pago ni fecha de entrega. La confirmación
-limpia el carrito y lleva a `/cuenta`; el pedido puede continuar en Admin por el
-flujo de etapas habitual. Esto registra un encargo, no confirma una compra pagada.
+usa una clave idempotente para que reintentar no duplique pedido ni pago. Marca
+`CONFIRMED`/`PAID` con `paymentMode: 'DEMO'`, registra el evento de compra, limpia
+el carrito y lleva directamente a `/pedidos/:id`. No valida ni reserva stock;
+`pricingScope: CATALOG_SUBTOTAL_ONLY` indica que entrega e impuestos no están
+incluidos. El recibo lo aclara y el taller coordina esos detalles aparte.
 
 ## Cotización
 
@@ -263,8 +274,8 @@ La interfaz debe contemplar como mínimo:
 - cotización aprobada;
 - cotización caducada;
 - cotización rechazada/cancelada;
-- pago pendiente de validación;
-- comprobante SINPE inválido;
+- pago DEMO pendiente;
+- pago DEMO completado con recibo;
 - formulario incompleto;
 - error de envío;
 - confirmación exitosa.
@@ -277,7 +288,7 @@ Una solicitud `APPROVED` puede llevar al pago de cotización.
 
 El usuario debe saber en todo momento si está comprando un producto o pagando una cotización técnica.
 
-## Cotización y fulfillment DEMO (2026-10-02)
+## Cotización y fulfillment DEMO (actualizado 2026-10-05)
 
 `src/utils/quoteAutomation.js` ofrece perfiles análogos para los modelos
 conocidos. Gramos, horas, desgaste, energía y costos son **DEMO estimado**: no
@@ -286,12 +297,12 @@ determinista guarda desglose, versión/fecha y validez; el snapshot no acredita
 precio comercial ni fabricación. La cotización puede generarse desde Admin o
 `/solicitud`; el cliente aprueba el alcance vigente desde `/cuenta`.
 
-La etapa `PAID` de esta entrega solo representa una verificación manual o un
-registro `DEMO` rotulado. DEMO crea un pedido `PENDING` con snapshot de alcance y
-referencia `SIMULATED-NO-REAL-PAYMENT`; no acredita SINPE, no mueve dinero ni
-inicia producción. Idempotencia de solicitud→pedido evita duplicar el encargo en
-reintentos. Los asistentes no ejecutan mutaciones; herramientas de cotización
-calculan y el servidor aplica roles al invocarlas.
+La etapa `PAID` con `paymentMode: 'DEMO'` es una simulación, no una verificación
+bancaria. Una cotización aprobada todavía no crea orden: el cliente debe
+registrar el pago desde su cuenta. Entonces se crea el pedido confirmado, con
+snapshot del alcance libre escrito por Admin (sin exigir producto de catálogo),
+y se muestra el recibo. La operación es idempotente. Los asistentes no ejecutan
+mutaciones; el servidor aplica rol, propiedad, vigencia y versión.
 
 ## Intake de solicitud y cotizador de catálogo — 2026-10-03
 

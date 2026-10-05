@@ -18,7 +18,7 @@ const cart = { lines: [{ productId: 'p1', color: 'Negro', quantity: 2 }], add: j
 const product = { id: 'p1', name: 'Organizador', description: 'Pieza útil para el taller.', status: 'ACTIVE', currency: 'CRC', material: 'PLA', price: 2500, availableColors: ['Negro'], images: ['/images/first.jpg', '/images/second.jpg'] };
 function PathProbe() {
   const location = useLocation();
-  return <output>{`${location.pathname}:${location.state?.orderConfirmation?.id || ''}`}</output>;
+  return <output>{location.pathname}</output>;
 }
 
 function setup(user = { id: 'c1', role: 'customer' }) {
@@ -53,11 +53,11 @@ describe('confirmación de encargo del carrito', () => {
     expect(screen.queryByText(/Sesión de cliente/)).not.toBeInTheDocument();
   });
 
-  it('manda solo variante/cantidad con sesión, limpia tras éxito y va a /cuenta con acuse', async () => {
+  it('manda solo variante/cantidad con sesión, limpia tras éxito y abre el recibo del pedido', async () => {
     submitCatalogOrder.mockResolvedValue({ order: { id: 'ord-123', subtotalCrc: 5000 } });
     setup();
-    fireEvent.click(screen.getByRole('button', { name: 'Confirmar encargo' }));
-    expect(await screen.findByText('/cuenta:ord-123')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Pagar .*DEMO/ }));
+    expect(await screen.findByText('/pedidos/ord-123')).toBeInTheDocument();
     expect(submitCatalogOrder).toHaveBeenCalledWith(expect.objectContaining({
       items: [{ productId: 'p1', color: 'Negro', quantity: 2 }], idempotencyKey: expect.any(String),
     }), { token: 'sim-token' });
@@ -67,27 +67,27 @@ describe('confirmación de encargo del carrito', () => {
   it('conserva el carrito cuando la API falla', async () => {
     submitCatalogOrder.mockRejectedValue(Object.assign(new Error(), { code: 'PRODUCT_UNAVAILABLE' }));
     setup();
-    fireEvent.click(screen.getByRole('button', { name: 'Confirmar encargo' }));
+    fireEvent.click(screen.getByRole('button', { name: /Pagar .*DEMO/ }));
     expect(await screen.findByRole('alert')).toHaveTextContent('dejó de estar publicado');
     expect(cart.clear).not.toHaveBeenCalled();
   });
 
   it('explica el bloqueo por variante no disponible sin prometer programación automática', () => {
     setup();
-    expect(screen.getByText(/no cobra ni inicia producción/)).toBeInTheDocument();
+    expect(screen.getByText(/Pago simulado · DEMO/)).toHaveTextContent('No se transfiere ni cobra dinero real.');
     cleanup();
     cart.lines.push({ productId: 'missing', color: 'Negro', quantity: 1 });
     try {
       setup();
-      expect(screen.getByRole('button', { name: 'Confirmar encargo' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: /Pagar .*DEMO/ })).toBeDisabled();
       expect(screen.getByText(/Quitalas o elegí otra opción/)).toBeInTheDocument();
     } finally { cart.lines.pop(); }
   });
 
-  it('envía al visitante a iniciar sesión conservando el carrito', async () => {
+  it('no permite pagar a quien no inició sesión', async () => {
     setup(null);
-    fireEvent.click(screen.getByRole('button', { name: 'Confirmar encargo' }));
-    expect(await screen.findByText('/login:')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Pagar .*DEMO/ })).toBeDisabled();
+    expect(screen.getByRole('link', { name: 'Iniciar sesión' })).toHaveAttribute('href', '/login');
     expect(submitCatalogOrder).not.toHaveBeenCalled();
     expect(cart.clear).not.toHaveBeenCalled();
   });
@@ -95,7 +95,7 @@ describe('confirmación de encargo del carrito', () => {
   it('distingue sesión administrativa, deshabilita el encargo y ofrece enlace a gestión', async () => {
     setup({ id: 'u1', name: 'Sebastián Flores', role: 'admin' });
     expect(screen.getByText(/Sesión de taller: Sebastián Flores/)).toBeInTheDocument();
-    const btn = screen.getByRole('button', { name: 'Confirmar encargo' });
+    const btn = screen.getByRole('button', { name: 'Pago reservado para clientes' });
     expect(btn).toBeDisabled();
     expect(screen.getByText(/Gestionar pedidos en Admin/)).toBeInTheDocument();
   });
@@ -117,7 +117,7 @@ describe('selección de producto sin sesión', () => {
   });
 
   it('permite recorrer las muestras de color con teclado', async () => {
-    setupProduct();
+    setupProduct({ id: 'c1', role: 'customer' });
     await act(async () => {});
     fireEvent.keyDown(screen.getByRole('radio', { name: 'Negro' }), { key: 'ArrowRight' });
     expect(screen.getByRole('radio', { name: 'Negro' })).toHaveAttribute('aria-checked', 'true');
@@ -138,17 +138,13 @@ describe('selección de producto sin sesión', () => {
     expect(screen.getByRole('button', { name: 'PLA' })).toBeInTheDocument();
   });
 
-  it('conserva la selección local y orienta al visitante a login/registro en vez de mostrar acceso al carrito', async () => {
+  it('bloquea agregar al carrito a visitantes y los orienta a iniciar sesión o registrarse', async () => {
     setupProduct();
     fireEvent.click(screen.getByRole('radio', { name: 'Negro' }));
-    fireEvent.click(screen.getByRole('button', { name: /Agregar al carrito/u }));
-
-    expect(cart.add).toHaveBeenCalledWith('p1', 'Negro', 1);
-    const notice = await screen.findByText(/guardada en este navegador/u);
-    const status = notice.closest('[role="status"]');
-    expect(status).toHaveTextContent('guardada en este navegador');
-    expect(status).toHaveTextContent('Iniciá sesión');
-    expect(status).toHaveTextContent('creá una cuenta');
+    expect(screen.queryByRole('button', { name: /Agregar al carrito/u })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Iniciar sesión para agregar/u })).toHaveAttribute('href', '/login');
+    expect(screen.getByRole('link', { name: /Crear cuenta/u })).toHaveAttribute('href', '/registro');
+    expect(cart.add).not.toHaveBeenCalled();
     expect(screen.queryByRole('link', { name: 'Ver carrito →' })).not.toBeInTheDocument();
   });
 

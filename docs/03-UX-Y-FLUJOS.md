@@ -2,6 +2,18 @@
 
 ## R-H85 — Recorridos visitante/cliente/Admin (2026-10-05)
 
+### Revisión de coherencia actual (2026-10-05)
+
+El catálogo se puede explorar sin cuenta. Agregar una pieza, abrir el carrito y
+pagar requieren sesión `customer`; un visitante recibe enlaces para iniciar
+sesión/registrarse y vuelve a la ficha del producto. No se conserva carrito
+anónimo. La compra de catálogo termina en un recibo DEMO. Una cotización
+personalizada no depende del catálogo: Admin registra monto y alcance, el
+cliente aprueba, paga DEMO desde su cuenta y recibe el recibo. Admin administra
+productos, solicitudes y pedidos, pero no paga ni valida comprobantes por el
+cliente. Búsqueda y filtros del catálogo se conservan al abrir la ficha y
+volver. Gmail/n8n de cotizaciones se conservan; el pago DEMO no envía correo.
+
 Las rutas FAQ, Materiales, Requisitos, Términos, Privacidad y Envíos tienen
 contenido ES/EN con límites académicos y acciones hacia flujos reales. Las rutas
 heredadas `/checkout/productos` y `/checkout/solicitud` redirigen al carrito y a
@@ -11,26 +23,20 @@ solo presenta pedidos que devuelve el servicio del usuario. Admin que abre
 `/cuenta` recibe una derivación clara a Administración; Perfil se declara de
 consulta, no de edición.
 
-No se agrega Stripe/PayPal simulado: marcar `PAID` sin proveedor de pago real
-contradiría el contrato académico y podría presentar una transacción falsa. El
-SINPE de ejemplo tampoco es destino de pago; la UI lo advierte. Una pasarela
-queda para cuando exista integración sandbox/real con resultado verificable.
+El pago `DEMO` está rotulado y no representa cobro ni transferencia real. La
+operación solo registra estados y muestra el recibo de la simulación. Una
+pasarela bancaria real queda fuera del alcance actual.
 El acceso de visitante queda en el control «Mi espacio» del navbar; su nombre
 accesible ahora anuncia el destino y el panel ofrece Iniciar sesión/Crear cuenta.
 No se duplica un CTA de login que compita con Cotizar en el header.
 
-La confirmación administrativa del comprobante ahora explica que la revisión es
-manual y no consulta el banco, espera una segunda acción explícita y devuelve el
-foco al disparador al cancelar con Escape. La ficha individual del pedido y la
-confirmación están cubiertas por pruebas; no se mutaron pedidos ni comprobantes.
+Admin ya no ofrece verificación de comprobantes de pago: ese paso se retiró del
+recorrido vigente. El historial puede conservar eventos antiguos, etiquetados
+como registros sin validar del flujo anterior.
 
-La ficha Admin ya no ofrece «Probar correo conmigo»: el endpoint acepta solo el
-envío de una cotización vigente al correo de la cuenta cliente, con copia al
-taller. Si un cliente legado envía `testRecipient`, la API responde
-`TEST_EMAIL_UNSUPPORTED` antes de contactar al proveedor; así no puede desviar
-ni disparar accidentalmente una cotización al cliente real. La vista de
-Actividad conserva el nombre de eventos históricos de prueba, si existieran;
-no crea nuevos eventos de ese tipo.
+La ficha Admin conserva la publicación de cotizaciones por el flujo n8n/Gmail
+existente, dirigida al correo de la cuenta customer y con la copia al taller
+configurada en la integración. Esta revisión no cambia ni envía el workflow.
 
 R-H83: Contacto deriva a rutas ejecutables según pieza/idea/seguimiento; la
 redacción evita insinuar un equipo grande y asigna al admin su propia acción.
@@ -46,20 +52,19 @@ solicitud. QUOTED/CHANGES_REQUESTED explican el siguiente paso sin habilitar
 acciones impropias. Correo lleva a cuenta para decisión; el acuse no equivale
 a aprobación/pago. Versiones importadas y render Gmail requieren verificación.
 
-## Recorrido carrito y pago — R-H78 (2026-10-05)
+## Recorrido carrito y pago — revisión vigente (2026-10-05)
 
-Confirmar encargo registra un pedido, no acredita pago ni inicia producción.
-El subtotal de piezas no incluye automáticamente entrega/impuestos; variantes
-no disponibles bloquean el CTA con explicación. Cuenta ofrece actualización
-manual y las seis etapas reales del taller, sin progreso activo para cancelados
-o rechazados; COMPLETED se conserva como cierre heredado. Los cargos registrados
-se desglosan, sin asumir cero para campos ausentes ni deuda desde producción.
+La compra de catálogo exige sesión, registra pago DEMO con idempotencia y abre
+`/pedidos/:id` con el recibo. Si el API falla, el carrito se conserva para
+corregir o reintentar. Las cotizaciones tienen un recorrido separado: Admin
+prepara alcance y monto libre, el cliente aprueba y paga desde su cuenta, y el
+sistema guarda el snapshot en el pedido. Admin no valida pagos ficticios ni crea
+pedidos en nombre del cliente. Ningún paso mueve dinero real.
 
-SINPE 8888-8888 es un ejemplo académico: se advierte no transferir dinero.
-Reportar no acredita pago; Admin confirma pago/pedido y producción es posterior.
-Carrito tablet separa resumen/líneas; cuenta móvil conserva pestañas y etapas.
-Pendiente comercial: destinatario real, entrega/retiro, cargos y aceptación
-del monto final antes de habilitar cobro real. No hay pasarela bancaria conectada.
+La vista del pedido distingue pago DEMO y etapas del taller. Entrega e impuestos
+no confirmados se muestran como pendientes de coordinación, nunca como incluidos
+o gratuitos. Los eventos antiguos de SINPE pueden permanecer en datos de prueba,
+pero sus controles ya no forman parte del recorrido actual.
 
 > Última actualización: **2026-10-05**.
 
@@ -79,10 +84,10 @@ al visitante a login con el destino preservado.
 ## Flujos
 
 ### Compra
-Home → Catálogo → Producto → (si visitante: selección local → login/registro) → Carrito customer → Confirmar encargo → `/cuenta` (acuse) → revisión/etapas del pedido en Admin.
+Home → Catálogo → Producto → (visitante: login/registro → volver al producto) → Carrito customer → Pagar · DEMO → `/pedidos/:id` (recibo) → seguimiento.
 
 ### Personalizada con archivo
-Solicitud → Archivo → Requisitos → Revisión → Pendiente de cotización → Cuenta → Cotización → Aprobación → Pago → Pedido.
+Solicitud → Archivo → Requisitos → Revisión → Pendiente de cotización → Admin define alcance/monto → Cuenta → Cliente aprueba → Pago · DEMO → Pedido/recibo.
 
 ### Personalizada sin archivo
 Solicitud → Ayuda de diseño → Descripción → Requisitos → Revisión → Pendiente de cotización → Cuenta → Cotización.
@@ -313,7 +318,11 @@ El usuario debe sentir que público, cuenta y admin pertenecen a Vértice CR med
 La consistencia no significa que todas las áreas tengan exactamente la misma densidad ni el mismo chrome.
 
 
-## HF-08 Checkout — diseño de flujo (2026-09-24)
+## HF-08 Checkout — propuesta histórica, reemplazada (2026-09-24)
+
+El diseño de formularios separados de datos/entrega/SINPE descrito a
+continuación no corresponde al MVP vigente. El flujo actual usa pago DEMO
+directo y recibo; se conserva este título como referencia de diseño anterior.
 
 ### Checkout de productos
 
@@ -325,13 +334,14 @@ La consistencia no significa que todas las áreas tengan exactamente la misma de
 
 ### Regla visual
 
-Los dos recorridos pueden compartir componentes de checkout (stepper, datos de facturación, entrega, SINPE, revisión), pero deben mantener **contexto visual explícito** sobre qué se está pagando.
+Los recorridos mantienen contexto visual explícito sobre catálogo o cotización,
+pero no muestran un formulario de facturación, entrega o SINPE.
 
 ### Navbar/footer
 
 Mantener el navbar público derivado de HF-01 con ajustes mínimos. En checkout puede simplificarse únicamente si mejora el foco sin perder navegación, identidad o accesibilidad. Footer comercial completo no es necesario; puede usarse uno técnico compacto. Stitch solo orienta estructura y contenido.
 
-### Estados de pago
+### Estados de pago anteriores
 
 - idle;
 - form invalid;
@@ -375,13 +385,12 @@ versión son validadas por el servidor; la respuesta no se ejecuta desde el emai
 
 ### Encargo desde el carrito — C-P4 (2026-10-04)
 
-La página y el acceso del navbar requieren una cuenta `customer`; visitantes que
-prepararon una selección local llegan a login/registro con el destino
-`/carrito` preservado. El CTA aparece cuando todas las líneas son válidas. Solo
-una cuenta `customer` puede confirmar. El éxito limpia el carrito,
-lleva a `/cuenta` y muestra el número del encargo, el subtotal y el aviso de que
-no se ha cobrado ni confirmado fecha de entrega. Si el API falla, el carrito se
-conserva para corregir o reintentar.
+La página y el acceso del navbar requieren una cuenta `customer`; visitantes son
+llevados a login/registro y vuelven a la ficha del producto. El CTA aparece
+cuando las líneas son válidas. El servidor recalcula el subtotal y registra
+pago DEMO; el éxito limpia el carrito y navega al recibo. Si el API falla, el
+carrito se conserva para corregir o reintentar. El recibo explica que no hubo
+cobro real y que entrega/impuestos siguen por coordinar.
 
 ### Tipografía de chrome global
 

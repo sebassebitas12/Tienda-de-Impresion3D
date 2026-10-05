@@ -15,7 +15,7 @@ import {
 import './admin.css';
 import './admin-product-pricing.css';
 
-const materials = ['ASA', 'PLA', 'PETG', 'ABS', 'TPU'];
+const materials = ['ASA', 'PLA', 'PLA Silk', 'PETG', 'ABS', 'TPU'];
 const slugify = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 const copy = {

@@ -35,20 +35,16 @@ export function CustomerOrderDetailPage() {
   const text = es ? {
     back: 'Volver a mis pedidos', title: 'Detalle del pedido', loading: 'Cargando pedido…', retry: 'Reintentar',
     error: 'No pudimos cargar el pedido. Revisá tu conexión e intentá de nuevo.', missing: 'No encontramos ese pedido en tu cuenta.',
-    progress: 'Avance del taller', parts: 'Piezas incluidas', subtotal: 'Subtotal de piezas', total: 'Total registrado',
-    amountNote: 'El monto registrado no confirma un pago por sí solo.', payment: 'Estado del comprobante', reference: 'Referencia', phone: 'Teléfono emisor',
-    rejection: 'Motivo indicado por el taller', proof: 'El comprobante está pendiente de revisión por el taller.',
-    noProof: 'Este prototipo no recibe pagos. No reportes un comprobante real: el número SINPE mostrado es solo de demostración y no es un destino de pago.',
-    status: { PENDING: 'Pendiente de revisión', CONFIRMED: 'Confirmado', IN_PRODUCTION: 'En producción', READY: 'Listo', SHIPPED: 'Enviado', DELIVERED: 'Entregado', COMPLETED: 'Completado', CANCELLED: 'Cancelado', REJECTED: 'Rechazado' },
+    progress: 'Avance del taller', parts: 'Piezas incluidas', subtotal: 'Subtotal de piezas', total: 'Comprobante DEMO',
+    amountNote: 'Pago simulado · DEMO. No se transfirió dinero real; la entrega se coordina aparte.', payment: 'Estado del pago',
+    status: { PENDING: 'Pago DEMO pendiente', CONFIRMED: 'Confirmado', IN_PRODUCTION: 'En producción', READY: 'Listo', SHIPPED: 'Enviado', DELIVERED: 'Entregado', COMPLETED: 'Completado', CANCELLED: 'Cancelado', REJECTED: 'Rechazado' },
     steps: ['Recibido', 'Confirmado', 'En producción', 'Listo', 'Enviado', 'Entregado'], quantity: 'Cantidad', unit: 'Por unidad',
   } : {
     back: 'Back to my orders', title: 'Order details', loading: 'Loading order…', retry: 'Try again',
     error: 'We could not load this order. Check your connection and try again.', missing: 'We could not find that order in your account.',
-    progress: 'Workshop progress', parts: 'Included parts', subtotal: 'Parts subtotal', total: 'Recorded total',
-    amountNote: 'The recorded amount alone does not confirm payment.', payment: 'Receipt status', reference: 'Reference', phone: 'Sender phone',
-    rejection: 'Workshop note', proof: 'The receipt is waiting for workshop review.',
-    noProof: 'This prototype does not receive payments. Do not submit a real receipt: the sample SINPE number is for demonstration only and is not a payment destination.',
-    status: { PENDING: 'Awaiting review', CONFIRMED: 'Confirmed', IN_PRODUCTION: 'In production', READY: 'Ready', SHIPPED: 'Shipped', DELIVERED: 'Delivered', COMPLETED: 'Completed', CANCELLED: 'Cancelled', REJECTED: 'Rejected' },
+    progress: 'Workshop progress', parts: 'Included parts', subtotal: 'Parts subtotal', total: 'DEMO receipt',
+    amountNote: 'Simulated payment · DEMO. No real money was transferred; delivery is arranged separately.', payment: 'Payment status',
+    status: { PENDING: 'DEMO payment pending', CONFIRMED: 'Confirmed', IN_PRODUCTION: 'In production', READY: 'Ready', SHIPPED: 'Shipped', DELIVERED: 'Delivered', COMPLETED: 'Completed', CANCELLED: 'Cancelled', REJECTED: 'Rejected' },
     steps: ['Received', 'Confirmed', 'In production', 'Ready', 'Shipped', 'Delivered'], quantity: 'Quantity', unit: 'Each',
   };
 
@@ -78,12 +74,18 @@ export function CustomerOrderDetailPage() {
     <div className="customer-order-detail__layout">
       <section className="customer-order-detail__items" aria-labelledby="customer-order-detail-items-title">
         <h2 id="customer-order-detail-items-title">{text.parts}</h2>
-        {order.orderItems?.length ? <ul>{order.orderItems.map((item, index) => <li key={item.id || `${item.productId}-${index}`}>
-          <div><strong>{item.productName || item.currentCatalogName || (es ? `Modelo ${item.productId}` : `Model ${item.productId}`)}</strong>
+        {order.orderItems?.length ? <ul>{order.orderItems.map((item, index) => <li key={item.id || item.productId + '-' + index}>
+          <div><strong>{item.productName || item.currentCatalogName || (es ? 'Modelo ' + item.productId : 'Model ' + item.productId)}</strong>
             <span>{[item.color, item.material].filter(Boolean).join(' · ')}</span>
             <small>{text.quantity}: {item.quantity} · {text.unit}: {formatCRC(item.unitPrice)}</small></div>
           <strong>{formatCRC(item.subtotal ?? Number(item.unitPrice) * Number(item.quantity))}</strong>
-        </li>)}</ul> : <p>{es ? 'Este pedido no tiene piezas detalladas.' : 'No item details are available for this order.'}</p>}
+        </li>)}</ul> : order.scopeSnapshot ? <div className="customer-order-detail__custom-scope">
+          <strong>{order.scopeSnapshot.name || (es ? 'Diseño personalizado' : 'Custom design')}</strong>
+          <span>{[order.scopeSnapshot.material, order.scopeSnapshot.dimensions].filter(Boolean).join(' · ')}</span>
+          <small>{text.quantity}: {order.scopeSnapshot.quantity || 1}</small>
+          {order.scopeSnapshot.fileName && <small>{es ? 'Archivo de referencia' : 'Reference file'}: {order.scopeSnapshot.fileName}</small>}
+          {order.scopeSnapshot.notes && <p>{order.scopeSnapshot.notes}</p>}
+        </div> : <p>{es ? 'Este pedido no tiene piezas detalladas.' : 'No item details are available for this order.'}</p>}
       </section>
 
       <aside className="customer-order-detail__summary">
@@ -91,15 +93,9 @@ export function CustomerOrderDetailPage() {
         <strong>{formatCRC(amount) || '—'}</strong>
         {Number.isFinite(order.subtotalCrc ?? order.subtotal) && <p>{text.subtotal}: {formatCRC(order.subtotalCrc ?? order.subtotal)}</p>}
         <p>{text.amountNote}</p>
-        {order.paymentStatus === 'PAID' ? <p className="customer-order-detail__payment" role="status">{es ? 'Pago verificado por el taller.' : 'Payment verified by the workshop.'}</p>
-          : order.paymentProof?.status === 'SUBMITTED' ? <div className="customer-order-detail__payment" role="status">
-            <strong>{text.payment}: {order.paymentProof.status}</strong>
-            <span>{text.reference}: {order.paymentProof.referenceNumber}</span>
-            <span>{text.phone}: {order.paymentProof.sinpePhone}</span>
-            <p>{text.proof}</p>
-          </div>
-            : order.paymentProof?.status === 'REJECTED' ? <div className="customer-proof-rejection-alert" role="alert"><strong>{text.payment}: {order.paymentProof.status}</strong><p>{text.rejection}: {order.paymentProof.rejectionReason}</p></div>
-              : order.status === 'PENDING' && <p className="customer-order-detail__payment">{text.noProof}</p>}
+        {order.paymentStatus === 'PAID'
+          ? <p className="customer-order-detail__payment" role="status">{order.paymentMode === 'DEMO' ? (es ? 'Pago simulado registrado · DEMO' : 'Simulated payment recorded · DEMO') : (es ? 'Pago registrado' : 'Payment recorded')}</p>
+          : order.status === 'PENDING' && <p className="customer-order-detail__payment" role="status">{es ? 'El pago DEMO todavía está pendiente. Podés completarlo desde Mis pedidos.' : 'DEMO payment is still pending. Complete it from My orders.'}</p>}
         <Link className="v-button v-button--secondary" to="/cuenta?tab=orders">{es ? 'Abrir Mis pedidos' : 'Open My orders'}</Link>
       </aside>
     </div>
