@@ -7,6 +7,15 @@
 
 ## Estado vigente para continuar (2026-10-05, revisión de flujo)
 
+- Integración casa–curso: recuperados `1e086a9`, `7e0c2dd` y `ba497da`
+  mediante bundle Git autorizado, SHA256 comprobado y fast-forward desde
+  `e5c1976`. Publicado `ba497da` en origin/Pruebas. Base runtime de casa
+  preservada sin stage ni cambios; no asumir que coincide con el fixture
+  versionado del curso. Gates locales: 50 suites/299 tests (sin caché), lint,
+  check:ui, build y 270 comprobaciones de automatización pasan. CI del push
+  está pendiente; revisión visual autenticada y proveedor IA real pendientes.
+  Continuar con docs/11 y revisar el recorrido completo, no declararlo cerrado.
+
 ### Corrección de alcance del usuario: presentación de 15 minutos
 
 La decisión vigente es cliente + IA preparan la cotización personalizada desde

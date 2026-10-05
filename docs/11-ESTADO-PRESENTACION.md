@@ -1,6 +1,18 @@
 # Estado y bloques de trabajo — Pruebas
 
 ## Visión confirmada
+
+### Integración en casa — 2026-10-05
+
+Los tres commits del curso hasta `ba497da` se recuperaron mediante bundle Git
+autorizado, verificado por SHA256 y `git bundle verify`; integración fast-forward
+desde `e5c1976` y push a `Pruebas` realizados. `db.json` runtime de casa conserva
+su huella anterior y no se incluyó en el push. Verificación local: Jest sin caché
+50 suites/299 tests, lint, check:ui, build y 270 comprobaciones de automatización
+aprobados. CI del push pendiente en este corte. No se verificó visualmente la
+versión integrada ni se llamó al proveedor IA real; los bloques restantes siguen
+abiertos. Las cifras de catálogo del curso describen el fixture, no la base
+runtime preservada de casa.
 MVP académico con experiencia completa: React, JSON Server y n8n. Pagos simulados; correo Gmail existente conservado. DeepSeek usa la credencial existente de n8n.
 
 ## Bloque implementado
