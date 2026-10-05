@@ -54,8 +54,10 @@ por lo que esta comprobación es de árbol accesible, no evidencia visual nueva.
 **Gates locales:** Jest 48 suites / 304 pruebas, lint, `check:ui` (48 módulos),
 `check:automation` (261 comprobaciones), build (entrada principal 291.16 kB,
 gzip 92.45 kB; sin advertencia de chunk >500 kB) y `git diff --check` pasan en
-este árbol. **CI remoto `verify.yml`: pendiente** después del push. Estos gates
-no reemplazan capturas a 375/768 ni teclado/tecnología asistiva real.
+este árbol. **CI remoto `verify.yml`: verde** para `642b5f1`, run #77
+(GitHub Actions run `37284941855`, 2026-10-05). El commit documental de cierre
+también debe completar CI antes de recomendar pull. Estos gates no reemplazan
+capturas a 375/768 ni teclado/tecnología asistiva real.
 
 ## R-H84 — Auditoría de Admin por pestaña (2026-10-05)
 

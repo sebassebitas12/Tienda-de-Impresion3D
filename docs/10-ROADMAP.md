@@ -12,7 +12,10 @@ browser con viewport emulado. Se retiró la prueba de correo arbitraria del
 producto Admin; el envío comercial conserva cliente registrado + copia del
 taller. Gates locales: 48 suites/304 tests, lint, check:ui, check:automation
 (261), build y diff-check verdes. `db.json` local queda fuera del commit. Gate
-final: push a `Pruebas` y CI remoto `verify.yml` verde.
+de implementación completado: commit `642b5f1` enviado a `Pruebas`, GitHub
+Actions `verify.yml` run #77 verde (run `37284941855`). La documentación registra
+esta evidencia en un commit de cierre separado; verificar su CI antes de
+recomendar pull. `db.json` local permanece sin stage.
 
 ## Gate de experiencia final — R-H74 (2026-10-04)
 

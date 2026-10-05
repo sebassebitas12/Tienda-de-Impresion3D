@@ -14,7 +14,9 @@ La regresión de correo verifica que un `testRecipient` legado se rechace antes
 de contactar al proveedor. La suite completa local queda en 48 suites / 304
 tests; lint, `check:ui` (48 módulos), `check:automation` (261 comprobaciones),
 build y `git diff --check`
-pasan. CI remoto todavía depende del push del commit final.
+pasan. GitHub Actions `verify.yml` run #77 está verde para `642b5f1`
+(run `37284941855`). La documentación de este cierre se enviará en un commit
+separado, que también debe pasar CI antes de recomendar pull.
 
 ## Comprobante SINPE por pedido — 2026-10-04
 

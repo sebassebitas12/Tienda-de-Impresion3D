@@ -20,10 +20,12 @@
   permite desviar el envío a un destinatario arbitrario; el correo comercial
   conserva como destino al cliente registrado y al taller. Gates locales: 48
   suites/304 tests, lint, check:ui, check:automation (261), build y diff-check
-  verdes; entrada principal 291.16 kB (gzip 92.45 kB), sin warning de chunk grande. Responsive
-  visual 375/768, Catálogo Light y teclado/AT integral siguen sin evidencia. El
-  `db.json` manual permanece sin tocar ni stage. Tras commit/push, verificar CI
-  `verify.yml` remoto antes de afirmar listo para pull.
+  verdes; entrada principal 291.16 kB (gzip 92.45 kB), sin warning de chunk
+  grande. GitHub Actions `verify.yml` run #77 completó verde para
+  `642b5f1` (2026-10-05; ejecución 37284941855). Responsive visual 375/768,
+  Catálogo Light y teclado/AT integral siguen sin evidencia. El `db.json` manual
+  permanece sin tocar ni stage. La documentación registra el cierre CI; validar
+  también el commit documental antes de recomendar pull.
 
 - R-H81: carrito simplificado; cuenta presenta piezas antes de pago y separa
   verificación de producción. Referencia de nombre actual para órdenes heredadas
