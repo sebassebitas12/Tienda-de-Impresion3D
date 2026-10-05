@@ -730,11 +730,52 @@ catálogo ni cambia estados. Tasas y Gmail permanecen como ramas deterministas
 independientes; los Agents no las invocan.
 
 `POST /quotes/profiles` y `/quotes/preview` son consultas/cálculo DEMO;
-`/quotes/create` exige customer y clave de idempotencia; `/quotes/mine` y
-`/quotes/approve` limitan al dueño. `/admin/actions/auto-quote` exige Admin y
+`/quotes/create` exige customer y clave de idempotencia; `/quotes/mine` filtra
+por usuario autenticado. `/quotes/approve` solo acepta una solicitud propia en
+`AWAITING_APPROVAL`, versión exacta y vigencia activa. `/quotes/respond` acepta
+`CHANGES_REQUESTED` o `REJECTED` únicamente para esa misma solicitud/versión y
+requiere motivo de 3–500 caracteres. Ambas decisiones actualizan la solicitud y
+añaden un evento a `activityLog` en la misma persistencia. `/admin/actions/auto-quote` exige Admin y
 versión/estado esperado. `/admin/actions/order-transition` aplica la secuencia
 permitida y deja evento. `/admin/actions/quote-fulfillment` evita pedido
 duplicado; la modalidad DEMO queda rotulada como no pago real.
+
+### Decisiones del cliente — C-P5 (2026-10-04)
+
+`POST /quotes/approve` recibe `{requestId, expectedVersion}` y la identidad sale
+solo del token de sesión académica. El servidor devuelve 404 para una solicitud
+ajena/no encontrada; requiere `customer`, estado `AWAITING_APPROVAL`, versión
+exacta y cotización no vencida. Registra `REQUEST_CUSTOMER_APPROVED` con actor,
+origen/destino y fecha.
+
+`POST /quotes/respond` recibe `{requestId, expectedVersion, decision, reason}`;
+`decision` solo puede ser `CHANGES_REQUESTED` o `REJECTED`, y `reason` debe tener
+3–500 caracteres tras recortar espacios. `CHANGES_REQUESTED` guarda el motivo
+en la solicitud y `activityLog`; no crea pedido ni altera precio/versionado.
+El taller debe revisar antes de emitir otra oferta. Ningún cliente puede enviar
+`userId` para escoger propietario.
+
+### Encargo de catálogo — C-P4 (2026-10-04)
+
+`POST /orders/submit-catalog-order` exige token de sesión `customer`; el
+propietario se toma del actor validado, nunca del body. Recibe
+`{items: [{productId, color, quantity}], idempotencyKey}`; cada cantidad debe
+ser entero positivo seguro y no puede repetirse una misma combinación
+producto/color. El servidor vuelve a validar publicación/variante y recalcula
+los precios desde `products`; cualquier precio remitido por la UI no se usa.
+No comprueba ni reserva stock.
+
+La operación agrega un `orders` con id `ord-*`, usuario autenticado, snapshot de
+`orderItems` (producto, color, cantidad, precio unitario y subtotal),
+`subtotalCrc`, `currency: 'CRC'`, `status: 'PENDING'`, fecha y
+`pricingScope: 'CATALOG_SUBTOTAL_ONLY'`; también agrega filas normalizadas a
+`orderItems` y evento `CATALOG_ORDER_CREATED` a `activityLog`. La idempotencia
+por usuario/clave devuelve el pedido previo si el fingerprint coincide y
+rechaza reutilizar la clave con líneas diferentes. La persistencia se serializa
+antes de responder. `subtotal`/`total` conservan compatibilidad con el listado
+Admin, pero no significan importe cobrado: impuestos, envío, pago y fecha de
+entrega quedan fuera. El frontend limpia el carrito solo ante éxito y envía el
+cliente a `/cuenta` con un acuse no persistente de navegación.
 
 Un solo workflow importable contiene cinco entradas (tres asistentes, tasas y
 correo) en `automation/n8n/vertice-cr-unificado.json`. En la fila de asistentes

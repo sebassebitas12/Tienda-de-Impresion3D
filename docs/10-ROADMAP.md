@@ -280,13 +280,13 @@ checkout, no se tomó como diagnóstico ya confirmado:
 | 1 | Fotos de catálogo | Admin permite cargar hasta seis fotos comprimidas, ordenarlas y elegir portada; JSON Server persiste data URLs en `images`. | C-P2 implementado localmente; revisión visual autenticada pendiente |
 | 2 | Archivo de solicitud | `/solicitud/archivo` recibe hasta cinco referencias (imagen/STL/OBJ), crea intake idempotente `PENDING_QUOTE` y mantiene los bytes fuera de `db.json`. | C-P3 implementado localmente; inspección visual autenticada pendiente |
 | 3 | Prueba de correo | `QuoteEmailTest` está limitada a cuenta propia con `[DEMO][PRUEBA]`; conservar para defensa, rotular y hacer secundaria. | C-P8 |
-| 4 | Compra | Carrito funciona, pero `/checkout/productos` y `/checkout/solicitud` siguen en `ConstructionPage`; no termina en pedido/pago. | C-P4 |
+| 4 | Compra | `/carrito` puede crear un encargo `PENDING` del catálogo con precios recalculados, snapshot, actividad e idempotencia; no cobra, reserva stock ni define entrega. Pago/checkout de cotización y detalle `/pedidos/:id` permanecen pendientes. | C-P4 implementado localmente; falta recorrido visual con sesión autenticada y CI |
 | 5 | Rutas en construcción | También `/pedidos/:id`, `/nosotros`, `/contacto`, `/faq`, `/materiales`, `/requisitos`, `/terminos`, `/privacidad` y `/envios` siguen usando el placeholder. | C-P4/P7 |
-| 6 | Cotización cliente | Puede aprobar una cotización vigente; no tiene rechazar/pedir cambios y no hay checkout después de aprobación. | C-P5/P4 |
+| 6 | Cotización cliente | `/cuenta` permite aprobar una oferta vigente o pedir cambios/rechazar con motivo; Admin aún debe completar el retorno operativo de `CHANGES_REQUESTED`. No hay pago tras aprobar. | C-P5 implementado localmente; integración Admin pendiente |
 | 7 | Transiciones Admin | Sí hay transiciones secuenciales, control por rol/estado/versionado, motivo para cierre temprano y evento `ORDER_STATUS_CHANGED`. La frase vieja “Pedidos solo lectura” era obsoleta; corregida en `docs/02`. | Implementado; probar recorrido |
 | 8 | Borradores + bot | La ficha Admin puede pedir propuestas de descripción/material/colores y estimaciones básicas al agente general; requiere revisión y confirmación del operador. | C-P1 implementado localmente; prueba live con export actualizado pendiente |
 | 9 | Clientes/Actividad | Clientes permite buscar y consultar pedidos/solicitudes asociados; Activity es historial de eventos existentes, no solo una pantalla vacía. Son superficies de consulta, no gestión integral de perfil. | Implementado; límites deliberados |
-| 10 | Cuenta | `/cuenta` muestra cotizaciones/aprobación; carece de pedidos y perfil. `/pedidos/:id` sigue en construcción. | C-P7/P4 |
+| 10 | Cuenta | `/cuenta` muestra cotizaciones y acuse del encargo recién creado; aún no lista historial de pedidos ni permite editar perfil. `/pedidos/:id` sigue en construcción. | C-P4/P5 implementados localmente; historial/perfil en C-P7 |
 
 Estimación de avance global: **55–65% (centro aproximado 60%) del MVP académico**,
 no una métrica calculada. Auth, la base storefront y Admin operativo ya existen;
@@ -365,21 +365,29 @@ Tests de UI cubren el asistente, las unidades y el envío de PNG+STL; `check:aut
 prueba multipart, autenticación, idempotencia y lectura autorizada sobre una
 base/almacenamiento temporal. La captura visual Admin autenticada sigue pendiente.
 
-#### C-P4 — Checkout de productos
+#### C-P4 — Encargo de productos desde el carrito
 
-- `/checkout/productos`: resumen del carrito → contacto/entrega (requiere sesión)
-  → SINPE mediante `SinpePaymentBlock` y comprobante → pedido.
-- `/pedidos/:id`: estado/detalle visible solo al dueño y enlace desde `/cuenta`.
-- `/checkout/solicitud`: checkout para cotización aprobada con el mismo bloque
-  SINPE.
-- No hay pasarela real; documentar que Admin verifica manualmente el comprobante.
+Implementado localmente: cuando las líneas son válidas, una cuenta `customer`
+puede confirmar el encargo desde `/carrito`. El servidor valida catálogo y
+variante, ignora precios del cliente, recalcula CRC, persiste el pedido como
+`PENDING`, sus líneas (embebidas y normalizadas) y el evento de actividad. Una
+clave idempotente evita duplicados al reintentar. Tras éxito, el cliente vuelve
+a `/cuenta` con acuse y el carrito se limpia; si falla, se conserva. Admin puede
+leer el nuevo pedido con el mismo adaptador de Pedidos.
 
-#### C-P5 — El cliente puede rechazar o pedir cambios
+Límite explícito: `subtotalCrc` y los campos compatibles `subtotal`/`total` son
+el subtotal del catálogo, no prueba de cobro ni precio final con entrega. No se
+reserva stock ni se promete fecha. Checkout de solicitud aprobada, pago,
+comprobante, historial completo de pedidos y `/pedidos/:id` siguen pendientes;
+ningún pago real forma parte de este slice.
 
-- En `CustomerQuotesPage`, junto a Aprobar, añadir Rechazar y Pedir cambios; el
-  comentario es obligatorio.
-- Definir transiciones en `docs/02`; Admin ve el comentario y puede recalcular una
-  nueva versión sin reescribir la anterior.
+#### C-P5 — El cliente aprueba, rechaza o pide cambios
+
+Implementado: `/cuenta` presenta monto, vigencia, notas y desglose de
+`AWAITING_APPROVAL`; el servidor limita aprobación a cliente/propietario/versión
+vigente. Pedir cambios o rechazar exige motivo y deja evento auditado.
+`CHANGES_REQUESTED` espera revisión/respuesta del taller; integración de esa
+transición en la vista Admin permanece en trabajo paralelo.
 
 #### C-P6 — Cotizar una variante
 
@@ -473,3 +481,11 @@ un error recuperable. El navegador comprobó solamente el intake quote Light a
 ~720 px. Admin volvió a `/login`, así que su revisión visual sigue bloqueada por
 la sesión y no se declara cerrada. Los gates locales del árbol sucio y el CI
 remoto del HEAD anterior no equivalen a CI verde de este corte.
+
+### Avance C-P5/P4 — 2026-10-04
+
+P5 y P4 tienen implementación, pruebas unitarias y checks locales. No declarar
+el ciclo customer→Admin de cambios solicitado cerrado hasta integrar
+`CHANGES_REQUESTED` en la bandeja Admin. La revisión visual autenticada de
+`/carrito` y `/cuenta`, CI para los commits nuevos y el checkout/pago permanecen
+pendientes. La confirmación de P4 registra un encargo, no una compra pagada.

@@ -339,3 +339,29 @@ tests, lint, `check:ui`, build y diff check; no hay commit/push. Próximo:
 configuración de Header Auth y publicación del workflow, integrar Hacienda y
 definir la tarifa ARESEP exacta a partir de la factura, además del cierre
 CRUD/responsive de Admin antes de IA y los tres asistentes.
+
+## Continuidad de Bloque C — 2026-10-04
+
+C-P5 está implementado localmente: `/cuenta` muestra los detalles de una oferta
+`AWAITING_APPROVAL`; aprobar valida dueño/versión/vigencia y pedir cambios o
+rechazar exige motivo y registra `activityLog`. Pruebas unitarias de lógica y UI
+añadidas. La vista Admin para procesar `CHANGES_REQUESTED` requiere integrar el
+estado con la revisión operativa; no declarar cerrado ese recorrido completo.
+
+C-P4 también está implementado localmente: `/carrito` crea un pedido de catálogo
+`PENDING` solo con sesión customer; la API vuelve a validar variante y precio,
+guarda snapshot/líneas normalizadas, actividad e idempotencia. El éxito limpia
+el carrito y lleva a `/cuenta` con un acuse; no hay pago, reserva de stock ni
+fecha de entrega. No alterar `db.json` real con pedidos de prueba. Jest (37
+suites/203), lint, `check:ui`, `check:automation` (255), build y diff check
+pasaron en el árbol local combinado.
+
+P5/P4 están listos para commits atómicos locales; CI remota aún no certifica
+estos cambios. No declarar cerrada la integración completa de P5: Admin todavía
+debe permitir retomar `CHANGES_REQUESTED`. Tampoco se verificó visualmente
+`/cuenta` con sesión customer ni el carrito con líneas. Sí se capturó el estado
+vacío de `/carrito` en Light (~1254×704): una caja interior innecesaria se retiró
+y título/descripción/CTA ahora comparten una sola superficie. Los breakpoints
+375/768 y Dark siguen pendientes. Seguir después con P8/P7/P9 según el orden
+acordado. Mantener fuera de los commits los cambios paralelos del orquestador
+en n8n, Admin, copy del correo y catálogo.

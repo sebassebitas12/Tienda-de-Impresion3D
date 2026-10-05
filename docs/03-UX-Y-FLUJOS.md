@@ -13,7 +13,7 @@
 ## Flujos
 
 ### Compra
-Home → Catálogo → Producto → Carrito → Checkout productos → Datos → Entrega → Revisión → Confirmación → Pedido.
+Home → Catálogo → Producto → Carrito → Confirmar encargo → `/cuenta` (acuse) → revisión/etapas del pedido en Admin.
 
 ### Personalizada con archivo
 Solicitud → Archivo → Requisitos → Revisión → Pendiente de cotización → Cuenta → Cotización → Aprobación → Pago → Pedido.
@@ -267,11 +267,26 @@ La Home separa modelos de catálogo fabricados bajo pedido de piezas propias que
 1. **Home:** ofrecer dos decisiones inequívocas: explorar modelos fabricados bajo pedido o enviar un archivo propio para revisión. Explicar que los modelos no son de entrega inmediata.
 2. **Catálogo:** permitir explorar por uso/tipo de pieza y filtrar por materiales confirmados —ASA, PLA, PETG, ABS y TPU— y FDM. No mostrar inventario, “disponible” ni entrega inmediata.
 3. **Ficha:** priorizar fotos reales cuando existan, uso previsto, material y variantes confirmadas; mostrar precio de catálogo solo si el contrato de datos lo respalda. La ruta personalizada explica revisión y cotización, sin presentar precio final.
-4. **Carrito y checkout de catálogo:** conservar producto/cantidad y resumen editable. Informar costo total y condiciones de entrega antes del pago, cuando existan datos confirmados. No inventar costos ni fechas estimadas.
+4. **Carrito y encargo de catálogo:** conservar producto/color/cantidad y resumen editable. “Confirmar encargo” registra un pedido `PENDING` con precios recalculados por servidor y lleva a `/cuenta`; no es pago ni confirma envío, stock o fecha. Esas condiciones siguen pendientes hasta que el taller las confirme.
 5. **Solicitud personalizada:** explicar requisitos antes de cargar; dar feedback de formato/progreso/error y permitir revisar lo enviado. Confirmar recepción y siguiente paso. `PENDING_QUOTE` no muestra precio final ni CTA de pago.
-6. **Después del envío/compra:** confirmar qué ocurrió y cuál es el paso siguiente; dar acceso al estado del pedido/cotización y ayuda humana.
+6. **Después del envío/encargo:** confirmar qué ocurrió y cuál es el paso siguiente; dar acceso al estado del pedido/cotización y ayuda humana. El encargo de catálogo aún no tiene pago, entrega ni fecha confirmados.
 
 La incertidumbre se resuelve con estados vacíos, errores y una explicación clara, no con información ficticia. Fuente de checkout: [Baymard, costos de envío en páginas de producto](https://baymard.com/research-articles/show-shipping-costs-on-product-pages). Patrón: aclarar temprano los costos que determinan el total; adaptación: Vértice los mostrará antes del checkout solo cuando tenga condiciones confirmadas.
+
+### Decisión del cliente sobre una cotización — C-P5 (2026-10-04)
+
+En `/cuenta`, `AWAITING_APPROVAL` muestra monto, vigencia, notas y desglose de
+la versión enviada. El cliente puede aprobar (solo si sigue vigente), o elegir
+“Solicitar cambios”/“Rechazar” con motivo obligatorio. La cuenta propia y la
+versión son validadas por el servidor; la respuesta no se ejecuta desde el email.
+
+### Encargo desde el carrito — C-P4 (2026-10-04)
+
+El CTA aparece cuando todas las líneas son válidas. Un visitante debe iniciar
+sesión; solo una cuenta `customer` puede confirmar. El éxito limpia el carrito,
+lleva a `/cuenta` y muestra el número del encargo, el subtotal y el aviso de que
+no se ha cobrado ni confirmado fecha de entrega. Si el API falla, el carrito se
+conserva para corregir o reintentar.
 
 ### Tipografía de chrome global
 

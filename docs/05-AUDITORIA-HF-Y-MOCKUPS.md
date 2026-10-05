@@ -1493,3 +1493,22 @@ para inspeccionar el render real, así que el diseño no se declara aprobado
 visualmente. Se requiere inicio de sesión válido en el mismo origen y capturas
 Light/Dark en 1280/768/375. Tampoco se inspeccionó visualmente el CTA «Cotizar
 DEMO» de las filas del catálogo.
+
+### R-H73 — Estado vacío del carrito y flujo C-P4 (2026-10-04)
+
+**Hallazgo visual confirmado:** captura local Light de `/carrito` vacío (~1254 ×
+704) mostró el `EmptyState` como un rectángulo blanco con borde dentro de otra
+tarjeta cálida redondeada; el CTA quedaba por debajo del rectángulo interior y
+parecía desprendido del mensaje.
+
+**Corrección:** el estado vacío ahora usa una única superficie, conserva el
+tratamiento ambiental cálido, limita el ancho en escritorio y agrupa mensaje y
+CTA con separación propia. En el render posterior el borde/fondo interior ya no
+compite con el contenedor; título, descripción y CTA se leen como una sola
+composición.
+
+**Alcance de evidencia:** el árbol accesible conserva título, descripción y
+enlace «Explorar modelos»; la captura posterior confirma el cambio a esa
+resolución. Solo se inspeccionó el carrito vacío en Light de escritorio; carrito
+con líneas, 375/768 px, Dark y `/cuenta` con sesión customer siguen pendientes.
+Esto no es aprobación visual del flujo completo ni una prueba de checkout live.

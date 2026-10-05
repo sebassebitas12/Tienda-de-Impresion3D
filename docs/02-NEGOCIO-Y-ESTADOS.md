@@ -13,6 +13,8 @@ NO es un producto de catálogo.
 Ciclo:
 ~~~text
 PENDING_QUOTE → IN_REVIEW → QUOTED → AWAITING_APPROVAL → APPROVED → PAID
+                                             ├→ CHANGES_REQUESTED
+                                             └→ REJECTED
 ~~~
 
 Salidas: REJECTED, EXPIRED, CANCELLED.
@@ -23,6 +25,8 @@ Reglas:
 - El rango de IA es orientativo.
 - En el MVP actual, solo el admin emite la cotización final. Meta de producto indicada por el usuario: automatizar los casos FDM estándar y dejar intervención del taller para excepciones; ver condiciones y datos pendientes en `docs/07`. Esta meta no cambia el flujo operativo hasta implementar y validar el motor.
 - Solo una cotización aprobada puede pagarse.
+- El cliente solo puede decidir una cotización propia cuando la solicitud está `AWAITING_APPROVAL` y la versión coincide con la oferta enviada. Aprobar exige vigencia activa; pedir cambios o rechazar exige un motivo breve y registra actor, motivo, fecha y transición en `activityLog`.
+- `CHANGES_REQUESTED` requiere una nueva revisión del taller. No crea un pedido ni aprueba la versión anterior; Admin debe emitir y enviar una oferta nueva para volver a `AWAITING_APPROVAL`.
 - El pedido pagado conserva requestId.
 - Solicitud y pedido son entidades relacionadas, no la misma entidad.
 
@@ -97,6 +101,19 @@ alterar pedidos desde los asistentes. El total registrado sigue sin ser prueba
 de pago; el modelo no tiene evidencia de cobro comercial automáticamente
 confirmada. Contrato técnico en `docs/07`.
 
+### Encargo de productos de catálogo — C-P4 (2026-10-04)
+
+`Confirmar encargo` desde `/carrito` crea un pedido `PENDING` solo para una
+sesión `customer`. El servidor valida producto publicado, variante y cantidad,
+ignora precios enviados por el navegador y recalcula cada precio unitario,
+subtotal y subtotal CRC con el catálogo vigente. Guarda el snapshot tanto en
+`orders[].orderItems` como en `orderItems`, registra `CATALOG_ORDER_CREATED` y
+usa una clave idempotente para que reintentar la misma confirmación no duplique
+el pedido. No valida ni reserva stock. `pricingScope: CATALOG_SUBTOTAL_ONLY`
+indica que no incluye envío, impuestos, pago ni fecha de entrega. La confirmación
+limpia el carrito y lleva a `/cuenta`; el pedido puede continuar en Admin por el
+flujo de etapas habitual. Esto registra un encargo, no confirma una compra pagada.
+
 ## Cotización
 
 La entrada del cliente distingue **pieza/archivo existente** de **ayuda para
@@ -151,8 +168,9 @@ instantánea de la solicitud y la cotización aceptada; mientras no exista pago
 verificado, ese aviso no debe decir que el pedido está pagado ni que ya entró a
 producción. Una vez exista un pedido, los cambios reales de etapa pueden generar
 correos de avance al cliente. El aviso al taller y los correos de avance todavía
-no están implementados. Rechazo y solicitud de cambios desde la app siguen
-pendientes según C-P5.
+no están implementados. En C-P5, aprobación, rechazo y solicitud de cambios se
+registran en `/cuenta`; el soporte de Admin para tomar/revisar solicitudes en
+`CHANGES_REQUESTED` todavía requiere completar ese recorrido operativo.
 
 ## IA
 

@@ -192,6 +192,24 @@ La captura real de `/solicitud/archivo` en escritorio confirma Dark/Light y árb
 accesible; no se subieron archivos en navegador. Admin requiere reautenticación
 antes de sus capturas visuales y recorridos reales.
 
+### C-P5 — decisión de cotización por el cliente — 2026-10-04
+
+`customerQuoteActions.test.js` cubre rol, pertenencia, estado/versión, vigencia,
+motivo obligatorio y evento de actividad para aprobar, pedir cambios y rechazar.
+`customerQuotesPage.test.jsx` cubre desglose visible en `AWAITING_APPROVAL`,
+acciones de respuesta y ocultamiento de decisiones antes del envío de la oferta.
+No se guardó ni aprobó una cotización en el `db.json` de desarrollo.
+
+### C-P4 — encargo de catálogo desde el carrito — 2026-10-04
+
+`catalogOrderOperations.test.js` cubre permisos de sesión, validación de
+producto/variante, recálculo autoritativo (no confía en precio del cliente),
+snapshot en tablas embebida y normalizada, evento, visibilidad en el adaptador
+de Pedidos Admin e idempotencia. `cartCheckout.test.jsx` comprueba sesión,
+payload, limpieza solo tras éxito, navegación/acuse y conservación del carrito
+ante error; `cart.test.jsx` cubre `clear()`. No se creó ningún pedido en el
+`db.json` real.
+
 ### Verificación local C-P2/P3 — 2026-10-04
 
 `npm test`: 33 suites/187 tests; `npm run lint`; `npm run check:ui` (48 módulos);
@@ -200,6 +218,15 @@ mock/tools/workflows/assets); `npm run build:n8n` (23 nodos, tres agentes, cinco
 entradas); `npm run build` (161 módulos) y `git diff --check` pasan. Son checks
 locales: no equivalen a CI verde ni a pruebas live de Admin, n8n o subida en un
 navegador autenticado.
+
+### Verificación local C-P4/P5 — 2026-10-04
+
+En el árbol local combinado: Jest 37 suites/203 tests; `npm run lint`,
+`npm run check:ui` (48 módulos), `npm run check:automation` (255 comprobaciones),
+`npm run build` (162 módulos) y `git diff --check` pasan. Estas verificaciones
+no equivalen a CI verde. La revisión visual real de `/carrito` y `/cuenta` en
+una sesión customer ni el ciclo Admin para `CHANGES_REQUESTED` se han confirmado
+en navegador; no se alteró la base de desarrollo.
 
 ### R-H72 — regresiones de cotización y respuestas — 2026-10-03
 
