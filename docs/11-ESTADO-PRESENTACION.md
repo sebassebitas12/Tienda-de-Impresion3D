@@ -22,3 +22,12 @@ MVP académico con experiencia completa: React, JSON Server y n8n. Pagos simulad
 
 ## Avance
 45% fue la estimación inicial de preparación. No se incrementa hasta validar la conexión real y recalificar los recorridos en pantalla. No representa porcentaje de código ni garantiza que todos los flujos estén completos.
+
+
+## Cierre de sesión y propuestas pendientes
+- Trabajo guardado localmente en rama Pruebas. Commits: 1e086a9 (checkpoint y alcance), 7e0c2dd (CRUD IA confirmado y workflow DeepSeek). No se hizo push.
+- DeepSeek: credencial existente en n8n. Conexión real pendiente de iniciar sesión, asignar credenciales/importar workflow y configurar URLs. Gmail conservado.
+- Imagen a modelo 3D: propuesta del usuario registrada, sin implementar. Aclarar si se busca visualizar un modelo existente o generar geometría desde una imagen. Three.js sería la capa de visualización; la generación necesitaría un servicio/modelo separado. Evaluar calidad geométrica, escala, imprimibilidad, costo, latencia y tiempo de integración antes de incorporarlo al alcance. Prioridad actual: cerrar recorridos existentes para la presentación.
+- Herramientas realmente utilizadas: navegador MCP/CUA para revisión visual; Jest para pruebas; script HTTP de automatización aislada y ESLint. NO se utilizó Playwright CLI. No confundir comprobaciones simuladas con validación de DeepSeek/Gmail reales.
+- Servicios de revisión iniciados: app 127.0.0.1:5174, API 127.0.0.1:3217, base temporal. No dependen de que este documento garantice que sigan vivos después de cerrar la sesión; comprobar procesos al retomar. Entorno original 5173/3000 preservado.
+- Al retomar: leer este estado y roadmap; revisar git status; comprobar app/API y sesión Admin; conectar n8n; cerrar cotización cliente+IA y revisión Admin; recorrer compra/pago/seguimiento; auditoría visual y ensayo de 15 minutos.
