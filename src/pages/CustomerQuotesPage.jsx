@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.js';
 import { usePreferences } from '../hooks/usePreferences.js';
 import { automationAction, automationError } from '../services/automationService.js';
@@ -12,9 +12,11 @@ export function CustomerQuotesPage() {
   const { user, token } = useAuth();
   const { language } = usePreferences();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const es = language === 'es';
   const confirmation = location.state?.orderConfirmation;
-  const [tab, setTab] = useState(confirmation ? 'orders' : 'quotes');
+  const requestedTab = searchParams.get('tab');
+  const [tab, setTab] = useState(confirmation || requestedTab === 'orders' ? 'orders' : requestedTab === 'profile' ? 'profile' : 'quotes');
   const [version, setVersion] = useState(0);
   const [state, setState] = useState({ requests: [], loading: true, error: '' });
   const [ordersState, setOrdersState] = useState({ orders: [], loading: true, error: '' });
@@ -24,6 +26,18 @@ export function CustomerQuotesPage() {
   const [proofSubmitting, setProofSubmitting] = useState(null);
   const [proofError, setProofError] = useState('');
   const [proofSuccess, setProofSuccess] = useState('');
+
+  useEffect(() => {
+    if (requestedTab === 'orders' || requestedTab === 'profile' || requestedTab === 'quotes') setTab(requestedTab);
+    else if (confirmation) setTab('orders');
+  }, [confirmation, requestedTab]);
+
+  function selectTab(nextTab) {
+    setTab(nextTab);
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', nextTab);
+    setSearchParams(next, { replace: true });
+  }
 
   useEffect(() => {
     if (user?.role !== 'customer') return;
@@ -129,8 +143,8 @@ export function CustomerQuotesPage() {
   return <section className="quote-page">
     <header>
       <span className="quote-eyebrow">{es ? 'Mi espacio' : 'My workspace'}</span>
-      <h1>{es ? 'Tu cuenta, tus piezas.' : 'Your account, your parts.'}</h1>
-      <p>{user.name} · {es ? 'Gestión de cotizaciones, pedidos de catálogo y seguimiento de producción.' : 'Quote management, catalog orders and production tracking.'}</p>
+      <h1>{user.role === 'admin' ? (es ? 'Tu espacio de taller.' : 'Your workshop workspace.') : es ? 'Tu cuenta, tus piezas.' : 'Your account, your parts.'}</h1>
+      <p>{user.name} · {user.role === 'admin' ? (es ? 'El seguimiento de solicitudes y pedidos del taller vive en Administración.' : 'Workshop requests and order management live in Administration.') : es ? 'Gestión de cotizaciones, pedidos de catálogo y seguimiento de producción.' : 'Quote management, catalog orders and production tracking.'}</p>
     </header>
 
     {confirmation && (
@@ -140,7 +154,12 @@ export function CustomerQuotesPage() {
     )}
 
     {user.role === 'admin' ? (
-      <Link to="/admin">{es ? 'Abrir administración' : 'Open administration'}</Link>
+      <section className="customer-admin-handoff" aria-labelledby="customer-admin-handoff-title">
+        <span className="quote-eyebrow">{es ? 'ACCESO DE TALLER' : 'WORKSHOP ACCESS'}</span>
+        <h2 id="customer-admin-handoff-title">{es ? 'Continuá el trabajo desde el panel operativo.' : 'Continue work in the operations dashboard.'}</h2>
+        <p>{es ? 'Esta vista es para pedidos y cotizaciones de clientes. En Administración encontrás solicitudes, catálogo, clientes y actividad.' : 'This space is for customer orders and quotes. Administration contains requests, catalog, customers and activity.'}</p>
+        <div><Link className="v-button v-button--primary v-button--pill" to="/admin">{es ? 'Abrir Administración' : 'Open administration'} ↗</Link><Link className="v-link-text" to="/catalogo">{es ? 'Volver a la tienda' : 'Return to the store'} ↗</Link></div>
+      </section>
     ) : (
       <>
         <nav className="customer-tabs" role="tablist" aria-label={es ? 'Secciones de la cuenta' : 'Account sections'}>
@@ -151,7 +170,7 @@ export function CustomerQuotesPage() {
             aria-controls="panel-quotes"
             aria-selected={tab === 'quotes'}
             className={`customer-tab-btn ${tab === 'quotes' ? 'is-active' : ''}`}
-            onClick={() => setTab('quotes')}
+            onClick={() => selectTab('quotes')}
           >
             {es ? 'Mis cotizaciones' : 'My quotes'} {state.requests.length > 0 && <span className="customer-tab-count">{state.requests.length}</span>}
           </button>
@@ -162,7 +181,7 @@ export function CustomerQuotesPage() {
             aria-controls="panel-orders"
             aria-selected={tab === 'orders'}
             className={`customer-tab-btn ${tab === 'orders' ? 'is-active' : ''}`}
-            onClick={() => setTab('orders')}
+            onClick={() => selectTab('orders')}
           >
             {es ? 'Mis pedidos' : 'My orders'} {ordersState.orders.length > 0 && <span className="customer-tab-count">{ordersState.orders.length}</span>}
           </button>
@@ -173,7 +192,7 @@ export function CustomerQuotesPage() {
             aria-controls="panel-profile"
             aria-selected={tab === 'profile'}
             className={`customer-tab-btn ${tab === 'profile' ? 'is-active' : ''}`}
-            onClick={() => setTab('profile')}
+            onClick={() => selectTab('profile')}
           >
             {es ? 'Mi perfil' : 'My profile'}
           </button>
@@ -368,6 +387,10 @@ export function CustomerQuotesPage() {
                     <StepperBar steps={orderSteps} current={orderStepIndex(order.status)} label={es ? 'Progreso de taller' : 'Workshop progress'} />
                   </div>}
 
+                  <Link className="v-link-text customer-order-detail-link" to={`/pedidos/${encodeURIComponent(order.id)}`}>
+                    {es ? 'Ver detalle del pedido' : 'View order details'} <span aria-hidden="true">↗</span>
+                  </Link>
+
                   {order.paymentStatus === 'PAID' ? (
                     <div className="customer-order-paid-box">
                       <div className="customer-order-proof-badge">
@@ -495,6 +518,7 @@ export function CustomerQuotesPage() {
           <div id="panel-profile" role="tabpanel" aria-labelledby="tab-profile">
             <div className="customer-profile-card">
               <h3>{es ? 'Datos de tu cuenta' : 'Your account details'}</h3>
+              <p className="customer-profile-note" role="note">{es ? 'Esta versión académica solo permite consultar estos datos. La edición de perfil y contraseña todavía no está conectada.' : 'This academic version is read-only. Profile and password editing are not connected yet.'}</p>
               <dl className="customer-profile-dl">
                 <div><dt>{es ? 'Nombre completo' : 'Full name'}</dt><dd>{user.name}</dd></div>
                 <div><dt>{es ? 'Correo electrónico' : 'Email address'}</dt><dd>{user.email}</dd></div>

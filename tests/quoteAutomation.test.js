@@ -237,6 +237,15 @@ describe('correo confirmado e idempotente', () => {
     const replay = await deliverQuote({ data: db, requestId: 'q1', expectedVersion: 1, actor, persist, fetchImpl, env });
     expect(replay.body.replay).toBe(true); expect(calls).toBe(1);
   });
+  test('rechaza el destinatario de prueba antes de contactar el proveedor', async () => {
+    const db = fixture(); const fetchImpl = jest.fn();
+    const result = await deliverQuote({ data: db, requestId: 'q1', expectedVersion: 1, actor, persist: async () => {}, env,
+      testRecipient: 'attacker@example.com',
+      fetchImpl,
+    });
+    expect(result).toEqual({ status: 400, body: { code: 'TEST_EMAIL_UNSUPPORTED' } });
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
   test('un 200 vacío o timeout no equivale a correo enviado ni permite duplicarlo', async () => {
     let db = fixture(); const persist = async value => { db = value; };
     const result = await deliverQuote({ data: db, requestId: 'q1', expectedVersion: 1, actor, persist, env, fetchImpl: async () => ({ ok: true, json: async () => ({}) }) });

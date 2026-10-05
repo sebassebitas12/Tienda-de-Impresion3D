@@ -5,7 +5,28 @@ controles/precios. Cuenta móvil conserva las tres pestañas visibles, etapas
 en rejilla 2 columnas (3 en anchos mayores) y campos sin mínimo que exceda su
 contenedor. Se mantienen tokens existentes; ver evidencia R-H78 en docs/05.
 
-> Última actualización: **2026-10-04**.
+> Última actualización: **2026-10-05**.
+
+## Contraste Light en flujos operativos — R-H85
+
+Se oscureció `--dim` de Light a `#6b6259`: contraste calculado 5.26:1 sobre
+`--ink` (`#f4f0e9`) y 4.77:1 sobre `--panel` (`#ebe5dc`). En esas superficies,
+`--muted` (`#625a52`) da 5.96:1 y 5.40:1; Lava `#b83900`, verde `#176b3a`,
+warning `#795000` y error `#b42318` dan 4.63:1, 5.24:1, 5.67:1 y 5.25:1
+respectivamente sobre `--panel`. El borde fuerte da 3.53:1 como componente UI.
+El warning de pago y la confirmación manual usan esos tokens; los botones de
+acción de pedido mantienen al menos 44 px de alto y la ficha de pedido permite
+quiebre de referencias y columnas apiladas en móvil.
+
+Son cálculos de colores planos/tokens, no certificación de cada mezcla,
+superposición o pantalla. La captura real de Admin Solicitudes fue de escritorio
+en Light; 375/768 y navegación completa con tecnología asistiva continúan sin
+verificación visual en navegador y no se declaran aprobados.
+
+La ficha de solicitud ya no intercala un formulario de «correo de prueba» entre
+la cotización y su seguimiento. El recorrido conserva una acción de envío
+orientada al cliente y el taller, reduciendo una bifurcación operativa que no
+pertenece a la experiencia final.
 
 ## Selección de fotografías y densidad Admin — 2026-10-03
 
@@ -1043,7 +1064,12 @@ El usuario informó que al instructor le costaba leer los textos pequeños por d
 
 Cambio aplicado a `src/styles/shell.css`: navbar 14 px escritorio / 13 px tablet; CTA 13/12 px; footer cuerpo y enlaces 14 px, títulos y metadata 12 px; idioma 12 px; enlaces de footer con altura mínima 24 px. Los tamaños escalan con `--a11y-font-scale`. Se sustituyó el estado hover naranja de texto por texto de superficie más subrayado Lava para mantener legibilidad del enlace en ambos temas. Esto corrige valores de CSS detectados; requiere completar inspección visual en 768/375 px, Light y escalas 150/200%, y prueba con tecnología asistiva.
 
-Contraste calculado para texto sobre `--ink`: `--dim` da aproximadamente 2.92:1 Dark / 3.02:1 Light y no debe usarse en texto pequeño esencial; `--muted` da 6.20:1 Dark / 4.97:1 Light. Valores de tokens base, no auditoría de cada superficie/overlay ni certificación general. Reservar `--dim` para decoración o metadata prescindible; preferir `--muted` o `--paper` para copy que el cliente necesite leer.
+Contraste base recalculado para texto: Dark `--dim` da 2.92:1 sobre `--ink`
+(`#0d0c0a`) y 2.62:1 sobre `--panel` (`#1b1915`), por lo que se reserva a
+decoración/metadata prescindible; `--muted` da 6.20:1 sobre `--ink`. Light
+`--dim` da 5.26:1 sobre `--ink` y 4.77:1 sobre `--panel`; `--muted` da 5.96:1
+y 5.40:1. Estos ratios de tokens no auditan overlays ni certifican la UI
+completa. Preferir `--muted` o `--paper` para copy esencial en Dark.
 
 ### Geometría Admin — corrección R-H54 (2026-10-01)
 

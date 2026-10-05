@@ -1,5 +1,21 @@
 # Vértice CR — Testing y calidad
 
+## R-H85 — Rutas informativas, pedido propio y teclado Admin — 2026-10-05
+
+`customerInformationAndOrderDetail` cubre contenido bilingüe de páginas
+informativas, detalle a partir del servicio `/orders/mine`, aislamiento de
+pedido ajeno, loading/error/reintento y enlace de regreso. `orderActionsKeyboard`
+comprueba que Escape cancele transiciones/rechazo de comprobante y devuelva el
+foco, además de requerir confirmación manual antes del endpoint Admin.
+`navbarAccountMenu` comprueba que el visitante identifique Mi espacio y encuentre
+login/registro. Los fixtures son de prueba y no modifican `db.json`.
+
+La regresión de correo verifica que un `testRecipient` legado se rechace antes
+de contactar al proveedor. La suite completa local queda en 48 suites / 304
+tests; lint, `check:ui` (48 módulos), `check:automation` (261 comprobaciones),
+build y `git diff --check`
+pasan. CI remoto todavía depende del push del commit final.
+
 ## Comprobante SINPE por pedido — 2026-10-04
 
 orderPaymentWorkflow prueba handlers cliente/Admin registrados: reporte y auditoría,

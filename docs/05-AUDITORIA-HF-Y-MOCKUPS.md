@@ -1,5 +1,62 @@
 # Vértice CR — Auditoría HF y mockups
 
+## R-H85 — Cierre de rutas del cliente y revisión Light Admin (2026-10-05)
+
+Se implementaron las seis páginas informativas que estaban vacías (FAQ,
+Materiales, Requisitos, Términos, Privacidad y Envíos) en ES/EN, con contenido
+respaldado por las reglas del prototipo, límites explícitos y enlaces a acciones
+que sí existen. Checkout heredado ya no termina en ConstructionPage: los
+productos vuelven al carrito protegido y la solicitud lleva a cotizaciones.
+`/pedidos/:id` ahora presenta detalle, piezas, importes, avance y estado de pago
+sin exponer otras cuentas: el guard es customer-only y la lectura consume
+`orders/mine`. Admin en `/cuenta` recibe un handoff a su panel; el perfil explica
+por qué sigue en modo de consulta.
+
+La auditoría de recorrido aportada por Claude se contrastó con el estado actual
+del repo antes de actuar: sus hallazgos de páginas informativas vacías, checkout
+huérfano y detalle `/pedidos/:id` describían un estado anterior y ya están
+resueltos. No se incorporan pasarelas Stripe/PayPal simuladas porque podrían
+mostrar un cobro inexistente. Sí se retiró de la ficha Admin la pantalla
+«Probar correo conmigo» y el backend dejó de aceptar el desvío a una dirección
+arbitraria: ahora rechaza el payload legado antes de contactar al proveedor. Se
+conserva el flujo de oferta al correo registrado del cliente y la copia
+configurada del taller.
+
+El hallazgo de login poco visible se resolvió semánticamente: el control de
+navbar ahora se anuncia como «Mi espacio» y una prueba confirma que abre
+«Iniciar sesión» y «Crear cuenta». Se preservó el CTA único de Cotizar, sin
+agregar otro botón competidor al header.
+
+Se rechazó explícitamente simular Stripe/PayPal o acreditar `PAID` desde una
+pantalla ficticia. La guía vigente prohíbe representar cobros reales sin
+proveedor; el SINPE de ejemplo no recibe fondos y se advierte no transferir.
+La confirmación de Admin muestra una revisión humana y segunda acción antes de
+registrar el resultado; Escape cancela y restaura foco. Esto no automatiza ni
+consulta un banco.
+
+**Evidencia visual:** captura del recorrido de Solicitudes Admin en Light a
+escritorio; árbol accesible de Catálogo confirmó filtros y acceso al cotizador
+DEMO; capturas anteriores del turno de Copiloto en ambos temas y de Pedidos
+Light se conservan como evidencia visual de escritorio. El CSS responsive existe
+para Admin Orders/Requests, Copiloto y Cuenta (breakpoints 760/560/480/430 px),
+pero este entorno no permitió fijar un viewport de 375/768 para capturarlo. No se
+afirma verificación visual móvil, teclado completo ni tecnología asistiva real.
+Catálogo Light y cada ficha de solicitud también quedan pendientes de captura
+dedicada. No se cambió el catálogo, ni se enviaron correos, mutaron pedidos o
+comprobantes, ni se alteró `db.json`.
+
+En la sesión Admin local se inspeccionó `/admin/solicitudes/r5`: la acción
+comercial permanece separada y deshabilitada porque el registro de ejemplo usa
+correos `example`; ya no aparece el panel para direccionar un correo de prueba.
+No se intentó el envío. La captura de esta ficha agotó el tiempo del navegador,
+por lo que esta comprobación es de árbol accesible, no evidencia visual nueva.
+
+**Gates locales:** Jest 48 suites / 304 pruebas, lint, `check:ui` (48 módulos),
+`check:automation` (261 comprobaciones), build (entrada principal 291.16 kB,
+gzip 92.45 kB; sin advertencia de chunk >500 kB) y `git diff --check` pasan en
+este árbol. **CI remoto `verify.yml`: pendiente** después del push. Estos gates
+no reemplazan capturas a 375/768 ni teclado/tecnología asistiva real.
+
 ## R-H84 — Auditoría de Admin por pestaña (2026-10-05)
 
 Recorrido capturado en Brave, escritorio, tema Dark y sesión de Administración:

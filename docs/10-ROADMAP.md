@@ -1,5 +1,19 @@
 # Vértice CR — Roadmap
 
+## R-H85 — Cierre de experiencia y gates (2026-10-05)
+
+Las rutas informativas, legacy checkout, detalle de pedido propio, handoff de
+Admin en Cuenta y recuperación de foco en decisiones de pedido quedaron
+implementados con regresiones automatizadas. Se preserva el alcance académico:
+sin pasarela de pago simulada ni declaración de cobro real. Estado visual:
+Admin Pedidos/Solicitudes/Copiloto tienen evidencia de escritorio en ambos temas
+o Light; responsive 375/768 y teclado/AT de extremo a extremo requieren un
+browser con viewport emulado. Se retiró la prueba de correo arbitraria del
+producto Admin; el envío comercial conserva cliente registrado + copia del
+taller. Gates locales: 48 suites/304 tests, lint, check:ui, check:automation
+(261), build y diff-check verdes. `db.json` local queda fuera del commit. Gate
+final: push a `Pruebas` y CI remoto `verify.yml` verde.
+
 ## Gate de experiencia final — R-H74 (2026-10-04)
 
 La auditoría de docs/05 confirma cortes de continuidad y discrepancias de estados

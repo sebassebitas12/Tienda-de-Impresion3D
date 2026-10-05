@@ -7,24 +7,23 @@
 
 ## Estado vigente para continuar (2026-10-05)
 
-- R-H84 Admin: recorrido autenticado escritorio Dark por Resumen, Pedidos,
-  Solicitudes, Catálogo, Categorías, Clientes, Actividad y Copiloto. Se hizo
-  explícita la confirmación de guardado/transición para cotización DEMO; se
-  aclaró que usa parámetros académicos simulados. Catálogo mantiene filtros
-  DRAFT/INACTIVE con cero conteo y guía a crear el primer borrador; ordinales
-  decorativos se retiraron de Solicitudes, Clientes y Copiloto. Tests nuevos.
-  Capturas posteriores de Catálogo, Solicitudes, Clientes y Copiloto Dark desktop;
-  filtro DRAFT vacío y campo del Copiloto visible al entrar comprobados. Light,
-  375/768, teclado y AT siguen pendientes. No se mutaron solicitudes/pedidos/
-  pagos ni correos. 45 suites/293 tests, lint, check:ui, build y
-  check:automation (258) pasan localmente; bundle JS 638.57 kB (>500 kB aviso).
-  Detalle/evidencia en docs/08 R-H84 y docs/05 R-H84.
-- Push pedido por usuario: conservar la base local existente (6 commits sin
-  push más cambios de trabajo ya presentes) y preparar el primer envío coherente
-  tras ejecutar gates. `db.json` contiene cambios locales/datos persistentes y
-  debe permanecer fuera del stage; nunca restaurarlo ni incluir `.env`. Auditar
-  exactamente los paths antes del commit. CI `verify.yml` debe quedar verde
-  antes de pedir pull; no afirmar visualización responsive completa.
+- R-H85: se implementaron FAQ, Materiales, Requisitos, Términos, Privacidad y
+  Envíos bilingües; checkout legacy redirige a flujos útiles; detalle de pedido
+  es customer-only y lee órdenes propias. Admin en `/cuenta` recibe handoff; el
+  perfil indica que aún es de consulta. No se agrega pago ficticio: la política
+  académica prohíbe acreditar `PAID` sin proveedor verificable. «Mi espacio» es
+  ahora identificable para lector de pantalla y ofrece login/registro. La
+  confirmación SINPE Admin aclara verificación manual, 44px de botones y Escape
+  con retorno de foco. Light `--dim` cumple 4.77:1 sobre panel; cálculo completo
+  en docs/04. Solicitudes Light capturada a escritorio; no se mutaron órdenes ni
+  pagos. Se quitó de Admin la pantalla de correo de prueba y el backend ya no
+  permite desviar el envío a un destinatario arbitrario; el correo comercial
+  conserva como destino al cliente registrado y al taller. Gates locales: 48
+  suites/304 tests, lint, check:ui, check:automation (261), build y diff-check
+  verdes; entrada principal 291.16 kB (gzip 92.45 kB), sin warning de chunk grande. Responsive
+  visual 375/768, Catálogo Light y teclado/AT integral siguen sin evidencia. El
+  `db.json` manual permanece sin tocar ni stage. Tras commit/push, verificar CI
+  `verify.yml` remoto antes de afirmar listo para pull.
 
 - R-H81: carrito simplificado; cuenta presenta piezas antes de pago y separa
   verificación de producción. Referencia de nombre actual para órdenes heredadas

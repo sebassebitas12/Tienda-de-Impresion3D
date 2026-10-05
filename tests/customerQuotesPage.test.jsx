@@ -17,8 +17,8 @@ const offer = {
   quotePricing: { mode: 'DEMO', breakdown: { materialCrc: 2000, wearCrc: 200, electricityCrc: 300, postProcessCrc: 500, designCrc: 0, otherCostsCrc: 0, costSubtotalCrc: 3000, markupPercent: 50, amountCrc: 4500 } },
 };
 
-function setup(request = offer, entry = '/cuenta') {
-  useAuth.mockReturnValue({ user: { id: 'c1', name: 'Ana', role: 'customer' }, token: 'sim-token' });
+function setup(request = offer, entry = '/cuenta', user = { id: 'c1', name: 'Ana', role: 'customer' }) {
+  useAuth.mockReturnValue({ user, token: 'sim-token' });
   usePreferences.mockReturnValue({ language: 'es' });
   automationAction.mockResolvedValue({ requests: request ? [request] : [] });
   return render(<MemoryRouter initialEntries={[entry]}><CustomerQuotesPage /></MemoryRouter>);
@@ -61,5 +61,14 @@ describe('vista de cotizaciones del cliente', () => {
     setup(null, { pathname: '/cuenta', state: { orderConfirmation: { id: 'ord-44', subtotalCrc: 5000 } } });
     expect(await screen.findByText(/Encargo ord-44 recibido/)).toBeInTheDocument();
     expect(screen.getByText(/no se ha cobrado/)).toBeInTheDocument();
+  });
+
+  it('orienta al administrador a su panel en vez de dejar un enlace suelto en /cuenta', async () => {
+    setup(null, '/cuenta', { id: 'a1', name: 'Sebastián', role: 'admin' });
+    expect(await screen.findByRole('heading', { name: /tu espacio de taller/i })).toBeInTheDocument();
+    expect(screen.getByText(/solicitudes, catálogo, clientes y actividad/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /abrir administración/i })).toHaveAttribute('href', '/admin');
+    expect(screen.getByRole('link', { name: /volver a la tienda/i })).toHaveAttribute('href', '/catalogo');
+    expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
   });
 });

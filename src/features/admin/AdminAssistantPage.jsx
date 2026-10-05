@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
 import { automationAction, automationError } from '../../services/automationService.js';
 import { AssistantFormattedText } from '../chatbot/AssistantFormattedText.jsx';
+import './admin.css';
 import './admin-assistant.css';
 
 const prompts = {

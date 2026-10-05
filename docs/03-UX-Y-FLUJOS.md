@@ -1,5 +1,37 @@
 # Vértice CR — UX, navegación y estados
 
+## R-H85 — Recorridos visitante/cliente/Admin (2026-10-05)
+
+Las rutas FAQ, Materiales, Requisitos, Términos, Privacidad y Envíos tienen
+contenido ES/EN con límites académicos y acciones hacia flujos reales. Las rutas
+heredadas `/checkout/productos` y `/checkout/solicitud` redirigen al carrito y a
+las cotizaciones de cuenta, respectivamente; no exponen checkout vacío. El
+detalle `/pedidos/:id` requiere rol `customer` y lee `/orders/mine`, por lo que
+solo presenta pedidos que devuelve el servicio del usuario. Admin que abre
+`/cuenta` recibe una derivación clara a Administración; Perfil se declara de
+consulta, no de edición.
+
+No se agrega Stripe/PayPal simulado: marcar `PAID` sin proveedor de pago real
+contradiría el contrato académico y podría presentar una transacción falsa. El
+SINPE de ejemplo tampoco es destino de pago; la UI lo advierte. Una pasarela
+queda para cuando exista integración sandbox/real con resultado verificable.
+El acceso de visitante queda en el control «Mi espacio» del navbar; su nombre
+accesible ahora anuncia el destino y el panel ofrece Iniciar sesión/Crear cuenta.
+No se duplica un CTA de login que compita con Cotizar en el header.
+
+La confirmación administrativa del comprobante ahora explica que la revisión es
+manual y no consulta el banco, espera una segunda acción explícita y devuelve el
+foco al disparador al cancelar con Escape. La ficha individual del pedido y la
+confirmación están cubiertas por pruebas; no se mutaron pedidos ni comprobantes.
+
+La ficha Admin ya no ofrece «Probar correo conmigo»: el endpoint acepta solo el
+envío de una cotización vigente al correo de la cuenta cliente, con copia al
+taller. Si un cliente legado envía `testRecipient`, la API responde
+`TEST_EMAIL_UNSUPPORTED` antes de contactar al proveedor; así no puede desviar
+ni disparar accidentalmente una cotización al cliente real. La vista de
+Actividad conserva el nombre de eventos históricos de prueba, si existieran;
+no crea nuevos eventos de ese tipo.
+
 R-H83: Contacto deriva a rutas ejecutables según pieza/idea/seguimiento; la
 redacción evita insinuar un equipo grande y asigna al admin su propia acción.
 
@@ -35,9 +67,10 @@ del monto final antes de habilitar cobro real. No hay pasarela bancaria conectad
 
 /, /catalogo, /producto/:id, /solicitud, /solicitud/archivo, /solicitud/ayuda-diseno, /checkout/productos, /checkout/solicitud, /registro, /nosotros, /contacto.
 
-`/carrito` requiere una sesión con rol `customer`; `/cuenta` y `/pedidos/:id`
-requieren sesión autenticada. Admin y visitantes no pueden abrir el carrito;
-el guard envía al visitante a login con el destino preservado.
+`/carrito` y `/pedidos/:id` requieren una sesión con rol `customer`; `/cuenta`
+requiere sesión autenticada y también puede orientar a Admin hacia su panel.
+Admin y visitantes no pueden abrir carrito ni detalle de pedido; el guard envía
+al visitante a login con el destino preservado.
 
 ## Rutas administrativas
 

@@ -129,7 +129,7 @@ export function Navbar({ onReading }) {
           <IconButton
             ref={menuTrigger}
             className="hamburger"
-            label={panel === 'menu' ? copy.close : copy.openMenu}
+            label={panel === 'menu' ? copy.close : copy.space}
             aria-expanded={panel === 'menu'}
             aria-controls="account-menu-panel"
             onClick={() => toggle('menu')}

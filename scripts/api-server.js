@@ -192,10 +192,11 @@ registerAction('/admin/actions/send-quote-email', async (req, res) => {
   const actor = sessionActor(req.headers.authorization, db.data);
   if (actor?.role !== 'admin') return res.status(403).json({ code: 'ADMIN_REQUIRED' });
   if (typeof payload.requestId !== 'string' || payload.expectedStatus !== 'QUOTED' || !Number.isSafeInteger(payload.expectedVersion)) return res.status(400).json({ code: 'INVALID_ACTION' });
+  if (Object.hasOwn(payload, 'testRecipient')) return res.status(400).json({ code: 'TEST_EMAIL_UNSUPPORTED' });
   try {
     const result = await serializeReviewAction(() => deliverQuote({
       data: db.data, requestId: payload.requestId, actor, expectedVersion: payload.expectedVersion,
-      testRecipient: payload.testRecipient, persist: persistData,
+      persist: persistData,
     }));
     return res.status(result.status).json(result.body);
   } catch { return res.status(500).json({ code: 'ACTION_PERSISTENCE_FAILED' }); }

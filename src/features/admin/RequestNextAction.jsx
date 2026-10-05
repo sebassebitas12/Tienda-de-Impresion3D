@@ -6,7 +6,6 @@ import { formatCRC } from '../../utils/money.js';
 import { isDeliverableEmail } from '../../utils/emailAddress.js';
 import { AutomaticQuote } from './AutomaticQuote.jsx';
 import { useAuth } from '../../hooks/useAuth.js';
-import { QuoteEmailTest } from './QuoteEmailTest.jsx';
 import { QuoteFulfillment } from './QuoteFulfillment.jsx';
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -168,7 +167,6 @@ export function RequestNextAction({ request, user, language, onSaved }) {
       </details>
       <p className="admin-quote-formula">{es ? 'Fórmula: gramos × (precio + desgaste) USD/kg × cambio + horas × potencia media (kW) × tarifa eléctrica + postprocesado + diseño + otros costos; luego recargo explícito. Valores guardados como una instantánea del cálculo.' : 'Formula: grams × (filament + wear) USD/kg × exchange rate + print hours × average power (kW) × electricity tariff + post-processing + design + other costs; then explicit markup. Inputs are saved as a calculation snapshot.'}</p>
     </form>}
-    <QuoteEmailTest request={request} onSaved={onSaved} language={language} />
     <QuoteFulfillment request={request} onSaved={onSaved} language={language} />
     {request.status === 'AWAITING_APPROVAL' && <p>{request.quoteEmailSentAt
       ? (es ? `Correo enviado a ${request.quoteEmailSentTo || 'cliente'} con copia a ${request.quoteEmailCopiedTo || 'taller'}. Ahora corresponde al cliente aprobar la cotización; no la apruebes en su nombre.` : `Email sent to ${request.quoteEmailSentTo || 'customer'} with a copy to ${request.quoteEmailCopiedTo || 'workshop'}. The customer must now approve the quote; do not approve it on their behalf.`)

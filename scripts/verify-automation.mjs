@@ -109,6 +109,8 @@ try {
   assert.equal('data' in afterIntake.customPrintRequests[0].attachments[0], false); assertions += 3;
   const priced = await post('/admin/actions/auto-quote', { requestId: intake.request.id, expectedStatus: 'PENDING_QUOTE', expectedVersion: 0, profileId: 'organizador' }, 'admin-test');
   assert.equal(priced.request.status, 'QUOTED'); assert.equal(priced.request.quotePricing.mode, 'DEMO'); assert.equal(mails, 0); assertions += 3;
+  const rejectedTestEmail = await post('/admin/actions/send-quote-email', { requestId: intake.request.id, expectedStatus: 'QUOTED', expectedVersion: 1, testRecipient: 'qa-recipient@example.net' }, 'admin-test', 400);
+  assert.equal(rejectedTestEmail.code, 'TEST_EMAIL_UNSUPPORTED'); assert.equal(mails, 0); assertions += 2;
   const created = await post('/admin/actions/send-quote-email', { requestId: intake.request.id, expectedStatus: 'QUOTED', expectedVersion: 1 }, 'admin-test');
   assert.equal(created.request.status, 'AWAITING_APPROVAL'); assert.equal(created.messageId, 'mock-gmail-1'); assert.equal(mails, 1); assertions += 3;
   const duplicate = await post('/admin/actions/send-quote-email', { requestId: intake.request.id, expectedStatus: 'QUOTED', expectedVersion: 1 }, 'admin-test'); assert.equal(duplicate.replay, true); assert.equal(mails, 1); assertions += 2;

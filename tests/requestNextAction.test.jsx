@@ -68,6 +68,7 @@ describe('paso de envío de cotización', () => {
     renderAction();
     expect(screen.getByText(/Para: cliente@vertice.cr/)).toBeInTheDocument();
     expect(screen.getByText(/Copia oculta: taller@vertice.cr/)).toBeInTheDocument();
+    expect(screen.queryByText(/Probar correo conmigo/)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Enviar al cliente y copiarme' }));
     await waitFor(() => expect(sendQuoteEmail).toHaveBeenCalledWith({ requestId: 'r2', actorId: 'u1', expectedVersion: 2 }, { token: undefined }));
     expect(await screen.findByText(/Correo enviado al cliente con copia oculta/)).toHaveAttribute('role', 'status');

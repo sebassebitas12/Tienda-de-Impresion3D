@@ -48,6 +48,7 @@ describe('pestaña de pedidos de cliente en /cuenta', () => {
 
     expect(await screen.findByText('Brazo Robótico')).toBeInTheDocument();
     expect(screen.getByText('ord-test-999')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Ver detalle del pedido/i })).toHaveAttribute('href', '/pedidos/ord-test-999');
     expect(screen.getByText('Reporte de pago · demostración académica')).toBeInTheDocument();
     expect(screen.getByText(/8888-8888 es de ejemplo: no transfirás dinero/)).toBeInTheDocument();
     expect(screen.getByText('Brazo Robótico').compareDocumentPosition(screen.getByRole('button', { name: /Notificar comprobante/ })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();

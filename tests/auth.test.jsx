@@ -113,8 +113,11 @@ describe('Navbar account session actions', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Abrir menú de cuenta' })).toBeVisible());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Mi Espacio' })).toBeVisible());
     expect(screen.queryByRole('link', { name: /^Carrito/u })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Mi Espacio' }));
+    expect(screen.getByRole('link', { name: 'Iniciar sesión' })).toHaveAttribute('href', '/login');
+    expect(screen.getByRole('link', { name: 'Crear cuenta' })).toHaveAttribute('href', '/registro');
     unmount();
 
     render(
@@ -142,7 +145,7 @@ describe('Navbar account session actions', () => {
       </MemoryRouter>
     );
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Abrir menú de cuenta' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Mi Espacio' }));
     const accountLink = await screen.findByRole('link', { name: 'Panel de administración' });
     expect(accountLink).toHaveAttribute('href', '/admin');
     expect(screen.queryByRole('link', { name: /^Carrito/u })).not.toBeInTheDocument();
@@ -165,7 +168,7 @@ describe('Navbar account session actions', () => {
       </MemoryRouter>
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Abrir menú de cuenta' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Mi Espacio' }));
     expect(await screen.findByText('Cliente')).toBeVisible();
     await userEvent.click(screen.getByRole('button', { name: 'Cerrar sesión' }));
 
@@ -190,7 +193,7 @@ describe('Navbar account session actions', () => {
       </MemoryRouter>
     );
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Abrir menú de cuenta' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Mi Espacio' }));
     expect(await screen.findByText('Sesión guardada · sin verificar')).toBeVisible();
     await userEvent.click(screen.getByRole('button', { name: 'Cerrar sesión' }));
 
