@@ -8,6 +8,8 @@ import { createApp } from 'json-server/lib/app.js';
 import { json as parseJson } from 'milliparsec';
 import { prepareRequestAction } from './request-actions.js';
 import { installAutomationOperations } from './automation-operations.js';
+import { installCustomerQuoteOperations } from './customer-quote-operations.js';
+import { installCatalogOrderOperations } from './catalog-order-operations.js';
 import { deliverQuote } from './quote-email.js';
 import { sessionActor } from './session-access.js';
 import { multipartBufferMiddleware } from './multipart-form.js';
@@ -200,6 +202,8 @@ const port = Number(process.env.PORT || 3000);
 installAutomationOperations({ registerAction, db, serialize: serializeReviewAction,
   persist: persistData,
 });
+installCustomerQuoteOperations({ registerAction, db, serialize: serializeReviewAction, persist: persistData });
+installCatalogOrderOperations({ registerAction, db, serialize: serializeReviewAction, persist: persistData });
 const host = process.env.HOST || 'localhost';
 app.listen(port, host, () => {
   console.log(`JSON Server + operaciones Vértice en http://${host}:${port}`);

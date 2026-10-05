@@ -6,6 +6,7 @@ import { sessionActor } from './session-access.js';
 import { executeAssistantToolCapability, runAssistant } from './assistant-runtime.js';
 import { createRatesProvider } from './quote-rates.js';
 import { prepareQuoteFulfillment } from './quote-fulfillment.js';
+import { prepareCustomerQuoteDecision } from './customer-quote-operations.js';
 import { parseMultipartForm } from './multipart-form.js';
 import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -194,20 +195,25 @@ export function installAutomationOperations({ registerAction, db, serialize, per
     if (actor?.role !== 'customer') return failure(res, 'CUSTOMER_REQUIRED', 403);
     try {
       const result = await serialize(async () => {
-        const index = db.data.customPrintRequests.findIndex(r => r.id === req.body?.requestId && r.userId === actor.id);
+        const index = db.data.customPrintRequests.findIndex(r => String(r.id) === String(req.body?.requestId) && String(r.userId) === String(actor.id));
         if (index < 0) return { error: 'REQUEST_NOT_FOUND' };
         const request = db.data.customPrintRequests[index];
-        if (!['QUOTED', 'AWAITING_APPROVAL'].includes(request.status) || (request.quoteVersion || 0) !== req.body.expectedVersion) return { error: 'STATUS_CONFLICT' };
-        if (!(Date.parse(request.quoteValidUntil) > Date.now())) return { error: 'QUOTE_EXPIRED' };
         const now = new Date().toISOString();
-        const updated = { ...request, status: 'APPROVED', approvedAt: now, approvedBy: actor.id, updatedAt: now };
+        const action = prepareCustomerQuoteDecision(request, actor, { ...req.body, decision: 'APPROVED' }, now);
+        if (action.error) return action;
         const next = structuredClone(db.data);
-        next.customPrintRequests[index] = updated;
-        next.activityLog.push(eventFor(updated, actor, 'REQUEST_CUSTOMER_APPROVED', request.status, now));
+        next.customPrintRequests[index] = action.request;
+        next.activityLog.push(action.event);
         await persist(next);
-        return { request: updated };
+        return { request: action.request, event: action.event };
       });
-      return result.error ? failure(res, result.error, 409) : res.json(result);
+      if (result.error) {
+        const status = result.error === 'REQUEST_NOT_FOUND' ? 404
+          : result.error === 'CUSTOMER_REQUIRED' ? 403
+            : result.error === 'STATUS_CONFLICT' || result.error === 'QUOTE_EXPIRED' ? 409 : 400;
+        return failure(res, result.error, status);
+      }
+      return res.json(result);
     } catch { failure(res, 'ACTION_PERSISTENCE_FAILED', 500); }
   });
 

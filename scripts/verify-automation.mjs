@@ -112,7 +112,7 @@ try {
   const created = await post('/admin/actions/send-quote-email', { requestId: intake.request.id, expectedStatus: 'QUOTED', expectedVersion: 1 }, 'admin-test');
   assert.equal(created.request.status, 'AWAITING_APPROVAL'); assert.equal(created.messageId, 'mock-gmail-1'); assert.equal(mails, 1); assertions += 3;
   const duplicate = await post('/admin/actions/send-quote-email', { requestId: intake.request.id, expectedStatus: 'QUOTED', expectedVersion: 1 }, 'admin-test'); assert.equal(duplicate.replay, true); assert.equal(mails, 1); assertions += 2;
-  await post('/quotes/approve', { requestId: intake.request.id, expectedVersion: 1 }, 'other-test', 409);
+  await post('/quotes/approve', { requestId: intake.request.id, expectedVersion: 1 }, 'other-test', 404);
   await post('/quotes/approve', { requestId: intake.request.id, expectedVersion: 999 }, 'customer-test', 409);
   await post('/quotes/approve', { requestId: intake.request.id, expectedVersion: 1 }, 'customer-test');
   const own = await post('/quotes/mine', {}, 'customer-test'); assert.equal(own.requests[0].status, 'APPROVED'); assertions++;
