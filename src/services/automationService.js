@@ -30,17 +30,20 @@ export async function readQuoteAttachment(requestId, attachmentId, { token, sign
 }
 
 const assistantErrors = {
+  ASSISTANT_NOT_CONFIGURED: { es: 'Falta configurar la asistencia IA. Podés completar y guardar el formulario manualmente.', en: 'AI assistance needs configuration. You can complete and save the form manually.' },
+  ASSISTANT_CREDENTIAL_INVALID: { es: 'La conexión IA rechazó la credencial configurada. Revisá la configuración del servicio.', en: 'The AI connection rejected its configured credential. Check service settings.' },
+  ASSISTANT_CREDIT_REQUIRED: { es: 'La cuenta del proveedor IA no tiene saldo disponible.', en: 'The AI provider account has no available credit.' },
   ASSISTANT_UNAVAILABLE: {
-    es: 'No se pudo conectar con n8n. Verificá que el workflow esté activo e intentá de nuevo.',
-    en: 'Could not connect to n8n. Check that the workflow is active and try again.',
+    es: 'No se pudo conectar con el asistente IA. Intentá de nuevo; los datos del formulario se conservan.',
+    en: 'Could not connect to the AI assistant. Retry; form data is preserved.',
   },
   ASSISTANT_TIMEOUT: {
-    es: 'n8n tardó demasiado en responder. Esperá un momento e intentá de nuevo.',
-    en: 'n8n took too long to respond. Wait a moment and try again.',
+    es: 'El asistente tardó demasiado en responder. Esperá un momento e intentá de nuevo.',
+    en: 'The assistant took too long to respond. Wait a moment and retry.',
   },
   ASSISTANT_INVALID_RESPONSE: {
-    es: 'n8n devolvió una respuesta inválida. No se aplicó ninguna acción; intentá de nuevo.',
-    en: 'n8n returned an invalid response. No action was applied; try again.',
+    es: 'La respuesta del asistente no pudo procesarse. Intentá de nuevo.',
+    en: 'The assistant response could not be processed. Retry.',
   },
   ASSISTANT_ITERATION_LIMIT: {
     es: 'El asistente no pudo completar la respuesta en esta consulta. Probá enviando un mensaje más corto; tu solicitud no se envió ni se cotizó.',
@@ -67,6 +70,17 @@ export const automationError = (code, language = 'es') => assistantErrors[code]?
   PAYMENT_MODE_INVALID: 'Un encargo DEMO no puede registrar un cobro real.',
   CUSTOMER_REQUIRED: 'Esta opción requiere una cuenta de cliente. Administración tiene su propio flujo de cotización.',
   ADMIN_REQUIRED: 'Esta acción requiere la sesión de Administración.',
+  CATEGORY_IN_USE: 'Esta categoría tiene piezas asociadas. Reasignalas antes de eliminarla.',
+  PRODUCT_IN_USE: 'La pieza forma parte de un pedido. Podés ocultarla para conservar el historial.',
+  CATALOG_RECORD_NOT_FOUND: 'El registro ya no existe. Pedile a la IA que consulte el catálogo de nuevo.',
+  CATALOG_DUPLICATE: 'Ya existe una pieza o categoría con ese nombre.',
+  CATALOG_CATEGORY_REQUIRED: 'Elegí una categoría existente para esta pieza.',
+  CATALOG_PUBLICATION_INCOMPLETE: 'Para publicar faltan material, colores o un precio mayor que cero. Completá la propuesta o guardala como borrador.',
+  CATALOG_NAME_REQUIRED: 'La propuesta necesita un nombre.',
+  CATALOG_PRICING_REQUIRED: 'Los datos del precio cambiaron. Completá peso y tiempo o indicá un precio.',
+  INVALID_CATALOG_FIELDS: 'La propuesta tiene campos inválidos. Pedí una propuesta corregida.',
+  INVALID_CATALOG_NUMBER: 'Revisá precio, peso y tiempo: deben ser números válidos.',
+  INVALID_CATALOG_ACTION: 'La propuesta no pudo validarse. Volvé a pedirla al asistente.',
     ROLE_REQUIRED: 'El Copiloto Admin es independiente del asistente de Home, pero la API rechazó la sesión actual (403). Cerrá sesión y volvé a entrar con una cuenta Admin en esta misma dirección; no se habilitó ningún acceso adicional.',
   MATERIAL_UNSUPPORTED: 'Este material no tiene un perfil FDM disponible.',
   WORKSHOP_EXCEPTION: 'Este uso necesita evaluación técnica; no admite cotización automática.',

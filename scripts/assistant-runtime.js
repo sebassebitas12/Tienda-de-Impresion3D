@@ -2,6 +2,8 @@ import { randomBytes } from 'node:crypto';
 import { ASSISTANT_COMMON_PROMPT, ASSISTANT_PROMPTS, ASSISTANT_TOOLS, ROLE_TOOLS, ADMIN_GUIDE, CATALOG_PRODUCT_DRAFT_PROMPT, CATALOG_PRODUCT_DRAFT_TASK } from '../src/utils/assistantPolicies.js';
 import { calculateAutomaticDemoQuote, DEMO_PROFILES } from '../src/utils/quoteAutomation.js';
 import { FDM_MATERIALS } from '../src/utils/quotePricing.js';
+import { runDeepSeek } from './deepseek-provider.js';
+import { prepareAdminCatalogAction } from './admin-ai-catalog.js';
 
 const GUIDE = {
   PLA: 'Piezas decorativas y prototipos de interior; evitar calor elevado.',
@@ -57,6 +59,7 @@ export async function executeAssistantToolCapability(capability, { mode, name, a
   if (context.allowTools === false) return { error: 'TOOL_FORBIDDEN' };
   const result = await executeAssistantTool(name, args, context);
   if (result.error) return { error: result.error };
+  if (name === 'prepare_catalog_action') context.adminAction = result;
   return { result };
 }
 
@@ -75,6 +78,9 @@ export function validateToolArguments(name, args) {
 export async function executeAssistantTool(name, args, { mode, actor, data, getRates }) {
   if (!ROLE_TOOLS[mode]?.includes(name) || (mode === 'admin' && actor?.role !== 'admin') || (name === 'request_details' && !actor)) return { error: 'TOOL_FORBIDDEN' };
   if (!validateToolArguments(name, args)) return { error: 'TOOL_ARGUMENTS_INVALID' };
+  if (name === 'list_catalog') return { categories: (data.categories || []).map(({ id, name, status }) => ({ id, name, status })),
+    products: (data.products || []).filter(p => !args.query || p.name.toLowerCase().includes(args.query.toLowerCase())).slice(0, 60).map(({ id, name, categoryId, material, price, status }) => ({ id, name, categoryId, material, price, status })) };
+  if (name === 'prepare_catalog_action') return prepareAdminCatalogAction(args, data);
   if (name === 'search_catalog') {
     const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
     const query = normalize(args.query);
@@ -133,16 +139,31 @@ export async function runAssistant({ mode, message, history = [], language = 'es
     ...history.filter(item => ['user', 'assistant'].includes(item?.role) && typeof item.content === 'string').slice(-10).map(({ role, content }) => ({ role, content: content.slice(0, 3000) })),
     { role: 'user', content: message.trim() },
   ];
+  if (task === CATALOG_PRODUCT_DRAFT_TASK) messages[0].content += `\nCategorías reales disponibles: ${JSON.stringify((context.data.categories || []).filter(c => c.status !== 'INACTIVE').map(({ id, name }) => ({ id, name })))}. Puedes añadir categoryId de esta lista y dimensions solo si el usuario dio medidas explícitas.`;
   const capability = issueAssistantToolCapability({ mode, actor: context.actor, data: context.data, getRates: context.getRates, allowTools: task !== CATALOG_PRODUCT_DRAFT_TASK });
   try {
+    const provider = env.VERTICE_AI_PROVIDER || (env.DEEPSEEK_API_KEY ? 'deepseek' : 'n8n');
+    let providerAction;
+    let result;
+    if (provider === 'deepseek') {
+      const generated = await runDeepSeek(messages, { env, fetchImpl,
+        tools: task === CATALOG_PRODUCT_DRAFT_TASK ? [] : ROLE_TOOLS[mode].map(name => ASSISTANT_TOOLS[name]),
+        executeTool: (name, args) => executeAssistantTool(name, args, { ...context, mode }) });
+      if (generated.error) return generated;
+      result = generated;
+      providerAction = generated.adminAction;
+    } else {
     const webhook = env[`VERTICE_ASSISTANT_${mode.toUpperCase()}_URL`] || `http://localhost:5678/webhook/vertice-assistant-${mode}`;
     const toolEndpointUrl = env.VERTICE_ASSISTANT_TOOLS_URL || 'http://localhost:3000/assistants/tools';
     const response = await fetchImpl(webhook, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Vertice-Webhook-Token': env.VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN || '' },
-      body: JSON.stringify({ mode, task: task || null, language, messages, toolCapability: capability, toolEndpointUrl }), signal: AbortSignal.timeout(90000) });
+      body: JSON.stringify({ mode, task: task || null, language, messages, toolCapability: capability, toolEndpointUrl,
+        ...(task === CATALOG_PRODUCT_DRAFT_TASK ? { catalogCategories: (context.data.categories || []).filter(c => c.status !== 'INACTIVE').map(({ id, name }) => ({ id, name })) } : {}) }), signal: AbortSignal.timeout(90000) });
     if (!response.ok) return { error: 'ASSISTANT_UNAVAILABLE' };
     let body;
     try { body = await response.json(); } catch { return { error: 'ASSISTANT_INVALID_RESPONSE' }; }
-    const result = Array.isArray(body) ? body[0] : body;
+    result = Array.isArray(body) ? body[0] : body;
+    providerAction = toolCapabilities.get(capability)?.adminAction;
+    }
     let output;
     try {
       const agentOutput = result?.output;
@@ -157,9 +178,12 @@ export async function runAssistant({ mode, message, history = [], language = 'es
     if (task === CATALOG_PRODUCT_DRAFT_TASK) {
       const productDraft = safeCatalogProductDraft(output.productDraft);
       if (!productDraft) return { error: 'ASSISTANT_INVALID_RESPONSE' };
-      return { reply: output.reply, productDraft, source: 'N8N' };
+      if (output.productDraft.categoryId && (context.data.categories || []).some(c => String(c.id) === String(output.productDraft.categoryId) && c.status !== 'INACTIVE')) productDraft.categoryId = String(output.productDraft.categoryId);
+      if (typeof output.productDraft.dimensions === 'string') productDraft.dimensions = output.productDraft.dimensions.trim().slice(0, 200);
+      return { reply: output.reply, productDraft, source: provider === 'deepseek' ? 'DEEPSEEK' : 'N8N' };
     }
-    return { reply: output.reply, links: safeLinks(output.links, mode), ...(mode === 'quote' ? { requestDraft: safeRequestDraft(output.requestDraft) } : {}), source: 'N8N' };
+    return { reply: output.reply, links: safeLinks(output.links, mode), ...(mode === 'quote' ? { requestDraft: safeRequestDraft(output.requestDraft) } : {}),
+      ...(mode === 'admin' && providerAction ? { adminAction: providerAction } : {}), source: provider === 'deepseek' ? 'DEEPSEEK' : 'N8N' };
   } catch (error) {
     if (error?.name === 'TimeoutError' || error?.name === 'AbortError') return { error: 'ASSISTANT_TIMEOUT' };
     return { error: 'ASSISTANT_UNAVAILABLE' };

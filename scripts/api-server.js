@@ -14,6 +14,7 @@ import { installProductReviewOperations } from './product-review-operations.js';
 import { deliverQuote } from './quote-email.js';
 import { sessionActor } from './session-access.js';
 import { multipartBufferMiddleware } from './multipart-form.js';
+import { applyAdminCatalogAction } from './admin-ai-catalog.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const databasePath = resolve(root, process.env.VERTICE_DB_FILE || 'db.json');
@@ -94,6 +95,20 @@ function registerRead(path, handler) {
   if (!route || index < 0) throw new Error('No se pudo instalar la consulta pública.');
   app.middleware.splice(index, 0, route);
 }
+
+registerAction('/admin/actions/catalog-ai-confirm', async (req, res) => {
+  try {
+    const result = await serializeReviewAction(async () => {
+      await db.read();
+      const actor = sessionActor(req.headers.authorization, db.data);
+      const applied = applyAdminCatalogAction(req.body?.action, db.data, actor);
+      if (!applied.error && !applied.alreadyApplied) await db.write();
+      return applied;
+    });
+    if (result.error) return res.status(result.error === 'ADMIN_REQUIRED' ? 403 : result.error === 'STATUS_CONFLICT' ? 409 : 422).json({ code: result.error });
+    res.json(result);
+  } catch { res.status(500).json({ code: 'ACTION_PERSISTENCE_FAILED' }); }
+});
 
 registerAction('/admin/actions/start-review', async (req, res) => {
   const { requestId, actorId, expectedStatus } = req.body || {};

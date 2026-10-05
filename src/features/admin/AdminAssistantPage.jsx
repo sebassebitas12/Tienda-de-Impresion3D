@@ -4,18 +4,19 @@ import { useAuth } from '../../hooks/useAuth.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
 import { automationAction, automationError } from '../../services/automationService.js';
 import { AssistantFormattedText } from '../chatbot/AssistantFormattedText.jsx';
+import { AdminCatalogActionPreview } from './AdminCatalogActionPreview.jsx';
 import './admin.css';
 import './admin-assistant.css';
 
 const prompts = {
   es: [
     { label: 'Prioridades', detail: 'Solicitudes y pedidos que requieren atención', message: '¿Qué necesita atención hoy? Resume solicitudes y pedidos por separado.' },
-    { label: 'Preparar cotización', detail: 'Guía por el flujo, sin cambiar registros', message: 'Quiero preparar una cotización. Guíame por los pasos de Admin sin cambiar ningún dato.' },
+    { label: 'Agregar una pieza', detail: 'Describila y la IA prepara la ficha', message: 'Quiero agregar una pieza nueva al catálogo. Preguntame su nombre y uso, proponé la ficha y calculá un precio DEMO aproximado. Guardar solo después de que confirme.' },
     { label: 'Calidad del catálogo', detail: 'Fichas incompletas o por revisar', message: 'Revisa la calidad del catálogo y dime qué fichas están incompletas.' },
   ],
   en: [
     { label: 'Priorities', detail: 'Requests and orders that need attention', message: 'What needs attention today? Summarize requests and orders separately.' },
-    { label: 'Prepare a quote', detail: 'Walk through the flow without changing records', message: 'I want to prepare a quote. Guide me through Admin without changing any data.' },
+    { label: 'Add a part', detail: 'Describe it and AI prepares the record', message: 'I want to add a new catalog part. Ask its name and intended use, prepare the record and an approximate DEMO price. Save only after my confirmation.' },
     { label: 'Catalog quality', detail: 'Incomplete or review-needed records', message: 'Review catalog quality and tell me which records are incomplete.' },
   ],
 };
@@ -47,7 +48,7 @@ export function AdminAssistantPage() {
     abort.current = new AbortController();
     try {
       const result = await automationAction('/assistants/chat', { mode: 'admin', message: text, history, language }, { token: auth?.token, signal: abort.current.signal });
-      setThread(current => [...current, { role: 'assistant', content: result.reply, links: result.links || [] }]);
+      setThread(current => [...current, { role: 'assistant', content: result.reply, links: result.links || [], adminAction: result.adminAction }]);
     } catch (failure) {
       if (failure.name !== 'AbortError') {
         if (failure.code === 'ROLE_REQUIRED') {
@@ -72,14 +73,14 @@ export function AdminAssistantPage() {
     <header className="admin-copilot__header">
       <div><span className="admin-eyebrow">ADMINISTRACIÓN / ASISTENCIA OPERATIVA</span>
         <h1 id="admin-copilot-title">{es ? 'Copiloto del taller' : 'Workshop copilot'}</h1>
-        <p>{es ? 'Consulta el estado del taller y recibe orientación para navegar Admin. No modifica registros ni aprueba cotizaciones.' : 'Review workshop status and get help navigating Admin. It cannot edit records or approve quotes.'}</p>
+        <p>{es ? 'Describí una pieza o pedí un cambio. La IA consulta el taller, prepara la ficha y guarda cuando confirmás la propuesta.' : 'Describe a part or request a change. AI queries the workshop, prepares the record and saves after you confirm.'}</p>
       </div>
       <Link className="admin-copilot__return" to="/admin">{es ? 'Volver al resumen' : 'Back to overview'} <span aria-hidden="true">↗</span></Link>
     </header>
 
     <div className="admin-copilot__console">
       <section className="admin-copilot__conversation" aria-label={es ? 'Conversación con el copiloto Admin' : 'Admin copilot conversation'}>
-        <div className="admin-copilot__conversation-head"><span><i aria-hidden="true" /> {es ? 'COPILOTO ADMIN · CONSULTA PROTEGIDA' : 'ADMIN COPILOT · PROTECTED QUERY'}</span><small>{es ? 'SOLO LECTURA' : 'READ ONLY'}</small></div>
+        <div className="admin-copilot__conversation-head"><span><i aria-hidden="true" /> {es ? 'COPILOTO ADMIN' : 'ADMIN COPILOT'}</span><small>{es ? 'CAMBIOS CON CONFIRMACIÓN' : 'CONFIRMED CHANGES'}</small></div>
         <div ref={log} className="admin-copilot__thread" role="log" aria-live="polite" aria-label={es ? 'Conversación' : 'Conversation'}>
           {!thread.length && <div className="admin-copilot__welcome">
             <span className="admin-copilot__index">VÉRTICE / ADMIN</span>
@@ -95,6 +96,7 @@ export function AdminAssistantPage() {
             <span>{turn.role === 'user' ? (es ? 'VOS' : 'YOU') : (es ? 'COPILOTO ADMIN' : 'ADMIN COPILOT')}</span>
             {turn.role === 'assistant' ? <AssistantFormattedText content={turn.content} /> : <p>{turn.content}</p>}
             {(turn.links || []).map(link => <Link key={`${link.path}-${link.label}`} to={link.path}>{link.label} ↗</Link>)}
+            {turn.adminAction && <AdminCatalogActionPreview action={turn.adminAction} token={auth?.token} language={language} />}
           </article>)}
           {busy && <p className="admin-copilot__status" role="status">{es ? 'Consultando información del taller…' : 'Checking workshop information…'}</p>}
         </div>
@@ -103,10 +105,10 @@ export function AdminAssistantPage() {
           <label htmlFor="admin-copilot-input">{es ? 'Pregunta sobre el taller' : 'Ask about the workshop'}</label>
           <div><textarea id="admin-copilot-input" ref={input} rows="2" maxLength="2000" value={message} onChange={event => setMessage(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); send(); } }} disabled={busy} placeholder={es ? 'Ej.: ¿Qué solicitudes esperan una cotización?' : 'e.g. Which requests are waiting for a quote?'} />
             <button className="admin-action-primary" type="submit" disabled={busy || !message.trim()}>{busy ? '…' : (es ? 'Consultar' : 'Ask')} <span aria-hidden="true">↗</span></button></div>
-          <small>{es ? 'Enter envía · Shift+Enter agrega una línea · No se realizan cambios desde el chat.' : 'Enter sends · Shift+Enter adds a line · The chat makes no changes.'}</small>
+          <small>{es ? 'Enter envía · Shift+Enter agrega una línea · Revisá y confirmá las propuestas para guardar.' : 'Enter sends · Shift+Enter adds a line · Review and confirm proposals to save.'}</small>
         </form>
       </section>
     </div>
-    <p className="admin-copilot__scope"><span>{es ? 'ALCANCE' : 'SCOPE'}</span>{es ? 'Consulta pedidos y solicitudes, revisa calidad del catálogo y explica dónde continuar. No cambia estados, aprueba cotizaciones ni envía correos.' : 'Look up orders and requests, review catalog quality, and explain where to continue. It cannot change statuses, approve quotes, or send email.'}</p>
+    <p className="admin-copilot__scope"><span>{es ? 'ALCANCE' : 'SCOPE'}</span>{es ? 'Creá, editá u ocultá piezas y categorías desde la conversación. Cada propuesta se revisa antes de guardar. También podés consultar pedidos y solicitudes.' : 'Create, edit or hide parts and categories through conversation. Review each proposal before saving. You can also query orders and requests.'}</p>
   </section>;
 }

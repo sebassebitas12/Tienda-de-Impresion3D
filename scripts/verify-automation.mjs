@@ -7,6 +7,7 @@ import { spawn } from 'node:child_process';
 import process from 'node:process';
 import { DEMO_PROFILES } from '../src/utils/quoteAutomation.js';
 import { ROLE_TOOLS } from '../src/utils/assistantPolicies.js';
+import { prepareAdminCatalogAction } from './admin-ai-catalog.js';
 
 // Isolated database and mock HTTP provider. Never sends email or calls a paid API.
 const directory = await mkdtemp(join(tmpdir(), 'vertice-automation-'));
@@ -73,6 +74,14 @@ try {
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   await post('/quotes/create', {}, 'customer-test', 410);
+  const aiCategoryAction = prepareAdminCatalogAction({ entity: 'categories', operation: 'CREATE', changes: { name: 'Categoría IA QA' } }, { categories: [], products: [] });
+  await post('/admin/actions/catalog-ai-confirm', { action: aiCategoryAction }, 'customer-test', 403);
+  const aiCategory = await post('/admin/actions/catalog-ai-confirm', { action: aiCategoryAction }, 'admin-test');
+  assert.equal(aiCategory.record.name, 'Categoría IA QA'); assertions++;
+  const retryAiCategory = await post('/admin/actions/catalog-ai-confirm', { action: aiCategoryAction }, 'admin-test');
+  assert.equal(retryAiCategory.alreadyApplied, true); assertions++;
+  const savedAiData = JSON.parse(await readFile(dbFile, 'utf8'));
+  assert.equal(savedAiData.categories.length, 1); assertions++;
   await post('/assistants/chat', { mode: 'admin', message: 'Resumen' }, 'customer-test', 403);
   const unavailable = await post('/assistants/chat', { mode: 'general', message: 'QA_PROVIDER_DOWN' }, undefined, 502);
   assert.equal(unavailable.code, 'ASSISTANT_UNAVAILABLE'); assertions++;
@@ -105,7 +114,7 @@ try {
   const adminFile = await post('/quotes/attachment/read', { requestId: intake.request.id, attachmentId: intake.request.attachments[0].id }, 'admin-test');
   assert.equal(adminFile.name, 'pieza.stl'); assertions++;
   const afterIntake = JSON.parse(await readFile(dbFile, 'utf8'));
-  assert.equal(afterIntake.customPrintRequests.length, 1); assert.equal(afterIntake.activityLog[0].action, 'REQUEST_SUBMITTED');
+  assert.equal(afterIntake.customPrintRequests.length, 1); assert.equal(afterIntake.activityLog.find(entry => entry.action === 'REQUEST_SUBMITTED').action, 'REQUEST_SUBMITTED');
   assert.equal('data' in afterIntake.customPrintRequests[0].attachments[0], false); assertions += 3;
   const priced = await post('/admin/actions/auto-quote', { requestId: intake.request.id, expectedStatus: 'PENDING_QUOTE', expectedVersion: 0, profileId: 'organizador' }, 'admin-test');
   assert.equal(priced.request.status, 'QUOTED'); assert.equal(priced.request.quotePricing.mode, 'DEMO'); assert.equal(mails, 0); assertions += 3;
@@ -147,9 +156,9 @@ try {
       if (node.type.endsWith('.code')) { new Function('$input', '$', node.parameters.jsCode); assertions++; }
     }
     if (file.includes('assistant-')) {
-      const providerNode = workflow.nodes.find(node => node.name === 'OpenRouter por rol');
-      assert.equal(providerNode.parameters.url, 'https://openrouter.ai/api/v1/chat/completions');
-      assert.ok(workflow.nodes.find(node => node.type.endsWith('.code'))?.parameters.jsCode.includes('nvidia/nemotron-3-ultra-550b-a55b:free'));
+      const providerNode = workflow.nodes.find(node => node.name === 'DeepSeek por rol');
+      assert.equal(providerNode.parameters.url, 'https://api.deepseek.com/chat/completions');
+      assert.ok(workflow.nodes.find(node => node.type.endsWith('.code'))?.parameters.jsCode.includes('deepseek-flash'));
       assertions += 2;
     }
     for (const output of Object.values(workflow.connections)) for (const connections of output.main) for (const connection of connections) { assert.ok(names.has(connection.node)); assertions++; }
@@ -174,9 +183,9 @@ try {
   const aiAgentNames = ['AI Agent — público', 'AI Agent — Admin', 'AI Agent — cotización'];
   assert.deepEqual(aiAgents.map(node => node.name), aiAgentNames); assertions++;
   assert.deepEqual(aiAgents.map(node => node.parameters.options.maxIterations), [4, 4, 3]); assertions++;
-  const openRouterNode = unified.nodes.find(node => node.name === 'OpenRouter Chat Model');
-  assert.equal(openRouterNode.type, '@n8n/n8n-nodes-langchain.lmChatOpenRouter');
-  assert.equal(openRouterNode.parameters.model, 'nvidia/nemotron-3-ultra-550b-a55b:free'); assertions += 2;
+  const openRouterNode = unified.nodes.find(node => node.name === 'DeepSeek Chat Model');
+  assert.equal(openRouterNode.type, '@n8n/n8n-nodes-langchain.lmChatDeepSeek');
+  assert.equal(openRouterNode.parameters.model, 'deepseek-flash'); assertions += 2;
   assert.deepEqual(unified.connections[openRouterNode.name].ai_languageModel[0].map(connection => connection.node), aiAgentNames); assertions++;
   for (const [index, mode] of ['general', 'admin', 'quote'].entries()) {
     const entryName = `Entrada — asistente ${mode}`;

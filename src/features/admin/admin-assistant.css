@@ -268,3 +268,12 @@
 
 html[data-motion="reduced"] .admin-copilot { animation: none; }
 html[data-motion="reduced"] .admin-copilot__prompts button { transition: none; }
+.admin-ai-action{margin-top:16px;padding:18px;border:1px solid var(--line);background:var(--panel);border-radius:8px}
+.admin-ai-action h3{margin:0 0 14px;font-size:18px}
+.admin-ai-action dl{display:grid;gap:10px}
+.admin-ai-action dl>div{display:grid;grid-template-columns:minmax(100px,1fr) 2fr;gap:12px}
+.admin-ai-action dt{color:var(--muted);font-size:12px}
+.admin-ai-action dd{margin:0;overflow-wrap:anywhere;font-size:14px}
+.admin-ai-action__buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.admin-ai-action__buttons button{min-height:44px}
+@media(max-width:480px){.admin-ai-action dl>div{grid-template-columns:1fr}.admin-ai-action__buttons button{width:100%}}

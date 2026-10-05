@@ -38,8 +38,8 @@ describe('Copiloto Admin independiente del chatbot público', () => {
     expect(document.querySelector('.admin-copilot__console').firstElementChild).toHaveClass('admin-copilot__conversation');
     expect(document.querySelector('.admin-copilot__guide')).not.toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Consultas sugeridas' })).toBeInTheDocument();
-    expect(screen.getByText(/No cambia estados, aprueba cotizaciones ni envía correos/)).toBeInTheDocument();
-    expect(screen.getByText(/solo lectura/i)).toBeInTheDocument();
+    expect(screen.getByText(/CAMBIOS CON CONFIRMACIÓN/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Agregar una pieza/i })).toBeInTheDocument();
   });
 
   it('mantiene el espacio Admin si la API rechaza la sesión y solo sale al pedir reautenticación', async () => {

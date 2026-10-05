@@ -24,17 +24,17 @@ const allowed = ${JSON.stringify(ROLE_TOOLS[mode])};
 const tools = body.tools.filter(t => allowed.includes(t.function?.name));
 const messages = body.messages.filter(m => ['user','assistant','tool'].includes(m.role));
 if (!messages.length) throw new Error('Falta mensaje');
-return [{json:{model:'nvidia/nemotron-3-ultra-550b-a55b:free',max_tokens:1600,
+return [{json:{model:'deepseek-flash',max_tokens:2400,
 messages:[{role:'system',content:${JSON.stringify(system)}+'\\nIdioma: '+(body.language==='en'?'English':'Español de Costa Rica')},...messages],tools,tool_choice:'auto'}}];`;
-  const model = http('OpenRouter por rol', 'https://openrouter.ai/api/v1/chat/completions', 660, {
-    method: 'POST', authentication: 'genericCredentialType', genericAuthType: 'httpHeaderAuth', sendBody: true, specifyBody: 'json', jsonBody: '={{ JSON.stringify($json) }}',
+  const model = http('DeepSeek por rol', 'https://api.deepseek.com/chat/completions', 660, {
+    method: 'POST', authentication: 'predefinedCredentialType', nodeCredentialType: 'deepSeekApi', sendBody: true, specifyBody: 'json', jsonBody: '={{ JSON.stringify($json) }}',
     options: { timeout: 40000 },
   });
   const normalize = `const body=$input.first().json; const choice=body.choices?.[0];
 if (!choice || !['stop','tool_calls'].includes(choice.finish_reason) || choice.message?.role!=='assistant') throw new Error('Respuesta incompleta del modelo');
 return [{json:{message:choice.message}}];`;
   const data = workflow(`Vértice — Asistente ${mode}`, [webhook(`vertice-assistant-${mode}`), code('Preparar rol y herramientas', prepare, 420), model, code('Respuesta normalizada', normalize, 900)],
-    `## Asistente ${mode}\n1. Este archivo es componente interno: importa solo vertice-cr-unificado.json.\n2. El workflow oficial usa el nodo OpenRouter Chat Model y una credencial OpenRouter API en n8n; no requiere una clave de DeepSeek.\n3. La API Vértice valida sesión y ejecuta las tools por rol; este workflow solo recibe contexto autorizado. Tools: ${ROLE_TOOLS[mode].join(', ')}. No accede a JSON Server ni modifica datos.`);
+    `## Asistente ${mode}\n1. Este archivo es componente interno: importa solo vertice-cr-unificado.json.\n2. El workflow oficial usa el nodo DeepSeek Chat Model y la credencial DeepSeek existente en n8n.\n3. La API Vértice valida sesión y ejecuta las tools por rol; este workflow solo recibe contexto autorizado. Tools: ${ROLE_TOOLS[mode].join(', ')}. No accede a JSON Server ni modifica datos.`);
   await writeFile(resolve(directory, `vertice-assistant-${mode}.json`), JSON.stringify(data, null, 2) + '\n');
 }
 

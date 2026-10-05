@@ -117,9 +117,8 @@ describe('Fotos y publicación del formulario Admin', () => {
     expect(screen.getByLabelText('Peso (g)')).toHaveValue(45);
     expect(screen.getByLabelText('Horas estimadas de producción')).toHaveValue(2.5);
     expect(screen.getByText(/Estimación IA, no medición/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /Calcular sugerencia DEMO/ }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('La IA solo estimó gramos y horas');
-    fireEvent.click(screen.getByRole('checkbox', { name: /Ya contrasté y actualicé los gramos y las horas/ }));
+    expect(Number(screen.getByLabelText('Precio publicado (₡)').value)).toBeGreaterThan(0);
+    expect(screen.getByLabelText('Precio publicado (₡)').value).not.toBe('');
     fireEvent.click(screen.getByRole('button', { name: /Calcular sugerencia DEMO/ }));
     expect(await screen.findByText(/RESULTADO DEMO/)).toBeInTheDocument();
   });
@@ -148,7 +147,7 @@ describe('Fotos y publicación del formulario Admin', () => {
     fireEvent.change(screen.getByLabelText('Nombre', { exact: true }), { target: { value: 'Caja organizadora' } });
     fireEvent.change(screen.getByLabelText('Descripción'), { target: { value: 'Texto previo del usuario' } });
     fireEvent.click(screen.getByRole('button', { name: 'Autocompletar ficha con IA' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('n8n devolvió una respuesta inválida');
+    expect(await screen.findByRole('alert')).toHaveTextContent('La respuesta del asistente no pudo procesarse');
     expect(screen.getByLabelText('Nombre', { exact: true })).toHaveValue('Caja organizadora');
     expect(screen.getByLabelText('Descripción')).toHaveValue('Texto previo del usuario');
   });
@@ -174,7 +173,7 @@ describe('Fotos y publicación del formulario Admin', () => {
     await screen.findByRole('heading', { name: 'Nuevo modelo' });
     fireEvent.change(screen.getByLabelText('Nombre', { exact: true }), { target: { value: 'Prensa pequeña' } });
     fireEvent.click(screen.getByRole('button', { name: 'Autocompletar ficha con IA' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('n8n tardó demasiado en responder');
+    expect(await screen.findByRole('alert')).toHaveTextContent('El asistente tardó demasiado en responder');
     expect(screen.getByLabelText('Descripción')).toHaveValue('');
   });
 

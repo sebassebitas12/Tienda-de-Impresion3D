@@ -42,7 +42,6 @@ export function AdminProductFormPage() {
   const [aiBusy, setAiBusy] = useState(false);
   const [aiReply, setAiReply] = useState('');
   const [aiError, setAiError] = useState('');
-  const [pricingDemoProfileApplied, setPricingDemoProfileApplied] = useState(false);
   const product = values || (existing ? {
     name: existing.name || '', slug: existing.slug || '', description: existing.description || '', categoryId: existing.categoryId || '',
     price: existing.price ?? '', material: String(existing.material || '').toUpperCase(), colors: (existing.availableColors || []).join(', '),
@@ -69,7 +68,6 @@ export function AdminProductFormPage() {
       if (['weightGrams', 'estimatedProductionHours'].includes(name) && next.aiProductionEstimate) next.aiProductionEstimate = { ...next.aiProductionEstimate, verifiedWithSlicer: false };
       return next;
     });
-    if (['weightGrams', 'estimatedProductionHours'].includes(name)) setPricingDemoProfileApplied(false);
     if (name === 'price' || ['material', 'weightGrams', 'estimatedProductionHours'].includes(name)) {
       setPricingPreview(null); setConfirmDemoPrice(false);
     }
@@ -78,15 +76,10 @@ export function AdminProductFormPage() {
     const profile = DEMO_PROFILES.find(item => item.id === pricingProfileId);
     if (!profile) return;
     setValues(current => ({ ...product, ...current, weightGrams: profile.weightGrams, estimatedProductionHours: profile.printHours }));
-    setPricingDemoProfileApplied(true);
     setPostProcessMinutes(profile.postProcessMinutes);
     setPricingPreview(null); setError('');
   };
   const calculatePrice = () => {
-    if (product.aiProductionEstimate && !product.aiProductionEstimate.verifiedWithSlicer && !pricingDemoProfileApplied) {
-      setError(language === 'es' ? 'La IA solo estimó gramos y horas. Confirmá los valores contrastados con el laminador o elegí explícitamente un perfil análogo DEMO.' : 'AI only estimated grams and time. Confirm slicer-verified values or explicitly choose an analogue DEMO profile.');
-      return;
-    }
     const quote = calculateProductDemoPrice({ material: product.material, weightGrams: product.weightGrams, printHours: product.estimatedProductionHours, postProcessMinutes });
     if (!quote) { setError(language === 'es' ? 'Elegí material y completá gramos y horas de impresión mayores que cero.' : 'Choose a material and enter weight and print hours greater than zero.'); return; }
     setPricingPreview(quote); setError('');
@@ -105,17 +98,20 @@ export function AdminProductFormPage() {
       if (!result?.productDraft) throw Object.assign(new Error('ASSISTANT_INVALID_RESPONSE'), { code: 'ASSISTANT_INVALID_RESPONSE' });
       const draft = result.productDraft;
       const generatedAt = new Date().toISOString();
+      const suggestedQuote = calculateProductDemoPrice({ material: draft.material, weightGrams: draft.weightGrams, printHours: draft.estimatedProductionHours });
       setValues(current => ({ ...product, ...current,
         slug: (current?.slug || product.slug || slugify(name)),
         description: draft.description,
         material: draft.material,
         colors: draft.colors.join(', '),
+        categoryId: current?.categoryId || product.categoryId || draft.categoryId || '',
+        dimensions: draft.dimensions || current?.dimensions || product.dimensions,
         weightGrams: draft.weightGrams ?? '',
         estimatedProductionHours: draft.estimatedProductionHours ?? '',
-        aiProductionEstimate: { source: 'N8N', generatedAt, estimateBasis: draft.estimateBasis, estimatedWeightGrams: draft.weightGrams, estimatedProductionHours: draft.estimatedProductionHours, verifiedWithSlicer: false },
-        ...(product.priceSource === 'DEMO' ? { priceSource: 'NEEDS_RECALCULATION', quotePricing: null } : {}),
+        aiProductionEstimate: { source: result.source || 'AI', generatedAt, estimateBasis: draft.estimateBasis, estimatedWeightGrams: draft.weightGrams, estimatedProductionHours: draft.estimatedProductionHours, verifiedWithSlicer: false },
+        ...(suggestedQuote && (!isEdit || product.priceSource === 'DEMO' || product.price === '') ? { price: String(suggestedQuote.breakdown.amountCrc), priceSource: 'DEMO', quotePricing: suggestedQuote } : product.priceSource === 'DEMO' ? { priceSource: 'NEEDS_RECALCULATION', quotePricing: null } : {}),
       }));
-      setPricingDemoProfileApplied(false); setPricingPreview(null); setConfirmDemoPrice(false);
+      setPricingPreview(null); setConfirmDemoPrice(false);
       setAiReply(result.reply || (language === 'es' ? 'Ficha propuesta. Revisá cada campo antes de guardar.' : 'Draft suggested. Review each field before saving.'));
     } catch (actionError) {
       const msg = automationError(actionError.code || actionError.message, language);
@@ -173,7 +169,7 @@ export function AdminProductFormPage() {
       <section className="admin-product-ai" aria-labelledby="admin-product-ai-title">
         <div><span className="admin-eyebrow">{language === 'es' ? 'ASISTENCIA DE FICHA · PROPUESTA' : 'PRODUCT DRAFT · SUGGESTION'}</span><h2 id="admin-product-ai-title">{language === 'es' ? 'Partí del nombre, revisá el resto.' : 'Start with a name, review the rest.'}</h2><p>{language === 'es' ? 'La IA sugiere descripción, material, colores y una referencia muy aproximada de peso/tiempo. No consulta stock ni mide la pieza.' : 'AI suggests a description, material, colors and a very rough weight/time reference. It does not check stock or measure the part.'}</p></div>
         <button className="admin-action-primary" type="button" onClick={completeProductWithAi} disabled={aiBusy || busy}>{aiBusy ? (language === 'es' ? 'Preparando propuesta…' : 'Preparing suggestion…') : (language === 'es' ? 'Autocompletar ficha con IA' : 'Autocomplete product with AI')}</button>
-        {aiBusy && <p className="admin-product-ai__status" role="status" aria-live="polite">{language === 'es' ? 'Consultando el agente general…' : 'Asking the general assistant…'}</p>}
+        {aiBusy && <p className="admin-product-ai__status" role="status" aria-live="polite">{language === 'es' ? 'Preparando ficha y propuesta de precio…' : 'Preparing record and suggested price…'}</p>}
         {aiError && <p className="admin-product-ai__error" role="alert">{aiError}</p>}
         {aiReply && <p className="admin-product-ai__reply" role="status">{aiReply}</p>}
         {product.aiProductionEstimate && <p className="admin-product-ai__caveat" role="note">{language === 'es' ? `Estimación IA, no medición. ${product.aiProductionEstimate.estimateBasis}` : `AI estimate, not a measurement. ${product.aiProductionEstimate.estimateBasis}`}</p>}

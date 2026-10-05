@@ -37,6 +37,7 @@ function formatDate(value, language) {
 function eventTitle(event, text) {
   if (event.action === 'REQUEST_REVIEW_STARTED') return text.review;
   const es = text.review === 'Se inició la revisión técnica';
+  if (event.action.startsWith('AI_CATALOG_')) return `${es ? ({ AI_CATALOG_CREATE: 'Registro creado con IA', AI_CATALOG_UPDATE: 'Registro editado con IA', AI_CATALOG_DELETE: 'Registro eliminado con IA' }[event.action]) : ({ AI_CATALOG_CREATE: 'Record created with AI', AI_CATALOG_UPDATE: 'Record updated with AI', AI_CATALOG_DELETE: 'Record deleted with AI' }[event.action])}: ${event.result?.name || event.entityId}`;
   if (event.action === 'REQUEST_INCORPORATED') return es ? 'Solicitud incorporada a pendientes' : 'Request registered as pending';
   if (event.action === 'REQUEST_QUOTE_SAVED') return es ? 'Cotización preparada' : 'Quote prepared';
   if (event.action === 'REQUEST_QUOTE_PUBLISHED') return es ? 'Cotización disponible para aprobación' : 'Quote available for approval';
