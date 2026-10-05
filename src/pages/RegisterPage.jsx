@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Input } from '../components/ui/index.js';
 import { useAuth } from '../hooks/useAuth.js';
+import { useOptionalCart } from '../hooks/useCart.js';
 import { usePreferences } from '../hooks/usePreferences.js';
 
 function messageFor(error, copy) {
@@ -15,15 +16,17 @@ function messageFor(error, copy) {
 }
 
 export function RegisterPage() {
-  const { copy } = usePreferences();
+  const { copy, language } = usePreferences();
   const auth = useAuth();
+  const cart = useOptionalCart();
   const navigate = useNavigate();
+  const location = useLocation();
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [localError, setLocalError] = useState('');
 
   const setField = (field, value) => {
-    setLocalError('');
-    auth.clearError();
+    if (localError) setLocalError('');
+    if (auth.error) auth.clearError();
     setForm(current => ({ ...current, [field]: value }));
   };
 
@@ -35,8 +38,10 @@ export function RegisterPage() {
     }
 
     try {
-      await auth.register({ name: form.name, email: form.email, password: form.password });
-      navigate('/cuenta', { replace: true });
+      const user = await auth.register({ name: form.name, email: form.email, password: form.password });
+      const requested = location.state?.from;
+      if (requested?.split('?')[0] === '/carrito' && user.role === 'customer') cart?.importGuestCart(user);
+      navigate(requested || '/cuenta', { replace: true });
     } catch {
       // Provider exposes the normalized error state to the UI.
     }
@@ -49,8 +54,16 @@ export function RegisterPage() {
         <p>{copy.authRegisterIntro}</p>
       </div>
 
+      {location.state?.reason === 'customer-cart-required' && <p className="auth-context-notice" role="status">
+        {language === 'en'
+          ? 'Create a customer account to view your cart and continue. Any selection saved in this browser will be linked to your account.'
+          : 'Creá una cuenta de cliente para ver el carrito y continuar. La selección guardada en este navegador se vincula a tu cuenta.'}
+      </p>}
+
       <form className="auth-form" onSubmit={onSubmit} noValidate>
         <Input
+          id="register-name"
+          name="name"
           label={copy.authName}
           autoComplete="name"
           value={form.name}
@@ -58,6 +71,8 @@ export function RegisterPage() {
           required
         />
         <Input
+          id="register-email"
+          name="email"
           type="email"
           label={copy.authEmail}
           autoComplete="email"
@@ -66,6 +81,8 @@ export function RegisterPage() {
           required
         />
         <Input
+          id="register-password"
+          name="password"
           type="password"
           label={copy.authPassword}
           autoComplete="new-password"
@@ -74,6 +91,8 @@ export function RegisterPage() {
           required
         />
         <Input
+          id="register-confirm-password"
+          name="confirmPassword"
           type="password"
           label={copy.authConfirmPassword}
           autoComplete="new-password"
@@ -92,7 +111,7 @@ export function RegisterPage() {
       </form>
 
       <p className="auth-switch">
-        {copy.authHasAccount} <Link to="/login">{copy.login}</Link>
+        {copy.authHasAccount} <Link to="/login" state={{ from: location.state?.from, reason: location.state?.reason }}>{copy.login}</Link>
       </p>
     </div>
   );

@@ -1,7 +1,7 @@
 import { AuthServiceError, normalizeAuthSession } from './authService.js';
 
 export const AUTH_SESSION_STORAGE_KEY = 'vertice.auth.session';
-export const DEFAULT_AUTH_TOKEN_TTL_MS = 60 * 60 * 1000;
+export const DEFAULT_AUTH_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 
 const ACTIVE_STATUS = 'ACTIVE';
 
@@ -55,7 +55,7 @@ export function createSimulatedToken(user, { now = Date.now(), ttlMs = DEFAULT_A
   return `sim.v1.${encodeBase64Url(JSON.stringify(payload))}`;
 }
 
-function readSimulatedToken(token) {
+export function readSimulatedToken(token) {
   if (typeof token !== 'string' || !token.startsWith('sim.v1.')) return null;
 
   try {
@@ -65,6 +65,18 @@ function readSimulatedToken(token) {
   } catch {
     return null;
   }
+}
+
+export function getTokenExpiresAt(token) {
+  const payload = readSimulatedToken(token);
+  if (!payload || !Number.isFinite(payload.exp)) return null;
+  return payload.exp * 1000;
+}
+
+export function isTokenExpired(token, now = Date.now()) {
+  const expiresAt = getTokenExpiresAt(token);
+  if (expiresAt === null) return true;
+  return expiresAt <= now;
 }
 
 function normalizeEmail(email) {

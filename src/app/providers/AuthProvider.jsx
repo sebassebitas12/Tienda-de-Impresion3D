@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { createAuthService } from '../../services/authService.js';
+import { AuthServiceError, createAuthService } from '../../services/authService.js';
+import { getTokenExpiresAt, isTokenExpired } from '../../services/jsonServerAuthAdapter.js';
 import { AuthContext } from './contexts.js';
 
 export function AuthProvider({ children, adapter }) {
@@ -34,6 +35,31 @@ export function AuthProvider({ children, adapter }) {
       cancelled = true;
     };
   }, [service]);
+
+  const expireSession = useCallback(reason => {
+    if (session) {
+      service.logout(session).catch(() => {});
+    }
+    setSession(null);
+    setHasPersistedSession(false);
+    setError(new AuthServiceError(
+      'AUTH_SESSION_EXPIRED',
+      reason || 'Tu sesión expiró. Por favor ingresá nuevamente tus credenciales para continuar.'
+    ));
+  }, [service, session]);
+
+  useEffect(() => {
+    if (!session?.token) return;
+    const expiresAt = getTokenExpiresAt(session.token);
+    if (!expiresAt) return;
+
+    const msUntilExpiry = expiresAt - Date.now();
+    const timer = setTimeout(() => {
+      expireSession('Tu sesión expiró. Por favor ingresá nuevamente tus credenciales para continuar.');
+    }, Math.max(0, msUntilExpiry));
+
+    return () => clearTimeout(timer);
+  }, [session?.token, expireSession]);
 
   const run = useCallback(async (action, task) => {
     setPendingAction(action);
@@ -78,10 +104,12 @@ export function AuthProvider({ children, adapter }) {
     }
   }, [service, session]);
 
+  const authenticated = Boolean(session?.user && (!session?.token || !session.token.startsWith('sim.v1.') || !isTokenExpired(session.token)));
+
   const value = useMemo(() => ({
-    user: session?.user || null,
-    token: session?.token || null,
-    isAuthenticated: Boolean(session?.user),
+    user: authenticated ? (session?.user || null) : null,
+    token: authenticated ? (session?.token || null) : null,
+    isAuthenticated: authenticated,
     hasPersistedSession,
     isRestoring,
     isPending: Boolean(pendingAction),
@@ -90,9 +118,10 @@ export function AuthProvider({ children, adapter }) {
     login,
     register,
     logout,
+    expireSession,
     clearError: () => setError(null),
-    hasRole: role => session?.user?.role === role,
-  }), [error, hasPersistedSession, isRestoring, login, logout, pendingAction, register, session]);
+    hasRole: role => Boolean(authenticated && session?.user?.role === role),
+  }), [authenticated, error, expireSession, hasPersistedSession, isRestoring, login, logout, pendingAction, register, session]);
 
   return <AuthContext value={value}>{children}</AuthContext>;
 }

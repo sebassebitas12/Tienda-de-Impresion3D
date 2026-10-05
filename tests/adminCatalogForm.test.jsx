@@ -9,7 +9,13 @@ import { automationAction } from '../src/services/automationService.js';
 import { createAdminCategory, createAdminProduct, deleteAdminCategory, deleteAdminProduct, getAdminCatalogData, getAdminCatalogReferences, updateAdminProduct } from '../src/services/adminCatalogService.js';
 
 jest.mock('../src/hooks/useAuth.js', () => ({ useAuth: () => ({ token: 'admin-token' }) }));
-jest.mock('../src/services/automationService.js', () => ({ automationAction: jest.fn(), automationError: code => code === 'ASSISTANT_TIMEOUT' ? 'El asistente tardó demasiado.' : 'No pudimos completar la propuesta.' }));
+jest.mock('../src/services/automationService.js', () => {
+  const actual = jest.requireActual('../src/services/automationService.js');
+  return {
+    automationAction: jest.fn(),
+    automationError: actual.automationError,
+  };
+});
 
 jest.mock('../src/services/adminCatalogService.js', () => ({
   getAdminCatalogData: jest.fn(), createAdminProduct: jest.fn(), updateAdminProduct: jest.fn(),
@@ -103,7 +109,7 @@ describe('Fotos y publicación del formulario Admin', () => {
     openForm();
     await screen.findByRole('heading', { name: 'Nuevo modelo' });
     fireEvent.change(screen.getByLabelText('Nombre', { exact: true }), { target: { value: 'Soporte para teléfono' } });
-    fireEvent.click(screen.getByRole('button', { name: '✨ Autocompletar ficha con IA' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Autocompletar ficha con IA' }));
     await waitFor(() => expect(automationAction).toHaveBeenCalledWith('/assistants/chat', expect.objectContaining({ mode: 'general', task: 'catalog_product_draft', message: 'Soporte para teléfono', language: 'es' }), { token: 'admin-token' }));
     expect(await screen.findByLabelText('Descripción')).toHaveValue('Soporte compacto para mantener el teléfono elevado sobre el escritorio.');
     expect(screen.getByLabelText('Material FDM')).toHaveValue('PETG');
@@ -118,13 +124,57 @@ describe('Fotos y publicación del formulario Admin', () => {
     expect(await screen.findByText(/RESULTADO DEMO/)).toBeInTheDocument();
   });
 
+  it('muestra advertencia cuando el nombre está vacío sin llamar a la API', async () => {
+    openForm();
+    await screen.findByRole('heading', { name: 'Nuevo modelo' });
+    fireEvent.click(screen.getByRole('button', { name: 'Autocompletar ficha con IA' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Escribí primero el nombre del producto');
+    expect(automationAction).not.toHaveBeenCalled();
+  });
+
+  it('muestra error de sesión caducada (ROLE_REQUIRED) inline bajo el botón de autocompletado', async () => {
+    automationAction.mockRejectedValue(Object.assign(new Error('ROLE_REQUIRED'), { code: 'ROLE_REQUIRED' }));
+    openForm();
+    await screen.findByRole('heading', { name: 'Nuevo modelo' });
+    fireEvent.change(screen.getByLabelText('Nombre', { exact: true }), { target: { value: 'Engranaje cónico' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Autocompletar ficha con IA' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('La API local no reconoce la sesión Admin');
+  });
+
+  it('muestra error cuando n8n devuelve respuesta inválida y conserva campos existentes', async () => {
+    automationAction.mockRejectedValue(Object.assign(new Error('ASSISTANT_INVALID_RESPONSE'), { code: 'ASSISTANT_INVALID_RESPONSE' }));
+    openForm();
+    await screen.findByRole('heading', { name: 'Nuevo modelo' });
+    fireEvent.change(screen.getByLabelText('Nombre', { exact: true }), { target: { value: 'Caja organizadora' } });
+    fireEvent.change(screen.getByLabelText('Descripción'), { target: { value: 'Texto previo del usuario' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Autocompletar ficha con IA' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('n8n devolvió una respuesta inválida');
+    expect(screen.getByLabelText('Nombre', { exact: true })).toHaveValue('Caja organizadora');
+    expect(screen.getByLabelText('Descripción')).toHaveValue('Texto previo del usuario');
+  });
+
+  it('autocompletar genera el slug automáticamente si estaba vacío', async () => {
+    automationAction.mockResolvedValue({
+      reply: 'Ficha generada.',
+      productDraft: { description: 'Soporte articulado con base roscada.', material: 'PETG', colors: ['Negro'], weightGrams: 50, estimatedProductionHours: 2.0, estimateBasis: 'Volumen referencial' },
+    });
+    openForm();
+    await screen.findByRole('heading', { name: 'Nuevo modelo' });
+    fireEvent.change(screen.getByLabelText('Nombre', { exact: true }), { target: { value: 'Brazo articulado' } });
+    expect(screen.getByLabelText('Referencia URL')).toHaveValue('');
+    fireEvent.click(screen.getByRole('button', { name: 'Autocompletar ficha con IA' }));
+    await waitFor(() => {
+      expect(screen.getByLabelText('Referencia URL')).toHaveValue('brazo-articulado');
+    });
+  });
+
   it('muestra el error de n8n y conserva los campos si la propuesta falla', async () => {
     automationAction.mockRejectedValue(Object.assign(new Error('ASSISTANT_TIMEOUT'), { code: 'ASSISTANT_TIMEOUT' }));
     openForm();
     await screen.findByRole('heading', { name: 'Nuevo modelo' });
     fireEvent.change(screen.getByLabelText('Nombre', { exact: true }), { target: { value: 'Prensa pequeña' } });
-    fireEvent.click(screen.getByRole('button', { name: '✨ Autocompletar ficha con IA' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('El asistente tardó demasiado');
+    fireEvent.click(screen.getByRole('button', { name: 'Autocompletar ficha con IA' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('n8n tardó demasiado en responder');
     expect(screen.getByLabelText('Descripción')).toHaveValue('');
   });
 

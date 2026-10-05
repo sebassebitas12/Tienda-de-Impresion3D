@@ -1,7 +1,7 @@
 import { matchesFacet, selectedValues } from './facetFilters.js';
 
 const PHASES = {
-  workshop: new Set(['PENDING_QUOTE', 'IN_REVIEW']),
+  workshop: new Set(['PENDING_QUOTE', 'IN_REVIEW', 'CHANGES_REQUESTED']),
   customer: new Set(['QUOTED', 'AWAITING_APPROVAL']),
   production: new Set(['APPROVED', 'PAID']),
   closed: new Set(['REJECTED', 'EXPIRED', 'CANCELLED']),

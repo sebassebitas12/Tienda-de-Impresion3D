@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ASSISTANT_COMMON_PROMPT, ASSISTANT_PROMPTS, ROLE_TOOLS, CATALOG_PRODUCT_DRAFT_PROMPT, CATALOG_PRODUCT_DRAFT_TASK } from '../src/utils/assistantPolicies.js';
+import { prepareQuoteEmail } from '../src/utils/quoteEmailTemplate.js';
 
 const directory = fileURLToPath(new URL('../automation/n8n/', import.meta.url));
 const load = async (file) => JSON.parse(await readFile(resolve(directory, file), 'utf8'));
@@ -9,6 +10,8 @@ const assistantModes = ['general', 'admin', 'quote'];
 const assistants = await Promise.all(assistantModes.map((mode) => load(`vertice-assistant-${mode}.json`)));
 const rates = await load('vertice-rates.json');
 const email = await load('vertice-quote-email.json');
+email.nodes.find(node => node.name === 'Validar y preparar correo').parameters.jsCode = `const prepareQuoteEmail = ${prepareQuoteEmail.toString()};\nreturn [{ json: prepareQuoteEmail($input.first().json.body ?? $input.first().json) }];`;
+await writeFile(resolve(directory, 'vertice-quote-email.json'), `${JSON.stringify(email, null, 2)}\n`);
 const nodes = [];
 const connections = {};
 const add = (source, { name, id, position, parameters } = {}) => {
@@ -57,12 +60,17 @@ const turns = body.messages.filter(m => ['user','assistant'].includes(m?.role) &
 if (!turns.length || turns.at(-1).role !== 'user') throw new Error('Falta el mensaje actual');
 const transcript = turns.map(m => (m.role === 'user' ? 'Cliente' : 'Asistente') + ': ' + m.content).join('\\n\\n');
 const isCatalogDraft = task === ${JSON.stringify(CATALOG_PRODUCT_DRAFT_TASK)};
-const systemPrompt = ${JSON.stringify(ASSISTANT_PROMPTS[mode] + '\n' + ASSISTANT_COMMON_PROMPT)} + (isCatalogDraft ? '\\n' + ${JSON.stringify(CATALOG_PRODUCT_DRAFT_PROMPT)} : '') + '\\nIdioma: ' + (body.language === 'en' ? 'English' : 'español de Costa Rica') + '\\nHerramientas permitidas: ' + (isCatalogDraft ? 'ninguna' : ${JSON.stringify(ROLE_TOOLS[mode].join(', '))});
-return [{json:{mode,task,toolCapability:body.toolCapability,toolEndpointUrl:body.toolEndpointUrl,systemPrompt,agentInput:transcript+'\\n\\nDevuelve exclusivamente el JSON solicitado por el sistema.'}}];` },
+const systemPrompt = isCatalogDraft
+  ? ${JSON.stringify(CATALOG_PRODUCT_DRAFT_PROMPT)} + '\\nIdioma: ' + (body.language === 'en' ? 'English' : 'español de Costa Rica') + '\\nHerramientas permitidas: ninguna'
+  : ${JSON.stringify(ASSISTANT_PROMPTS[mode] + '\n' + ASSISTANT_COMMON_PROMPT)} + '\\nIdioma: ' + (body.language === 'en' ? 'English' : 'español de Costa Rica') + '\\nHerramientas permitidas: ' + ${JSON.stringify(ROLE_TOOLS[mode].join(', '))};
+const agentInput = isCatalogDraft
+  ? 'TAREA ADMIN: El producto a autocompletar se llama \"' + turns.at(-1).content + '\". No busques en la tienda ni uses herramientas. Genera exclusivamente el objeto JSON con reply breve, links:[], requestDraft:null y el objeto productDraft completo con description, material, colors, weightGrams, estimatedProductionHours y estimateBasis.'
+  : transcript + '\\n\\nDevuelve exclusivamente el JSON solicitado por el sistema.';
+return [{json:{mode,task,toolCapability:body.toolCapability,toolEndpointUrl:body.toolEndpointUrl,systemPrompt,agentInput}}];` },
   });
   connectMain(entryName, prepareName);
   nodes.push({
-    name: agentName, id: `vertice-ai-agent-${mode}`, type: '@n8n/n8n-nodes-langchain.agent', typeVersion: 2.2,
+    name: agentName, id: `vertice-ai-agent-${mode}`, type: '@n8n/n8n-nodes-langchain.agent', typeVersion: 3.1,
     position: [790, y], parameters: {
       promptType: 'define', text: '={{ $json.agentInput }}',
       options: { systemMessage: '={{ $json.systemPrompt }}', maxIterations: mode === 'quote' ? 3 : 4, returnIntermediateSteps: false },

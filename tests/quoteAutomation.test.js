@@ -140,15 +140,18 @@ describe('roles, herramientas y recorridos', () => {
       categories: [
         { id: 'cat3', name: 'Juguetes', slug: 'juguetes', status: 'ACTIVE' },
         { id: 'cat4', name: 'Decoración', slug: 'decoracion', status: 'ACTIVE' },
+        { id: 'cat5', name: 'Gadgets', slug: 'gadgets', status: 'ACTIVE' },
       ],
       products: [
         { id: 'p6', name: 'Llavero personalizado base', slug: 'llavero-base', categoryId: 'cat3', status: 'ACTIVE', material: 'PLA', price: 2500, currency: 'CRC' },
+        { id: 'p7', name: 'Organizador modular de escritorio', slug: 'organizador-modular-escritorio', categoryId: 'cat5', status: 'ACTIVE', material: 'PETG', price: 8000, currency: 'CRC' },
         { id: 'p4', name: 'Maceta geométrica', slug: 'maceta-geometrica', categoryId: 'cat4', status: 'ACTIVE', material: 'PETG', price: 7500, currency: 'CRC' },
         { id: 'p-draft', name: 'Juguete de prueba', categoryId: 'cat3', status: 'DRAFT', material: 'PLA' },
       ],
     };
     const matching = await executeAssistantTool('search_catalog', { query: 'juguetes' }, { mode: 'general', data: catalog, getRates: rates });
     expect(matching).toEqual([{ id: 'p6', name: 'Llavero personalizado base', material: 'PLA', price: 2500, currency: 'CRC', category: 'Juguetes', madeToOrder: true, path: '/producto/p6' }]);
+    expect(await executeAssistantTool('search_catalog', { query: 'organizador de escritorio' }, { mode: 'general', data: catalog, getRates: rates })).toMatchObject([{ id: 'p7', name: 'Organizador modular de escritorio' }]);
     expect(await executeAssistantTool('search_catalog', { query: 'decoracion' }, { mode: 'general', data: catalog, getRates: rates })).toMatchObject([{ name: 'Maceta geométrica', category: 'Decoración' }]);
     expect(await executeAssistantTool('search_catalog', { query: '' }, { mode: 'general', data: catalog, getRates: rates })).toEqual([]);
   });
@@ -218,7 +221,8 @@ describe('roles, herramientas y recorridos', () => {
     const order = { status: 'PENDING' };
     expect(prepareOrderTransition(order, { expectedStatus: 'PENDING', nextStatus: 'READY' }, now).error).toBe('TRANSITION_FORBIDDEN');
     expect(prepareOrderTransition(order, { expectedStatus: 'PENDING', nextStatus: 'CANCELLED' }, now).error).toBe('REASON_REQUIRED');
-    expect(prepareOrderTransition(order, { expectedStatus: 'PENDING', nextStatus: 'CONFIRMED' }, now).patch.status).toBe('CONFIRMED');
+    expect(prepareOrderTransition(order, { expectedStatus: 'PENDING', nextStatus: 'CONFIRMED' }, now).error).toBe('PAYMENT_VERIFICATION_REQUIRED');
+    expect(prepareOrderTransition({ ...order, paymentStatus: 'PAID' }, { expectedStatus: 'PENDING', nextStatus: 'CONFIRMED' }, now).patch.status).toBe('CONFIRMED');
   });
 });
 

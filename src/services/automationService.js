@@ -62,6 +62,8 @@ const assistantErrors = {
 export const automationError = (code, language = 'es') => assistantErrors[code]?.[language === 'en' ? 'en' : 'es'] || (language === 'en' ? 'Could not answer. Check your connection and try again.' : ({
   QUOTE_NOT_READY: 'Hace falta una cotización vigente con desglose, aprobada por su cliente.',
   PAYMENT_EVIDENCE_REQUIRED: 'Indicá el comprobante y confirmá que verificaste el monto completo.',
+  PAYMENT_PROOF_OUTDATED: 'El cliente actualizó el comprobante mientras revisabas. Actualizá el pedido para verificar la evidencia más reciente.',
+  PAYMENT_VERIFICATION_REQUIRED: 'Para confirmar un pedido en PENDING se debe validar el comprobante de pago primero.',
   PAYMENT_MODE_INVALID: 'Un encargo DEMO no puede registrar un cobro real.',
   CUSTOMER_REQUIRED: 'Esta opción requiere una cuenta de cliente. Administración tiene su propio flujo de cotización.',
   ADMIN_REQUIRED: 'Esta acción requiere la sesión de Administración.',

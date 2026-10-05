@@ -79,13 +79,14 @@ export async function executeAssistantTool(name, args, { mode, actor, data, getR
     const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
     const query = normalize(args.query);
     if (!query) return [];
+    const terms = query.split(/\s+/).filter(Boolean);
     const categories = new Map((data.categories || []).map(category => [String(category.id), category]));
     return (data.products || []).filter(product => {
       if (product.status !== 'ACTIVE' || !FDM_MATERIALS.includes(product.material)) return false;
       const category = categories.get(String(product.categoryId));
       const searchable = [product.name, product.slug, product.material, product.description, category?.name, category?.slug]
         .map(normalize).filter(Boolean).join(' ');
-      return searchable.includes(query);
+      return terms.every(term => searchable.includes(term));
     }).slice(0, 12).map(({ id, name: label, material, price, currency, categoryId }) => ({
       id, name: label, material, price, currency, category: categories.get(String(categoryId))?.name || null,
       madeToOrder: true, path: `/producto/${id}`,
@@ -128,7 +129,7 @@ export async function runAssistant({ mode, message, history = [], language = 'es
     if (guidance) return { reply: guidance, links: [], requestDraft: null, source: 'WORKSHOP_GUIDE' };
   }
   const messages = [
-    { role: 'system', content: `${ASSISTANT_PROMPTS[mode]}\n${ASSISTANT_COMMON_PROMPT}${task === CATALOG_PRODUCT_DRAFT_TASK ? `\n${CATALOG_PRODUCT_DRAFT_PROMPT}` : ''}\nIdioma: ${language === 'en' ? 'English' : 'español'}.` },
+    { role: 'system', content: task === CATALOG_PRODUCT_DRAFT_TASK ? `${CATALOG_PRODUCT_DRAFT_PROMPT}\nIdioma: ${language === 'en' ? 'English' : 'español'}.` : `${ASSISTANT_PROMPTS[mode]}\n${ASSISTANT_COMMON_PROMPT}\nIdioma: ${language === 'en' ? 'English' : 'español'}.` },
     ...history.filter(item => ['user', 'assistant'].includes(item?.role) && typeof item.content === 'string').slice(-10).map(({ role, content }) => ({ role, content: content.slice(0, 3000) })),
     { role: 'user', content: message.trim() },
   ];

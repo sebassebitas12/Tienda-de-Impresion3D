@@ -85,8 +85,8 @@ export function AdminAssistantPage() {
             <h2>{es ? '¿Qué necesitas resolver?' : 'What do you need to work through?'}</h2>
             <p>{es ? 'Consulta el estado del taller o elegí un punto de partida. Las acciones siguen bajo tu control.' : 'Check workshop status or choose a starting point. Actions stay under your control.'}</p>
             <div className="admin-copilot__prompts" role="region" aria-label={es ? 'Consultas sugeridas' : 'Suggested queries'}>
-              {topics.map((topic, index) => <button key={topic.label} type="button" onClick={() => send(topic.message)} disabled={busy}>
-                <span className="admin-copilot__prompt-index">0{index + 1}</span><span className="admin-copilot__prompt-copy"><strong>{topic.label}</strong><small>{topic.detail}</small></span><b aria-hidden="true">↗</b>
+              {topics.map(topic => <button key={topic.label} type="button" onClick={() => send(topic.message)} disabled={busy}>
+                <span className="admin-copilot__prompt-copy"><strong>{topic.label}</strong><small>{topic.detail}</small></span><b aria-hidden="true">↗</b>
               </button>)}
             </div>
           </div>}

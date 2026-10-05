@@ -1,6 +1,165 @@
 # Vértice CR — Auditoría HF y mockups
 
-> Última actualización: **2026-10-04**.
+## R-H84 — Auditoría de Admin por pestaña (2026-10-05)
+
+Recorrido capturado en Brave, escritorio, tema Dark y sesión de Administración:
+Resumen muestra pedidos/solicitudes/cobros diferenciados; Pedidos permite filtrar
+y entrar al detalle; Solicitudes agrupa por fase y conduce a la ficha; Catálogo
+muestra filtros, publicación, categorías, material y acceso a cotizador DEMO;
+Categorías conserva editor contextual; Clientes presenta búsqueda e historial;
+Actividad muestra eventos registrados; Copiloto usa espacio propio y propone
+consultas sin ejecutar acciones por sí solo. Catálogo y Solicitudes tuvieron
+prioridad por riesgo de alterar el catálogo y avanzar el ciclo de cotización.
+
+Hallazgos corregidos: el cálculo de cotización era una mutación de negocio oculta
+tras “Calcular”; ahora exige confirmar el guardado/cambio a Cotizada y dice que
+no manda email. Estimación y tarifas se rotulan como DEMO. En Catálogo los
+filtros Borrador/Oculto permanecen disponibles con cero resultados y el vacío
+de Borrador dirige a crear ficha. Se quitaron ordinales ornamentales de las
+listas de Solicitudes/Clientes y consultas sugeridas del Copiloto.
+
+El mapa de Solicitudes dejó de repetir el total en el texto auxiliar y explica
+que elegir etapas filtra la bandeja. En Copiloto, la captura inicial cortaba el
+composer a esta altura de escritorio; se compactó el espacio de bienvenida para
+mostrar campo y acción completos en la primera vista.
+
+Verificación visual posterior: screenshot real de Catálogo Dark escritorio,
+25 modelos mostrados; filtros Publicado 25, Borrador 0 y Oculto 0 visibles.
+También se recapturaron Solicitudes, Clientes y Copiloto Dark escritorio; en
+este último se ve el composer completo al entrar.
+Jest cubre filtro vacío y el diálogo de confirmación/cancelación sin mutación.
+No se guardó cotización ni se cambió estado/datos comerciales. Light,
+responsive real a 375/768, teclado y tecnología asistiva siguen pendientes;
+esta captura no certifica esos contextos ni el dashboard completo.
+
+## R-H81 — Carrito y lectura del pedido (2026-10-05)
+
+Contacto revisado en navegador de escritorio: conserva rutas distintas para
+archivo, idea y seguimiento. Ajuste editorial: hablar desde el taller en singular
+y dirigir al admin a acciones propias, sin sugerir personal adicional.
+
+Carrito sustituye tarjeta verde de sesión por titular y enlace a cuenta, sin
+duplicar paneles. Resumen «Tu encargo» conserva subtotal y alcance explícito.
+Cuenta muestra las piezas antes del reporte SINPE; confirmar pago no inicia
+producción. Se conserva subtotal cero explícito y se restaura loading al refrescar
+cotizaciones. /orders/mine aporta currentCatalogName solo si falta snapshot:
+referencia actual, nunca sustitución de precio/material histórico ni persistencia.
+
+Evidencia IAB real: carrito y cuenta 375 Light, 1280 Dark. Selección temporal
+p7 Negro retirada al terminar; sin crear pedidos, pagos ni correos. n8n local
+muestra el workflow unificado Published y 3 asistentes/tasas/correo separados.
+Gmail solo encuentra la prueba anterior del 4 oct.; no acredita que el nuevo
+renderer llegó al correo activo. API activa no recarga el módulo modificado:
+nombres enriquecidos verificados por test, pendiente reinicio controlado de API.
+45 suites/291 tests, lint,
+check:ui y build verdes. Bundle >500 kB sigue advertido; sin CI remoto.
+No implica cierre del recorrido completo ni aprobación comercial de pagos.
+
+### R-H82 — diagnóstico en n8n publicado (2026-10-05)
+
+Prueba desde Home: respuesta general sin herramienta sí llegó; búsqueda real
+de catálogo ejecutó `search_catalog`, pero la ejecución n8n falló después de
+la herramienta. Evidencia ejecución 66: OpenRouter respondió en ambos turnos,
+Tool HTTP fue Success y devolvió lista vacía; AI Agent 2.2 terminó con
+`Cannot read properties of undefined (reading 'message')` dentro de
+`wrapLangChainParserError` (n8n 2.39.8, que ofrece Agent 3.1). Se sube el
+workflow fuente a Agent 3.1. La búsqueda ahora exige que todos los términos
+aparezcan en los campos indexados, aunque no estén en orden contiguo.
+JSON regenerado y tests locales verdes. El n8n actualmente publicado sigue
+usando Agent 2.2; importar y volver a publicar el nuevo JSON, luego repetir
+esta misma búsqueda. La causa de parser es compatible con defecto del nodo
+antiguo, pero aún falta verificar que Agent 3.1 lo resuelve en este proveedor.
+
+## R-H80 — Versión local de presentación, tienda/ficha/cuenta/correo (2026-10-05)
+
+Cambios efectivos, no cierre global:
+- Ficha: una sola selección de color, navegación por flechas, galería completa
+  con miniaturas si hay más de una foto, imagen principal sin recorte y fallo
+  de foto explícito. Ruta visible para pedir modificación/tamaño personalizado.
+- Tienda: filtros por categoría real y material con rótulos visibles; no agrega
+  categorías/datos ni altera los 25 productos.
+- Cuenta: título orientado al cliente, perfil sin mezcla de rol taller, siguiente
+  paso para QUOTED y CHANGES_REQUESTED. No ofrece aprobación en un estado inválido.
+- Reseñas: elimina la afirmación no respaldada de fabricación verificada.
+- Correo: renderer único probado, tonos cálidos de marca, tablas de ancho acotado,
+  precio al cliente separado del alcance, vigencia y enlace a cuenta. No muestra
+  costos internos como otro precio, ni afirma evaluación técnica/material confirmado.
+  Demo/prueba visibles y enlace localhost identificado como local.
+
+Evidencia IAB: ficha p7 Dark 375, catálogo Dark 1280, preview de correo 375/1280.
+Correcto observado: pieza completa, selección única, identidad cálida y lectura
+del precio. La galería multifoto se verifica en Jest con fixture aislado, no se
+inventaron fotos nuevas en db.json. Preview generado mediante
+scripts/preview-quote-email.mjs en automation/evidence/_local_archive (ignorado).
+No se envió correo real ni se cambió workflow activo n8n. Gmail recibido sigue
+siendo la versión anterior; reimportación/render Gmail posterior pendientes.
+
+Gate final: 45 suites/289 tests, lint, check:ui, build y check:automation (258)
+pasan. Se corrigió el verificador aislado que todavía saltaba validación de pago.
+Sin cambios de db.json ni dependencia nueva. Bundle >500 kB sigue advertido.
+No hay commit/push ni CI remoto verificado en este turno. Presentación local
+lista para revisión humana; auditoría integral y checkout comercial no cerrados.
+
+## R-H79 — Correo real y auditoría abierta de experiencia (2026-10-05)
+
+Por instrucción del usuario, los cuatro bloques anteriores no constituyen una
+lista exhaustiva ni garantizan 100%. El cierre se evalúa recorriendo pantallas
+y transiciones como visitante/customer/Admin: qué ve, entiende, puede hacer y
+qué ocurre después. Registrar correctos, duplicados, defectos y mejoras, con
+evidencia antes/después; no cerrar por pruebas técnicas solamente.
+
+Primer paso observado: correo `[DEMO] [PRUEBA] Cotización Vértice CR · Solicitud
+r1`, enviado el 4 de octubre. Leído con Gmail y capturado en Gmail web. No se
+envió otro correo ni se cambió n8n. Hallazgos:
+- P1: el cuerpo recibido no coincide con la plantilla actual del repositorio.
+  No tiene CTA/enlace a cuenta; revisar versión ejecutada en n8n. Esto no prueba
+  que el workflow publicado actualmente continúe usando esa versión.
+- P1: costo calculado ₡6.699 y total ₡10.384 sin explicación de la diferencia.
+  No es evidencia de cálculo incorrecto; sí de comunicación incompleta.
+- P2 visual confirmado: tabla ocupa casi todo el ancho del panel Gmail; labels
+  e importes demasiado separados. El max-width de main no conserva en ese
+  render el ancho acotado esperado. Usar contenedor compatible con email y
+  verificar Gmail, no solo un navegador de preview.
+- P2: Material repetido como polímero y costo; datos técnicos mezclados con
+  costos internos y total. Separar alcance del encargo y precio al cliente.
+- P2: saludo usa persona del dataset demo distinta del destinatario de prueba;
+  rotular prueba sin personalización confusa. La marca es solo texto, sin
+  identidad visual completa. No se declara rediseño implementado.
+
+Siguiente paso: contrastar payload/plantilla/workflow ejecutado, definir correo
+legible con monto/vigencia/alcance y acción en app; después seguir los recorridos
+paso a paso. No habilitar cobros ni enviar pruebas duplicadas durante auditoría.
+
+## R-H78 — Auditoría práctica carrito/cuenta/pago (2026-10-05)
+
+Observado en IAB mediante login normal de cuentas académicas: ficha p7,
+selección Negro, carrito customer, cuenta de Ana y detalle Admin o4.
+No se crearon pedidos/comprobantes ni se enviaron correos. La selección temporal
+se quitó; db.json no se editó.
+
+- P1 corregido: DELIVERED aparecía como recibido. Se reconocen READY/SHIPPED/
+  DELIVERED, sin presentar un monto histórico como deuda. Reseña desde entregado.
+- P1 corregido: SINPE de ejemplo parecía destinatario real; se rotula demo y
+  se advierte no transferir. Confirmar pago ya no se llama iniciar producción.
+- P1 visual: carrito Dark 768 superponía resumen/controles; captura posterior
+  confirma separación vertical. Cuenta Light 375 desbordaba por el stepper;
+  captura posterior confirma rejilla y tarjeta dentro del viewport.
+- P2 corregido: cuenta no desglosaba cargos de entrega presentes en Admin;
+  se muestran campos registrados, sin inferir ceros ni precios históricos.
+
+Cobertura visual: cuenta Light 375/escritorio, carrito Light 375 y Dark 768,
+Admin detalle Dark 768. No constituye matriz global completa ni aprobación
+humana. Mutaciones de pago/encargo se cubren con Jest aislado, no banco real.
+Gate local final: 44 suites / 278 tests; lint, check:ui y build pasan. Persiste
+advertencia de bundle JS superior a 500 kB. CI remoto no revisado en este bloque.
+
+Pendientes confirmados: checkout no captura entrega/retiro ni condiciones finales;
+ficha pública solo muestra images[0] pese a galería administrativa; pedidos
+heredados carecen de nombre/material snapshot en cuenta; personalización de
+catálogo necesita recorrido específico. Priorizar entrega y monto final antes
+de habilitar pagos reales. No se declara experiencia terminada al 100%.
+
+> Última actualización: **2026-10-05**.
 
 ## P1 — Asistencia IA en ficha de producto — 2026-10-04
 
@@ -1512,3 +1671,130 @@ enlace «Explorar modelos»; la captura posterior confirma el cambio a esa
 resolución. Solo se inspeccionó el carrito vacío en Light de escritorio; carrito
 con líneas, 375/768 px, Dark y `/cuenta` con sesión customer siguen pendientes.
 Esto no es aprobación visual del flujo completo ni una prueba de checkout live.
+
+## R-H74 — Auditoría de recorrido real, no de paleta (2026-10-04)
+
+Alcance: lectura y navegación, sin confirmar compras, solicitudes, correos ni
+pagos; sin escribir db.json. Brave: cliente Ana, carrito, cuenta/cotizaciones,
+pedidos, perfil, catálogo, ficha llavero y entrada de solicitud. Captura Dark de
+Mis pedidos. IAB aislado: visitante en archivo → login → volver; texto del resumen
+desaparece. Light 375×812: captura del formulario y menú; viewport 375/documento
+360, sin overflow en lo inspeccionado. Overrides restaurados. No es una matriz
+responsive completa. Admin se inspeccionó en código, no con sesión live: pendiente.
+
+### Bloqueos de cierre
+
+| Prioridad | Evidencia | Qué debe cerrarse |
+|---|---|---|
+| Alta | Visitante pierde borrador al ir al login; enlaces no conservan retorno y registro siempre lleva a cuenta | Continuidad de tarea, retorno y tratamiento explícito de adjuntos durante autenticación |
+| Alta | Cuenta usa COMPLETED; Admin usa READY/SHIPPED/DELIVERED. o1 DELIVERED aparece crudo y en Recibido | Contrato compartido de etapas, terminales y reseña posterior a entrega |
+| Alta | quote-fulfillment registra pago antes de crear pedido PENDING; cuenta vuelve a pedir transferencia para ese pedido | Unificar circuito personalizado/catálogo o reconocer evidencia previa; evitar doble pago |
+| Alta | OrderActions/prepareOrderTransition dejan avanzar sin paymentStatus PAID; validar dice iniciar producción aunque solo confirma | Separar pago verificado y fabricación, validación en servidor y copy coherente |
+| Alta | Catálogo live muestra 5 modelos. Disco/API: 25 registros, 19 DRAFT y uno ACTIVE PLA Silk fuera del contrato | Reconciliar fichas/documentación sin inventar costos ni sobrescribir pruebas del usuario |
+| Alta | Sobre nosotros/Contacto muestran construcción en vivo; router deja igual FAQ/materiales/requisitos/legal/envíos y checkout/detalle público | Información útil, soporte real y rutas coherentes, sin destinos de relleno |
+| Alta | Pedido catálogo guarda solo subtotal, sin elección retiro/envío/destino/costo/plazo; cuenta pide total SINPE | Definir entrega antes del pago sin inventar importes/plazos |
+| Media | Carrito p7 DRAFT: ₡0 y botón deshabilitado; faltan resumen del bloqueo y recuperación contextual | Distinguir selección no cotizable de total cero y facilitar corrección |
+| Media | Cuenta muestra p1/p2 y PLA inventado por fallback; o4 total ₡8500 vs línea ₡6500 sin explicación | Nombres/snapshot, material desconocido explícito y desglose histórico |
+| Media | Pedido personalizado sin orderItems se titula 0 modelos, scopeSnapshot no se muestra | Representar encargo personalizado y vincular solicitud/pedido |
+| Media | QUOTED/APPROVED cliente no explican siguiente paso accionable | Responsable y acción por etapa, vínculo al pedido y pago cuando corresponda |
+| Media | Descartar invoca delete sin confirmación, aun en revisión | Cancelación auditable de trabajo enviado; distinguir ocultar de borrar |
+| Media | ProductMedia usa solo images[0]; llavero personalizable solo tiene color/cantidad | Galería pública y especificación/nota o derivación a solicitud |
+| Media | Perfil es solo lectura y expone ACTIVE / Cliente particular / Taller | Copy claro y alcance honesto; definir edición de contacto según MVP |
+| Media | Copy DEMO se suavizó hasta prometer programación de fabricación con pago simulado | Mantener procedencia de simulación y no confundir con operación real |
+| Media | Pedidos sin reintento, loading inicial false y formulario compartido entre órdenes | Recuperación, carga real y campos aislados por pedido |
+
+P2 mantiene `/products/soporte-audifonos.jpg` en los datos actuales y el catálogo
+presenta placeholder, pese a que el asset nuevo existe en public/images.
+No declarar que los 25 modelos están publicados ni que la foto está conectada.
+
+Orden de cierre: continuidad/auth y estados → pedido/pago/entrega → catálogo,
+galería/personalización/carrito → informativas/soporte → Admin autenticado y
+regresión de roles/temas/1280/768/375/teclado/errores. No se implementaron cambios
+de producto en esta auditoría ni se usaron tests verdes como prueba end-to-end.
+
+## R-H75 — Contexto de carrito y páginas institucionales — 2026-10-04
+
+**Cambio realizado:** `vertice-cart-v1` se migra únicamente a visitante; nuevas
+claves separan visitante, cada cliente y Admin. El cliente que entra o se registra
+desde `/carrito` combina explícitamente su selección visitante con su cuenta. La
+restauración de sesión muestra estado de carga antes del carrito, y las pestañas
+del mismo navegador sincronizan la clave activa. Cambiar la identidad cambia la
+suscripción/almacenamiento sin desmontar la navegación, para no cortar el menú o
+la acción en curso. Se sustituyeron los destinos de
+construcción de `/nosotros` y `/contacto` por páginas informativas en ambos
+idiomas. Contacto deriva archivo, idea y seguimiento a rutas existentes y puede
+abrir el asistente general. No se publica email.
+
+**Evidencia disponible:** pruebas enfocadas del bloque: 4 suites, 20 tests
+pasando (incluyen carrito, retorno desde login/registro, checkout y páginas
+institucionales). En IAB local se capturó `/nosotros` en Light de escritorio y
+`/contacto` en Light/Dark; el árbol accesible confirmó contenido ES/EN, enlaces
+y apertura del asistente. No se autenticó ni creó solicitud/pedido. La página
+About ya no presenta rótulos numéricos ornamentales.
+No es evidencia aún de `/carrito` real con dos cuentas, login live, checkout,
+ responsive 375/768/1280, Light/Dark completos, Admin autenticado ni CI. Esos
+recorridos siguen abiertos.
+
+**Referencia → adaptación:** dirección y tokens vigentes de `docs/04` → páginas
+editoriales/operativas sin números decorativos, con enlaces a flujos reales →
+evita que contenido institucional aparente promesas o acciones que aún no
+existen. Sin referencia externa nueva; Stitch no intervino en decisiones de
+estilo.
+
+## R-H76 — Recorrido de Contacto y honestidad del canal — 2026-10-04
+
+**Ajuste:** `/contacto` acumulaba el padding superior del shell fijo y de la
+página, dejando un vacío innecesario. Se eliminó el offset duplicado solo en esta
+ruta y se organiza el primer bloque alrededor de la orientación del proceso;
+debajo se diferencian las rutas para adjuntar una pieza, ordenar una idea y dar
+seguimiento, con ayuda contextual y preguntas frecuentes. Se corrigió el copy de
+retorno de sesión al voseo del sitio.
+
+**Auditoría del canal:** el correo personal permanece privado. No se puede crear
+un buzón real desde el frontend; publicar `hola@verticecr.com` u otra dirección
+no confirmada mandaría a clientes a un destino posiblemente muerto. Un formulario
+de contacto general sigue pendiente de un receptor interno configurado y de su
+contrato de envío; no reutilizar intake de cotización como si fuera soporte.
+
+**Evidencia local:** capturas IAB de `/contacto` en escritorio (aprox. 1270×707)
+en Light y Dark, incluyendo hero; en Light también se inspeccionaron las tarjetas
+de rutas. El árbol accesible confirmó enlaces a `/solicitud/archivo`,
+`/solicitud/ayuda-diseno`, `/login`, `/cuenta` y `/admin` según rol, más el botón
+que abre el asistente general. El test de página comprueba esos destinos y el FAQ.
+No se inspeccionaron breakpoints 375/768, teclado completo, envío de solicitud
+real ni contacto por email. Se conserva la orientación establecida en `docs/04`;
+no se añadió referencia estética externa.
+
+## R-H77 — Acceso al carrito restringido a cliente — 2026-10-05
+
+**Hallazgo reproducido:** la captura del usuario muestra el icono del carrito en
+el navbar con sesión visitante, aunque las líneas ya se almacenaban separadas
+por identidad. Persistencia aislada no equivale a acceso correctamente
+restringido.
+
+**Corrección:** el navbar muestra carrito solo a `customer`; `/carrito` usa
+`RequireRole role="customer"`, conserva el destino al redirigir al login y
+rechaza también a Admin. El login y registro explican por qué se pide sesión y
+preservan destino/aviso. Un visitante aún puede elegir una pieza; se guarda en
+su espacio local (o en la pestaña activa si falla el almacenamiento) y el aviso ofrece login/registro para volver al carrito. El
+login/registro ya fusiona esa selección al carrito de la cuenta. El CTA de ficha
+no ofrece un enlace directo al carrito al visitante. Admin no puede agregar
+modelos desde la tienda.
+
+**Regresión cubierta:** pruebas del navbar (visitante/cliente/Admin), del guard
+de rol (destino conservado y rechazo de Admin) y del aviso de ficha visitante
+frente al enlace de carrito para cliente, además del aviso de login/registro.
+IAB local: a ~1265×713 en Light, la captura del navbar/menú visitante ya no
+muestra carrito y la ruta `/carrito` redirige a `/login`. También confirmé en la
+pestaña local de Brave, en Dark de escritorio con el menú de visitante abierto,
+que no aparece el icono. No hubo sesión customer live ni viewport 375/768;
+teclado y lector de pantalla siguen pendientes. Comprobar la fusión de datos
+locales tras login también queda pendiente. El cambio no borra ninguna clave ni
+modifica `db.json`.
+
+Checks locales tras este ajuste: 44 suites/271 tests, lint y `check:ui` pasan;
+build pasa con el aviso conocido de bundle principal >500 kB. No es CI remota.
+
+**Decisión funcional:** el usuario actual pidió explícitamente no mostrar el
+carrito antes de login. Se conserva el staging local de artículos para evitar
+perder selección, pero no se expone su contenido ni un acceso en chrome público.

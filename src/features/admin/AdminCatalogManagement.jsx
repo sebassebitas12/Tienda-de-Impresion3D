@@ -41,6 +41,7 @@ export function AdminProductFormPage() {
   const [confirmDemoPrice, setConfirmDemoPrice] = useState(false);
   const [aiBusy, setAiBusy] = useState(false);
   const [aiReply, setAiReply] = useState('');
+  const [aiError, setAiError] = useState('');
   const [pricingDemoProfileApplied, setPricingDemoProfileApplied] = useState(false);
   const product = values || (existing ? {
     name: existing.name || '', slug: existing.slug || '', description: existing.description || '', categoryId: existing.categoryId || '',
@@ -92,14 +93,20 @@ export function AdminProductFormPage() {
   };
   const completeProductWithAi = async () => {
     const name = product.name.trim();
-    if (!name) { setError(language === 'es' ? 'Escribí primero el nombre del producto.' : 'Enter the product name first.'); return; }
-    setAiBusy(true); setError(''); setAiReply('');
+    setAiError(''); setError(''); setAiReply('');
+    if (!name) {
+      const msg = language === 'es' ? 'Escribí primero el nombre del producto.' : 'Enter the product name first.';
+      setAiError(msg);
+      return;
+    }
+    setAiBusy(true);
     try {
       const result = await automationAction('/assistants/chat', { mode: 'general', task: 'catalog_product_draft', message: name, language }, { token });
       if (!result?.productDraft) throw Object.assign(new Error('ASSISTANT_INVALID_RESPONSE'), { code: 'ASSISTANT_INVALID_RESPONSE' });
       const draft = result.productDraft;
       const generatedAt = new Date().toISOString();
       setValues(current => ({ ...product, ...current,
+        slug: (current?.slug || product.slug || slugify(name)),
         description: draft.description,
         material: draft.material,
         colors: draft.colors.join(', '),
@@ -111,7 +118,8 @@ export function AdminProductFormPage() {
       setPricingDemoProfileApplied(false); setPricingPreview(null); setConfirmDemoPrice(false);
       setAiReply(result.reply || (language === 'es' ? 'Ficha propuesta. Revisá cada campo antes de guardar.' : 'Draft suggested. Review each field before saving.'));
     } catch (actionError) {
-      setError(automationError(actionError.code || actionError.message, language));
+      const msg = automationError(actionError.code || actionError.message, language);
+      setAiError(msg);
     } finally { setAiBusy(false); }
   };
   const confirmSlicerValues = checked => setValues(current => ({ ...product, ...current, aiProductionEstimate: { ...product.aiProductionEstimate, verifiedWithSlicer: checked } }));
@@ -164,8 +172,9 @@ export function AdminProductFormPage() {
     <form className="admin-catalog-form__surface" onSubmit={save} noValidate>
       <section className="admin-product-ai" aria-labelledby="admin-product-ai-title">
         <div><span className="admin-eyebrow">{language === 'es' ? 'ASISTENCIA DE FICHA · PROPUESTA' : 'PRODUCT DRAFT · SUGGESTION'}</span><h2 id="admin-product-ai-title">{language === 'es' ? 'Partí del nombre, revisá el resto.' : 'Start with a name, review the rest.'}</h2><p>{language === 'es' ? 'La IA sugiere descripción, material, colores y una referencia muy aproximada de peso/tiempo. No consulta stock ni mide la pieza.' : 'AI suggests a description, material, colors and a very rough weight/time reference. It does not check stock or measure the part.'}</p></div>
-        <button className="admin-action-primary" type="button" onClick={completeProductWithAi} disabled={aiBusy || busy}>{aiBusy ? (language === 'es' ? 'Preparando propuesta…' : 'Preparing suggestion…') : '✨ Autocompletar ficha con IA'}</button>
+        <button className="admin-action-primary" type="button" onClick={completeProductWithAi} disabled={aiBusy || busy}>{aiBusy ? (language === 'es' ? 'Preparando propuesta…' : 'Preparing suggestion…') : (language === 'es' ? 'Autocompletar ficha con IA' : 'Autocomplete product with AI')}</button>
         {aiBusy && <p className="admin-product-ai__status" role="status" aria-live="polite">{language === 'es' ? 'Consultando el agente general…' : 'Asking the general assistant…'}</p>}
+        {aiError && <p className="admin-product-ai__error" role="alert">{aiError}</p>}
         {aiReply && <p className="admin-product-ai__reply" role="status">{aiReply}</p>}
         {product.aiProductionEstimate && <p className="admin-product-ai__caveat" role="note">{language === 'es' ? `Estimación IA, no medición. ${product.aiProductionEstimate.estimateBasis}` : `AI estimate, not a measurement. ${product.aiProductionEstimate.estimateBasis}`}</p>}
       </section>
@@ -245,7 +254,7 @@ export function AdminCategoriesPage() {
     <Link className="admin-request-back" to="/admin/catalogo">← {t.back}</Link>
     <header className="admin-page-heading"><div><span className="admin-eyebrow">CATÁLOGO / ORGANIZACIÓN</span><h1 id="admin-categories-title">{t.categoriesTitle}</h1><p>{t.categoriesHelp}</p></div></header>
     <form className="admin-catalog-form__surface admin-category-create" aria-label={t.addCategory} onSubmit={event => saveCategory(event)}>
-      <div className="admin-category-create__heading"><span className="admin-eyebrow">01 / {language === 'es' ? 'NUEVA EN EL CATÁLOGO' : 'ADD TO CATALOG'}</span><h2>{t.addCategory}</h2><p>{language === 'es' ? 'Definí un nombre y una referencia para agrupar modelos.' : 'Set a name and reference to group models.'}</p></div>
+      <div className="admin-category-create__heading"><span className="admin-eyebrow">{language === 'es' ? 'NUEVA EN EL CATÁLOGO' : 'ADD TO CATALOG'}</span><h2>{t.addCategory}</h2><p>{language === 'es' ? 'Definí un nombre y una referencia para agrupar modelos.' : 'Set a name and reference to group models.'}</p></div>
       <div className="admin-category-create__fields">
         <label>{t.categoryName}<input value={draft.name} onChange={event => setDraft(current => ({ ...current, name: event.target.value }))} required /></label>
         <label>{t.categorySlug}<input value={draft.slug || slugify(draft.name)} onChange={event => setDraft(current => ({ ...current, slug: event.target.value }))} required /></label>
@@ -257,7 +266,7 @@ export function AdminCategoriesPage() {
       <div className="admin-category-row__summary"><span className="admin-eyebrow">{language === 'es' ? 'CATEGORÍA' : 'CATEGORY'} / {String(category.id).toUpperCase()}</span><strong>{category.name}</strong><small>{category.slug} · {products.filter(product => String(product.categoryId) === String(category.id)).length} {language === 'es' ? 'modelos' : 'models'}</small></div>
       <div className="admin-category-row__actions"><button className="admin-action-secondary" type="button" aria-expanded={editing === category.id} aria-controls={`category-editor-${category.id}`} onClick={() => { setEditing(editing === category.id ? null : category.id); setEditDraft({ name: category.name, slug: category.slug }); setError(''); }}>{editing === category.id ? t.cancel : (language === 'es' ? 'Editar categoría' : 'Edit category')}</button><button className="admin-action-secondary admin-category-delete" type="button" disabled={busy} onClick={() => { setError(''); if (usedCategories.has(String(category.id))) { setError(t.categoryUsed); return; } setDeleteTarget(category); }}>{t.deleteCategory}</button></div>
       {editing === category.id && <form id={`category-editor-${category.id}`} className="admin-category-editor" aria-label={`${t.editCategory}: ${category.name}`} onSubmit={event => saveCategory(event, category.id)}>
-        <header><div><span className="admin-eyebrow">02 / {language === 'es' ? 'IDENTIDAD DE CATÁLOGO' : 'CATALOG IDENTITY'}</span><h2>{t.editCategory}: {category.name}</h2></div><p>{t.categoryUrlHelp}</p></header>
+        <header><div><span className="admin-eyebrow">{language === 'es' ? 'IDENTIDAD DE CATÁLOGO' : 'CATALOG IDENTITY'}</span><h2>{t.editCategory}: {category.name}</h2></div><p>{t.categoryUrlHelp}</p></header>
         <div className="admin-category-editor__body">
           <div className="admin-category-editor__fields">
             <label>{t.categoryName}<input autoFocus value={editDraft.name} onChange={event => setEditDraft(current => ({ ...current, name: event.target.value, slug: current.slug || slugify(event.target.value) }))} required /></label>

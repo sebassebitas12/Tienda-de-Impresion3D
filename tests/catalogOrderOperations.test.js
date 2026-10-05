@@ -10,6 +10,60 @@ const payload = { items: [{ productId: 'p1', color: 'Negro', quantity: 2, unitPr
 const fixture = () => ({ products: [product], users: [actor], orders: [], orderItems: [], activityLog: [] });
 
 describe('creación de encargos de catálogo', () => {
+  const tokenFor = (user, exp = 9999999999) => `Bearer sim.v1.${btoa(JSON.stringify({ kind: 'SIMULATED_JWT', sub: user.id, role: user.role, exp }))}`;
+  function mineFixture(users = [{ ...actor, status: 'ACTIVE' }]) {
+    const embedded = [{ productId: 'p1', quantity: 2, unitPrice: 2500, subtotal: 5000 }];
+    const db = { data: { ...fixture(), users, orders: [
+      { id: 'own', userId: 'c1', orderItems: embedded },
+      { id: 'legacy', userId: 'c1' },
+      { id: 'other', userId: 'c2', orderItems: [{ productId: 'private' }] },
+    ], orderItems: [{ orderId: 'legacy', productId: 'p2', quantity: 1 }, { orderId: 'other', productId: 'private' }] } };
+    const handlers = new Map();
+    const persist = jest.fn();
+    installCatalogOrderOperations({ registerAction: (path, handler) => handlers.set(path, handler), db, serialize: task => task(), persist });
+    return { db, persist, invoke(authorization, body = {}) {
+      let result; let status = 200;
+      const res = { status(value) { status = value; return this; }, json(value) { result = value; return this; } };
+      handlers.get('/orders/mine')({ headers: { authorization }, body }, res);
+      return { status, body: result };
+    } };
+  }
+
+  it('consulta solo pedidos propios con sus líneas, ignorando userId del payload', () => {
+    const { db, persist, invoke } = mineFixture();
+    const before = structuredClone(db.data);
+    const result = invoke(tokenFor(actor), { userId: 'c2' });
+    expect(result.status).toBe(200);
+    expect(result.body.orders.map(order => order.id)).toEqual(['own', 'legacy']);
+    expect(result.body.orders[0].orderItems).toEqual(before.orders[0].orderItems.map(item => ({ ...item, currentCatalogName: 'Organizador' })));
+    expect(result.body.orders[1].orderItems).toEqual([before.orderItems[0]]);
+    expect(db.data).toEqual(before);
+    expect(persist).not.toHaveBeenCalled();
+  });
+
+  it('conserva el snapshot histórico y nunca rellena costos/material desde el catálogo vigente', () => {
+    const { db, invoke } = mineFixture();
+    db.data.orders[0].orderItems[0].productName = 'Nombre al comprar';
+    const result = invoke(tokenFor(actor)).body.orders[0].orderItems[0];
+    expect(result.productName).toBe('Nombre al comprar');
+    expect(result.currentCatalogName).toBeUndefined();
+    expect(result.material).toBeUndefined();
+    expect(result.unitPrice).toBe(2500);
+  });
+
+  it('rechaza ausencia de sesión, admin, cuenta inactiva y token vencido con 403', () => {
+    const admin = { id: 'a1', role: 'admin', status: 'ACTIVE' };
+    const inactive = { id: 'c3', role: 'customer', status: 'INACTIVE' };
+    const { invoke } = mineFixture([{ ...actor, status: 'ACTIVE' }, admin, inactive]);
+    for (const token of [undefined, 'Bearer inválido', tokenFor(admin), tokenFor(inactive), tokenFor(actor, 1)]) {
+      expect(invoke(token)).toEqual({ status: 403, body: { code: 'CUSTOMER_REQUIRED' } });
+    }
+  });
+
+  it('devuelve una lista vacía cuando el cliente no tiene pedidos', () => {
+    const user = { id: 'empty', role: 'customer', status: 'ACTIVE' };
+    expect(mineFixture([user]).invoke(tokenFor(user)).body).toEqual({ orders: [] });
+  });
   it('recalcula el precio, crea el pedido y refleja items/actividad en una persistencia', () => {
     let sequence = 0;
     const result = prepareCatalogOrder(fixture(), actor, payload, now, () => `id-${++sequence}`);

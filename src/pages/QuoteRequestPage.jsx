@@ -11,40 +11,97 @@ import './quote-intake.css';
 const emptyDraft = { description: '', intendedUse: '', dimensions: '', dimensionsUnit: 'cm', material: '', quantity: 1, needsDesign: false, referenceUrl: '' };
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
+function readPersistedQuoteDraft() {
+  try {
+    const raw = (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('vertice.quote.draft'))
+      || (typeof localStorage !== 'undefined' && localStorage.getItem('vertice.quote.draft'));
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
 export function QuoteRequestPage() {
   const location = useLocation();
   const summaryHeading = useRef(null);
-  const manuallyEditedFields = useRef(new Set());
   const intent = location.pathname.endsWith('/archivo') ? 'file' : location.pathname.endsWith('/ayuda-diseno') ? 'design' : null;
   const auth = useAuth();
   const { language } = usePreferences();
   const es = language !== 'en';
-  const [draft, setDraft] = useState(emptyDraft);
+
+  const [persistedSnapshot] = useState(() => readPersistedQuoteDraft());
+  const manuallyEditedFields = useRef(new Set(persistedSnapshot?.manuallyEditedFields || []));
+
+  const [draft, setDraft] = useState(() => (persistedSnapshot?.draft ? { ...emptyDraft, ...persistedSnapshot.draft } : emptyDraft));
   const [files, setFiles] = useState([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(null);
-  const [assistantDraftReady, setAssistantDraftReady] = useState(false);
+  const [assistantDraftReady, setAssistantDraftReady] = useState(() => Boolean(persistedSnapshot?.assistantDraftReady));
+  const [restoredNotice, setRestoredNotice] = useState(() => {
+    if (!persistedSnapshot?.draft) return '';
+    if (persistedSnapshot.unpersistedFileNames?.length) {
+      return es
+        ? `Recuperamos los datos de tu solicitud. Por seguridad del navegador, los archivos adjuntos (${persistedSnapshot.unpersistedFileNames.join(', ')}) deben seleccionarse nuevamente.`
+        : `Your request details were restored. Due to browser security, attachments (${persistedSnapshot.unpersistedFileNames.join(', ')}) must be selected again.`;
+    }
+    return es
+      ? 'Recuperamos los datos de tu solicitud para que puedas continuar.'
+      : 'Your request details were restored so you can continue.';
+  });
   const idempotencyKey = useRef('');
   const authenticatedCustomer = auth?.user?.role === 'customer';
 
+  function persistDraft(nextDraft, nextFiles, nextAssistantReady) {
+    try {
+      const hasContent = Object.entries(nextDraft).some(([k, v]) => v && v !== emptyDraft[k]);
+      if (!hasContent && !nextFiles.length) {
+        sessionStorage.removeItem('vertice.quote.draft');
+        localStorage.removeItem('vertice.quote.draft');
+        return;
+      }
+      const payload = JSON.stringify({
+        draft: nextDraft,
+        assistantDraftReady: nextAssistantReady,
+        manuallyEditedFields: [...manuallyEditedFields.current],
+        unpersistedFileNames: nextFiles.map(f => f.name),
+        savedAt: Date.now(),
+      });
+      sessionStorage.setItem('vertice.quote.draft', payload);
+      localStorage.setItem('vertice.quote.draft', payload);
+    } catch {
+      // storage unavailable
+    }
+  }
+
   function updateDraft(key, value) {
     manuallyEditedFields.current.add(key);
-    setDraft(current => ({ ...current, [key]: value }));
+    setDraft(current => {
+      const next = { ...current, [key]: value };
+      persistDraft(next, files, assistantDraftReady);
+      return next;
+    });
     idempotencyKey.current = '';
     setError('');
+    setRestoredNotice('');
   }
 
   function applyAssistantDraft(value) {
     if (!value || typeof value !== 'object') return;
     setAssistantDraftReady(true);
-    setDraft(current => Object.fromEntries(Object.entries(current).map(([key, previous]) => {
-      const next = value[key];
-      if (manuallyEditedFields.current.has(key)) return [key, previous];
-      return [key, next === null || next === undefined || next === '' ? emptyDraft[key] : next];
-    })));
+    setDraft(current => {
+      const next = Object.fromEntries(Object.entries(current).map(([key, previous]) => {
+        const incoming = value[key];
+        if (manuallyEditedFields.current.has(key)) return [key, previous];
+        return [key, incoming === null || incoming === undefined || incoming === '' ? emptyDraft[key] : incoming];
+      }));
+      persistDraft(next, files, true);
+      return next;
+    });
     idempotencyKey.current = '';
     setError('');
+    setRestoredNotice('');
   }
 
   function reviewSummary() {
@@ -63,8 +120,10 @@ export function QuoteRequestPage() {
     if (selected.some(file => file.size > MAX_FILE_SIZE)) { setError(es ? 'Cada archivo debe pesar 5 MB o menos.' : 'Each file must be 5 MB or smaller.'); return; }
     if (!selected.every(file => /\.(png|jpe?g|webp|gif|stl|obj)$/i.test(file.name))) { setError(es ? 'Usá imágenes PNG/JPG/WebP/GIF o modelos STL/OBJ.' : 'Use PNG/JPG/WebP/GIF images or STL/OBJ models.'); return; }
     setFiles(selected);
+    persistDraft(draft, selected, assistantDraftReady);
     idempotencyKey.current = '';
     setError('');
+    setRestoredNotice('');
   }
 
   async function submit(event) {
@@ -73,12 +132,19 @@ export function QuoteRequestPage() {
     if (!authenticatedCustomer) { setError(es ? 'Iniciá sesión con una cuenta de cliente para enviar esta solicitud.' : 'Sign in with a customer account to submit this request.'); return; }
     if (draft.description.trim().length < 3) { setError(es ? 'Contá brevemente qué pieza necesitás.' : 'Briefly describe the part you need.'); return; }
     if (draft.referenceUrl && !/^https:\/\//i.test(draft.referenceUrl.trim())) { setError(es ? 'La referencia debe ser un enlace HTTPS.' : 'The reference must be an HTTPS link.'); return; }
+    if (draft.dimensions.trim() && !/\d/.test(draft.dimensions)) { setError(es ? 'Ingresá dimensiones numéricas válidas (ej.: 15 × 10 × 5).' : 'Enter valid numeric dimensions (e.g. 15 × 10 × 5).'); return; }
     setBusy(true);
     if (!idempotencyKey.current) idempotencyKey.current = globalThis.crypto?.randomUUID?.() || `rq-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     try {
       const dimensions = intent === 'file' && draft.dimensions.trim() ? `${draft.dimensions.trim()} ${draft.dimensionsUnit}` : draft.dimensions.trim();
       const result = await submitQuoteIntake({ ...draft, dimensions, description: draft.description.trim(), referenceUrl: draft.referenceUrl.trim(), sourceType: intent === 'file' ? 'FILE_UPLOAD' : 'DESIGN_HELP', idempotencyKey: idempotencyKey.current }, files, { token: auth?.token });
       setSubmitted(result.request);
+      try {
+        sessionStorage.removeItem('vertice.quote.draft');
+        localStorage.removeItem('vertice.quote.draft');
+      } catch {
+        // cleanup fallback
+      }
     } catch (failure) { setError(automationError(failure.code, language)); }
     finally { setBusy(false); }
   }
@@ -92,17 +158,17 @@ export function QuoteRequestPage() {
       <p>{intent === 'file' ? (es ? 'Adjuntá el archivo, fotos o enlaces que ayuden a entender la pieza. El taller recibe una solicitud sin precio automático.' : 'Attach the model, photos or links that help explain the part. The workshop receives a request, not an automatic price.') : intent === 'design' ? (es ? 'El asistente organiza la idea y completa este resumen. Revisalo, adjuntá referencias y enviá una sola solicitud al taller.' : 'The assistant organizes your idea into this summary. Review it, add references and submit one request to the workshop.') : (es ? 'Elegí el camino que se parece a tu proyecto. Siempre podés adjuntar referencias para explicar lo que necesitás.' : 'Choose the path that fits your project. You can always attach references to show what you need.')}</p></header>
 
     {!intent && <nav className="quote-intents" aria-label={es ? 'Tipo de cotización' : 'Quote type'}>
-      <Link className="quote-intent" to="/solicitud/archivo"><span className="quote-intent__index">01 / MODELO</span><h2>{es ? 'Ya tengo una pieza o referencia' : 'I have a part or reference'}</h2><p>{es ? 'Adjuntá un STL/OBJ, imágenes o enlaces y describí qué necesitas.' : 'Attach an STL/OBJ, images or links and describe what you need.'}</p><strong>{es ? 'Preparar solicitud' : 'Prepare request'} <span aria-hidden="true">↗</span></strong></Link>
-      <Link className="quote-intent" to="/solicitud/ayuda-diseno"><span className="quote-intent__index">02 / IDEA</span><h2>{es ? 'Quiero ayuda para definirla' : 'Help me define it'}</h2><p>{es ? 'Conversá con el asistente y revisá el resumen antes de enviarlo.' : 'Talk to the assistant and review the summary before submitting.'}</p><strong>{es ? 'Organizar mi idea' : 'Organize my idea'} <span aria-hidden="true">↗</span></strong></Link>
+      <Link className="quote-intent" to="/solicitud/archivo"><span className="quote-intent__index">{es ? 'MODELO O PIEZA' : 'MODEL OR PART'}</span><h2>{es ? 'Ya tengo una pieza o referencia' : 'I have a part or reference'}</h2><p>{es ? 'Adjuntá un STL/OBJ, imágenes o enlaces y describí qué necesitas.' : 'Attach an STL/OBJ, images or links and describe what you need.'}</p><strong>{es ? 'Preparar solicitud' : 'Prepare request'} <span aria-hidden="true">↗</span></strong></Link>
+      <Link className="quote-intent" to="/solicitud/ayuda-diseno"><span className="quote-intent__index">{es ? 'IDEA O PROYECTO' : 'IDEA OR PROJECT'}</span><h2>{es ? 'Quiero ayuda para definirla' : 'Help me define it'}</h2><p>{es ? 'Conversá con el asistente y revisá el resumen antes de enviarlo.' : 'Talk to the assistant and review the summary before submitting.'}</p><strong>{es ? 'Organizar mi idea' : 'Organize my idea'} <span aria-hidden="true">↗</span></strong></Link>
     </nav>}
 
     {intent && <div className={`quote-intake-layout${intent === 'file' ? ' quote-intake-layout--file' : ''}`}>
       {intent === 'design' ? <AssistantPanel key={auth?.user?.id || 'guest'} mode="quote" id="quote-assistant" embedded onDraftChange={applyAssistantDraft} draftReady={assistantDraftReady} onReviewDraft={reviewSummary} />
-        : <aside className="quote-intake-brief"><span className="quote-eyebrow">01 / REFERENCIAS</span><h2>{es ? 'Mostrá la pieza desde varios ángulos.' : 'Show the part from useful angles.'}</h2><p>{es ? 'Podés adjuntar fotos, STL u OBJ y compartir un enlace HTTPS. La imagen ayuda al taller a entender la intención; no se usa para fingir mediciones.' : 'Attach photos, STL or OBJ files, or share an HTTPS link. Images help the workshop understand the intent; they are not treated as measurements.'}</p><ul><li>{es ? 'Hasta 5 archivos, máximo 5 MB cada uno' : 'Up to 5 files, 5 MB each'}</li><li>{es ? 'PNG, JPG, WebP, GIF, STL u OBJ' : 'PNG, JPG, WebP, GIF, STL or OBJ'}</li><li>{es ? 'No se calcula un precio al enviar' : 'No price is calculated on submission'}</li></ul></aside>}
+        : <aside className="quote-intake-brief"><span className="quote-eyebrow">{es ? 'REFERENCIAS TÉCNICAS' : 'TECHNICAL REFERENCES'}</span><h2>{es ? 'Mostrá la pieza desde varios ángulos.' : 'Show the part from useful angles.'}</h2><p>{es ? 'Podés adjuntar fotos, STL u OBJ y compartir un enlace HTTPS. La imagen ayuda al taller a entender la intención; no se usa para fingir mediciones.' : 'Attach photos, STL or OBJ files, or share an HTTPS link. Images help the workshop understand the intent; they are not treated as measurements.'}</p><ul><li>{es ? 'Hasta 5 archivos, máximo 5 MB cada uno' : 'Up to 5 files, 5 MB each'}</li><li>{es ? 'PNG, JPG, WebP, GIF, STL u OBJ' : 'PNG, JPG, WebP, GIF, STL or OBJ'}</li><li>{es ? 'No se calcula un precio al enviar' : 'No price is calculated on submission'}</li></ul></aside>}
 
       <form className="quote-intake-form" onSubmit={submit}>
-        <div className="quote-intake-form__heading"><span className="quote-eyebrow">02 / {es ? 'RESUMEN DE SOLICITUD' : 'REQUEST SUMMARY'}</span><h2 ref={summaryHeading} tabIndex="-1">{es ? 'Revisá lo que va a recibir el taller.' : 'Review what the workshop will receive.'}</h2><p>{es ? 'No hace falta saberlo todo ahora. Lo que no conozcas puede quedar sin definir.' : 'You do not need every detail now. Unknowns can remain unspecified.'}</p></div>
-        {submitted ? <div className="quote-intake-success" role="status"><span>✓</span><div><h3>{es ? 'Solicitud enviada al taller' : 'Request sent to the workshop'}</h3><p>{es ? `Referencia ${submitted.id}. No se generó un precio ni se envió un correo.` : `Reference ${submitted.id}. No price was created and no email was sent.`}</p><Link to="/cuenta">{es ? 'Ver mis solicitudes' : 'View my requests'} ↗</Link></div></div> : <>
+        <div className="quote-intake-form__heading"><span className="quote-eyebrow">{es ? 'RESUMEN DE SOLICITUD' : 'REQUEST SUMMARY'}</span><h2 ref={summaryHeading} tabIndex="-1">{es ? 'Revisá lo que va a recibir el taller.' : 'Review what the workshop will receive.'}</h2><p>{es ? 'No hace falta saberlo todo ahora. Lo que no conozcas puede quedar sin definir.' : 'You do not need every detail now. Unknowns can remain unspecified.'}</p></div>
+        {submitted ? <div className="quote-intake-success" role="status"><span>✓</span><div><h3>{es ? 'Solicitud enviada al taller' : 'Request sent to the workshop'}</h3><p>{es ? `Referencia ${submitted.id.slice(0, 18)}… Tu solicitud fue recibida por el taller. No se generó un precio automático; el taller la revisará para enviarte la cotización formal.` : `Reference ${submitted.id.slice(0, 18)}… Your request was received. No price was created automatically; the workshop will review it to send a formal quote.`}</p><Link to="/cuenta">{es ? 'Ver mis solicitudes' : 'View my requests'} ↗</Link></div></div> : <>
           <label>{es ? '¿Qué querés fabricar?' : 'What do you want to make?'}<textarea rows="4" maxLength="2000" required value={draft.description} onChange={event => updateDraft('description', event.target.value)} placeholder={es ? 'Describí la pieza, qué forma tiene o qué problema resuelve.' : 'Describe the part, its shape or what problem it solves.'} /></label>
           <label>{es ? '¿Para qué la vas a usar?' : 'What will you use it for?'}<input maxLength="500" value={draft.intendedUse} onChange={event => updateDraft('intendedUse', event.target.value)} placeholder={es ? 'Uso previsto (si ya lo sabés)' : 'Intended use (if known)'} /></label>
           <div className="quote-intake-form__grid">{intent === 'file' ? <div className="quote-intake-dimensions"><label htmlFor="quote-intake-dimensions">{es ? 'Medidas aproximadas' : 'Approximate dimensions'}</label><div><input id="quote-intake-dimensions" maxLength="180" value={draft.dimensions} onChange={event => updateDraft('dimensions', event.target.value)} placeholder={es ? 'Ej.: 15 × 3 × 2' : 'e.g. 15 × 3 × 2'} /><label className="quote-intake-dimensions__unit-label" htmlFor="quote-intake-dimensions-unit">{es ? 'Unidad' : 'Unit'}</label><select id="quote-intake-dimensions-unit" aria-label={es ? 'Unidad de medida' : 'Measurement unit'} value={draft.dimensionsUnit} onChange={event => updateDraft('dimensionsUnit', event.target.value)}><option value="mm">mm</option><option value="cm">cm</option><option value="in">in</option></select></div><small>{es ? 'Largo × ancho × alto. La unidad elegida se agrega al resumen.' : 'Length × width × height. The selected unit is included in the summary.'}</small></div> : <label>{es ? 'Medidas aproximadas' : 'Approximate dimensions'}<input maxLength="200" value={draft.dimensions} onChange={event => updateDraft('dimensions', event.target.value)} placeholder={es ? 'Ej.: largo 15 cm, ancho 3 cm' : 'e.g. 15 cm long, 3 cm wide'} /></label>}
@@ -111,11 +177,12 @@ export function QuoteRequestPage() {
             <label className="quote-intake-check"><input type="checkbox" checked={draft.needsDesign} onChange={event => updateDraft('needsDesign', event.target.checked)} />{es ? 'Necesito ayuda con el diseño' : 'I need design help'}</label></div>
           <label>{es ? 'Enlace de referencia (opcional)' : 'Reference link (optional)'}<input type="url" value={draft.referenceUrl} onChange={event => updateDraft('referenceUrl', event.target.value)} placeholder="https://" /></label>
           <label className="quote-intake-upload">{es ? 'Fotos o archivos 3D' : 'Photos or 3D files'}<input type="file" accept="image/png,image/jpeg,image/webp,image/gif,.stl,.obj" multiple onChange={selectFiles} /><small>{es ? 'Hasta 5 archivos · 5 MB máximo cada uno' : 'Up to 5 files · 5 MB maximum each'}</small></label>
-          {files.length > 0 && <ul className="quote-intake-files" aria-label={es ? 'Archivos seleccionados' : 'Selected files'}>{files.map((file, index) => <li key={`${file.name}-${index}`}><span>{file.name}</span><small>{(file.size / 1024 / 1024).toFixed(1)} MB</small><button type="button" onClick={() => { setFiles(current => current.filter((_, itemIndex) => itemIndex !== index)); idempotencyKey.current = ''; }}>{es ? 'Quitar' : 'Remove'}</button></li>)}</ul>}
+          {files.length > 0 && <ul className="quote-intake-files" aria-label={es ? 'Archivos seleccionados' : 'Selected files'}>{files.map((file, index) => <li key={`${file.name}-${index}`}><span>{file.name}</span><small>{(file.size / 1024 / 1024).toFixed(1)} MB</small><button type="button" onClick={() => { setFiles(current => { const next = current.filter((_, itemIndex) => itemIndex !== index); persistDraft(draft, next, assistantDraftReady); return next; }); idempotencyKey.current = ''; }}>{es ? 'Quitar' : 'Remove'}</button></li>)}</ul>}
+          {restoredNotice && <p className="quote-intake-restored" role="status">{restoredNotice}</p>}
           <p className="quote-intake-notice">{es ? 'Algunos usos (por ejemplo, contacto corporal, médico o estructural) requieren evaluación del taller. El asistente no certifica seguridad ni calcula precio.' : 'Some uses (such as body contact, medical or structural) need workshop evaluation. The assistant does not certify safety or calculate a price.'}</p>
-          {error && <p className="quote-intake-error" role="alert">{error}{!authenticatedCustomer && <Link to="/login">{es ? ' Iniciar sesión ↗' : ' Sign in ↗'}</Link>}</p>}
+          {error && <p className="quote-intake-error" role="alert">{error}{!authenticatedCustomer && <Link to="/login" state={{ from: location.pathname }}>{es ? ' Iniciar sesión ↗' : ' Sign in ↗'}</Link>}</p>}
           <button className="v-button v-button--primary quote-intake-submit" type="submit" disabled={busy}>{busy ? (es ? 'Enviando solicitud…' : 'Sending request…') : (es ? 'Revisé el resumen · Enviar al taller' : 'I reviewed the summary · Send to workshop')} <span aria-hidden="true">↗</span></button>
-          {!authenticatedCustomer && <small className="quote-intake-auth-note">{es ? 'Necesitás iniciar sesión con cuenta de cliente para enviarla. ' : 'Sign in with a customer account to submit. '}<Link to="/login">{es ? 'Iniciar sesión' : 'Sign in'} ↗</Link></small>}
+          {!authenticatedCustomer && <small className="quote-intake-auth-note">{es ? 'Necesitás iniciar sesión con cuenta de cliente para enviarla. ' : 'Sign in with a customer account to submit. '}<Link to="/login" state={{ from: location.pathname }}>{es ? 'Iniciar sesión' : 'Sign in'} ↗</Link></small>}
         </>}
       </form>
     </div>}

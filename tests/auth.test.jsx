@@ -8,6 +8,8 @@ import { AppProviders } from '../src/app/providers/AppProviders.jsx';
 import { Navbar } from '../src/app/layout/Navbar.jsx';
 import { AdminLayout } from '../src/app/layout/AdminLayout.jsx';
 import { RequireAuth, RequireRole } from '../src/app/routes/AuthGuards.jsx';
+import { LoginPage } from '../src/pages/LoginPage.jsx';
+import { RegisterPage } from '../src/pages/RegisterPage.jsx';
 import { useAuth } from '../src/hooks/useAuth.js';
 import { AuthServiceError, createAuthService } from '../src/services/authService.js';
 
@@ -102,6 +104,30 @@ describe('AuthProvider', () => {
 });
 
 describe('Navbar account session actions', () => {
+  test('oculta el carrito a visitantes y lo muestra a clientes autenticados', async () => {
+    const { unmount } = render(
+      <MemoryRouter initialEntries={['/']}>
+        <AppProviders authAdapter={{ restoreSession: async () => null }}>
+          <Navbar onReading={jest.fn()} />
+        </AppProviders>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Abrir menú de cuenta' })).toBeVisible());
+    expect(screen.queryByRole('link', { name: /^Carrito/u })).not.toBeInTheDocument();
+    unmount();
+
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <AppProviders authAdapter={{ restoreSession: async () => customerSession }}>
+          <Navbar onReading={jest.fn()} />
+        </AppProviders>
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByRole('link', { name: /^Carrito/u })).toHaveAttribute('href', '/carrito');
+  });
+
   test('envía al admin al dashboard desde el menú Mi cuenta', async () => {
     function CurrentPath() {
       return <output aria-label="Ruta actual">{useLocation().pathname}</output>;
@@ -119,6 +145,7 @@ describe('Navbar account session actions', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Abrir menú de cuenta' }));
     const accountLink = await screen.findByRole('link', { name: 'Panel de administración' });
     expect(accountLink).toHaveAttribute('href', '/admin');
+    expect(screen.queryByRole('link', { name: /^Carrito/u })).not.toBeInTheDocument();
     await userEvent.click(accountLink);
     await waitFor(() => expect(screen.getByLabelText('Ruta actual')).toHaveTextContent(/^\/admin$/u));
   });
@@ -201,6 +228,23 @@ describe('Navbar account session actions', () => {
 });
 
 describe('Auth route guards', () => {
+  test('explica por qué el carrito pide sesión y mantiene el aviso al crear cuenta', async () => {
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/login', state: { from: '/carrito', reason: 'customer-cart-required' } }]}>
+        <AppProviders authAdapter={{ restoreSession: async () => null }}>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/registro" element={<RegisterPage />} />
+          </Routes>
+        </AppProviders>
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByRole('status')).toHaveTextContent('para ver el carrito y continuar');
+    await userEvent.click(screen.getByRole('link', { name: 'Crear cuenta' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('Creá una cuenta de cliente para ver el carrito');
+  });
+
   test('RequireAuth redirige invitado a login', async () => {
     render(
       <AuthProvider adapter={{ restoreSession: async () => null }}>
@@ -253,5 +297,45 @@ describe('Auth route guards', () => {
 
     await waitFor(() => expect(screen.getByText('HOME')).toBeVisible());
     expect(screen.queryByText('ADMIN')).not.toBeInTheDocument();
+  });
+
+  test('RequireRole conserva /carrito al mandar a un visitante al login y bloquea Admin', async () => {
+    function LocationProbe() {
+      const location = useLocation();
+      return <output aria-label="Destino solicitado">{`${location.state?.from || ''}:${location.state?.reason || ''}`}</output>;
+    }
+
+    const { unmount } = render(
+      <AuthProvider adapter={{ restoreSession: async () => null }}>
+        <MemoryRouter initialEntries={['/carrito']}>
+          <Routes>
+            <Route path="/login" element={<><div>LOGIN</div><LocationProbe /></>} />
+            <Route element={<RequireRole role="customer" />}>
+              <Route path="/carrito" element={<div>CART</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>
+    );
+
+    await waitFor(() => expect(screen.getByText('LOGIN')).toBeVisible());
+    expect(screen.getByLabelText('Destino solicitado')).toHaveTextContent('/carrito:customer-cart-required');
+    unmount();
+
+    render(
+      <AuthProvider adapter={{ restoreSession: async () => adminSession }}>
+        <MemoryRouter initialEntries={['/carrito']}>
+          <Routes>
+            <Route path="/" element={<div>HOME</div>} />
+            <Route element={<RequireRole role="customer" />}>
+              <Route path="/carrito" element={<div>CART</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>
+    );
+
+    await waitFor(() => expect(screen.getByText('HOME')).toBeVisible());
+    expect(screen.queryByText('CART')).not.toBeInTheDocument();
   });
 });

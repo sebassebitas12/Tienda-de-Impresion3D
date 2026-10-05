@@ -12,7 +12,7 @@ export function PublicLayout() {
     <div className="app-shell">
       <RouteFocus />
       <Navbar key={location.pathname + location.search} onReading={() => setActiveTool('reading')} />
-      <main id="main-content" tabIndex={-1}><Outlet /></main>
+      <main id="main-content" tabIndex={-1}><Outlet context={{ openGeneralAssistant: () => setActiveTool('chat') }} /></main>
       <Footer />
       <FloatingTools active={activeTool} onActiveChange={setActiveTool} />
     </div>

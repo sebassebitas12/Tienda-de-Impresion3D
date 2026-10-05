@@ -10,6 +10,7 @@ import { prepareRequestAction } from './request-actions.js';
 import { installAutomationOperations } from './automation-operations.js';
 import { installCustomerQuoteOperations } from './customer-quote-operations.js';
 import { installCatalogOrderOperations } from './catalog-order-operations.js';
+import { installProductReviewOperations } from './product-review-operations.js';
 import { deliverQuote } from './quote-email.js';
 import { sessionActor } from './session-access.js';
 import { multipartBufferMiddleware } from './multipart-form.js';
@@ -84,6 +85,14 @@ function registerAction(path, handler, middleware = []) {
   const fallbackIndex = app.middleware.findIndex(middleware => middleware.type === 'mw' && middleware.path === '/:name');
   if (!route || fallbackIndex < 0) throw new Error('No se pudo instalar la operación administrativa.');
   app.middleware.splice(fallbackIndex, 0, route);
+}
+
+function registerRead(path, handler) {
+  app.get(path, handler);
+  const route = app.middleware.pop();
+  const index = app.middleware.findIndex(entry => entry.type === 'mw' && entry.path === '/:name');
+  if (!route || index < 0) throw new Error('No se pudo instalar la consulta pública.');
+  app.middleware.splice(index, 0, route);
 }
 
 registerAction('/admin/actions/start-review', async (req, res) => {
@@ -204,6 +213,7 @@ installAutomationOperations({ registerAction, db, serialize: serializeReviewActi
 });
 installCustomerQuoteOperations({ registerAction, db, serialize: serializeReviewAction, persist: persistData });
 installCatalogOrderOperations({ registerAction, db, serialize: serializeReviewAction, persist: persistData });
+installProductReviewOperations({ registerAction, registerRead, db, serialize: serializeReviewAction, persist: persistData });
 const host = process.env.HOST || 'localhost';
 app.listen(port, host, () => {
   console.log(`JSON Server + operaciones Vértice en http://${host}:${port}`);

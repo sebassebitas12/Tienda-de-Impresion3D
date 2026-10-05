@@ -22,10 +22,10 @@ export function QuoteFulfillment({ request, language, onSaved }) {
     } catch (failure) { setError(automationError(failure.code)); }
     finally { setBusy(false); }
   }
-  return <form className="admin-order-actions" onSubmit={save}><h2>{es ? 'Del encargo al pedido' : 'From quote to order'}</h2>
-    <p>{demo ? (es ? 'Recorrido académico: se simula el pago y se crea un pedido DEMO. No se registra un cobro real ni se ordena fabricación física.' : 'Academic flow: simulate payment and create a DEMO order. No real charge or physical production is recorded.') : (es ? 'Registrá únicamente un pago que verificaste fuera del sistema. No se carga dinero a ningún medio de pago.' : 'Record only a payment verified outside this system. No payment method is charged.')}</p>
+  return <form className="admin-order-actions" onSubmit={save}><h2>{es ? 'Inicialización de orden de taller' : 'Workshop order initialization'}</h2>
+    <p>{demo ? (es ? 'Aprobación del cliente confirmada. Al inicializar la orden se programa la producción y se asigna al tablero de pedidos de taller.' : 'Customer approval confirmed. Initializing the order schedules production and assigns it to the workshop board.') : (es ? 'Registrá únicamente un pago verificado fuera del sistema. No se carga dinero a ningún medio de pago.' : 'Record only a payment verified outside this system. No payment method is charged.')}</p>
     {!demo && <><label>{es ? 'Referencia del comprobante' : 'Payment evidence reference'}<input required minLength={4} maxLength={200} value={reference} onChange={event => setReference(event.target.value)} /></label><label><input type="checkbox" required checked={confirmed} onChange={event => setConfirmed(event.target.checked)} />{es ? 'Verifiqué el comprobante y el monto completo' : 'I verified the evidence and full amount'}</label></>}
-    <button type="submit" className="v-button v-button--primary" disabled={busy}>{demo ? (es ? 'Simular pago y crear pedido DEMO' : 'Simulate payment and create DEMO order') : (es ? 'Registrar pago verificado y crear pedido' : 'Record verified payment and create order')}</button>
+    <button type="submit" className="v-button v-button--primary" disabled={busy}>{demo ? (es ? 'Inicializar orden de fabricación' : 'Initialize manufacturing order') : (es ? 'Registrar pago verificado y crear pedido' : 'Record verified payment and create order')}</button>
     {error && <p role="alert">{error}</p>}
   </form>;
 }

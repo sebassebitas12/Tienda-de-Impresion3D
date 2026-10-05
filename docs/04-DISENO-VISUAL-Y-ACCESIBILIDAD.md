@@ -1,12 +1,30 @@
 # Vértice CR — Diseño visual, temas y accesibilidad
 
-> Última actualización: **2026-10-03**.
+Carrito a 761–1100 px apila resumen y líneas para evitar superposición de
+controles/precios. Cuenta móvil conserva las tres pestañas visibles, etapas
+en rejilla 2 columnas (3 en anchos mayores) y campos sin mínimo que exceda su
+contenedor. Se mantienen tokens existentes; ver evidencia R-H78 en docs/05.
+
+> Última actualización: **2026-10-04**.
 
 ## Selección de fotografías y densidad Admin — 2026-10-03
 
 La biblioteca de fotos es un control operativo del formulario, no una reproducción de las tarjetas públicas: preview, búsqueda y grilla scrollable de 4/3/2 columnas para escritorio/tablet/móvil. Usa contain para reconocer el objeto completo; las bandas de miniatura son intencionales y no cambian el tratamiento de Tienda. Tokens Dark/Light existentes, selección visible y foco de teclado; sin dependencias ni estética de Stitch.
 
 En móvil, resumen y detalle de pedido deben mostrar todos los valores importantes sin scroll horizontal de tabla. Los recorridos de seis etapas se distribuyen 3×2. Las referencias del cotizador Admin requieren ancho mínimo 260 px para no fragmentar títulos en tablet. Se elimina el círculo ornamental del panel de cotización, manteniendo superficie y jerarquía.
+
+Las páginas institucionales deben explicar decisiones y próximos pasos reales,
+no ocupar espacio con etiquetas numéricas ornamentales ni prometer operaciones
+que el taller todavía no respalda. Contacto prioriza rutas accionables y conserva
+el asistente en el contexto público existente; no presenta un correo genérico o
+un canal no autorizado como soporte confirmado. En Contacto, la jerarquía combina
+una orientación breve del proceso con rutas de entrada diferenciadas (archivo,
+idea y seguimiento), ayuda contextual y FAQ; comparte tokens sin repetir una
+composición. El main de esta ruta no duplica el offset del header fijo. En el
+carrito, los estados de carga, vacío, líneas no disponibles y confirmación deben
+seguir diferenciables;
+la identidad de cuenta debe separar la selección sin cambiar el lenguaje visual
+compartido de Tienda.
 
 ## Dirección vigente
 

@@ -78,6 +78,16 @@ describe('administración del catálogo', () => {
     expect(screen.queryByText('20')).not.toBeInTheDocument();
   });
 
+  it('mantiene accesible el filtro de borradores aunque el catálogo no tenga ninguno', async () => {
+    getAdminCatalogData.mockResolvedValue(rawData);
+    renderAdmin();
+    const draftFilter = await screen.findByRole('button', { name: 'Borrador 0' });
+    fireEvent.click(draftFilter);
+    expect(draftFilter).toHaveAttribute('aria-pressed', 'true');
+    expect(await screen.findByText('No hay modelos con esos filtros.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Crear primer borrador' })).toHaveAttribute('href', '/admin/catalogo/nuevo');
+  });
+
   it('mantiene borradores sin precio fuera de publicación y del conteo de materiales legados', async () => {
     const draft = { id: 'p7', name: 'Base para control', slug: 'base-control', categoryId: 'c1', images: ['/images/producto-base-control.jpg'], price: null, currency: 'CRC', material: null, status: 'DRAFT', featured: false };
     const draftData = { products: [rawData.products[0], draft], categories: [{ id: 'c1', name: 'Gadgets' }] };

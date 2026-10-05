@@ -1,5 +1,13 @@
 # Vértice CR — Roadmap
 
+## Gate de experiencia final — R-H74 (2026-10-04)
+
+La auditoría de docs/05 confirma cortes de continuidad y discrepancias de estados
+cliente/Admin. Prioridad de cierre: preservar tarea durante auth, compartir etapas,
+unificar pago catálogo/cotización evitando doble depósito y definir entrega;
+después reconciliar catálogo/fichas y completar informativas. Inspección Admin
+autenticada y matriz responsive/temas pendientes. Este bloque solo audita.
+
 > **Última actualización:** 2026-10-04
 > **Estado:** ACTIVO  
 > **Fase actual:** 4 — Fundaciones React.  

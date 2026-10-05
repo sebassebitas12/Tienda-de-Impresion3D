@@ -10,7 +10,8 @@ export function RequireAuth({ children }) {
   }
 
   if (!auth.isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
+    const isExpired = auth.error?.code === 'AUTH_SESSION_EXPIRED';
+    return <Navigate to="/login" replace state={{ from: location.pathname + location.search, reason: isExpired ? 'session-expired' : undefined }} />;
   }
 
   return children || <Outlet />;
@@ -25,7 +26,9 @@ export function RequireRole({ role, children }) {
   }
 
   if (!auth.isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
+    const isExpired = auth.error?.code === 'AUTH_SESSION_EXPIRED';
+    const reason = isExpired ? 'session-expired' : role === 'customer' && location.pathname === '/carrito' ? 'customer-cart-required' : undefined;
+    return <Navigate to="/login" replace state={{ from: location.pathname + location.search, reason }} />;
   }
 
   if (auth.user?.role !== role) {

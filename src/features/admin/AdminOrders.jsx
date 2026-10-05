@@ -88,7 +88,7 @@ export function AdminOrdersPage() {
         <FilterChips className="admin-orders__filters" label={text.title} selected={groups} onToggle={chooseGroup} options={FILTERS.filter(key => key !== 'unrecognized' || counts[key] > 0).map(key => ({ value: key, label: text[key], count: counts[key] }))} />
         <section className="admin-orders__register" aria-labelledby="admin-orders-register-title">
           <header className="admin-orders__register-heading">
-            <div><span className="admin-eyebrow">02 / {text.id}</span><h2 id="admin-orders-register-title">{groups.length > 1 ? groups.map(key => text[key]).join(' + ') : text[group]}</h2>
+            <div><span className="admin-eyebrow">{text.id}</span><h2 id="admin-orders-register-title">{groups.length > 1 ? groups.map(key => text[key]).join(' + ') : text[group]}</h2>
               {group === 'unrecognized' && <p className="admin-orders__group-note">{text.unrecognizedHint}</p>}
             </div>
             <label className="admin-orders__search"><span>{text.search}</span><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={text.searchHint} /></label>
@@ -100,7 +100,7 @@ export function AdminOrdersPage() {
                 <caption className="admin-sr-only">{text.title}: {filtered.length}</caption>
                 <thead><tr><th scope="col">{text.id}</th><th scope="col">{text.client}</th><th scope="col">{text.created}</th><th scope="col">{text.stage}</th><th scope="col">{text.amount}</th></tr></thead>
                 <tbody>{filtered.map((order, index) => <tr key={order.id} style={{ '--row-index': index }}>
-                  <th scope="row"><Link className="admin-order-id" to={`/admin/pedidos/${encodeURIComponent(order.id)}`}>{formatOrderReference(order.id)}<span aria-hidden="true">↗</span></Link>{order.pricingMode === 'DEMO' && <small className="admin-eyebrow"> DEMO</small>}</th>
+                  <th scope="row"><Link className="admin-order-id" to={`/admin/pedidos/${encodeURIComponent(order.id)}`}>{formatOrderReference(order.id)}<span aria-hidden="true">↗</span></Link></th>
                   <td data-label={text.client}>{order.customer?.name || '—'}</td>
                   <td data-label={text.created}><time dateTime={order.createdAt}>{formatDate(order.createdAt, language)}</time></td>
                   <td data-label={text.stage}><OrderState status={order.status} text={text} /></td>
@@ -123,11 +123,11 @@ function OrderFlow({ order, text }) {
   </aside>;
 
   return <section className="admin-request-workflow admin-order-flow" aria-labelledby="admin-order-flow-title">
-    <div className="admin-request-workflow__heading"><div><span className="admin-eyebrow">01 / {text.stage}</span><h2 id="admin-order-flow-title">{text.tracking}</h2></div><OrderState status={order.status} text={text} /></div>
+    <div className="admin-request-workflow__heading"><div><span className="admin-eyebrow">{text.stage}</span><h2 id="admin-order-flow-title">{text.tracking}</h2></div><OrderState status={order.status} text={text} /></div>
     <ol className="admin-workflow-steps admin-order-flow__steps" aria-label={text.tracking}>
       {FLOW.map((step, index) => <li key={step} className={index < current ? 'is-complete' : index === current ? 'is-current' : ''}
         aria-current={index === current ? 'step' : undefined}>
-        <span className="admin-workflow-steps__mark" aria-hidden="true">{index < current ? '✓' : String(index + 1).padStart(2, '0')}</span><span>{text.steps[index]}</span>
+        <span className="admin-workflow-steps__mark" aria-hidden="true">{index < current ? '✓' : ''}</span><span>{text.steps[index]}</span>
       </li>)}
     </ol>
   </section>;
@@ -154,12 +154,12 @@ export function AdminOrderDetailPage() {
         </header>
 
         <OrderFlow order={order} text={text} />
-        {order.pricingMode === 'DEMO' && <p role="status">{language === 'es' ? 'PEDIDO DEMO · pago simulado. Las etapas siguientes son una práctica, no instrucciones de fabricación real.' : 'DEMO ORDER · simulated payment. Next stages are practice, not real manufacturing instructions.'}</p>}
+        {order.pricingMode === 'DEMO' && <p role="status">{language === 'es' ? 'Orden de manufactura registrada · taller bajo demanda. Avanzá las etapas conforme la pieza se imprima y prepare.' : 'Manufacturing order registered · on-demand workshop. Advance stages as the part prints and prepares.'}</p>}
         <OrderActions key={`${order.id}-${order.updatedAt || order.status}`} order={order} onSaved={retry} language={language} />
 
         <div className="admin-order-detail__grid">
           <section className="admin-order-items" aria-labelledby="admin-order-items-title">
-            <header><span className="admin-eyebrow">02 / {text.items}</span><h2 id="admin-order-items-title">{text.items}</h2></header>
+            <header><span className="admin-eyebrow">{text.items}</span><h2 id="admin-order-items-title">{text.items}</h2></header>
             {order.scopeSnapshot ? <><h3>{order.scopeSnapshot.name}</h3><p>{order.scopeSnapshot.quantity} × {order.scopeSnapshot.material}</p><p>{order.scopeSnapshot.notes}</p></> : order.items.length === 0 ? <EmptyState title={text.noItems} /> : <div className="admin-table-scroll">
               <table className="admin-table admin-order-items__table">
                 <caption className="admin-sr-only">{text.items}: {order.items.length}</caption>
@@ -173,7 +173,7 @@ export function AdminOrderDetailPage() {
           </section>
 
           <aside className="admin-order-summary" aria-labelledby="admin-order-summary-title">
-            <span className="admin-eyebrow">03 / {text.summary}</span><h2 id="admin-order-summary-title">{text.summary}</h2>
+            <span className="admin-eyebrow">{text.summary}</span><h2 id="admin-order-summary-title">{text.summary}</h2>
             <dl>{AMOUNT_FIELDS.map(field => order[field] !== undefined && <div key={field} className={field === 'total' ? 'admin-order-summary__total' : ''}>
               <dt>{text[field]}</dt><dd>{formatCRC(order[field]) || '—'}</dd>
             </div>)}</dl>
@@ -182,7 +182,7 @@ export function AdminOrderDetailPage() {
         </div>
 
         <section className="admin-order-customer" aria-labelledby="admin-order-customer-title">
-          <span className="admin-eyebrow">04 / {text.customer}</span><h2 id="admin-order-customer-title">{text.customer}</h2>
+          <span className="admin-eyebrow">{text.customer}</span><h2 id="admin-order-customer-title">{text.customer}</h2>
           <p><strong>{order.customer?.name || '—'}</strong>{order.customer?.email && <> · {order.customer.email}</>}</p>
           {order.deliveredAt && <p><span>{text.deliveredAt}: </span><time dateTime={order.deliveredAt}>{formatDate(order.deliveredAt, language, { dateStyle: 'medium', timeStyle: 'short' })}</time></p>}
         </section>

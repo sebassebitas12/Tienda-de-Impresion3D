@@ -124,10 +124,13 @@ try {
   const other = await post('/quotes/mine', {}, 'other-test'); assert.equal(other.requests.length, 0); assertions++;
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', nextStatus: 'CONFIRMED' }, 'customer-test', 403);
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', nextStatus: 'READY' }, 'admin-test', 400);
-  const advanced = await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', expectedUpdatedAt: null, nextStatus: 'CONFIRMED' }, 'admin-test');
+  await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', expectedUpdatedAt: null, nextStatus: 'CONFIRMED' }, 'admin-test', 409);
+  const proof = await post('/orders/submit-payment-proof', { orderId: 'qa-order', referenceNumber: 'QA-NO-REAL-PAYMENT', sinpePhone: '88881234' }, 'customer-test');
+  const advanced = await post('/admin/actions/verify-payment', { orderId: 'qa-order', decision: 'CONFIRM', expectedProofSubmittedAt: proof.order.paymentProof.submittedAt }, 'admin-test');
+  assert.equal(advanced.order.paymentStatus, 'PAID'); assertions++;
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', nextStatus: 'CONFIRMED' }, 'admin-test', 409);
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'CONFIRMED', expectedUpdatedAt: advanced.order.updatedAt, nextStatus: 'CANCELLED', reason: 'Cierre QA de prueba' }, 'admin-test');
-  const persisted = JSON.parse(await readFile(dbFile, 'utf8')); assert.equal(persisted.quoteDeliveries[0].status, 'SENT'); assert.equal(persisted.activityLog.length, 7); assertions += 2;
+  const persisted = JSON.parse(await readFile(dbFile, 'utf8')); assert.equal(persisted.quoteDeliveries[0].status, 'SENT'); assert.ok(persisted.activityLog.some(event => event.action === 'ORDER_PAYMENT_CONFIRMED')); assertions += 2;
 
   const files = (await readdir('automation/n8n')).filter(name => name.endsWith('.json') && name !== 'vertice-cr-unificado.json'); assert.equal(files.length, 5); assertions++;
   for (const file of files) {

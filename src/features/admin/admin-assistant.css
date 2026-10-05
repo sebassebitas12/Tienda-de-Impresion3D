@@ -150,7 +150,6 @@
 }
 
 .admin-copilot__prompts button:disabled { opacity: .55; cursor: wait; }
-.admin-copilot__prompt-index { flex: none; padding-top: 2px; color: var(--lava); font: 11px/1.4 var(--mono); letter-spacing: .08em; }
 .admin-copilot__prompt-copy { display: grid; min-width: 0; gap: 5px; }
 .admin-copilot__prompt-copy strong { font-size: 14px; font-weight: 600; }
 .admin-copilot__prompt-copy small { color: var(--muted); font-size: 12px; line-height: 1.45; }
@@ -214,6 +213,12 @@
 .admin-copilot__composer > small { margin-top: 8px; color: var(--muted); font-size: 11px; line-height: 1.5; }
 .admin-copilot__scope { display: flex; align-items: baseline; gap: 14px; margin: 14px 2px 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 .admin-copilot__scope span { flex: none; color: var(--lava); font: 10px/1.4 var(--mono); letter-spacing: .12em; }
+
+@media (min-width: 851px) and (max-height: 900px) {
+  .admin-copilot__conversation { min-height: min(590px, calc(100dvh - 300px)); }
+  .admin-copilot__thread { min-height: 260px; padding-block: 24px; }
+  .admin-copilot__welcome { padding-block: 12px; }
+}
 
 @keyframes admin-copilot-arrive {
   from { opacity: 0; transform: translateY(9px); }

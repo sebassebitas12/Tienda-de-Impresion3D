@@ -1,21 +1,119 @@
 # AI_CONTEXT.md — Vértice CR
 
-> **Última actualización:** 2026-10-04
+> **Última actualización:** 2026-10-05
 > **Estado:** SNAPSHOT ACTIVO  
 > **Rama:** `Pruebas`  
 > **No es un diario:** este archivo resume el presente. El historial detallado vive en los documentos de dominio.
 
-## Estado vigente para continuar (2026-10-04)
+## Estado vigente para continuar (2026-10-05)
 
-- El usuario confirmó en vivo los tres asistentes con OpenRouter y el correo con tabla formateada: **Bloque B cerrado por validación del usuario**. No reenviar correos ni cambiar credenciales.
-- Rama de trabajo `Pruebas`. `automation/n8n/vertice-cr-unificado.json` es la fuente oficial y `scripts/build-n8n-unified.mjs` la genera; se conserva `toolHttpRequest` v1.1.
-- P1 quedó en el commit local `a66c328 feat(admin): autocompletar fichas de producto con IA`. Envía nombre/idioma al agente general con tarea Admin sin tools; rellena campos editables sin guardar/publicar. Gramos/horas no pasan al cálculo hasta validarlos con laminador; perfil análogo sigue siendo DEMO. B1/B2 están cerrados por la prueba live comunicada por el usuario.
-- C-P2: galería Admin admite hasta 6 fotos reales comprimidas a <=300 KiB, reordenables, con portada; `products.images[0]` sigue siendo la imagen principal. Se persisten como data URLs en JSON Server local, decisión académica, no apta para producción.
-- C-P3: `/solicitud/archivo` incorpora medidas con unidad mm/cm/in, asistente general y envío autenticado/idempotente de hasta 5 adjuntos de 5 MiB. Metadatos en JSON Server y bytes en `.local-data/quote-attachments`; no mide STL ni calcula/envía cotización automáticamente.
-- Verificación local actual: 33 suites/187 tests, lint, `check:ui` (48 módulos), `check:automation` (255), `build:n8n` (23 nodos/3 agentes/5 entradas), build (161 módulos) y `git diff --check` pasan. No es CI ni prueba live de cada flujo.
-- Navegador: formulario público `/solicitud/archivo` inspeccionado en Dark/Light a ~1344×625; árbol accesible confirma campos, unidad y requisito de sesión. No se seleccionó archivo ni se envió solicitud. Admin redirigió a `/login` por sesión expirada: faltan capturas reales Admin Dark/Light y 1280/768/375, además del recorrido autenticado de la galería.
-- Próximo orden C: cerrar y verificar commits locales P2 y P3 por separado; luego P5 → P4 → P8 → P7 → P9 según `docs/10`. El export actualizado de P1 requiere importar/publicar el workflow existente antes de probarlo live, conservando credenciales y sin crear duplicados. No hacer push hasta tener autorización; CI del nuevo SHA no está observado.
-- Preservar cambios de usuario ajenos a estos bloques (AGENTS.md y fotografías del catálogo modificadas durante la sesión); no incluirlos en commits. Consultar `docs/07`, `docs/09` y `docs/10` al retomar.
+- R-H84 Admin: recorrido autenticado escritorio Dark por Resumen, Pedidos,
+  Solicitudes, Catálogo, Categorías, Clientes, Actividad y Copiloto. Se hizo
+  explícita la confirmación de guardado/transición para cotización DEMO; se
+  aclaró que usa parámetros académicos simulados. Catálogo mantiene filtros
+  DRAFT/INACTIVE con cero conteo y guía a crear el primer borrador; ordinales
+  decorativos se retiraron de Solicitudes, Clientes y Copiloto. Tests nuevos.
+  Capturas posteriores de Catálogo, Solicitudes, Clientes y Copiloto Dark desktop;
+  filtro DRAFT vacío y campo del Copiloto visible al entrar comprobados. Light,
+  375/768, teclado y AT siguen pendientes. No se mutaron solicitudes/pedidos/
+  pagos ni correos. 45 suites/293 tests, lint, check:ui, build y
+  check:automation (258) pasan localmente; bundle JS 638.57 kB (>500 kB aviso).
+  Detalle/evidencia en docs/08 R-H84 y docs/05 R-H84.
+- Push pedido por usuario: conservar la base local existente (6 commits sin
+  push más cambios de trabajo ya presentes) y preparar el primer envío coherente
+  tras ejecutar gates. `db.json` contiene cambios locales/datos persistentes y
+  debe permanecer fuera del stage; nunca restaurarlo ni incluir `.env`. Auditar
+  exactamente los paths antes del commit. CI `verify.yml` debe quedar verde
+  antes de pedir pull; no afirmar visualización responsive completa.
+
+- R-H81: carrito simplificado; cuenta presenta piezas antes de pago y separa
+  verificación de producción. Referencia de nombre actual para órdenes heredadas
+  implementada sin cambiar snapshots/precios: falta recargar API activa y verla.
+  n8n unificado confirmado Published; Gmail no contiene prueba con plantilla nueva.
+- R-H83: Contacto probado como visitante y copia ajustada para no insinuar un
+  equipo inexistente; Sobre nosotros inspeccionado visualmente en escritorio.
+- R-H82: búsqueda por términos corregida; workflow local actualizado de Agent
+  2.2 a 3.1. Ejecución 66 mostró error parser en Agent 2.2 tras tool HTTP exitoso.
+  El n8n publicado aún corre 2.2; requiere importar/publicar el JSON regenerado
+  y volver a probar la herramienta. Respuesta directa sin tool ya comprobada.
+  Browser real 375 Light/1280 Dark; sin pagos/órdenes/correos ni editar db.json.
+  Gate local: 45 suites/291 tests, lint/check:ui/build verdes, warning de bundle.
+  Siguiente: reinicio controlado API, correo en n8n/Gmail y auditoría abierta.
+
+- **R-H80, versión local de presentación:** tienda con categoría/material;
+  ficha sin selector de color duplicado, galería y ruta a personalización;
+  cuenta explica QUOTED/CHANGES_REQUESTED, reseñas sin falsa certificación.
+  Correo rediseñado desde renderer único probado e incrustado en workflow
+  oficial regenerado. Preview IAB 375/1280; Gmail/n8n activo aún no actualizado.
+  No se enviaron correos ni se editó db.json. Gate: 45 suites/289 tests, lint,
+  check:ui/build y 258 comprobaciones de automatización verdes; bundle grande
+  sigue advertido. Sin commit/push/CI remoto. Próximo: revisar versión Gmail
+  tras importación, continuar auditoría visual abierta y condiciones de entrega.
+
+- **R-H79, auditoría abierta:** usuario rechaza considerar cuatro bloques como
+  garantía de 100%. Recorrer visualización y acciones paso a paso, registrar
+  correctos/duplicados/defectos. Correo real de prueba leído y capturado en Gmail:
+  HTML anterior distinto a plantilla actual, tabla demasiado ancha, sin enlace
+  a cuenta, diferencia costo/total no explicada y Material duplicado. No se
+  envió correo ni se modificó n8n. Próximo: comprobar versión ejecutada y
+  rediseñar/verificar correo; continuar recorrido completo sin porcentaje fijo.
+  Evidencia y límites en docs/05 R-H79.
+
+- **R-H78, carrito/cuenta/pago:** corregidos progreso READY/SHIPPED/DELIVERED,
+  encargo sin cobro/producción, advertencia SINPE de ejemplo, desglose de cargos
+  registrados y actualización de seguimiento. Evidencia IAB antes/después de
+  desborde cuenta 375 y superposición carrito 768; Admin o4 autenticado sin
+  mutaciones. No se editó db.json. Gate final: 44 suites/278 tests, lint,
+  check:ui y build verdes localmente; CI remoto pendiente. Próximo cierre:
+  entrega/retiro y monto final, galería pública y snapshots heredados. Detalle
+  en docs/03 y docs/05 R-H78; checkout comercial no se declara completo.
+
+- **Catálogo y procedencia (Bloque 1 / Codex):**
+  - Los productos `p7` a `p25` quedaron reclasificados formalmente en `db.json` con `priceSource: 'DEMO'`, `priceConfirmation: { mode: 'DEMO' }`, y `aiProductionEstimate: { source: 'DEMO', verifiedWithSlicer: false }`.
+  - No se inventan medidas de laminador ni precios de taller.
+  - En `/catalogo` ([Shop.jsx](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/src/pages/Shop.jsx)), se añadió una nota académica sobria y discreta (`.shop-product-demo-note`) para los ítems DEMO.
+  - Los 25 productos se conservan activos, con sus imágenes y ordenables. Se respetó la directiva de no ejecutar `git checkout -- db.json`.
+
+- **Sesión y expiración activa (Bloque 2 / Codex):**
+  - Se implementó expiración activa y recuperación coherente en [AuthProvider.jsx](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/src/app/providers/AuthProvider.jsx) mediante `setTimeout` programado hacia `getTokenExpiresAt(token)` y desautenticación reactiva con error tipado `AUTH_SESSION_EXPIRED`.
+  - [AuthGuards.jsx](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/src/app/routes/AuthGuards.jsx) (`RequireAuth` y `RequireRole`) preservan la ruta de destino (`state: { from, reason: 'session-expired' }`), y tanto [LoginPage.jsx](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/src/pages/LoginPage.jsx) como [RegisterPage.jsx](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/src/pages/RegisterPage.jsx) presentan aviso informativo y conservan el destino al navegar entre sí.
+  - Sincronizado en [07-DATOS-API-AUTH.md](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/docs/07-DATOS-API-AUTH.md) y verificado con la nueva suite [tests/sessionExpiration.test.jsx](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/tests/sessionExpiration.test.jsx) (3 tests pasando).
+
+- **Autocompletado IA en Admin (Bloque 3 / Codex):**
+  - Suite exhaustiva añadida en [tests/adminCatalogForm.test.jsx](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/tests/adminCatalogForm.test.jsx) con 17 pruebas unitarias y de integración de componentes UI: valida nombre vacío, `ROLE_REQUIRED`, timeout, respuesta inválida, generación automática de slug y preservación de campos previos ante fallos de red.
+  - Separación estricta entre la propuesta de autocompletado IA y la calculadora de precios DEMO del taller.
+
+- **E01 - Preservación de solicitud personalizada (Bloque 4 / Codex):**
+  - Implementada en [QuoteRequestPage.jsx](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/src/pages/QuoteRequestPage.jsx) la persistencia reactiva en `sessionStorage`/`localStorage` (`vertice.quote.draft`), incluyendo campos manuales, estado del asistente y nombres de archivos.
+  - Si un visitante llena la solicitud y se redirige a `/login` o `/registro`, al volver se restaura el formulario y se advierte de forma explícita (`.quote-intake-restored`) que por políticas de seguridad del navegador los archivos adjuntos deben seleccionarse nuevamente.
+  - Suite automatizada [tests/quoteDraftPersistence.test.jsx](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/tests/quoteDraftPersistence.test.jsx) añadida y pasando.
+
+- **E03–E05 - Consistencia de pago y concurrencia SINPE (Bloque 5 / Codex):**
+  - E03: Pedidos originados desde cotización aprobada (`prepareQuoteFulfillment`) nacen en `status: 'CONFIRMED'` y `paymentStatus: 'PAID'`; en `/cuenta` ([CustomerQuotesPage.jsx](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/src/pages/CustomerQuotesPage.jsx)) se muestra el badge de pago verificado y se suprime el formulario e instrucciones de SINPE.
+  - E04: La transición operativa genérica (`prepareOrderTransition`) bloquea avanzar de `PENDING` a `CONFIRMED` sin pago verificado (`409 PAYMENT_VERIFICATION_REQUIRED`). En UI Admin ([OrderActions.jsx](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/src/features/admin/OrderActions.jsx)), se desactiva el botón genérico de avance y se alerta sobre la necesidad de validar el comprobante primero.
+  - E05: La verificación de pago SINPE ([order-payment-operations.js](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/scripts/order-payment-operations.js)) valida `expectedProofSubmittedAt`. Si el cliente actualizó el comprobante con una versión más reciente, la acción rechaza con `409 PAYMENT_PROOF_OUTDATED`.
+  - Verificado con [tests/orderPaymentWorkflow.test.js](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/tests/orderPaymentWorkflow.test.js) (15 tests) y [tests/customerOrdersTab.test.jsx](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/tests/customerOrdersTab.test.jsx) (5 tests).
+
+- **Resultados de verificación y gates:**
+  - `npm test`: 44 test suites pasando, 271 tests pasando (100% en la suite local al 2026-10-05).
+  - `npm run lint`: 0 errores, 0 advertencias (código limpio).
+  - `npm run check:ui`: 48 módulos transformados con éxito.
+  - `npm run build`: bundle de producción Vite generado sin errores (dist/index.html, dist/assets/).
+  - `git diff --check`: 0 errores de formato ni espacios en blanco.
+
+- **Recorrido visitante/cuenta e institucionales (bloque local 2026-10-04):**
+  - `/nosotros` y `/contacto` son páginas ES/EN, con enlaces a catálogo, solicitud por archivo, ayuda de diseño y seguimiento según rol. Contacto abre el asistente general; no publica correo de empresa sin autorización explícita.
+  - `CartProvider` separa visitante, cada usuario y Admin; la migración `vertice-cart-v1` queda atribuida solo a visitante. La captura de R-H77 detectó el icono visible sin sesión: ahora el navbar solo ofrece el carrito a `customer`, `/carrito` requiere ese rol y login/registro preserva destino y fusiona la selección guardada del visitante. La ficha comunica ese handoff; Admin no tiene acceso de compra. El logout preserva carritos independientes y las pestañas del mismo navegador sincronizan la clave activa.
+  - R-H77: el navbar del visitante ya no ofrece carrito; `/carrito` exige `customer`, envía a login con destino/aviso y restringe Admin. La ficha visitante explica que la selección se conserva localmente y ofrece crear cuenta/entrar; el login/registro la incorpora al carrito customer. No se borró almacenamiento ni se tocó `db.json`. Tests de regresión añadidos; IAB Light escritorio (~1265×713) y pestaña real Brave Dark confirman navbar/menú de visitante sin carrito y redirección al login. Vista customer live, viewport 375/768 y continuidad de datos locales tras login siguen pendientes. Detalle en `docs/05` R-H77.
+  - Gate local tras el bloque: `npm test` 44 suites/271 tests, `npm run lint`, `npm run check:ui`, `npm run build` y `git diff --check` pasan. Build conserva el aviso de bundle JS principal superior a 500 kB. CI remoto y vista Admin con sesión no se validaron aquí.
+  - Contratos documentados en `docs/02`, recorrido en `docs/03`, guía visual en `docs/04` y evidencia parcial en `docs/05` R-H77. Siguiente cierre: revisar carrito customer en viewport móvil, tema Dark y continuidad real de carrito al autenticarse; no declarar completa la revisión responsive global.
+
+- **Revisión puntual de Contacto (2026-10-04):**
+  - Eliminado el offset superior duplicado del shell en `/contacto`; su composición distingue entrada por archivo, idea y seguimiento, explica el proceso real y conserva FAQ/asistente general. El link de sesión visitante retorna a `/cuenta` después del login.
+  - No se muestra el Gmail personal ni un buzón inventado: un correo corporativo no puede ser creado por código. El formulario de mensaje general y su destino interno siguen pendientes; no confundirlos con intake de cotización.
+  - IAB: `/contacto` capturado en escritorio (~1270×707) Light/Dark. Árbol AX confirma enlaces por rol y llamada al asistente. Aún sin captura 375/768 ni teclado completo. Registro `docs/05` R-H76.
+  - Verificación local más reciente: `npm test` 44 suites/271 tests; lint, `check:ui` y build pasan (con aviso de bundle principal >500 kB). El worktree ya estaba muy modificado antes de este corte; no hacer stage/commit/push sin aislar y revisar esos cambios preexistentes.
+
 
 ## Registro anterior para continuar (2026-10-03; superado)
 

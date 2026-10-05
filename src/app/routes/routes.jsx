@@ -16,6 +16,8 @@ import { AdminCustomerDetailPage, AdminCustomersPage } from '../../features/admi
 import { AdminAssistantPage } from '../../features/admin/AdminAssistantPage.jsx';
 import { NotFoundPage } from '../../pages/NotFoundPage.jsx';
 import { RouteErrorPage } from '../../pages/RouteErrorPage.jsx';
+import { AboutPage } from '../../pages/AboutPage.jsx';
+import { ContactPage } from '../../pages/ContactPage.jsx';
 import { CartPage, CatalogPage, ProductPage } from '../../pages/Shop.jsx';
 import { QuoteRequestPage } from '../../pages/QuoteRequestPage.jsx';
 import { CustomerQuotesPage } from '../../pages/CustomerQuotesPage.jsx';
@@ -23,12 +25,14 @@ import { adminPages, publicPages } from './manifest.js';
 
 const pages = manifest => manifest.map(([path, titleKey]) => ({
   path,
-  element: path === '/cuenta' ? <CustomerQuotesPage /> : path.startsWith('/solicitud') ? <QuoteRequestPage /> : path === '/carrito' ? <CartPage /> : path === '/catalogo' ? <CatalogPage /> : path === '/producto/:id' ? <ProductPage /> : <ConstructionPage titleKey={titleKey} />,
+  element: path === '/cuenta' ? <CustomerQuotesPage /> : path.startsWith('/solicitud') ? <QuoteRequestPage /> : path === '/carrito' ? <CartPage /> : path === '/catalogo' ? <CatalogPage /> : path === '/producto/:id' ? <ProductPage /> : path === '/nosotros' ? <AboutPage /> : path === '/contacto' ? <ContactPage /> : <ConstructionPage titleKey={titleKey} />,
 }));
 
 const protectedPublicPaths = new Set(['/cuenta', '/pedidos/:id']);
 const protectedPublicPages = publicPages.filter(([path]) => protectedPublicPaths.has(path));
-const openPublicPages = publicPages.filter(([path]) => path !== '/' && !protectedPublicPaths.has(path));
+const customerOnlyPaths = new Set(['/carrito']);
+const customerOnlyPages = publicPages.filter(([path]) => customerOnlyPaths.has(path));
+const openPublicPages = publicPages.filter(([path]) => path !== '/' && !protectedPublicPaths.has(path) && !customerOnlyPaths.has(path));
 const adminRoutePages = adminPages.map(([path, titleKey]) => ({
       path,
       element: path === '/admin' ? <AdminDashboardPage />
@@ -58,6 +62,10 @@ export const routes = [
       {
         element: <RequireAuth />,
         children: pages(protectedPublicPages),
+      },
+      {
+        element: <RequireRole role="customer" />,
+        children: pages(customerOnlyPages),
       },
       { path: '*', element: <NotFoundPage /> },
     ],

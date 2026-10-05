@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { isOrderableProduct } from '../src/utils/cart.js';
 import { productSubtotal } from '../src/utils/money.js';
 import { sessionActor } from './session-access.js';
+import { installOrderPaymentOperation } from './order-payment-operations.js';
 
 function normalizeRequestedItems(items) {
   if (!Array.isArray(items) || items.length === 0) return null;
@@ -76,7 +77,21 @@ export function prepareCatalogOrder(data, actor, payload, now, idFactory = rando
 }
 
 export function installCatalogOrderOperations({ registerAction, db, serialize, persist }) {
+  installOrderPaymentOperation({ registerAction, db, serialize, persist });
   const failure = (res, code, status = 400) => res.status(status).json({ code });
+  registerAction('/orders/mine', (req, res) => {
+    const actor = sessionActor(req.headers.authorization, db.data);
+    if (actor?.role !== 'customer') return failure(res, 'CUSTOMER_REQUIRED', 403);
+    const orders = (db.data.orders || [])
+      .filter(order => String(order.userId) === String(actor.id))
+      .map(order => ({ ...order, orderItems: (Array.isArray(order.orderItems)
+        ? order.orderItems
+        : (db.data.orderItems || []).filter(item => String(item.orderId) === String(order.id))).map(item => {
+        const product = (db.data.products || []).find(candidate => String(candidate.id) === String(item.productId));
+        return product && !item.productName ? { ...item, currentCatalogName: product.name } : item;
+      }) }));
+    return res.json({ orders });
+  });
   registerAction('/orders/submit-catalog-order', async (req, res) => {
     const actor = sessionActor(req.headers.authorization, db.data);
     if (actor?.role !== 'customer') return failure(res, 'CUSTOMER_REQUIRED', 403);

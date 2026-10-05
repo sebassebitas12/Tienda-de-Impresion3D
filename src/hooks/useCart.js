@@ -5,3 +5,7 @@ export function useCart() {
   if (!context) throw new Error('useCart requiere CartProvider');
   return context;
 }
+
+export function useOptionalCart() {
+  return useContext(CartContext);
+}

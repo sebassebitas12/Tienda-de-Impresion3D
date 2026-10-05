@@ -75,6 +75,10 @@ Nunca inventes:
 
 Cuando un dato sea experimental, márcalo como demo/propuesta. Cuando no esté respaldado, elimínalo o déjalo pendiente.
 
+### 5.1 `db.json` y pruebas manuales del usuario (indicación del usuario, 2026-10-04)
+
+Los cambios en `db.json` producidos en runtime (JSON Server al usar la app: cotizaciones, transiciones de estado, pedidos, usuarios de prueba) son **pruebas manuales del usuario** y **no se commitean**. Descartarlos con `git checkout -- db.json` antes de cualquier commit. Solo se commitean cambios a `db.json` hechos intencionalmente como parte de un bloque (fixtures/catálogo) y documentados.
+
 ## 6. Mockups y fidelidad visual
 
 `mockups/hf-01-home-definitivo.html` es el **mockup de máxima fidelidad de la Home** y la fuente visual para React una vez aprobado.

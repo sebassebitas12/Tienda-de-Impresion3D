@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { MemoryRouter } from 'react-router-dom';
 import { RequestNextAction } from '../src/features/admin/RequestNextAction.jsx';
 import { sendQuoteEmail, transitionRequest } from '../src/services/adminActionsService.js';
+import { automationAction } from '../src/services/automationService.js';
 import { calculateManualQuote } from '../src/utils/quotePricing.js';
 
 jest.mock('../src/services/adminActionsService.js', () => ({
@@ -33,6 +34,33 @@ function renderAction(overrides = {}) {
 }
 
 describe('paso de envío de cotización', () => {
+  it('explica el cambio de estado y exige confirmación antes de guardar una cotización DEMO', async () => {
+    const onSaved = jest.fn();
+    render(<MemoryRouter><RequestNextAction request={{ ...request, status: 'IN_REVIEW' }} user={user} language="es" onSaved={onSaved} /></MemoryRouter>);
+    const prepare = await screen.findByRole('button', { name: 'Preparar cotización DEMO' });
+    await waitFor(() => expect(prepare).toBeEnabled());
+    fireEvent.click(prepare);
+    expect(screen.getByText(/guarda una estimación DEMO y pasa la solicitud a «Cotizada»\. No envía ningún correo/)).toBeInTheDocument();
+    expect(automationAction).not.toHaveBeenCalledWith('/admin/actions/auto-quote', expect.anything(), expect.anything());
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(screen.queryByRole('group', { name: 'Confirmar cotización DEMO' })).not.toBeInTheDocument();
+    expect(automationAction).not.toHaveBeenCalledWith('/admin/actions/auto-quote', expect.anything(), expect.anything());
+    fireEvent.click(prepare);
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar estimación DEMO' }));
+    await waitFor(() => expect(automationAction).toHaveBeenCalledWith('/admin/actions/auto-quote', expect.objectContaining({ requestId: 'r2', expectedStatus: 'IN_REVIEW' }), { token: undefined }));
+    await waitFor(() => expect(onSaved).toHaveBeenCalled());
+  });
+
+  it('muestra el motivo y guarda una revisión sin enviar la oferta anterior', async () => {
+    transitionRequest.mockResolvedValue({});
+    renderAction({ status: 'CHANGES_REQUESTED', customerDecisionReason: 'Necesito un acabado distinto' });
+    expect(screen.getByText('Necesito un acabado distinto')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Enviar al cliente y copiarme' })).not.toBeInTheDocument();
+    fireEvent.change(screen.getByRole('textbox', { name: 'Alcance y condiciones para el cliente' }), { target: { value: 'Nuevo acabado acordado.' } });
+    fireEvent.submit(screen.getByRole('button', { name: 'Guardar cotización' }).closest('form'));
+    await waitFor(() => expect(transitionRequest).toHaveBeenCalledWith(expect.objectContaining({ action: 'save-quote', expectedStatus: 'CHANGES_REQUESTED', expectedVersion: 2, notes: 'Nuevo acabado acordado.' }), { token: undefined }));
+    expect(sendQuoteEmail).not.toHaveBeenCalled();
+  });
   afterEach(() => { cleanup(); jest.clearAllMocks(); });
 
   it('muestra los dos destinatarios y pasa a aprobación solo tras confirmar el envío', async () => {
@@ -48,8 +76,21 @@ describe('paso de envío de cotización', () => {
 
   it('bloquea el envío cuando la dirección aún es un correo de ejemplo', async () => {
     renderAction({ customerEmail: 'ana@example.com' });
-    await screen.findByText('0 referencias');
+    expect(await screen.findByText(/contienen correos de ejemplo o inválidos/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Enviar al cliente y copiarme' })).toBeDisabled();
-    expect(screen.getByText(/contienen correos de ejemplo o inválidos/)).toBeInTheDocument();
+  });
+
+  it('permite devolver la solicitud a revisión técnica y muestra título de cotización registrada', async () => {
+    transitionRequest.mockResolvedValue({ request: { status: 'IN_REVIEW' } });
+    renderAction();
+    expect(screen.getByText('Cotización registrada · Lista para enviar')).toBeInTheDocument();
+    const reopenBtn = screen.getByRole('button', { name: 'Devolver a revisión técnica' });
+    expect(reopenBtn).toBeInTheDocument();
+    fireEvent.click(reopenBtn);
+    await waitFor(() => expect(transitionRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ requestId: 'r2', actorId: 'u1', action: 'reopen-review', expectedStatus: 'QUOTED', expectedVersion: 2 }),
+      { token: undefined }
+    ));
+    expect(await screen.findByText(/Solicitud devuelta a revisión técnica/)).toHaveAttribute('role', 'status');
   });
 });

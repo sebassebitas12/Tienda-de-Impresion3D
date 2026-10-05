@@ -45,7 +45,7 @@ const words = {
     errorTitle: 'No pudimos cargar las solicitudes', errorText: 'Revisá que JSON Server esté activo y volvé a intentar.',
     all: 'Todas', workshop: 'Acción del taller', customer: 'Espera del cliente', production: 'Aprobadas / pagadas', closed: 'Cerradas', legacy: 'Estado no reconocido',
     legacySummary: count => `${count} solicitud${count === 1 ? '' : 'es'} pendiente${count === 1 ? '' : 's'} de incorporar`, legacyView: 'Revisar e incorporar',
-    distribution: 'Mapa de solicitudes', distributionHint: count => `${count} solicitudes reconocidas en el flujo actual`,
+    distribution: 'Mapa de solicitudes', distributionHint: 'Elegí una etapa para filtrar la bandeja de abajo.', totalLabel: count => `${count} solicitudes reconocidas en el flujo actual`,
     searchLabel: 'Buscar solicitud', searchPlaceholder: 'ID, cliente, archivo o material', results: count => `${count} resultados`,
     empty: 'No hay solicitudes en este grupo.', noMatch: 'No encontramos coincidencias.', noRequest: 'No encontramos esta solicitud.', customerLabel: 'Cliente',
     customerUnknown: 'Cliente no asociado', request: 'Solicitud', received: 'Recibida', material: 'Material', quantity: 'Cantidad',
@@ -65,7 +65,7 @@ const words = {
     loading: 'Loading requests', retry: 'Retry', errorTitle: 'Could not load requests', errorText: 'Check that JSON Server is running and try again.',
     all: 'All', workshop: 'Workshop action', customer: 'Waiting on customer', production: 'Approved / paid', closed: 'Closed', legacy: 'Unrecognized status',
     legacySummary: count => `${count} request${count === 1 ? '' : 's'} with an unrecognized status`, legacyView: 'View these records',
-    distribution: 'Request map', distributionHint: count => `${count} requests in the recognized workflow`,
+    distribution: 'Request map', distributionHint: 'Choose a stage to filter the inbox below.', totalLabel: count => `${count} requests in the recognized workflow`,
     searchLabel: 'Search requests', searchPlaceholder: 'ID, customer, file or material', results: count => `${count} results`,
     empty: 'No requests in this group.', noMatch: 'No matching requests found.', noRequest: 'Request not found.', customerLabel: 'Customer',
     customerUnknown: 'No linked customer', request: 'Request', received: 'Received', material: 'Material', quantity: 'Quantity',
@@ -106,15 +106,15 @@ function RequestDistribution({ requests, phase, onPhaseChange, text }) {
   return (
     <section className="admin-request-map" aria-labelledby="admin-request-map-title">
       <div className="admin-request-map__heading">
-        <div><span className="admin-eyebrow">01 / {text.distribution}</span><h2 id="admin-request-map-title">{text.distribution}</h2></div>
-        <p>{text.distributionHint(total)}</p>
+        <div><span className="admin-eyebrow">{text.distribution}</span><h2 id="admin-request-map-title">{text.distribution}</h2></div>
+        <p>{text.distributionHint}</p>
       </div>
       {total === 0 ? <div className="admin-request-map__empty" aria-live="polite">{text.empty}</div> : (
         <div className="admin-request-map__body">
           <div className="admin-donut-wrap">
             <svg className="admin-donut" viewBox="0 0 100 100" role="img" aria-labelledby="admin-donut-title admin-donut-description">
               <title id="admin-donut-title">{text.distribution}</title>
-              <desc id="admin-donut-description">{text.distributionHint(total)}</desc>
+              <desc id="admin-donut-description">{text.distributionHint}</desc>
               <circle className="admin-donut__track" cx="50" cy="50" r="42" />
               {segments.map(segment => <circle key={segment.key} className={`admin-donut__segment admin-donut__segment--${segment.key}`} cx="50" cy="50" r="42"
                 strokeDasharray={`${segment.length} ${circumference}`} strokeDashoffset={-segment.offset} style={{ '--segment-delay': `${REQUEST_PHASES.indexOf(segment.key) * 90}ms`, '--donut-circumference': circumference, '--donut-end': -segment.offset }} />)}
@@ -153,7 +153,7 @@ export function AdminRequestsPage() {
     <section className="admin-requests-page" aria-labelledby="admin-requests-title" aria-busy={status === 'loading'}>
       <header className="admin-page-heading admin-requests-heading">
         <div><span className="admin-eyebrow">{text.source}</span><h1 id="admin-requests-title">{text.title}</h1><p>{text.intro}</p></div>
-        <span className="admin-request-total"><strong>{officialRequests.length}</strong><span>{text.distributionHint(officialRequests.length)}</span></span>
+        <span className="admin-request-total"><strong>{officialRequests.length}</strong><span>{text.totalLabel(officialRequests.length)}</span></span>
       </header>
 
       {status === 'loading' && <div className="admin-request-loading" role="status" aria-label={text.loading}>{[1, 2].map(i => <Skeleton key={i} />)}</div>}
@@ -166,7 +166,7 @@ export function AdminRequestsPage() {
           <button type="button" onClick={() => choosePhase('legacy')} aria-pressed={phase === 'legacy'}>{text.legacyView} →</button>
         </div>}
         <section className="admin-request-inbox" aria-labelledby="admin-request-inbox-title">
-          <header className="admin-request-inbox__heading"><div><span className="admin-eyebrow">02 / {text.request}</span><h2 id="admin-request-inbox-title">{phases.length > 1 ? phases.map(value => phaseLabel(text, value)).join(' + ') : phaseLabel(text, phase)}</h2></div>
+          <header className="admin-request-inbox__heading"><div><span className="admin-eyebrow">{text.request}</span><h2 id="admin-request-inbox-title">{phases.length > 1 ? phases.map(value => phaseLabel(text, value)).join(' + ') : phaseLabel(text, phase)}</h2></div>
             <label className="admin-request-search"><span>{text.searchLabel}</span><input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder={text.searchPlaceholder} /></label>
           </header>
           <p className="admin-request-results" role="status" aria-live="polite">{text.results(filtered.length)}</p>
@@ -174,7 +174,6 @@ export function AdminRequestsPage() {
             <ul className="admin-request-cards" key={`${phase}-${search}`}>
               {filtered.map((request, index) => <li key={request.id} style={{ '--row-index': index }}>
                 <Link className="admin-request-card" to={`/admin/solicitudes/${encodeURIComponent(request.id)}`}>
-                  <span className="admin-request-card__index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
                   <span className="admin-request-card__main"><span className="admin-request-card__title">{request.fileName || request.description || `${text.request} ${request.id}`}</span>
                     <span className="admin-request-card__meta">{request.id} <i aria-hidden="true">·</i> {request.customerName || text.customerUnknown} <i aria-hidden="true">·</i> {request.material || '—'} <i aria-hidden="true">·</i> {request.quantity ?? '—'} {text.quantity.toLocaleLowerCase()}</span></span>
                   <span className="admin-state" data-status={request.status}>{text.statuses[request.status] || request.status}</span>
@@ -241,7 +240,7 @@ export function AdminRequestDetailPage() {
             <p>{request.customerName || text.customerUnknown} <span aria-hidden="true">·</span> {formatDate(request.submittedAt, language)}</p></div>
           <span className="admin-state" data-status={request.status}>{text.statuses[request.status] || request.status}</span>
         </header>
-        {['SUBMITTED', 'PENDING_QUOTE', 'IN_REVIEW', 'QUOTED', 'AWAITING_APPROVAL', 'APPROVED', 'PAID'].includes(request.status) && <RequestNextAction key={`${request.id}-${request.updatedAt || request.status}`} request={request} user={user} language={language} onSaved={retry} />}
+        {['SUBMITTED', 'PENDING_QUOTE', 'IN_REVIEW', 'CHANGES_REQUESTED', 'QUOTED', 'AWAITING_APPROVAL', 'APPROVED', 'PAID'].includes(request.status) && <RequestNextAction key={`${request.id}-${request.updatedAt || request.status}`} request={request} user={user} language={language} onSaved={retry} />}
         {phaseIsLegacy ? <aside className="admin-detail-legacy" role="status"><strong>{text.legacyTitle}</strong><p>{text.legacyDescription(request.status)}</p></aside> : (
           <>
           {request.status === 'PENDING_QUOTE' && user?.role === 'admin' && <div className="admin-review-action">
@@ -249,12 +248,12 @@ export function AdminRequestDetailPage() {
             <Button loading={reviewAction.status === 'loading'} loadingLabel={text.startingReview} onClick={beginReview}>{text.startReview}</Button>
           </div>}
           <section className="admin-request-workflow" aria-labelledby="admin-workflow-title">
-            <div className="admin-request-workflow__heading"><div><span className="admin-eyebrow">03 / {text.current}</span><h2 id="admin-workflow-title">{text.workflow}</h2></div>
+            <div className="admin-request-workflow__heading"><div><span className="admin-eyebrow">{text.current}</span><h2 id="admin-workflow-title">{text.workflow}</h2></div>
               <span className="admin-state" data-status={request.status}>{text.statuses[request.status]}</span></div>
             {activeIndex >= 0 ? <ol className="admin-workflow-steps" aria-label={text.workflow}>
               {FLOW.map((step, index) => <li key={step} className={index < activeIndex ? 'is-complete' : index === activeIndex ? 'is-current' : ''}
                 aria-current={index === activeIndex ? 'step' : undefined} style={{ '--step-index': index }}>
-                <span className="admin-workflow-steps__mark" aria-hidden="true">{index < activeIndex ? '✓' : String(index + 1).padStart(2, '0')}</span><span>{text.flowSteps[index]}</span>
+                <span className="admin-workflow-steps__mark" aria-hidden="true">{index < activeIndex ? '✓' : ''}</span><span>{text.flowSteps[index]}</span>
               </li>)}
             </ol> : <p className="admin-request-workflow__terminal">{text.statuses[request.status] || request.status}</p>}
             {reviewStartedLabel && <p className="admin-review-activity">{reviewStartedLabel} · <Link to={`/admin/actividad?solicitud=${encodeURIComponent(request.id)}`}>{text.viewActivity}</Link></p>}
@@ -262,7 +261,7 @@ export function AdminRequestDetailPage() {
           </>
         )}
         <div className="admin-request-detail__grid">
-          <section className="admin-detail-panel" aria-labelledby="admin-detail-brief-title"><span className="admin-eyebrow">04 / {text.details}</span><h2 id="admin-detail-brief-title">{text.details}</h2>
+          <section className="admin-detail-panel" aria-labelledby="admin-detail-brief-title"><span className="admin-eyebrow">{text.details}</span><h2 id="admin-detail-brief-title">{text.details}</h2>
             <dl><div><dt>{text.customerLabel}</dt><dd>{request.customerName || text.customerUnknown}</dd></div>
               <div><dt>{text.sourceType}</dt><dd>{text.types[request.sourceType] || request.sourceType || '—'}</dd></div>
               <div><dt>{text.material}</dt><dd>{request.material || '—'}</dd></div>
@@ -277,7 +276,7 @@ export function AdminRequestDetailPage() {
               <div><dt>{text.received}</dt><dd>{formatDate(request.submittedAt, language)}</dd></div>
             </dl>
           </section>
-          <aside className="admin-quote-panel" aria-labelledby="admin-quote-title"><span className="admin-eyebrow">05 / {text.quote}</span><h2 id="admin-quote-title">{text.quote}</h2>
+          <aside className="admin-quote-panel" aria-labelledby="admin-quote-title"><span className="admin-eyebrow">{text.quote}</span><h2 id="admin-quote-title">{text.quote}</h2>
             {showsQuote ? <><strong className="admin-quote-panel__amount">{formatCRC(request.quotedPrice)}</strong>
               {request.quotedAt && <p>{text.quoteDate}: {formatDate(request.quotedAt, language)}</p>}{request.quoteValidUntil && <p>{text.validUntil}: {formatDate(request.quoteValidUntil, language)}</p>}</>
           : <p>{['PENDING_QUOTE', 'IN_REVIEW'].includes(request.status) ? text.noQuote : text.noQuoteForStatus}</p>}

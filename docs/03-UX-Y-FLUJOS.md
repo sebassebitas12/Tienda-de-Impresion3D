@@ -1,10 +1,43 @@
 # Vértice CR — UX, navegación y estados
 
-> Última actualización: **2026-10-04**.
+R-H83: Contacto deriva a rutas ejecutables según pieza/idea/seguimiento; la
+redacción evita insinuar un equipo grande y asigna al admin su propia acción.
+
+R-H81: titular del carrito sin insignia técnica de sesión. Cuenta prioriza
+piezas del pedido antes de pago. Verificación del pago y comienzo de producción
+son pasos separados. Nombre histórico manda; si falta, se puede mostrar el
+nombre vigente identificado como referencia del catálogo actual.
+
+R-H80: catálogo filtra por categoría real además de material; ficha usa solo
+muestras de color (teclado por flechas), galería y acceso a modificaciones por
+solicitud. QUOTED/CHANGES_REQUESTED explican el siguiente paso sin habilitar
+acciones impropias. Correo lleva a cuenta para decisión; el acuse no equivale
+a aprobación/pago. Versiones importadas y render Gmail requieren verificación.
+
+## Recorrido carrito y pago — R-H78 (2026-10-05)
+
+Confirmar encargo registra un pedido, no acredita pago ni inicia producción.
+El subtotal de piezas no incluye automáticamente entrega/impuestos; variantes
+no disponibles bloquean el CTA con explicación. Cuenta ofrece actualización
+manual y las seis etapas reales del taller, sin progreso activo para cancelados
+o rechazados; COMPLETED se conserva como cierre heredado. Los cargos registrados
+se desglosan, sin asumir cero para campos ausentes ni deuda desde producción.
+
+SINPE 8888-8888 es un ejemplo académico: se advierte no transferir dinero.
+Reportar no acredita pago; Admin confirma pago/pedido y producción es posterior.
+Carrito tablet separa resumen/líneas; cuenta móvil conserva pestañas y etapas.
+Pendiente comercial: destinatario real, entrega/retiro, cargos y aceptación
+del monto final antes de habilitar cobro real. No hay pasarela bancaria conectada.
+
+> Última actualización: **2026-10-05**.
 
 ## Rutas públicas
 
-/, /catalogo, /producto/:id, /solicitud, /solicitud/archivo, /solicitud/ayuda-diseno, /carrito, /checkout/productos, /checkout/solicitud, /registro, /pedidos/:id, /cuenta.
+/, /catalogo, /producto/:id, /solicitud, /solicitud/archivo, /solicitud/ayuda-diseno, /checkout/productos, /checkout/solicitud, /registro, /nosotros, /contacto.
+
+`/carrito` requiere una sesión con rol `customer`; `/cuenta` y `/pedidos/:id`
+requieren sesión autenticada. Admin y visitantes no pueden abrir el carrito;
+el guard envía al visitante a login con el destino preservado.
 
 ## Rutas administrativas
 
@@ -13,7 +46,7 @@
 ## Flujos
 
 ### Compra
-Home → Catálogo → Producto → Carrito → Confirmar encargo → `/cuenta` (acuse) → revisión/etapas del pedido en Admin.
+Home → Catálogo → Producto → (si visitante: selección local → login/registro) → Carrito customer → Confirmar encargo → `/cuenta` (acuse) → revisión/etapas del pedido en Admin.
 
 ### Personalizada con archivo
 Solicitud → Archivo → Requisitos → Revisión → Pendiente de cotización → Cuenta → Cotización → Aprobación → Pago → Pedido.
@@ -76,6 +109,33 @@ aprobación demo del cliente, el intake de requisitos y la recepción local de
 adjuntos privados. Siguen pendientes el procesamiento/laminado real de archivos,
 el pago real y las notificaciones de avance. El botón de correo
 del cliente no debe enviar una cotización demo directamente como precio final.
+
+### Páginas institucionales y contexto de sesión — 2026-10-04
+
+`/nosotros` explica el alcance del taller, el recorrido de una pieza de catálogo
+y una solicitud personalizada, y diferencia las estimaciones iniciales de una
+cotización confirmada. `/contacto` funciona como enrutador de ayuda: archivo o
+referencias → `/solicitud/archivo`; idea por desarrollar → `/solicitud/ayuda-diseno`;
+seguimiento → `/cuenta` para cliente, `/admin` para Admin y `/login` para
+visitante con retorno a su cuenta. Desde Contacto se puede abrir el asistente
+general ya presente en el chrome público. No se publica un correo ni se afirma
+un canal directo hasta contar con autorización y un destino confirmado. La página
+explica qué recibe el taller, qué no ocurre al enviar y cómo se sigue la decisión;
+no simula una bandeja de contacto ni muestra una dirección sin buzón. Un correo
+corporativo real requiere dominio/buzón configurado fuera de la app. Si se necesita
+contacto general por mensaje, queda pendiente implementar un formulario conectado
+a un destino interno confirmado; las solicitudes de fabricación existentes no se
+deben disfrazar como consultas generales.
+
+La selección del visitante puede prepararse localmente desde una ficha de
+producto, pero no se muestra ni se abre el carrito hasta iniciar sesión como
+cliente. El aviso de agregado ofrece login/registro y explica que la selección
+queda guardada en ese navegador. Al volver a `/carrito`, la sesión customer
+combina explícitamente esa selección con su carrito de cuenta. El icono del
+navbar solo aparece para clientes autenticados; Admin no compra desde ese
+chrome. El cambio de cuenta o logout no debe mostrar a otra persona las líneas
+anteriores. Esto es persistencia local, no sincronización entre dispositivos ni
+un pedido real.
 
 ### Admin
 Login → Dashboard → bandeja → detalle → acción → actividad.
@@ -282,15 +342,17 @@ versión son validadas por el servidor; la respuesta no se ejecuta desde el emai
 
 ### Encargo desde el carrito — C-P4 (2026-10-04)
 
-El CTA aparece cuando todas las líneas son válidas. Un visitante debe iniciar
-sesión; solo una cuenta `customer` puede confirmar. El éxito limpia el carrito,
+La página y el acceso del navbar requieren una cuenta `customer`; visitantes que
+prepararon una selección local llegan a login/registro con el destino
+`/carrito` preservado. El CTA aparece cuando todas las líneas son válidas. Solo
+una cuenta `customer` puede confirmar. El éxito limpia el carrito,
 lleva a `/cuenta` y muestra el número del encargo, el subtotal y el aviso de que
 no se ha cobrado ni confirmado fecha de entrega. Si el API falla, el carrito se
 conserva para corregir o reintentar.
 
 ### Tipografía de chrome global
 
-La auditoría del instructor encontró textos ilegibles por defecto, en especial navbar y footer. El shell React sube navegación pública a 14 px en escritorio y 13 px en tablet; copy/enlaces del footer a 14 px y títulos/metadata secundaria a 12 px. Revisar a escala 100% y 150/200%, además de conservar las explicaciones en lenguaje natural y no reemplazarlas por etiquetas técnicas pequeñas. En viewport estrecho deben conservarse carrito, idioma y menú; el buscador puede vivir en el menú cuando no quepa como control de primer nivel.
+La auditoría del instructor encontró textos ilegibles por defecto, en especial navbar y footer. El shell React sube navegación pública a 14 px en escritorio y 13 px en tablet; copy/enlaces del footer a 14 px y títulos/metadata secundaria a 12 px. Revisar a escala 100% y 150/200%, además de conservar las explicaciones en lenguaje natural y no reemplazarlas por etiquetas técnicas pequeñas. En viewport estrecho deben conservarse idioma y menú para cualquier visitante; el acceso al carrito solo aparece con sesión customer. El buscador puede vivir en el menú cuando no quepa como control de primer nivel.
 
 **Actualización R-H46 (2026-10-01; supersedida en R-H48):** navbar/CTA a 16/15 px, footer a 16 px y colapso de navegación a 1000 px se revirtieron cuando el usuario aclaró que la captura se observó con zoom al 75%. Se restaura la primera iteración R-H45: navbar 14/13 px, CTA 13/12 px, idioma 12 px, footer 14 px con secundarios a 12 px y menú a partir de 820 px. La revisión de otros breakpoints y escalas sigue pendiente.
 

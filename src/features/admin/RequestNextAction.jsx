@@ -68,7 +68,10 @@ export function RequestNextAction({ request, user, language, onSaved }) {
     try {
       await transitionRequest({ requestId: request.id, actorId: user.id, expectedStatus: request.status,
         expectedVersion: request.quoteVersion || 0, action, pricingInputs: inputs, validUntil, notes }, { token: auth?.token });
-      setStatus('success'); setMessage(es ? 'Cálculo y cotización guardados en el historial.' : 'Calculation and quote saved to the history.');
+      setStatus('success');
+      setMessage(action === 'reopen-review'
+        ? (es ? 'Solicitud devuelta a revisión técnica.' : 'Request returned to technical review.')
+        : (es ? 'Cálculo y cotización guardados en el historial.' : 'Calculation and quote saved to the history.'));
       onSaved();
     } catch (error) {
       setStatus('error');
@@ -102,7 +105,7 @@ export function RequestNextAction({ request, user, language, onSaved }) {
     }
   }
 
-  const editable = ['IN_REVIEW', 'QUOTED'].includes(request.status);
+  const editable = ['IN_REVIEW', 'QUOTED', 'CHANGES_REQUESTED'].includes(request.status);
   if (user?.role !== 'admin') return null;
   const canSendQuote = isDeliverableEmail(request.customerEmail) && isDeliverableEmail(user.email)
     && Number.isSafeInteger(request.quotedPrice) && request.quotedPrice > 0 && request.currency === 'CRC'
@@ -113,13 +116,34 @@ export function RequestNextAction({ request, user, language, onSaved }) {
 
   return <section className="admin-next-action" aria-labelledby="request-next-title" aria-busy={busy}>
     <header><span className="admin-eyebrow">{es ? 'Tu siguiente paso' : 'Your next step'}</span><h2 id="request-next-title">
-      {editable ? (es ? 'Calculá el costo del encargo' : 'Calculate the job cost') : request.status === 'SUBMITTED' ? (es ? 'Incorporar solicitud recibida' : 'Register received request') : (es ? 'Seguimiento del encargo' : 'Job follow-up')}
+      {request.status === 'QUOTED'
+        ? (es ? 'Cotización registrada · Lista para enviar' : 'Quote recorded · Ready to send')
+        : editable
+          ? (es ? 'Calculá el costo del encargo' : 'Calculate the job cost')
+          : request.status === 'SUBMITTED'
+            ? (es ? 'Incorporar solicitud recibida' : 'Register received request')
+            : (es ? 'Seguimiento del encargo' : 'Job follow-up')}
     </h2></header>
-    {['PENDING_QUOTE', 'IN_REVIEW', 'QUOTED'].includes(request.status) && <AutomaticQuote request={request} onSaved={onSaved} language={language} />}
+    {['PENDING_QUOTE', 'IN_REVIEW'].includes(request.status) && <AutomaticQuote request={request} onSaved={onSaved} language={language} />}
     {request.status === 'SUBMITTED' && <><p>{es ? 'Esta solicitud se recibió con una etiqueta antigua. Registrala como pendiente para poder iniciar su revisión. Se conservará el estado original en el historial.' : 'This request used an old label. Register it as pending to begin reviewing it. The original status will remain in its history.'}</p>
       <button className="v-button v-button--primary" disabled={busy} onClick={() => act('incorporate-request')}>{es ? 'Registrar como pendiente' : 'Register as pending'}</button></>}
+    {request.status === 'QUOTED' && <div className="admin-quote-send">
+      <span className="admin-eyebrow">{es ? 'Siguiente paso · correo' : 'Next step · email'}</span>
+      <div className="admin-quote-send__summary">
+        <p><strong>{es ? 'Monto cotizado:' : 'Quoted price:'}</strong> {formatCRC(request.quotedPrice)}</p>
+        {request.quoteValidUntil && <p><strong>{es ? 'Vigente hasta:' : 'Valid until:'}</strong> {request.quoteValidUntil.slice(0, 10)}</p>}
+        {request.quoteNotes && <p><strong>{es ? 'Condiciones:' : 'Terms:'}</strong> {request.quoteNotes}</p>}
+      </div>
+      <p className="admin-quote-send__recipients">{es ? <>Para: {request.customerEmail || 'correo de cliente sin registrar'}<br />Copia oculta: {user.email}</> : <>To: {request.customerEmail || 'customer email not recorded'}<br />Blind copy: {user.email}</>}</p>
+      {(!isDeliverableEmail(request.customerEmail) || !isDeliverableEmail(user.email)) && <p className="admin-quote-send__warning">{es ? 'Los datos actuales contienen correos de ejemplo o inválidos. Se bloqueará cualquier envío hasta tener direcciones reales.' : 'Current data contains sample or invalid email addresses. Sending is blocked until real addresses are available.'}</p>}
+      <div className="admin-quote-send__actions" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+        <button className="v-button v-button--primary" type="button" disabled={busy || !canSendQuote} onClick={sendQuote}>{busy ? (es ? 'Enviando correo…' : 'Sending email…') : (es ? 'Enviar al cliente y copiarme' : 'Send to customer and copy me')}</button>
+        <button className="v-button v-button--ghost" type="button" disabled={busy} onClick={() => act('reopen-review')}>{busy ? (es ? 'Actualizando…' : 'Updating…') : (es ? 'Devolver a revisión técnica' : 'Return to technical review')}</button>
+      </div>
+    </div>}
+    {request.status === 'CHANGES_REQUESTED' && <aside className="admin-quote-send__summary"><h3>{es ? 'Cambios solicitados por el cliente' : 'Customer requested changes'}</h3><p>{request.customerDecisionReason || (es ? 'No se registró un motivo.' : 'No reason recorded.')}</p><p>{es ? `Revisá el alcance y guardá la versión ${(request.quoteVersion || 0) + 1}. Después podrás enviarla para una nueva aprobación.` : 'Review the scope and save a new version, then send it for approval.'}</p></aside>}
     {editable && <form onSubmit={event => { event.preventDefault(); act('save-quote'); }}>
-      <details open={request.quotePricing?.mode === 'MANUAL'}><summary>{es ? 'Costeo avanzado · datos reales o ajuste manual' : 'Advanced costing · real data or manual adjustment'}</summary>
+      <details open={['IN_REVIEW', 'CHANGES_REQUESTED'].includes(request.status) || request.quotePricing?.mode === 'MANUAL'}><summary>{request.status === 'QUOTED' ? (es ? 'Ajustar cálculo o parámetros técnicos' : 'Adjust calculation or technical parameters') : (es ? 'Costeo avanzado · datos reales o ajuste manual' : 'Advanced costing · real data or manual adjustment')}</summary>
       <p>{es ? `Usá los datos del laminador por pieza y costos actuales del taller. La cantidad solicitada es ${request.quantity}; el diseño se calcula una vez por pedido.` : `Use slicer data per piece and current shop costs. Requested quantity is ${request.quantity}; design is calculated once per order.`}</p>
       <div className="admin-quote-material"><label>{es ? 'Material confirmado' : 'Confirmed material'}<select required value={inputs.material} onChange={update('material')} disabled={busy}>
         <option value="">{es ? 'Seleccioná un material' : 'Select a material'}</option>{FDM_MATERIALS.map(material => <option key={material} value={material}>{material}</option>)}
@@ -142,12 +166,6 @@ export function RequestNextAction({ request, user, language, onSaved }) {
       <label className="admin-quote-validity">{es ? 'Cotización válida hasta' : 'Quote valid until'}<input type="date" required value={validUntil} onChange={event => setValidUntil(event.target.value)} disabled={busy} /></label>
       <div className="admin-next-action__buttons"><button className="v-button v-button--primary" disabled={busy || !quote} type="submit">{busy ? (es ? 'Guardando…' : 'Saving…') : (es ? 'Guardar cotización' : 'Save quote')}</button></div>
       </details>
-      {request.status === 'QUOTED' && <div className="admin-quote-send">
-        <span className="admin-eyebrow">{es ? 'Siguiente paso · correo' : 'Next step · email'}</span>
-        <p className="admin-quote-send__recipients">{es ? <>Para: {request.customerEmail || 'correo de cliente sin registrar'}<br />Copia oculta: {user.email}</> : <>To: {request.customerEmail || 'customer email not recorded'}<br />Blind copy: {user.email}</>}</p>
-        {(!isDeliverableEmail(request.customerEmail) || !isDeliverableEmail(user.email)) && <p className="admin-quote-send__warning">{es ? 'Los datos actuales contienen correos de ejemplo o inválidos. Se bloqueará cualquier envío hasta tener direcciones reales.' : 'Current data contains sample or invalid email addresses. Sending is blocked until real addresses are available.'}</p>}
-        <button className="v-button v-button--primary" type="button" disabled={busy || !canSendQuote} onClick={sendQuote}>{busy ? (es ? 'Enviando correo…' : 'Sending email…') : (es ? 'Enviar al cliente y copiarme' : 'Send to customer and copy me')}</button>
-      </div>}
       <p className="admin-quote-formula">{es ? 'Fórmula: gramos × (precio + desgaste) USD/kg × cambio + horas × potencia media (kW) × tarifa eléctrica + postprocesado + diseño + otros costos; luego recargo explícito. Valores guardados como una instantánea del cálculo.' : 'Formula: grams × (filament + wear) USD/kg × exchange rate + print hours × average power (kW) × electricity tariff + post-processing + design + other costs; then explicit markup. Inputs are saved as a calculation snapshot.'}</p>
     </form>}
     <QuoteEmailTest request={request} onSaved={onSaved} language={language} />
@@ -155,8 +173,8 @@ export function RequestNextAction({ request, user, language, onSaved }) {
     {request.status === 'AWAITING_APPROVAL' && <p>{request.quoteEmailSentAt
       ? (es ? `Correo enviado a ${request.quoteEmailSentTo || 'cliente'} con copia a ${request.quoteEmailCopiedTo || 'taller'}. Ahora corresponde al cliente aprobar la cotización; no la apruebes en su nombre.` : `Email sent to ${request.quoteEmailSentTo || 'customer'} with a copy to ${request.quoteEmailCopiedTo || 'workshop'}. The customer must now approve the quote; do not approve it on their behalf.`)
       : (es ? 'Cotización publicada. Ahora corresponde al cliente aprobarla; el administrador no aprueba en su nombre.' : 'Quote published. Customer approval is the next step; the administrator cannot approve on their behalf.')}</p>}
-    {request.status === 'APPROVED' && <p>{request.quotePricing?.mode === 'DEMO' ? (es ? 'El cliente aprobó la simulación. Podés completar el recorrido con un pedido DEMO, sin cobro real.' : 'The customer approved the simulation. You can complete the flow with a DEMO order, without a real charge.') : (es ? 'El cliente aprobó el encargo. El pago debe confirmarse con su comprobante antes de iniciar fabricación.' : 'The customer approved the job. Confirm payment against its receipt before starting production.')}</p>}
-    {request.status === 'PAID' && <p>{request.paymentMode === 'DEMO' ? (es ? 'Pago SIMULADO y pedido DEMO. No autoriza producción ni representa dinero cobrado.' : 'SIMULATED payment and DEMO order. No production or real charge authorized.') : (es ? 'Pago registrado. Coordiná la fabricación según el alcance acordado.' : 'Payment recorded. Coordinate production according to the agreed scope.')}</p>}
+    {request.status === 'APPROVED' && <p>{request.quotePricing?.mode === 'DEMO' ? (es ? 'El cliente aprobó la cotización técnica. Podés inicializar la orden de taller para programar la producción.' : 'The customer approved the technical quote. You can initialize the workshop order to schedule production.') : (es ? 'El cliente aprobó el encargo. El pago debe confirmarse con su comprobante antes de iniciar fabricación.' : 'The customer approved the job. Confirm payment against its receipt before starting production.')}</p>}
+    {request.status === 'PAID' && <p>{request.paymentMode === 'DEMO' ? (es ? 'Orden de fabricación inicializada. El seguimiento de producción continúa en la sección de pedidos.' : 'Manufacturing order initialized. Production tracking continues in the orders section.') : (es ? 'Pago registrado. Coordiná la fabricación según el alcance acordado.' : 'Payment recorded. Coordinate production according to the agreed scope.')}</p>}
     {status !== 'idle' && message && <p role={status === 'error' ? 'alert' : 'status'}>{message}</p>}
     <Link className="admin-action-secondary" to={`/admin/actividad?solicitud=${encodeURIComponent(request.id)}`}>{es ? 'Ver historial del encargo' : 'View job history'} ↗</Link>
   </section>;

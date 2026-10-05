@@ -47,7 +47,7 @@ function customerInitials(name, fallback) {
 
 function CustomerOrders({ orders, text, language }) {
   return <section className="admin-customer-history" aria-labelledby="admin-customer-orders-title">
-    <header><span className="admin-eyebrow">01 / {text.orders}</span><h2 id="admin-customer-orders-title">{text.orders} <small>{orders.length}</small></h2></header>
+    <header><span className="admin-eyebrow">{text.orders}</span><h2 id="admin-customer-orders-title">{text.orders} <small>{orders.length}</small></h2></header>
     {orders.length ? <ol>{orders.map(order => <li key={order.id}>
       <Link to={`/admin/pedidos/${encodeURIComponent(order.id)}`}><strong>{formatOrderReference(order.id)}</strong><span className="admin-state" data-status={order.status}>{text.stages[order.status] || order.status}</span><time dateTime={order.createdAt}>{dateLabel(order.createdAt, language)}</time><span aria-hidden="true">↗</span></Link>
     </li>)}</ol> : <p>{text.noOrders}</p>}
@@ -56,7 +56,7 @@ function CustomerOrders({ orders, text, language }) {
 
 function CustomerRequests({ requests, text, language }) {
   return <section className="admin-customer-history" aria-labelledby="admin-customer-requests-title">
-    <header><span className="admin-eyebrow">02 / {text.requests}</span><h2 id="admin-customer-requests-title">{text.requests} <small>{requests.length}</small></h2></header>
+    <header><span className="admin-eyebrow">{text.requests}</span><h2 id="admin-customer-requests-title">{text.requests} <small>{requests.length}</small></h2></header>
     {requests.length ? <ol>{requests.map(request => <li key={request.id}>
       <Link to={`/admin/solicitudes/${encodeURIComponent(request.id)}`}><strong>{request.fileName || request.description || request.id}</strong><span className="admin-state" data-status={request.status}>{text.stages[request.status] || request.status}</span><time dateTime={request.submittedAt}>{dateLabel(request.submittedAt, language)}</time><span aria-hidden="true">↗</span></Link>
     </li>)}</ol> : <p>{text.noRequests}</p>}
@@ -77,16 +77,15 @@ export function AdminCustomersPage() {
     {status === 'success' && <>
       <div className="admin-customers__toolbar">
         <label className="admin-customers__search"><span>{text.search}</span><input type="search" value={query} placeholder={text.searchHint} onChange={event => setQuery(event.target.value)} /></label>
-        <p className="admin-customers__total" role="status" aria-live="polite"><strong>{String(filtered.length).padStart(2, '0')}</strong><span>{text.count(filtered.length)}</span></p>
+        <p className="admin-customers__total" role="status" aria-live="polite"><strong>{filtered.length}</strong><span>{text.count(filtered.length)}</span></p>
       </div>
       <div className="admin-customers__register-label"><span className="admin-eyebrow">{language === 'es' ? 'REGISTRO DE CUENTAS' : 'ACCOUNT REGISTER'}</span><span className="admin-eyebrow">{language === 'es' ? 'PEDIDOS / SOLICITUDES' : 'ORDERS / REQUESTS'}</span></div>
       {filtered.length ? <ul className="admin-customers__list">{filtered.map((customer, index) => <li key={customer.id} style={{ '--row-index': index }}>
         <Link to={`/admin/clientes/${encodeURIComponent(customer.id)}`}>
-          <span className="admin-customers__ordinal">{String(index + 1).padStart(2, '0')}</span>
           <span className="admin-customers__monogram" aria-hidden="true">{customerInitials(customer.name, customer.id)}</span>
           <span className="admin-customers__identity"><strong>{customer.name || customer.id}</strong><small>{customer.email || '—'}</small></span>
           <span className="admin-state" data-status={customer.status}>{text[customer.status.toLowerCase()] || customer.status}</span>
-          <span className="admin-customers__counts"><span><small>{text.orders}</small><strong>{String(customer.orders.length).padStart(2, '0')}</strong></span><span><small>{text.requests}</small><strong>{String(customer.requests.length).padStart(2, '0')}</strong></span></span>
+          <span className="admin-customers__counts"><span><small>{text.orders}</small><strong>{customer.orders.length}</strong></span><span><small>{text.requests}</small><strong>{customer.requests.length}</strong></span></span>
           <span className="admin-customers__arrow" aria-hidden="true">↗</span>
         </Link>
       </li>)}</ul> : <EmptyState title={query ? text.noMatch : text.empty} />}

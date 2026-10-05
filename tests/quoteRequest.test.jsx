@@ -17,7 +17,7 @@ function renderPage(path, session = null) {
 }
 
 describe('intake de solicitudes personalizadas', () => {
-  afterEach(() => { cleanup(); localStorage.clear(); jest.clearAllMocks(); });
+  afterEach(() => { cleanup(); localStorage.clear(); sessionStorage.clear(); jest.clearAllMocks(); });
 
   it('presenta la ruta de modelo/referencias y la de ayuda para definir la idea', () => {
     renderPage('/solicitud');

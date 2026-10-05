@@ -1,5 +1,40 @@
 # Vértice CR — Testing y calidad
 
+## Comprobante SINPE por pedido — 2026-10-04
+
+orderPaymentWorkflow prueba handlers cliente/Admin registrados: reporte y auditoría,
+confirmación PAID/CONFIRMED, rechazo con motivo, reingreso, bloqueo de decisión
+repetida, propiedad, roles, estados no PENDING, validación y fallo de persistencia.
+Fixtures en memoria: no escribe db.json ni llama banco/n8n. npm test: 40 suites /
+237 tests verdes en el árbol local actual. Se eliminó duplicación concurrente de
+los dos helpers de pago en commerceService manteniendo el contrato solicitado.
+
+## Cancelación y descarte del cliente — 2026-10-04
+
+customerQuoteActions prueba los handlers registrados de POST /quotes/cancel y
+/quotes/delete: éxito propio, conservación de solicitudes ajenas, 404 para ajenas
+o inexistentes, 409 para APPROVED/PAID, sesión customer activa y requestId requerido.
+También comprueba que los rechazos no persisten y que cancelar conserva solicitud
+y registra actividad. Fixtures en memoria, sin escribir db.json ni llamar n8n.
+Verificación: npm test, 39 suites / 225 tests verdes en el árbol local actual.
+
+## Pedidos propios — 2026-10-04
+
+catalogOrderOperations cubre aislamiento entre clientes, payload de identidad
+ignorado, líneas embebidas y normalizadas, lista vacía y 403 para sesión ausente,
+inválida, vencida, inactiva o Admin. Fixture en memoria; lectura no persiste.
+Suite completa: 38 suites / 215 tests verdes. Dos selectores de adminCatalogForm
+se alinearon con el texto vigente sin emoji del botón de autocompletado.
+
+## Reseñas y cambios de cotización — 2026-10-04
+
+Verificación local: 38 suites / 212 tests verdes; lint, check:ui y build pasan.
+Build conserva aviso de chunk mayor de 500 kB. productReviews prueba validación,
+permisos, persistencia y proyección pública con fixture en memoria; requestActions
+prueba nueva versión, conservación de oferta y conflicto; requestNextAction prueba
+motivo y guardado sin envío automático. No se escribió db.json ni se enviaron correos.
+Revisión visual autenticada de CHANGES_REQUESTED y CI de estos cambios pendientes.
+
 > Última actualización: **2026-10-04**.
 
 ## Verificación del handoff A — 2026-10-03

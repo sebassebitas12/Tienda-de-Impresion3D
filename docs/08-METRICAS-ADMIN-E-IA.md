@@ -13,6 +13,42 @@
 
 ## Principio
 
+### Revisión solicitada por cliente (2026-10-04)
+
+CHANGES_REQUESTED se cuenta como atención del taller, no como estado heredado.
+El detalle muestra customerDecisionReason y habilita el editor de cotización.
+Guardar recalcula con quotePricing, incrementa versión y vuelve a QUOTED;
+después se utiliza el envío existente para solicitar nueva aprobación.
+
+## R-H84 — recorrido de Admin y resguardo de cotización DEMO (2026-10-05)
+
+Recorrido de escritorio autenticado por Resumen, Pedidos, Solicitudes,
+Catálogo, Categorías, Clientes, Actividad y Copiloto. Catálogo y Solicitudes
+recibieron mayor atención. No se mutaron pedidos, solicitudes, pagos ni correos.
+
+- La acción de estimar una cotización guardaba el resultado y avanzaba la
+  solicitud IN_REVIEW→QUOTED al primer clic; la etiqueta “Calcular” no exponía
+  ese efecto. Ahora el primer paso abre una confirmación que declara el guardado,
+  el cambio de estado y que no envía correo. El importe queda explícitamente
+  identificado como DEMO con parámetros académicos, no medición del laminador
+  ni tarifas vigentes. El endpoint conserva su validación y auditoría.
+- El filtro de publicación del catálogo ahora mantiene ACTIVE, DRAFT e INACTIVE
+  aunque el conteo sea cero. En DRAFT vacío se ofrece crear el primer borrador;
+  antes era imposible entrar a esa vista desde la interfaz cuando no había
+  borradores.
+- Retirados ordinales decorativos en listas de Solicitudes y Clientes y en las
+  sugerencias del Copiloto; las marcas de progreso conservan solo ✓ para fases
+  completadas. Esto no cambia el orden ni el modelo de datos.
+- El mapa de solicitudes dejó de repetir la cifra total en el texto auxiliar y
+  ahora explica que las etapas filtran la bandeja. El Copiloto ajusta el espacio
+  vertical en escritorio de poca altura para dejar visible el campo y su acción
+  inicial sin desplazamiento.
+- El recorrido confirmó acceso a detalle por pedido/solicitud, perfiles y
+  revisiones de categoría; Actividad contiene eventos y Copiloto es un espacio
+  distinto del asistente público. Pendiente: vista real Light y tamaños móvil/
+  tablet, ejercicios de teclado/lector, y revalidación completa post-cambio.
+  No declarar el dashboard completo por esta pasada de escritorio.
+
 Admin debe ayudar a decidir y actuar diariamente, no demostrar cantidad de widgets.
 
 ## KPIs principales

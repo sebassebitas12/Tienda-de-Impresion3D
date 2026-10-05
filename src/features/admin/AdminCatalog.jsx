@@ -15,7 +15,7 @@ const words = {
   es: {
     title: 'Catálogo del taller', intro: 'Revisá las piezas que se muestran en la tienda.', source: 'Modelos · JSON Server',
     loading: 'Cargando catálogo', error: 'No pudimos cargar el catálogo', errorHint: 'Revisá que JSON Server esté activo y volvé a intentar.', retry: 'Reintentar',
-    all: 'Todos', search: 'Buscar modelo', searchHint: 'Nombre, referencia, material o categoría', results: count => `${count} modelos`,
+    all: 'Todos', search: 'Buscar modelo', searchHint: 'Nombre, referencia, material o categoría', results: count => `${count} modelos`, createFirstDraft: 'Crear primer borrador',
     noMatch: 'No hay modelos con esos filtros.', noProducts: 'Todavía no hay modelos registrados.', imageFallback: 'Sin foto',
     draft: 'Borrador', draftsNote: 'Los borradores siguen ocultos hasta completar y confirmar su ficha. No se inventan precio ni material.', reviewDrafts: count => `Revisar borradores (${count}) ↗`,
     incompleteDraft: 'Este modelo sigue en borrador. Confirmá precio, material y ficha antes de publicarlo.',
@@ -32,7 +32,7 @@ const words = {
   en: {
     title: 'Workshop catalog', intro: 'Review the parts shown in the store.', source: 'Models · JSON Server',
     loading: 'Loading catalog', error: 'Could not load the catalog', errorHint: 'Check that JSON Server is running and try again.', retry: 'Retry',
-    all: 'All', search: 'Search models', searchHint: 'Name, reference, material or category', results: count => `${count} models`,
+    all: 'All', search: 'Search models', searchHint: 'Name, reference, material or category', results: count => `${count} models`, createFirstDraft: 'Create the first draft',
     noMatch: 'No models match these filters.', noProducts: 'No models have been recorded yet.', imageFallback: 'No photo',
     draft: 'Draft', draftsNote: 'Drafts stay hidden until their details are completed and confirmed. Price and material are never guessed.', reviewDrafts: count => `Review drafts (${count}) ↗`,
     incompleteDraft: 'This model is still a draft. Confirm its price, material and details before publishing.',
@@ -93,11 +93,11 @@ export function AdminCatalogPage() {
       {counts.needsReview > 0 && <p className="admin-catalog__review-note" role="status">{counts.needsReview} {language === 'es' ? 'registro(s) usan un material fuera de la capacidad vigente.' : 'record(s) use a material outside current capabilities.'}</p>}
       <div className="admin-catalog__controls">
         <label className="admin-request-search"><span>{text.search}</span><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={text.searchHint} /></label>
-        <div className="admin-filter-facet"><span>{text.publication}</span><FilterChips label={text.publication} selected={publication} onToggle={value => updateFilter('estado', value)} options={[{ value: 'all', label: text.all }, ...Object.keys(counts.statuses).sort().map(value => ({ value, label: publicationLabel(value, language, text), count: counts.statuses[value] }))]} /></div>
+        <div className="admin-filter-facet"><span>{text.publication}</span><FilterChips label={text.publication} selected={publication} onToggle={value => updateFilter('estado', value)} options={[{ value: 'all', label: text.all }, ...['ACTIVE', 'DRAFT', 'INACTIVE'].map(value => ({ value, label: publicationLabel(value, language, text), count: counts.statuses[value] || 0 }))]} /></div>
         <div className="admin-filter-facet"><span>{text.material}</span><FilterChips label={text.material} selected={material} onToggle={value => updateFilter('material', value)} options={[{ value: 'all', label: text.all }, ...Object.keys(counts.materials).sort().map(value => ({ value, label: materialLabel(value, text), count: counts.materials[value] }))]} /></div>
       </div>
       <p className="admin-orders__results" role="status" aria-live="polite">{text.results(filtered.length)}</p>
-      {filtered.length === 0 ? <EmptyState title={query || publication !== 'all' || material !== 'all' ? text.noMatch : text.noProducts} /> : <div className="admin-catalog__list" aria-label={text.title}>
+      {filtered.length === 0 ? <div className="admin-catalog__empty"><EmptyState title={query || publication !== 'all' || material !== 'all' ? text.noMatch : text.noProducts} />{publication.includes('DRAFT') && !query && <Link className="admin-action-primary" to="/admin/catalogo/nuevo">{text.createFirstDraft}</Link>}</div> : <div className="admin-catalog__list" aria-label={text.title}>
         {filtered.map((product, index) => <article className="admin-catalog-row" key={product.id} style={{ '--row-index': index }}>
           <ProductImage product={product} label={text.imageFallback} className="admin-catalog-row__image" />
           <Link className="admin-catalog-row__main" to={`/admin/catalogo/${encodeURIComponent(product.id)}`}><strong>{product.name}</strong><small>{product.category?.name || product.slug || product.id}</small></Link>

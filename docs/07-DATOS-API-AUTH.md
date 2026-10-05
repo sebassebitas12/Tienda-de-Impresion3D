@@ -1,5 +1,74 @@
 # Vértice CR — Datos, API externa, JWT y N8N
 
+R-H81: /orders/mine agrega currentCatalogName a líneas sin productName cuando
+existe el producto. Es enriquecimiento de lectura, no snapshot retroactivo.
+No incorpora material/precios actuales ni escribe db.json. API local requiere
+recargar el proceso para observar este cambio; persistencia inmutable probada.
+
+R-H82: búsqueda de catálogo del asistente separa la consulta normalizada en
+términos y exige que todos estén presentes (independiente del orden contiguo).
+Workflow unificado usa Agent 3.1 para evitar el fallo observado en Agent 2.2
+tras llamada a herramienta HTTP. Regenerado localmente, aún requiere importar,
+publicar y verificar ejecución real con herramienta.
+
+## Fuente de plantilla de correo — R-H80 (2026-10-05)
+
+src/utils/quoteEmailTemplate.js es el renderer único, puro y probado.
+scripts/build-n8n-unified.mjs lo incrusta en el Code node y regenera tanto el
+componente vertice-quote-email.json como el workflow oficial unificado.
+No mantener otra plantilla manual dentro de los JSON. El renderer valida
+destinatarios/monto/vigencia, escapa contenido y restringe enlace HTTP(S).
+appUrl opcional permite la URL publicada; sin ella usa localhost y advierte
+que no es un sitio público. Mostrar precio cotizado al cliente, no confundir
+costos internos con otro total. El workflow unificado se ve Published en n8n
+(2026-10-05); Gmail aún solo muestra el mensaje anterior del 4 oct. Falta un
+correo real controlado para comprobar el HTML publicado y su acuse; hasta
+entonces el renderer probado no prueba la salida del workflow activo.
+
+## Reporte y verificación de pago por pedido — 2026-10-04
+
+POST /orders/submit-payment-proof: customer ACTIVE; {orderId, referenceNumber,
+sinpePhone, proofNotes?}. Pedido propio o 404 ORDER_NOT_FOUND; solo PENDING o
+409 STATUS_CONFLICT. Referencia recortada 4–100 (400 INVALID_REFERENCE), teléfono
+8–25 (INVALID_PHONE), notas opcionales string máximo 500 (INVALID_NOTES).
+Guarda paymentProof SUBMITTED y ORDER_PAYMENT_PROOF_SUBMITTED, sin cambiar etapa.
+
+POST /admin/actions/verify-payment: admin ACTIVE; {orderId, decision, notes?}.
+404 si no existe; 409 salvo pedido PENDING con proof SUBMITTED. CONFIRM guarda
+CONFIRMED, paymentStatus PAID, paidAt y proof CONFIRMED con auditoría
+ORDER_PAYMENT_CONFIRMED. REJECT requiere motivo recortado mínimo 3, máximo 500
+(400 REASON_REQUIRED), guarda proof REJECTED/rejectionReason y evento
+ORDER_PAYMENT_PROOF_REJECTED, conserva PENDING. Otra decisión: INVALID_DECISION.
+Roles inválidos: 403 CUSTOMER_REQUIRED/ADMIN_REQUIRED. Éxito: {order}; fallo de
+persistencia: 500 ACTION_PERSISTENCE_FAILED. Autorización dentro de la operación
+serializada; persistencia atómica existente. Helpers submitOrderPaymentProof y
+verifyOrderPaymentProof en commerceService propagan token y signal.
+
+## Consulta de pedidos propios — 2026-10-04
+
+POST /orders/mine, sin payload requerido, exige Bearer de customer ACTIVE.
+Responde { orders: [...] } filtrando userId exclusivamente desde la sesión;
+no acepta identidad del payload. Cada pedido conserva orderItems embebidos;
+si faltan, une las líneas normalizadas por orderId. Sin pedidos: lista vacía.
+Sesión ausente, vencida, inactiva o de otro rol: 403 CUSTOMER_REQUIRED.
+Es lectura sin persistencia ni eventos. commerceService.fetchMyOrders({token, signal})
+usa automationAction. La protección sigue siendo académica, no auth de producción.
+
+## Reseñas — 2026-10-04
+
+GET /reviews?productId=:id devuelve una lista pública (solo PUBLISHED), sin userId.
+POST /reviews/submit exige Bearer académico customer ACTIVE y recibe productId,
+rating entero 1–5, title (1–100), comment (10–2000), authorName (1–100).
+El nombre de la cuenta prevalece para evitar suplantación. Producto inexistente:
+404 PRODUCT_NOT_FOUND; validación: 400 INVALID_REVIEW; sesión: 403 CUSTOMER_REQUIRED.
+Éxito: 201 {review}. Persistencia serializada/atómica; reviews se crea al primer
+envío válido, sin modificar el dataset durante los tests. Sigue siendo un backend
+académico: las rutas CRUD genéricas de JSON Server no son seguridad de producción.
+
+save-quote admite CHANGES_REQUESTED con expectedStatus/expectedVersion coincidentes.
+Guarda quoteHistory, incrementa quoteVersion y vuelve a QUOTED; el envío confirmado
+existente pasa a AWAITING_APPROVAL. Los importes se recalculan con quotePricing.
+
 > Última actualización: **2026-10-04**.
 
 ## Propósito
@@ -57,6 +126,12 @@ criptográfica ni es seguridad de producción. Restore vuelve a consultar el
 usuario en JSON Server para validar existencia, estado y rol actual. N8N se
 reserva para IA/automatizaciones y no participa en login. El frontend ocultando
 botones no sustituye los guards de rutas.
+
+### Vigencia y expiración activa de tokens (2026-10-04)
+- **TTL por defecto:** 24 horas (`DEFAULT_AUTH_TOKEN_TTL_MS = 24 * 60 * 60 * 1000`) para permitir jornadas de prueba y evaluación académica continuas sin desautenticación imprevista.
+- **Detección activa en frontend:** `AuthProvider` calcula el tiempo restante mediante `getTokenExpiresAt(token)` y programa un temporizador exacto. Al expirar, o si `isTokenExpired(token)` se cumple, `isAuthenticated` pasa inmediatamente a `false`, se limpia la sesión persistida y se emite el error `AUTH_SESSION_EXPIRED`.
+- **Protección de rutas y destino:** `RequireAuth` y `RequireRole` detectan la pérdida de autenticación y redirigen a `/login` con `state: { from: location.pathname + location.search, reason: 'session-expired' }`.
+- **Sin renovación silenciosa ni bypass:** El token expirado nunca se renueva silenciosamente ni se relajan las verificaciones del servidor (`sessionActor` en API). El usuario debe reingresar credenciales legítimas, tras lo cual es devuelto a su destino manteniendo los borradores en curso.
 
 ## N8N
 

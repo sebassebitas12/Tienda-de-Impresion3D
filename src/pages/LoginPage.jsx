@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Input } from '../components/ui/index.js';
 import { useAuth } from '../hooks/useAuth.js';
+import { useOptionalCart } from '../hooks/useCart.js';
 import { usePreferences } from '../hooks/usePreferences.js';
 
 function messageFor(error, copy) {
@@ -18,6 +19,7 @@ function messageFor(error, copy) {
 export function LoginPage() {
   const { copy, language } = usePreferences();
   const auth = useAuth();
+  const cart = useOptionalCart();
   const navigate = useNavigate();
   const location = useLocation();
   const [form, setForm] = useState({ email: '', password: '' });
@@ -27,6 +29,7 @@ export function LoginPage() {
     try {
       const user = await auth.login(form);
       const requested = location.state?.from;
+      if (requested?.split('?')[0] === '/carrito' && user.role === 'customer') cart?.importGuestCart(user);
       navigate(requested || (user.role === 'admin' ? '/admin' : '/cuenta'), { replace: true });
     } catch {
       // Provider exposes the normalized error state to the UI.
@@ -40,14 +43,28 @@ export function LoginPage() {
         <p>{copy.authLoginIntro}</p>
       </div>
 
+      {location.state?.reason === 'session-expired' && <p className="auth-context-notice" role="status">
+        {language === 'en'
+          ? 'Your session expired. Sign in again to continue where you left off; your draft has been preserved.'
+          : 'Tu sesión expiró. Volvé a iniciar sesión para continuar donde estabas; tu borrador fue preservado.'}
+      </p>}
+
       {location.state?.reason === 'admin-session-rejected' && <p className="auth-context-notice" role="status">
         {language === 'en'
           ? 'The local API rejected the previous Admin session. Sign in again with an active Admin account on this same address; access checks remain enabled.'
           : 'La API local rechazó la sesión anterior de Administración. Volvé a iniciar sesión con una cuenta Admin activa en esta misma dirección; la protección sigue habilitada.'}
       </p>}
 
+      {location.state?.reason === 'customer-cart-required' && <p className="auth-context-notice" role="status">
+        {language === 'en'
+          ? 'Sign in or create a customer account to view your cart and continue. Any selection saved in this browser will be linked to your account.'
+          : 'Iniciá sesión o creá una cuenta de cliente para ver el carrito y continuar. La selección guardada en este navegador se vincula a tu cuenta.'}
+      </p>}
+
       <form className="auth-form" onSubmit={onSubmit} noValidate>
         <Input
+          id="login-email"
+          name="email"
           type="email"
           label={copy.authEmail}
           autoComplete="email"
@@ -56,6 +73,8 @@ export function LoginPage() {
           required
         />
         <Input
+          id="login-password"
+          name="password"
           type="password"
           label={copy.authPassword}
           autoComplete="current-password"
@@ -72,7 +91,7 @@ export function LoginPage() {
       </form>
 
       <p className="auth-switch">
-        {copy.authNoAccount} <Link to="/registro">{copy.register}</Link>
+        {copy.authNoAccount} <Link to="/registro" state={{ from: location.state?.from, reason: location.state?.reason }}>{copy.register}</Link>
       </p>
     </div>
   );

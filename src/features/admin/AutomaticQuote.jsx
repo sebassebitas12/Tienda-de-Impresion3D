@@ -11,6 +11,7 @@ export function AutomaticQuote({ request, onSaved, language }) {
   const [profileId, setProfileId] = useState(request.profileId || request.quotePricing?.profileId || '');
   const [state, setState] = useState({ busy: false, error: '' });
   const [loading, setLoading] = useState(true);
+  const [confirming, setConfirming] = useState(false);
   const es = language === 'es';
   useEffect(() => {
     const controller = new AbortController();
@@ -19,7 +20,9 @@ export function AutomaticQuote({ request, onSaved, language }) {
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, []);
-  async function calculate() {
+  async function saveEstimate() {
+    if (state.busy) return;
+    setConfirming(false);
     setState({ busy: true, error: '' });
     try {
       await automationAction('/admin/actions/auto-quote', { requestId: request.id, expectedStatus: request.status,
@@ -29,12 +32,16 @@ export function AutomaticQuote({ request, onSaved, language }) {
   }
   const quote = request.quotePricing;
   return <section className="admin-auto-quote" aria-labelledby="auto-quote-title">
-    <header><div><span className="admin-eyebrow">{es ? 'Automatización · DEMO' : 'Automation · DEMO'}</span><h2 id="auto-quote-title">{es ? 'Una referencia. Un cálculo completo.' : 'One reference. A complete calculation.'}</h2></div>
+    <header><div><span className="admin-eyebrow">{es ? 'Referencia académica · DEMO' : 'Academic reference · DEMO'}</span><h2 id="auto-quote-title">{es ? 'Una referencia. Un estimado DEMO.' : 'One reference. A DEMO estimate.'}</h2></div>
       {quote?.mode === 'DEMO' && <strong>{formatCRC(request.quotedPrice)}</strong>}</header>
-    <p>{es ? 'Elegí una referencia para generar una estimación DEMO con peso, tiempo y costos simulados. Revisá el desglose antes de enviarlo al cliente.' : 'Choose a reference for a DEMO estimate with simulated weight, time and costs. Review the breakdown before sending it to the customer.'}</p>
+    <p>{es ? 'Usá una pieza análoga o su descripción para estimar peso y tiempo. El monto usa parámetros académicos simulados: no son mediciones de laminador ni tarifas vigentes del taller. Contrastá los datos antes de enviar una oferta al cliente.' : 'Use an analogous part or its description to estimate weight and time. The amount uses simulated academic parameters, not slicer measurements or current workshop rates. Verify the inputs before sending an offer to the customer.'}</p>
     <ReferencePicker profiles={profiles} value={profileId} onChange={setProfileId} disabled={state.busy} loading={loading} language={language} allowAutomatic />
-    <div className="admin-auto-quote__controls"><button type="button" className="v-button v-button--primary" disabled={state.busy || loading} onClick={calculate}>{state.busy ? (es ? 'Calculando…' : 'Calculating…') : (es ? 'Calcular y guardar DEMO' : 'Calculate and save DEMO')}</button></div>
-    {quote?.mode === 'DEMO' && <p>{quote.inputs.weightGrams} g · {quote.inputs.printHours} h / {es ? 'pieza' : 'piece'} · {quote.inputs.material} · {es ? 'Vence' : 'Expires'} {request.quoteValidUntil?.slice(0, 10)}<br />{es ? 'Cambio' : 'Exchange'}: {quote.provenance.exchange} · {es ? 'Electricidad' : 'Electricity'}: {quote.provenance.electricity}</p>}
+    <div className="admin-auto-quote__controls"><button type="button" className="v-button v-button--primary" disabled={state.busy || loading} onClick={() => { setState(current => ({ ...current, error: '' })); setConfirming(true); }}>{state.busy ? (es ? 'Guardando…' : 'Saving…') : (es ? 'Preparar cotización DEMO' : 'Prepare DEMO quote')}</button></div>
+    {confirming && <div className="admin-quote-send__summary" role="group" aria-label={es ? 'Confirmar cotización DEMO' : 'Confirm DEMO quote'}>
+      <p>{es ? 'Esta acción guarda una estimación DEMO y pasa la solicitud a «Cotizada». No envía ningún correo. ¿Querés continuar?' : 'This saves a DEMO estimate and moves the request to “Quoted”. It does not send an email. Continue?'}</p>
+      <div className="admin-next-action__buttons"><button type="button" className="v-button v-button--ghost" onClick={() => setConfirming(false)}>{es ? 'Cancelar' : 'Cancel'}</button><button type="button" className="v-button v-button--primary" onClick={saveEstimate}>{es ? 'Guardar estimación DEMO' : 'Save DEMO estimate'}</button></div>
+    </div>}
+    {quote?.mode === 'DEMO' && <p>{quote.inputs.weightGrams} g · {quote.inputs.printHours} h / {es ? 'pieza' : 'piece'} · {quote.inputs.material} · {es ? 'Vigencia hasta' : 'Valid until'} {request.quoteValidUntil?.slice(0, 10)}<br />{es ? 'Tasa de cambio' : 'Exchange rate'}: {quote.provenance.exchange} · {es ? 'Tarifa eléctrica' : 'Electric tariff'}: {quote.provenance.electricity}</p>}
     {state.error && <p role="alert">{state.error}</p>}
   </section>;
 }

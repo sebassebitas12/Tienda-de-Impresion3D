@@ -1,8 +1,44 @@
 # Vértice CR — Negocio, entidades y estados
 
-> Última actualización: **2026-10-01**.
+> Última actualización: **2026-10-04**.
 
 ## Entidades
+
+### Reporte SINPE por pedido (2026-10-04)
+
+Cliente activo reporta referencia/teléfono/notas para un pedido PENDING propio.
+El reporte no acredita dinero: conserva PENDING con paymentProof SUBMITTED.
+Admin comprueba el depósito externamente y confirma (CONFIRMED, paymentStatus
+PAID, paidAt) o rechaza con motivo (PENDING, proof REJECTED). Tras rechazo se
+puede reportar de nuevo; cada reporte y decisión registra actividad en la misma
+persistencia. Solo se verifica un proof SUBMITTED para evitar repetir decisiones.
+No integra el banco, no sube una imagen ni valida automáticamente el número SINPE.
+Este bloque añade endpoints/servicios; no modifica el recorrido previo de
+quote-fulfillment ni añade formulario de comprobante en UI.
+
+### Consistencia de pago y concurrencia SINPE (E03–E05, 2026-10-04)
+
+- **E03 (Liquidación de cotización aprobada):** Todo pedido originado a partir de una cotización aprobada (`prepareQuoteFulfillment`) nace inmediatamente en estado de taller `CONFIRMED` con estado financiero `paymentStatus: 'PAID'` y marca de tiempo `paidAt`. En el portal del cliente (`/cuenta`), estos pedidos muestran el estado de pago acreditado y no solicitan un segundo depósito ni despliegan instrucciones de SINPE Móvil.
+- **E04 (Separación de estado de producción y pago):** Un pedido en estado `PENDING` no puede avanzar directamente a `CONFIRMED` mediante la acción operativa genérica de transición (`/admin/actions/order-transition`) si su estado de pago no está liquidado (`paymentStatus !== 'PAID'`). En caso de intento, la operación devuelve `409 PAYMENT_VERIFICATION_REQUIRED`. La interfaz de Admin desactiva la opción de avance genérico e instruye revisar y validar el comprobante primero.
+- **E05 (Concurrencia de comprobantes SINPE):** La verificación del taller (`/admin/actions/verify-payment`) recibe `expectedProofSubmittedAt`. Si el cliente actualizó o reemplazó su comprobante con un nuevo reporte mientras el taller tenía la pantalla abierta, la API rechaza la validación con `409 PAYMENT_PROOF_OUTDATED`, evitando confirmar una referencia obsoleta y exigiendo recargar la vista.
+
+### Preservación de solicitud personalizada durante autenticación (E01, 2026-10-04)
+
+El formulario de solicitud personalizada (`/solicitud`) guarda de forma reactiva el borrador en almacenamiento de sesión/local (`vertice.quote.draft`), incluyendo campos manuales, interpretaciones del asistente y nombres de archivos seleccionados. Si un visitante no autenticado redacta su solicitud y navega a `/login` o `/registro`, el estado `from` preserva la ruta con retorno transparente; al volver, el formulario restaura íntegramente los campos y despliega un aviso informativo que aclara que, por políticas de seguridad del navegador, los archivos binarios adjuntos deben seleccionarse nuevamente antes del envío.
+
+### Procedencia y benchmarks demo del catálogo (2026-10-04)
+
+Los productos `p7` a `p25` corresponden a ítems de benchmark y demostración académica. Están identificados explícitamente en el modelo con `priceSource: 'DEMO'`, `priceConfirmation.mode: 'DEMO'`, y `aiProductionEstimate: { source: 'DEMO', verifiedWithSlicer: false }`. No se presentan como medidas certificadas por laminador ni precios confirmados por el taller. En la vista de tienda (`/catalogo`) se exhiben con una advertencia discreta y sobria indicando su naturaleza de referencia académica, manteniéndose activos y disponibles para pruebas operativas.
+
+### Reseñas y revisión de ofertas (2026-10-04)
+
+Customer activo puede reseñar un producto existente: rating entero 1–5,
+título 1–100 y comentario 10–2000 caracteres tras recortar espacios.
+No exige compra verificada ni promete moderación. Autoría: nombre de la cuenta.
+Admin atiende CHANGES_REQUESTED en la bandeja del taller, ve el motivo y guarda
+una nueva oferta QUOTED con quoteVersion incrementada. quoteHistory conserva
+las ofertas reemplazadas y el motivo. Solo el envío confirmado por el proveedor
+vuelve a AWAITING_APPROVAL; guardar no envía ni aprueba.
 
 users, products, categories, orders, orderItems, customPrintRequests, reviews, coupons, notifications, activityLog, settings.
 
@@ -301,3 +337,17 @@ stock, no mide la pieza, no propone precio ni publica/guarda por sí sola. El
 operador revisa y edita cada campo. Antes de usar peso/horas estimados en el
 calculador debe contrastarlos con el laminador; el perfil análogo DEMO continúa
 siendo una alternativa explícita distinta.
+
+### Aislamiento del carrito por identidad
+
+El carrito es persistencia local del navegador, no un carrito remoto ni un
+pedido. La clave de visitante (`vertice-cart-v2:guest`) se separa de la clave
+por usuario (`vertice-cart-v2:user:<id>`), por lo que cerrar sesión no mezcla
+selecciones entre cuentas. Entrar o registrarse desde `/carrito` como cliente
+incorpora explícitamente las líneas del visitante a su carrito, combinando
+variantes iguales; iniciar sesión desde otro punto no transfiere esa selección.
+El carrito global anterior se migra únicamente como carrito de visitante porque
+no existe dato fiable para atribuirlo a una cuenta. Admin también tiene un
+espacio aislado y no recibe líneas de cliente. Los cambios se sincronizan entre
+pestañas del mismo navegador; no sincronizan dispositivos ni sustituyen el
+pedido confirmado en la API.

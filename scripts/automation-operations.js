@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { installOrderPaymentOperation } from './order-payment-operations.js';
 import process from 'node:process';
 import { DEMO_PROFILES, calculateAutomaticDemoQuote } from '../src/utils/quoteAutomation.js';
 import { FDM_MATERIALS } from '../src/utils/quotePricing.js';
@@ -18,6 +19,9 @@ export function prepareOrderTransition(order, payload, now) {
   const closure = ['CANCELLED', 'REJECTED'].includes(payload.nextStatus) && ['PENDING', 'CONFIRMED'].includes(order.status);
   if (ORDER_NEXT[order.status] !== payload.nextStatus && !closure) return { error: 'TRANSITION_FORBIDDEN' };
   if (closure && (typeof payload.reason !== 'string' || payload.reason.trim().length < 3 || payload.reason.length > 500)) return { error: 'REASON_REQUIRED' };
+  if (order.status === 'PENDING' && payload.nextStatus === 'CONFIRMED' && order.paymentStatus !== 'PAID') {
+    return { error: 'PAYMENT_VERIFICATION_REQUIRED' };
+  }
   return { patch: { status: payload.nextStatus, updatedAt: now, ...(closure ? { closureReason: payload.reason.trim() } : {}), ...(payload.nextStatus === 'DELIVERED' ? { deliveredAt: now } : {}) }, event: 'ORDER_STATUS_CHANGED' };
 }
 
@@ -30,6 +34,7 @@ export function prepareAutomaticRequest(request, quote, actorId, now) {
 }
 
 export function installAutomationOperations({ registerAction, db, serialize, persist }) {
+  installOrderPaymentOperation({ registerAction, db, serialize, persist }, true);
   const getRates = createRatesProvider();
   const attempts = new Map();
   const attachmentRoot = resolve(process.cwd(), process.env.VERTICE_ATTACHMENT_DIR || '.local-data/quote-attachments');
@@ -63,7 +68,7 @@ export function installAutomationOperations({ registerAction, db, serialize, per
     }
     if (typeof description !== 'string' || description.trim().length < 3 || description.length > 2000 ||
         (intendedUse !== '' && intendedUse !== null && (typeof intendedUse !== 'string' || intendedUse.length > 500)) ||
-        (dimensions !== '' && dimensions !== null && (typeof dimensions !== 'string' || dimensions.length > 200)) ||
+        (dimensions !== '' && dimensions !== null && (typeof dimensions !== 'string' || dimensions.length > 200 || !/\d/.test(dimensions))) ||
         (material && !FDM_MATERIALS.includes(String(material).toUpperCase())) ||
         !Number.isSafeInteger(Number(quantity)) || Number(quantity) < 1 || Number(quantity) > 100 ||
         (needsDesign !== undefined && typeof needsDesign !== 'boolean') || !safeUrl ||
@@ -217,6 +222,75 @@ export function installAutomationOperations({ registerAction, db, serialize, per
     } catch { failure(res, 'ACTION_PERSISTENCE_FAILED', 500); }
   });
 
+  registerAction('/quotes/cancel', async (req, res) => {
+    const actor = actorFor(req);
+    if (actor?.role !== 'customer') return failure(res, 'CUSTOMER_REQUIRED', 403);
+    const requestId = String(req.body?.requestId || '');
+    if (!requestId) return failure(res, 'INVALID_REQUEST');
+    try {
+      const result = await serialize(async () => {
+        const index = db.data.customPrintRequests.findIndex(r => String(r.id) === requestId && String(r.userId) === String(actor.id));
+        if (index < 0) return { error: 'REQUEST_NOT_FOUND' };
+        const request = db.data.customPrintRequests[index];
+        const cancellable = ['PENDING_QUOTE', 'IN_REVIEW', 'SUBMITTED', 'AWAITING_APPROVAL', 'CHANGES_REQUESTED', 'QUOTED'].includes(request.status);
+        if (!cancellable) return { error: 'STATUS_CONFLICT' };
+        const now = new Date().toISOString();
+        const updated = {
+          ...request,
+          status: 'CANCELLED',
+          customerResponse: 'CANCELLED',
+          cancelledAt: now,
+          customerDecisionReason: req.body?.reason || 'Cancelada por el cliente',
+          updatedAt: now,
+        };
+        const next = structuredClone(db.data);
+        next.customPrintRequests[index] = updated;
+        next.activityLog.push({
+          id: randomUUID(),
+          entity: 'customPrintRequest',
+          entityId: String(request.id),
+          action: 'REQUEST_CUSTOMER_CANCELLED',
+          fromStatus: request.status,
+          toStatus: 'CANCELLED',
+          actorId: String(actor.id),
+          actorName: actor.name,
+          occurredAt: now,
+          reason: req.body?.reason || 'Cancelada por el cliente',
+        });
+        await persist(next);
+        return { request: updated };
+      });
+      if (result.error) {
+        const status = result.error === 'REQUEST_NOT_FOUND' ? 404
+          : result.error === 'CUSTOMER_REQUIRED' ? 403
+            : result.error === 'STATUS_CONFLICT' ? 409 : 400;
+        return failure(res, result.error, status);
+      }
+      return res.json(result);
+    } catch { failure(res, 'ACTION_PERSISTENCE_FAILED', 500); }
+  });
+
+  registerAction('/quotes/delete', async (req, res) => {
+    const actor = actorFor(req);
+    if (actor?.role !== 'customer') return failure(res, 'CUSTOMER_REQUIRED', 403);
+    const requestId = String(req.body?.requestId || '');
+    if (!requestId) return failure(res, 'INVALID_REQUEST');
+    try {
+      const result = await serialize(async () => {
+        const index = db.data.customPrintRequests.findIndex(r => String(r.id) === requestId && String(r.userId) === String(actor.id));
+        if (index < 0) return { error: 'REQUEST_NOT_FOUND' };
+        const request = db.data.customPrintRequests[index];
+        if (['APPROVED', 'PAID'].includes(request.status)) return { error: 'STATUS_CONFLICT' };
+        const next = structuredClone(db.data);
+        next.customPrintRequests.splice(index, 1);
+        await persist(next);
+        return { success: true, deletedId: requestId };
+      });
+      if (result.error) return failure(res, result.error, result.error === 'REQUEST_NOT_FOUND' ? 404 : 409);
+      return res.json(result);
+    } catch { failure(res, 'ACTION_PERSISTENCE_FAILED', 500); }
+  });
+
   registerAction('/admin/actions/order-transition', async (req, res) => {
     const actor = actorFor(req);
     if (actor?.role !== 'admin') return failure(res, 'ADMIN_REQUIRED', 403);
@@ -236,7 +310,13 @@ export function installAutomationOperations({ registerAction, db, serialize, per
         await persist(next);
         return { order: next.orders[index] };
       });
-      return result.error ? failure(res, result.error, result.error === 'STATUS_CONFLICT' ? 409 : 400) : res.json(result);
+      if (result.error) {
+        const status = ['STATUS_CONFLICT', 'PAYMENT_VERIFICATION_REQUIRED'].includes(result.error)
+          ? 409
+          : (result.error === 'ORDER_NOT_FOUND' ? 404 : 400);
+        return failure(res, result.error, status);
+      }
+      return res.json(result);
     } catch { failure(res, 'ACTION_PERSISTENCE_FAILED', 500); }
   });
 
