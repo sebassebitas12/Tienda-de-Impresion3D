@@ -20,7 +20,7 @@ describe('motor automático DEMO y procedencia', () => {
     expect(quote.mode).toBe('DEMO'); expect(quote.inputs.weightGrams).toBe(150);
     expect(quote.inputs.printHours).toBe(5.04); expect(quote.breakdown.amountCrc).toBeGreaterThan(0);
     expect(quote.provenance.exchange).toBe('HACIENDA'); expect(quote.provenance.slicing).toBe('DEMO_ANALOGUE');
-    expect(quote.notes).toContain('No autoriza producción ni cobros reales');
+    expect(quote.notes).toContain('Alcance y material sujetos a revisión final del taller');
     expect(quote.validUntil).toBe('2026-10-09');
   });
   test('escala cúbica, diseño una vez por pedido y cantidades enteras', () => {
@@ -33,6 +33,9 @@ describe('motor automático DEMO y procedencia', () => {
   });
   test('no deduce mediciones ni admite usos críticos; no bloquea palabras como armar', () => {
     expect(resolveDemoProfile({ description: 'objeto desconocido' })).toBeNull();
+    expect(resolveDemoProfile({ description: 'objeto desconocido' }, { fallback: true })?.id).toBe('soporte');
+    expect(resolveDemoProfile({ description: 'Cotizar solo el brazo robótico de una banda transportadora' })?.id).toBe('brazo');
+    expect(resolveDemoProfile({ attachments: [{ name: 'engranaje_motor.stl' }] })?.id).toBe('engranaje');
     expect(calculateAutomaticDemoQuote({ ...request, description: 'férula ortopédica', profileId: 'soporte' }).error).toBe('WORKSHOP_EXCEPTION');
     expect(calculateAutomaticDemoQuote({ ...request, description: 'para armar mi organizador' }).error).toBeUndefined();
     expect(DEMO_PROFILES).toHaveLength(23);

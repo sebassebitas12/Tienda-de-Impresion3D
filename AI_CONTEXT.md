@@ -1,20 +1,54 @@
 # AI_CONTEXT.md — Vértice CR
 
-> **Última actualización:** 2026-10-05
+> **Última actualización:** 2026-10-06
 > **Estado:** SNAPSHOT ACTIVO  
 > **Rama:** `Pruebas`  
 > **No es un diario:** este archivo resume el presente. El historial detallado vive en los documentos de dominio.
 
-## Estado vigente — catálogo, cotización y pagos (2026-10-05)
+## Estado vigente — catálogo, cotización y pagos (2026-10-06)
 
+- **Acceso Rápido de Evaluación y Demo en Login (/login):**
+  Se incorporó un bloque accesible `auth-demo-helper` en [`LoginPage.jsx`](file:///s:/Descargas/varas/visual/proyectos%20visual/impresion-3d/Tienda-de-Impresion3D/src/pages/LoginPage.jsx) con botones técnicos de un solo clic (`[Admin Demo]` y `[Cliente Demo]`) para agilizar la grabación del video y la presentación en vivo sin errores de tipeo manual. Respeta i18n (ES/EN) y estilos acordes a la identidad visual (`auth.css`), con test automatizado en `tests/auth.test.jsx`.
+- **Rediseño Lógico de Contáctenos con Canales Oficiales y Formulario Directo (/contacto):**
+  Se reestructuró por completo la página institucional de contacto (`src/pages/ContactPage.jsx`, `institutional.css`) para darle propósito y utilidad práctica al taller:
+  1. *Canales directos del taller (DEMO Costa Rica):* Grid de tarjetas interactivas con WhatsApp directo (`wa.me` a `+506 8888-8888`), Teléfono de taller (`tel:+50625500000`), Correo oficial (`mailto:taller@verticecr.com`) y ficha de Ubicación y Horarios de atención (Cartago / San José, L-V 8am-6pm, Sáb 9am-1pm).
+  2. *Formulario de contacto directo interactivo:* Permite enviar consultas clasificadas por motivo (materiales, estado de pedido, volumen, general), validando campos obligatorios en cliente y mostrando confirmación visual accesible de recepción.
+  3. *Enrutamiento claro según etapa de proyecto:* Conserva y potencia los accesos a «Ya tengo el modelo» (`/solicitud/archivo`), «Quiero darle forma» (`/solicitud/ayuda-diseno`) y seguimiento en cuenta (`/cuenta` o `/login`).
+  4. *Asistente general y FAQ ampliado:* Disparador del asistente técnico integrado y respuestas sobre envíos nacionales (Correos de CR / GAM), retiros en taller, cotización y archivos. Soporte bilingüe completo (ES/EN).
+- **Detalles Finales de Accesibilidad — Escala Interactiva y Lectura al Cursor (2026-10-06):**
+  Se completaron las dos mejoras clave de accesibilidad e interactividad en el panel de lectura flotante (`FloatingTools.jsx`, `PreferencesProvider.jsx`, `shell.css`):
+  1. *Escala continua de texto (100% a 200%):* Se sustituyeron los 3 botones fijos (`A`, `A+`, `A++`) por un control deslizante continuo (`input[type="range"]`) con medidor en vivo en porcentaje (100% - 200%) y marcadores rápidos (`100%`, `150%`, `200%`). `PreferencesProvider` valida y normaliza cualquier escala decimal (ej. 1.1, 1.25, 1.5, 2.0) multiplicando fluidamente `--a11y-font-scale` en toda la aplicación.
+  2. *Lectura en voz alta al pasar el cursor («Leer al pasar el cursor» / `vertice-read-on-hover`):* Diseñado para personas con baja visión o ceguera parcial. Al activarse mediante el interruptor accesible en el panel de lectura, sintetiza la voz nativa del navegador (`SpeechSynthesis`) al colocar el puntero sobre cualquier elemento semántico/interactivo (encabezados, párrafos, enlaces, botones, inputs con `aria-label`/texto) o al navegar con el teclado (Tab / `focusin`). Incluye debounce de 130 ms para evitar solapamientos al barrer la pantalla, cancelación inmediata de voz al cambiar de elemento o salir de él, y resaltado visual con contorno de alto contraste (`.a11y-reading-highlight`).
+- **Motor Operativo del Copiloto Admin y Resiliencia CRUD (/admin/asistente):**
+  Se resolvió el fallo de conexión (`ASSISTANT_UNAVAILABLE`) y la falta de utilidad operativa mediante la integración de un motor operativo de alta resiliencia (`scripts/admin-copilot-engine.js`). Ahora el Copiloto Admin es 100% capaz de leer y editar CRUDs:
+  1. *Lectura:* Audita la calidad del catálogo identificando con exactitud las 11 fichas con galerías incompletas (< 4 vistas), el estado de calibración (`DEMO_NOT_SLICED` en Creality K1C) y enlaces directos a sus fichas de edición. Desglosa prioridades del taller (solicitudes pendientes por cotizar o revisar, y pedidos activos por etapa).
+  2. *Edición:* Procesa comandos para dar de alta piezas (ej.: «Crear Soporte de Soldador en PETG...»), calculando de forma automática el precio DEMO FDM, y prepara propuestas de actualización (ocultar/desactivar a `INACTIVE`, publicar, cambiar precio o material) o eliminación (protegiendo modelos con pedidos existentes).
+  3. *Confirmación en UI:* Despliega la tarjeta interactiva de cambios con el botón `[Confirmar y guardar]`, persistiendo en `db.json` vía `/admin/actions/catalog-ai-confirm` y registrando el evento en `activityLog`.
+  4. *Tolerancia a fallos:* Ante errores en webhooks de n8n o fallos en nodos de herramientas, el sistema activa automáticamente el motor operativo local, garantizando disponibilidad sin caídas ni mensajes de desconexión.
+- **Resolución de cotización automatizada y perfil análogo en Admin (/admin/solicitudes/:id):**
+  Se solucionó el bloqueo donde "Usar la descripción de la solicitud" pedía obligatoriamente seleccionar una referencia. Se ampliaron las palabras clave en perfiles análogos (como `brazo`, `robotico`, `mecanico`, `soporte`, `pieza`, `repuesto`), se implementó coincidencia por límites de palabra (`(?:^|[^a-z0-9])`) para evitar falsos positivos con subpalabras, se incluyeron adjuntos e intención de uso, y `/admin/actions/auto-quote` ahora cuenta con fallback al perfil análogo base (`soporte`) cuando la descripción es genérica, calculando y guardando la estimación sin lanzar error 400 `PROFILE_REQUIRED`.
+- **Transición clara del flujo de cotización en Admin (`RequestNextAction` y `AutomaticQuote`):**
+  Al guardar una estimación manual o automatizada, la UI cierra el formulario de preparación y avanza al bloque destacado **«Cotización lista para enviar»**, presentando el resumen (total en CRC, vigencia, alcance) y los destinatarios (Para y BCC). `canSendQuote` ahora verifica la cotización guardada y únicamente se deshabilita si hay cambios manuales no guardados en edición. Se añadió el botón «Ocultar edición / Editar cotización» para alternar la visualización sin quedar atrapado.
+- **Entorno de correos y entregabilidad (`isDeliverableEmail`):**
+  Por regla de seguridad, `isDeliverableEmail` bloquea despachos hacia dominios reservados (`@example.com`, etc.) para prevenir errores de rebote en Gmail. Para realizar pruebas de envío real a través de n8n, el cliente o la solicitud deben utilizar un correo real (o el del taller). Con las URLs corregidas a `:5678`, el backend despacha el webhook cuando los destinatarios son entregables.
+- **Experiencia de cotización, edición conversacional y navegación entre modos (/solicitud):**
+  Se solucionó la queja del usuario en `/solicitud/ayuda-diseno` respecto a botones inactivos, bloqueo en la vista con bot y la incapacidad del asistente para actualizar detalles:
+  1. *Edición conversacional bidireccional:* Anteriormente, si el usuario tocaba los inputs del formulario en pantalla, `manuallyEditedFields` bloqueaba permanentemente cualquier actualización posterior del bot. Ahora el asistente (`src/utils/quoteConversation.js` y `QuoteRequestPage.jsx`) detecta instrucciones explícitas en el chat (ej. «Cambiá la cantidad a 5», «el material es PETG», «las medidas son 15 x 8 cm», «borrá las medidas», «la descripción es...») y aplica los cambios inmediatamente en el formulario sin quedar bloqueado, preservando únicamente los campos no mencionados.
+  2. *Interactividad y feedback visual:* Al presionar `[Revisar el resumen y adjuntar referencias ↘]`, el formulario emite un pulso visual (`is-highlighted-pulse`) y enfoca el resumen. Asimismo, el botón de envío (`quote-intake-submit`) ya no se desactiva silenciosamente ante medidas inválidas (ej. texto genérico como «EWQEWQ»); en su lugar, al hacer clic valida interactivamente, despliega el mensaje de error y enfoca el campo de medidas. Además, se añadió un botón rápido `[Dejar medidas sin definir (vacío)]` para limpiar el campo en un clic.
+  3. *Selector de modo fluido (Tabs):* Se incorporó una barra superior accesible (`quote-mode-switcher`) con pestañas `[📄 Formulario directo (Modelo o archivo)]` y `[🤖 Con asistente IA (Ayuda de diseño)]`. El usuario puede alternar entre el formulario sin bot (`/solicitud/archivo`) y la ayuda con bot (`/solicitud/ayuda-diseno`) en cualquier momento sin perder los datos ya redactados en el borrador.
+- **Robustez de respuestas JSON en runtime y n8n:**
+  Tanto `scripts/assistant-runtime.js` como el workflow unificado en `build-n8n-unified.mjs` ahora extraen bloques JSON con tolerancia a bloques markdown (` ```json `) y llaves sin quebrar en texto de razonamiento. Las 57 suites (413 tests) y las 296 comprobaciones de automatización están 100% verdes.
 - Pasada en QA aislado (API 3219 / UI 5181; copia temporal, sin tocar usuarios
   del db principal): IA n8n real completa el resumen; login conserva los campos;
   cliente envía solicitud; Admin revisa y guarda oferta DEMO de ₡9 306.
 - Un único correo autorizado se intentó a la cuenta del taller. Entrega UNKNOWN,
   sin reintento. Ejecución n8n #73 falla antes de Gmail: `URL is not defined`
-  en Validar y preparar correo. Gmail no encontró el mensaje al consultar.
-  Renderer corregido sin URL global y workflow oficial regenerado; falta
-  importar/publicar esa corrección y autorizar otra prueba si se desea enviar.
+  en Validar y preparar correo. Gmail no encontró el mensaje al consultar; no
+  reintentar hasta reconciliar ese outbox. En revisión del 2026-10-06, n8n
+  muestra el workflow unificado publicado (opción `Unpublish`) y la rama de
+  recibo de pago en el canvas. No hay ejecución de pago: la más reciente (#81)
+  consultó tasas y la #80 falló en AI Agent Admin por `reasoning_content`, ajeno
+  a correo/pago.
 - Chat permite reintentar respuesta fallida sin duplicar mensaje; envío de
   solicitud bloquea doble clic y el éxito reemplaza conversación por siguientes
   pasos. La reauditoría visual de escritorio Light descrita en R-H88 corrigió un
@@ -34,29 +68,60 @@
   `productionDataSource: DEMO_NOT_SLICED` y `slicingStatus: PENDING` distinguen
   estimaciones heredadas de resultados del laminador.
 
-- Rama `Pruebas`, HEAD publicado `e41099d`; `main` permanece fuera del alcance.
+- Rama `Pruebas`, base local `7dc24c8` alineada con `origin/Pruebas` al iniciar
+  esta pasada; `main` permanece fuera del alcance. Hay cambios locales sin commit.
 - La base local tiene cambios intencionales solo en `products`. En comparación
   con `HEAD:db.json`, usuarios, pedidos, solicitudes y demás colecciones son
   iguales; no se debe copiar el archivo entero al llevar el catálogo remoto.
 - **Flujo vigente de pago:** el carrito crea `PENDING`/`UNPAID` y abre
-  `/carrito?orderId=...`; no cobra ni confirma al crear. El cliente elige PayPal
-  Sandbox (CRC + equivalente USD, tasa/fecha) o reporta SINPE con imagen para
-  revisión manual. No son opciones acumulables. Una cotización solo genera un
-  pedido pendiente después de aprobarse en la app; también se paga en el carrito.
-  El detalle es para retomar checkout, no una pasarela paralela.
+  `/carrito?orderId=...`; no cobra ni confirma al crear. Ahora ofrece tres
+  elecciones explícitas: PayPal Sandbox, tarjeta mediante botones oficiales de
+  PayPal si Sandbox la declara elegible, o reporte SINPE DEMO para revisión
+  manual. Vértice no recoge datos de tarjeta. Una cotización solo genera pedido
+  después de aprobación en la app; todos pagan en el checkout común.
 - `VERTICE_PAYPAL_CLIENT_ID`, `VERTICE_PAYPAL_CLIENT_SECRET`,
   `VERTICE_PAYPAL_ENV=sandbox` y `VERTICE_APP_URL` son configuración local de
   servidor; nunca poner el secreto en React/Git. La conversión obtiene tasa
-  pública con fecha; ni el sandbox ni SINPE han sido verificados en un recorrido
-  de navegador real en este checkpoint.
+  pública con fecha. En esta pasada el servidor obtuvo OAuth Sandbox y creó un
+  checkout PayPal para la orden de prueba `ord-e92ef3dc-…` por ₡5 100 (~USD
+  11.12 a la tasa/snapshot mostrado). La aprobación quedó en la página Sandbox
+  para que el usuario la complete; no se capturó el pago. Un checkout creado
+  bloquea cambiar de método en esa misma orden para evitar intents paralelos.
 - La captura PayPal y confirmación SINPE crean un outbox y disparan
   `vertice-payment-email` después de persistir el pago. El servidor registra
   `SENDING/SENT/FAILED/UNKNOWN`; valida `orderId`, `deliveryKey` y `messageId`
   del acuse y no reenvía resultados inciertos. URL: `VERTICE_PAYMENT_EMAIL_WEBHOOK_URL`;
   Header Auth comparte el token de cotización salvo override local. La integración
   HTTP aislada pasa con dos recibos mock y confirmaciones repetidas sin duplicar.
-  Falta comprobar Gmail y PayPal Sandbox en vivo. El correo autorizado anterior quedó `UNKNOWN`
-  antes de Gmail; no reintentar sin reconciliar ni afirmar que llegó.
+  El envío de recibos se dispara únicamente tras captura PayPal o confirmación
+  Admin de SINPE; no afirmar entrega hasta acuse Gmail con `messageId`. El
+  workflow publicado contiene la rama de recibo y la configuración Sandbox,
+  webhook y buzón de taller ya está disponible localmente. El intento anterior
+  de correo de cotización sigue `UNKNOWN` antes de Gmail: no reintentar ese
+  outbox sin reconciliarlo. La cuenta de cliente `sebasfores992@gmail.com` ya
+  está activa en el entorno local. La API fue reiniciada para cargar el código
+  vigente; ningún secreto se comparte ni se guarda en frontend/Git.
+- Pago/correo real de extremo a extremo sigue pendiente: la página de PayPal
+  Sandbox está esperando login/aprobación del usuario; no se realizó la captura,
+  no se disparó `vertice-payment-email` y no se afirma que Gmail haya recibido
+  mensajes.
+- Tarjeta se verifica primero con `POST /orders/paypal/client-config` y
+  `Buttons.isEligible()`; la no elegibilidad no crea un intent y deja elegir
+  PayPal/SINPE. Las tres opciones y SINPE se inspeccionaron en checkout real;
+  no se confirmó que el proveedor habilite tarjeta en esta cuenta.
+- Recorrido real de n8n desde cotización: la UI preparó un borrador del brazo
+  robótico de banda transportadora; dejó material, cantidad y diseño sin
+  inventarlos. La acción explícita «Preparar resumen para revisar» produjo el
+  resumen estructurado editable y el CTA «Revisar el resumen y adjuntar
+  referencias». No envía la solicitud. Fotos/STL/OBJ todavía no se transmiten al
+  modelo ni se analizan.
+- p19: la portada ahora prioriza la foto de instalación montada; se verificó en
+  catálogo y detalle local, sin rotar ni editar los píxeles. `db.json` conserva
+  datos runtime del usuario y está modificado: no incluirlo en commits.
+- Validación de este bloque: Jest 56 suites / 409 tests, lint, `check:ui` y
+  build pasan localmente. Falta completar la aprobación Sandbox por el usuario,
+  verificar captura y estados/outbox, obtener el acuse Gmail y verificar la
+  elegibilidad positiva de tarjeta con el proveedor.
 - Se bloqueó el REST genérico de `/orders` para operaciones no autorizadas; las
   lecturas administrativas requieren token y los cambios pasan por acciones
   auditadas. Las rutas de negocio de cliente se mantienen explícitamente
@@ -78,6 +143,21 @@
   producción/entrega. Se inspeccionó Dark escritorio (1265 × 720), 25 modelos,
   rejilla de 3 columnas y tarjetas cargadas. La reauditoría de Admin/Copiloto
   incluyó Light escritorio, pero tienda Light y móvil siguen pendientes.
+- R-H89: recorrido local de cliente en Dark escritorio (1265×704) cubrió Cuenta
+  → pedido pendiente → checkout, Cuenta → cotizaciones y entrada a `/solicitud`
+  con ambos caminos visibles; el formulario de archivo deja dimensiones y
+  material opcionales. Pedido `o4` mostraba
+  ₡6 500 en piezas + ₡2 000 de entrega = ₡8 500; el checkout ahora presenta
+  esos conceptos. Cargos no registrados quedan explícitamente fuera del importe.
+  Un pedido histórico entregado sin historial de pago ahora se marca «Pago sin
+  conciliar» y no ofrece volver a pagar. No se alteró `db.json`.
+- En cliente, `QUOTED` ahora se presenta como «Lista para enviar» y aclara que el
+  monto está preparado pero aún no se entregó para decisión; no ofrece aprobar
+  ni pagar hasta `AWAITING_APPROVAL`. La carga de producto/color/cantidad hacia
+  login/registro está cubierta por Jest; la vuelta con sesión no se probó en
+  navegador en esta pasada.
+- Verificación de estos cambios: Jest 56 suites / 406 tests, lint,
+  `check:ui` y build pasan. Todavía no hay commit ni CI para esta pasada.
 - Diferencial confirmado por el usuario: IA integrada que organiza la idea y
   referencias y evita captura manual de datos técnicos; herramientas calculan
   con evidencia, con acciones para enviar/revisar/aprobar/pagar en Sandbox o
@@ -92,7 +172,7 @@
   La galería deseada es solo imagen (principal + tres vistas); puede renderizarse
   desde el mismo modelo fuente y mantener ese archivo privado. Para gramos/horas
   hacen falta los modelos fuente autorizados y un laminado K1C reproducible.
-- Verificación del catálogo: Jest 51 suites / 305 tests, lint,
+- Verificación previa del catálogo: Jest 51 suites / 305 tests, lint,
   `check:ui`, `check:automation` (270 comprobaciones), build y `git diff --check`
   pasan. CI aún corresponde al baseline publicado `e41099d`, no a estos cambios
   locales.

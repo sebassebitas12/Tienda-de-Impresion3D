@@ -8,6 +8,29 @@ import { StepperBar } from '../components/ui/StepperBar.jsx';
 import { formatCRC } from '../utils/money.js';
 import './quotes.css';
 
+function orderQuantityTitle(order, es) {
+  const quantity = (order.orderItems || []).reduce((total, item) => {
+    const itemQuantity = Number(item.quantity);
+    return total + (Number.isSafeInteger(itemQuantity) && itemQuantity > 0 ? itemQuantity : 0);
+  }, 0);
+  if (!quantity) return es ? 'Detalle del encargo' : 'Order details';
+  return es
+    ? `Encargo · ${quantity} ${quantity === 1 ? 'pieza' : 'piezas'}`
+    : `Order · ${quantity} ${quantity === 1 ? 'part' : 'parts'}`;
+}
+
+function orderPaymentLabel(order, es) {
+  if (order.paymentMode === 'PAYPAL_SANDBOX' && order.paymentStatus === 'PAID') return es ? 'PayPal Sandbox · pago de prueba' : 'PayPal Sandbox · test payment';
+  if (order.paymentMode === 'SINPE_MANUAL' && order.paymentStatus === 'PAID') return es ? 'SINPE revisado por taller' : 'SINPE reviewed by workshop';
+  if (order.paymentMode === 'DEMO' && order.paymentStatus === 'PAID') return es ? 'Pago simulado · DEMO' : 'Simulated payment · DEMO';
+  if (order.paymentStatus === 'PAID') return es ? 'Pago registrado' : 'Payment recorded';
+  if (order.paymentProof?.status === 'SUBMITTED') return es ? 'Comprobante en revisión' : 'Proof under review';
+  if (order.paymentProof?.status === 'REJECTED') return es ? 'Comprobante observado' : 'Proof needs changes';
+  if (order.paymentStatus === 'REVIEW_REQUIRED') return es ? 'Pago requiere revisión' : 'Payment needs review';
+  if (order.status === 'PENDING') return es ? 'Pago pendiente' : 'Payment pending';
+  return es ? 'Pago sin conciliar' : 'Payment record needs review';
+}
+
 export function CustomerQuotesPage() {
   const { user, token } = useAuth();
   const { language } = usePreferences();
@@ -93,7 +116,7 @@ export function CustomerQuotesPage() {
   }
   const statusLabel = status => ({
     PENDING_QUOTE: es ? 'Por cotizar' : 'Awaiting quote', IN_REVIEW: es ? 'En revisión' : 'In review',
-    QUOTED: es ? 'Cotizada' : 'Quoted', AWAITING_APPROVAL: es ? 'Esperando tu aprobación' : 'Awaiting your approval',
+    QUOTED: es ? 'Lista para enviar' : 'Ready to send', AWAITING_APPROVAL: es ? 'Esperando tu aprobación' : 'Awaiting your approval',
     APPROVED: es ? 'Aprobada' : 'Approved', CHANGES_REQUESTED: es ? 'Cambios solicitados' : 'Changes requested', PAID: es ? 'Pagada · DEMO' : 'Paid · DEMO',
     REJECTED: es ? 'Rechazada' : 'Rejected', EXPIRED: es ? 'Vencida' : 'Expired', CANCELLED: es ? 'Cancelada' : 'Cancelled',
   })[status] || status;
@@ -216,7 +239,7 @@ export function CustomerQuotesPage() {
                     </div>
                   </header>
 
-                  {request.status === 'QUOTED' && <p className="customer-quote-next-step">{es ? 'El taller está preparando la propuesta para enviártela. Cuando esté lista para tu aprobación, verás aquí las opciones para aprobar o pedir cambios. No tenés que pagar todavía.' : 'The workshop is preparing your proposal. Once sent for approval, you will be able to approve or request changes here. No payment is required yet.'}</p>}
+                  {request.status === 'QUOTED' && <p className="customer-quote-next-step">{es ? 'El taller ya preparó el monto, pero todavía no te envió la cotización para decidir. Cuando la envíe, podrás aprobarla o pedir cambios desde aquí. No pagues todavía.' : 'The workshop has prepared the amount but has not sent the quote for your decision yet. Once sent, you can approve it or request changes here. Do not pay yet.'}</p>}
                   {request.status === 'CHANGES_REQUESTED' && <p className="customer-quote-next-step">{es ? 'El taller recibió tu solicitud de cambios. Esperá la nueva versión antes de aprobar o pagar.' : 'The workshop received your change request. Wait for the revised quote before approving or paying.'}</p>}
                   {request.status !== 'AWAITING_APPROVAL' && request.quoteNotes && (
                     <div className="customer-quote-notes">
@@ -349,11 +372,11 @@ export function CustomerQuotesPage() {
                         <span className={`v-badge v-badge--request status-${order.status?.toLowerCase()}`}>{orderStatusLabel(order.status)}</span>
                         {order.createdAt && <time className="customer-quote-date">{order.createdAt.slice(0, 10)}</time>}
                       </div>
-                      <h2>{es ? `Pedido de ${order.orderItems?.length || 0} ${(order.orderItems?.length || 0) === 1 ? 'modelo' : 'modelos'}` : `Order with ${order.orderItems?.length || 0} models`}</h2>
+                      <h2>{orderQuantityTitle(order, es)}</h2>
                     </div>
                     <div className="customer-quote-price-col">
                       <strong>{formatCRC(order.total ?? order.subtotalCrc)}</strong>
-                      <small>{order.paymentMode === 'PAYPAL_SANDBOX' && order.paymentStatus === 'PAID' ? (es ? 'PayPal Sandbox · pago de prueba' : 'PayPal Sandbox · test payment') : order.paymentMode === 'SINPE_MANUAL' && order.paymentStatus === 'PAID' ? (es ? 'SINPE revisado por taller' : 'SINPE reviewed by workshop') : order.paymentMode === 'DEMO' && order.paymentStatus === 'PAID' ? (es ? 'Pago simulado · DEMO' : 'Simulated payment · DEMO') : order.paymentStatus === 'PAID' ? (es ? 'Pago registrado' : 'Payment recorded') : order.paymentProof?.status === 'SUBMITTED' ? (es ? 'Comprobante en revisión' : 'Proof under review') : order.paymentProof?.status === 'REJECTED' ? (es ? 'Comprobante observado' : 'Proof needs changes') : (es ? 'Pago pendiente' : 'Payment pending')}</small>
+                      <small>{orderPaymentLabel(order, es)}</small>
                     </div>
                   </header>
 
@@ -363,7 +386,7 @@ export function CustomerQuotesPage() {
                         <div className="customer-order-item-info">
                           <span className="customer-order-item-name">{item.productName || item.currentCatalogName || (es ? `Modelo ${item.productId}` : `Model ${item.productId}`)}</span>
                           {!item.productName && item.currentCatalogName && <small>{es ? 'Referencia del catálogo actual' : 'Current catalog reference'}</small>}
-                          <span className="customer-order-item-meta">{item.color} · {item.material || (es ? 'Material no registrado' : 'Material not recorded')} · <span className="customer-quote-chip-label">{es ? 'Cant:' : 'Qty:'}</span> {item.quantity}</span>
+                          <span className="customer-order-item-meta">{[item.color, item.material || (es ? 'Material no registrado' : 'Material not recorded'), `${es ? 'Cant:' : 'Qty:'} ${item.quantity}`].filter(Boolean).join(' · ')}</span>
                         </div>
                         <div className="customer-order-item-price">
                           <strong>{formatCRC(item.subtotal ?? item.unitPrice * item.quantity)}</strong>
@@ -404,13 +427,25 @@ export function CustomerQuotesPage() {
                           : (es ? 'El pago registrado y el avance del taller son pasos separados.' : 'Recorded payment and workshop progress are separate steps.')}
                       </p>
                     </div>
-                  ) : order.status === 'PENDING' && (
+                  ) : order.paymentStatus === 'REVIEW_REQUIRED' ? (
+                    <div className="customer-order-payment-box" role="alert">
+                      <strong>{es ? 'Pago requiere revisión' : 'Payment needs review'}</strong>
+                      <p>{es ? 'No vuelvas a iniciar el pago. Revisá el detalle o consultá al taller antes de continuar.' : 'Do not start another payment. Review the details or contact the workshop before continuing.'}</p>
+                      <Link className="v-link-text" to={`/pedidos/${encodeURIComponent(order.id)}`}>{es ? 'Revisar detalle del pedido' : 'Review order details'} ↗</Link>
+                    </div>
+                  ) : order.status === 'PENDING' ? (
                     <div className="customer-order-payment-box">
                       <strong>{order.paymentProof?.status === 'SUBMITTED' ? (es ? 'Comprobante en revisión manual' : 'Proof under manual review') : order.paymentProof?.status === 'REJECTED' ? (es ? 'Comprobante observado · requiere corrección' : 'Proof rejected · correction needed') : (es ? 'Pedido pendiente de pago' : 'Order awaiting payment')}</strong>
                       <p>{order.paymentProof?.status === 'SUBMITTED' ? (es ? 'El pedido no se confirma hasta que el taller valide el comprobante. Podés consultar el estado desde el carrito.' : 'The order is not confirmed until the workshop verifies the proof. Check its status in the cart.') : order.paymentProof?.status === 'REJECTED' ? (es ? `Revisá el motivo y enviá una nueva imagen desde el carrito: ${order.paymentProof.rejectionReason || 'comprobante observado'}.` : `Review the reason and submit a new image from the cart: ${order.paymentProof.rejectionReason || 'proof rejected'}.`) : (es ? 'El pedido está guardado, pero aún no está pagado ni confirmado. Elegí PayPal Sandbox o reportá un SINPE desde el carrito.' : 'The order is saved but is not paid or confirmed. Choose PayPal Sandbox or report SINPE from the cart.')}</p>
                       <Link className="v-button v-button--primary" to={`/carrito?orderId=${encodeURIComponent(order.id)}`}>
                         {order.paymentProof?.status === 'REJECTED' ? (es ? 'Corregir en el carrito' : 'Correct proof in cart') : order.paymentProof?.status === 'SUBMITTED' ? (es ? 'Ver estado en el carrito' : 'View status in cart') : (es ? 'Continuar al carrito para pagar' : 'Continue to cart to pay')} ↗
                       </Link>
+                    </div>
+                  ) : order.paymentStatus !== 'PAID' && !['SUBMITTED', 'REJECTED'].includes(order.paymentProof?.status) && (
+                    <div className="customer-order-payment-box" role="status">
+                      <strong>{es ? 'Historial de pago incompleto' : 'Payment history incomplete'}</strong>
+                      <p>{es ? 'Este pedido no incluye constancia de pago en el registro disponible. No vuelvas a pagar desde aquí; consultá al taller para confirmar el caso.' : 'No payment confirmation is present in the available order record. Do not pay again here; contact the workshop to verify it.'}</p>
+                      <Link className="v-link-text" to="/contacto">{es ? 'Consultar al taller' : 'Contact the workshop'} ↗</Link>
                     </div>
                   )}
                   {['DELIVERED', 'COMPLETED'].includes(order.status) && (

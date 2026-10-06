@@ -341,4 +341,34 @@ describe('Auth route guards', () => {
     await waitFor(() => expect(screen.getByText('HOME')).toBeVisible());
     expect(screen.queryByText('CART')).not.toBeInTheDocument();
   });
+
+  test('LoginPage botones demo rellenan credenciales de Admin y Cliente', async () => {
+    const user = userEvent.setup();
+    render(
+      <AppProviders>
+        <MemoryRouter initialEntries={['/login']}>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+          </Routes>
+        </MemoryRouter>
+      </AppProviders>
+    );
+
+    const emailInput = screen.getByLabelText(/correo/i);
+    const passwordInput = screen.getByLabelText(/contraseña/i);
+
+    const adminBtn = screen.getByRole('button', { name: /admin demo/i });
+    const customerBtn = screen.getByRole('button', { name: /cliente demo|customer demo/i });
+
+    expect(adminBtn).toBeInTheDocument();
+    expect(customerBtn).toBeInTheDocument();
+
+    await user.click(adminBtn);
+    expect(emailInput).toHaveValue('sebas@example.com');
+    expect(passwordInput).toHaveValue('demo-admin-2026');
+
+    await user.click(customerBtn);
+    expect(emailInput).toHaveValue('ana@example.com');
+    expect(passwordInput).toHaveValue('demo-customer-2026');
+  });
 });

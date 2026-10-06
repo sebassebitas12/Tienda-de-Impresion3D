@@ -38,7 +38,10 @@ export function RegisterPage() {
     try {
       await auth.register({ name: form.name, email: form.email, password: form.password });
       const requested = location.state?.from;
-      navigate(requested || '/cuenta', { replace: true });
+      const returnState = location.state?.pendingCartSelection
+        ? { pendingCartSelection: location.state.pendingCartSelection }
+        : undefined;
+      navigate(requested || '/cuenta', { replace: true, state: returnState });
     } catch {
       // Provider exposes the normalized error state to the UI.
     }
@@ -57,7 +60,7 @@ export function RegisterPage() {
           : 'Creá una cuenta de cliente para ver tu carrito y continuar.'}
       </p>}
       {location.state?.reason === 'catalog-customer-required' && <p className="auth-context-notice" role="status">
-        {language === 'en' ? 'Create a customer account to add this part. You will return to the product page.' : 'Creá una cuenta de cliente para agregar esta pieza. Después volverás a la ficha del producto.'}
+        {language === 'en' ? 'Create a customer account to add this part. Your selected color and quantity will be waiting on the product page.' : 'Creá una cuenta de cliente para agregar esta pieza. Al volver, conservarás el color y la cantidad elegidos.'}
       </p>}
 
       <form className="auth-form" onSubmit={onSubmit} noValidate>

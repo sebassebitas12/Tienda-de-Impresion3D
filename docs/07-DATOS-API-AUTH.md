@@ -1,5 +1,26 @@
 # Vértice CR — Datos, API externa, JWT y N8N
 
+## Checkout y recibo Sandbox — verificación en curso 2026-10-06
+
+El checkout de `/carrito?orderId=...` presenta PayPal Sandbox, pago con tarjeta
+mediante el SDK oficial de PayPal (solo si la cuenta Sandbox reporta elegibilidad)
+y SINPE Móvil DEMO para revisión manual. React no recibe ni almacena datos de
+tarjeta. `POST /orders/paypal/client-config` valida sesión/propiedad/estado y
+devuelve solo el Client ID público; el cliente comprueba elegibilidad del SDK
+antes de llamar a `POST /orders/paypal/create`, por lo que una tarjeta no
+habilitada no crea un intent ni deja bloqueado el pedido. El secreto permanece
+solo en servidor. Si un intent PayPal ya fue creado, el cliente debe completarlo
+o cancelarlo antes de cambiar de método.
+
+Verificación live: API local obtuvo OAuth Sandbox y creó el checkout de la orden
+pendiente de prueba `ord-e92ef3dc-…`; CRC→USD y la tasa con fecha quedaron en el
+snapshot. El login/aprobación/captura no se completó: el usuario debe continuar
+en Sandbox. Por lo tanto, no hubo transición a `PAID`, no se disparó la rama
+`vertice-payment-email`, y no se declara correo entregado. El recibo solo puede
+marcarse `SENT` tras validar el acuse n8n/Gmail `messageId`; `UNKNOWN` nunca se
+reintenta automáticamente. La elegibilidad real de pago con tarjeta y la
+entrega del email continúan pendientes de comprobación en vivo.
+
 ## Intake conversacional y medidas — reauditoría 2026-10-05
 
 `AssistantPanel` envía texto e historial a `/assistants/chat`; las fotos/STL/OBJ
@@ -208,6 +229,16 @@ Header Auth; por defecto usa `VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN`, con override
 opcional `VERTICE_PAYMENT_EMAIL_WEBHOOK_TOKEN`. Los destinatarios vienen de DB
 y configuración del taller, no de texto del agente. La prueba HTTP aislada
 confirma dos recibos mock y ausencia de duplicados. No se envió correo real.
+
+**Revisión en vivo 2026-10-06:** n8n muestra el workflow unificado publicado
+(opción `Unpublish`) y el canvas contiene `Entrada — aviso de pago` → preparar
+recibo → Gmail → confirmar `messageId`. No aparece aún una ejecución de recibo:
+las ejecuciones visibles más recientes son tasas y asistentes. En `.env` local
+quedaron configurados el webhook de pago y el BCC del taller; la API debe
+reiniciarse para cargarlos. Siguen faltando las credenciales PayPal Sandbox, y
+la cuenta cliente de prueba indicada no está registrada en `db.json`. El test
+real debe usar una cuenta válida, nunca el pedido histórico con correo `example`.
+No se inició un pago ni se envió un correo.
 
 ## Reporte y verificación de pago por pedido — 2026-10-04
 
@@ -1328,3 +1359,41 @@ tests, `check:ui`, `check:automation` (248 comprobaciones), `build:n8n`, build y
 orientación comparativa live acabó aún en el literal de iteraciones. Reiniciar
 solo `npm run api` y repetir es requisito para cerrar esta comprobación; n8n y
 Vite no necesitan reinicio por el cambio local del runtime.
+
+### Contrato vigente del resumen conversacional — 2026-10-06
+
+Para `POST /assistants/chat`, `mode: "quote"` puede recibir `prepareDraft: true`
+y `draftContext` únicamente en la acción explícita de preparar/resumir. El
+servidor vuelve a filtrar valores a `description`, `intendedUse`, `dimensions`,
+materiales FDM, cantidad 1–100, `needsDesign` y enlace de referencia, limitando
+longitudes. No transmite archivos adjuntos, imágenes, modelos 3D ni secretos.
+El proveedor recibe el contexto como datos no confiables y debe devolver
+`requestDraft` estructurado; el API vuelve a validar la respuesta existente.
+
+La interfaz no crea solicitud por la respuesta del agente. Si el proveedor no
+devuelve estructura o falla, solo puede habilitar revisión local cuando exista
+una descripción de pieza identificable. Ese resultado se distingue como
+`local-fallback`, combina lo que puede extraerse de mensajes/contexto del
+formulario, queda editable y requiere confirmación explícita antes de enviar.
+No se rotula como resumen producido por IA. Validación local: `tests/assistantRuntime.test.js`
+y `tests/quoteRequest.test.jsx`. Una prueba en el workflow n8n publicado debe
+confirmar que propaga la tarea `prepareDraft` y conserva `requestDraft`; el JSON
+del repo por sí solo no prueba el despliegue.
+
+### URLs webhook y revisión del mensaje recibido — 2026-10-06
+
+Se comprobó en `.env` local que `VERTICE_QUOTE_EMAIL_WEBHOOK_URL` y
+`VERTICE_PAYMENT_EMAIL_WEBHOOK_URL` usan `http://localhost:5678/webhook/...`;
+`http://localhost:5678/healthz` respondió HTTP 200. Una lectura anterior
+describió mal el host al omitir el puerto; no cambiar `.env` a causa de ese
+diagnóstico.
+
+Gmail de solo lectura: el mensaje de prueba existente del 2026-10-04 muestra una
+plantilla previa, no la actual del repo. No contiene CTA a `/cuenta`, presenta
+un desglose interno ambiguo y la copia BCC no es verificable en la lectura. No
+se encontró recibo de pago ni se hizo otro envío. El HTML local/workflow
+generado ya evita el desglose y enlaza a la cuenta; falta actualizar/verificar
+el workflow que efectivamente ejecuta n8n, mapear cliente y copia de taller y
+comprobar el próximo mensaje controlado. La rama de pago no se considera
+probada hasta una captura Sandbox completada, acuse con `messageId` y recepción
+verificada en ambas cuentas.

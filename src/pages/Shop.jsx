@@ -6,7 +6,7 @@ import { useCatalog } from '../hooks/useCatalog.js';
 import { useCart } from '../hooks/useCart.js';
 import { useAuth } from '../hooks/useAuth.js';
 import { usePreferences } from '../hooks/usePreferences.js';
-import { capturePaypalCheckout, createCatalogOrderIdempotencyKey, createPaypalCheckout, fetchMyOrders, submitCatalogOrder, submitOrderPaymentProof } from '../services/commerceService.js';
+import { capturePaypalCheckout, createCatalogOrderIdempotencyKey, createPaypalCheckout, fetchMyOrders, fetchPaypalClientConfig, submitCatalogOrder, submitOrderPaymentProof } from '../services/commerceService.js';
 import { isOrderableProduct, MAX_CATALOG_ORDER_QUANTITY, reconcileCart } from '../utils/cart.js';
 import { matchesFacet, toggleFacetParams } from '../utils/facetFilters.js';
 import { formatCRC } from '../utils/money.js';
@@ -70,10 +70,19 @@ function ProductSelection({ product, es }) {
   const cart = useCart();
   const { user } = useAuth();
   const location = useLocation();
-  const [color, setColor] = useState(''); const [quantity, setQuantity] = useState(1); const [notice, setNotice] = useState('');
+  const pendingSelection = location.state?.pendingCartSelection;
+  const canRestoreSelection = pendingSelection?.productId === String(product.id)
+    && product.availableColors?.includes(pendingSelection.color)
+    && Number.isSafeInteger(Number(pendingSelection.quantity))
+    && Number(pendingSelection.quantity) >= 1
+    && Number(pendingSelection.quantity) <= MAX_CATALOG_ORDER_QUANTITY;
+  const [color, setColor] = useState(canRestoreSelection ? pendingSelection.color : '');
+  const [quantity, setQuantity] = useState(canRestoreSelection ? String(pendingSelection.quantity) : 1);
+  const [notice, setNotice] = useState('');
   const valid = (product.availableColors || []).includes(color) && Number.isSafeInteger(Number(quantity)) && Number(quantity) >= 1 && Number(quantity) <= MAX_CATALOG_ORDER_QUANTITY;
   const canShop = user?.role === 'customer' && cart.ready;
   const returnToProduct = `${location.pathname}${location.search}`;
+  const cartSelectionForAuth = valid && color ? { productId: String(product.id), color, quantity: Number(quantity) } : null;
   return <form className="shop-selection" onSubmit={event => {
     event.preventDefault();
     if (!canShop) return;
@@ -131,8 +140,8 @@ function ProductSelection({ product, es }) {
       : user?.role !== 'admin' && <div className="shop-cart-session-state shop-cart-session-state--guest">
         <p>{es ? 'Para agregar esta pieza necesitás iniciar sesión con una cuenta de cliente.' : 'Sign in with a customer account to add this part.'}</p>
         <div className="shop-cart-auth-actions">
-          <Link className="v-button v-button--primary v-button--pill shop-cart-auth-btn" to="/login" state={{ from: returnToProduct, reason: 'catalog-customer-required' }}>{es ? 'Iniciar sesión para agregar' : 'Sign in to add'} ↗</Link>
-          <Link className="v-link-text" to="/registro" state={{ from: returnToProduct, reason: 'catalog-customer-required' }}>{es ? 'Crear cuenta' : 'Create account'} →</Link>
+          <Link className="v-button v-button--primary v-button--pill shop-cart-auth-btn" to="/login" state={{ from: returnToProduct, reason: 'catalog-customer-required', pendingCartSelection: cartSelectionForAuth }}>{es ? 'Iniciar sesión para agregar' : 'Sign in to add'} ↗</Link>
+          <Link className="v-link-text" to="/registro" state={{ from: returnToProduct, reason: 'catalog-customer-required', pendingCartSelection: cartSelectionForAuth }}>{es ? 'Crear cuenta' : 'Create account'} →</Link>
         </div>
       </div>}
     {notice && user?.role === 'customer' && <p role="status">{notice} <Link to="/carrito">{es ? 'Ver carrito' : 'View cart'} →</Link></p>}
@@ -156,12 +165,35 @@ export function ProductPage() {
     ) : <EmptyState title={es ? 'Este modelo no está publicado' : 'This model is not published'} />)}</section>;
 }
 
+function loadPaypalSdk(clientId) {
+  if (window.paypal) return Promise.resolve(window.paypal);
+  if (window.__verticePaypalSdkPromise) return window.__verticePaypalSdkPromise;
+  window.__verticePaypalSdkPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    const params = new URLSearchParams({ 'client-id': clientId, currency: 'USD', intent: 'capture', components: 'buttons', 'enable-funding': 'card' });
+    script.src = `https://www.paypal.com/sdk/js?${params.toString()}`;
+    script.async = true;
+    script.onload = () => window.paypal ? resolve(window.paypal) : reject(new Error('PAYPAL_SDK_UNAVAILABLE'));
+    script.onerror = () => reject(new Error('PAYPAL_SDK_UNAVAILABLE'));
+    document.head.appendChild(script);
+  }).catch(error => {
+    window.__verticePaypalSdkPromise = null;
+    throw error;
+  });
+  return window.__verticePaypalSdkPromise;
+}
+
 function PendingOrderCheckout({ orderId, routePayment, routeProviderToken, es, token, cart, navigate, onBack }) {
   const [order, setOrder] = useState(null);
   const [loadedKey, setLoadedKey] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('paypal');
+  const [paypalSession, setPaypalSession] = useState(null);
+  const [paypalButtonStatus, setPaypalButtonStatus] = useState('idle');
+  const paypalButtonHost = useRef(null);
+  const sdkCaptureInProgress = useRef(false);
   const [proof, setProof] = useState({ referenceNumber: '', sinpePhone: '', proofNotes: '', proofFileName: '', proofImageDataUrl: '' });
   const [readingProof, setReadingProof] = useState(false);
   const captureRef = useRef('');
@@ -198,25 +230,77 @@ function PendingOrderCheckout({ orderId, routePayment, routeProviderToken, es, t
 
   async function startPaypal() {
     if (submitting || !order || order.status !== 'PENDING') return;
-    if (order.paypalCheckout?.status === 'CREATED' && order.paypalCheckout.approvalUrl) {
-      window.location.assign(order.paypalCheckout.approvalUrl);
-      return;
-    }
     setSubmitting(true); setError(''); setNotice('');
     try {
+      if (paymentMethod === 'card') {
+        const config = await fetchPaypalClientConfig({ orderId: order.id }, { token });
+        if (!config.clientId) throw Object.assign(new Error(), { code: 'PAYPAL_NOT_CONFIGURED' });
+        const paypal = await loadPaypalSdk(config.clientId);
+        const cardEligibility = paypal.Buttons({ fundingSource: paypal.FUNDING.CARD, createOrder: () => 'eligibility-check' });
+        if (!cardEligibility.isEligible()) throw Object.assign(new Error(), { code: 'CARD_NOT_AVAILABLE' });
+      }
       const result = await createPaypalCheckout({ orderId: order.id }, { token });
       setOrder(current => ({ ...current, paypalCheckout: { status: 'CREATED', approvalUrl: result.approvalUrl,
-        amountUsd: result.amountUsd, fxSnapshot: result.fxSnapshot } }));
-      setNotice(es ? 'Revisá el equivalente en USD y la tasa. Al continuar abrirás PayPal Sandbox para aprobar el pago.' : 'Review the USD amount and exchange rate. Continue to PayPal Sandbox to approve the payment.');
+        providerOrderId: result.providerOrderId, amountUsd: result.amountUsd, fxSnapshot: result.fxSnapshot } }));
+      if (!result.clientId || !result.providerOrderId) throw Object.assign(new Error(), { code: 'PAYPAL_RESPONSE_INVALID' });
+      setPaypalButtonStatus('loading');
+      setPaypalSession({ method: paymentMethod, clientId: result.clientId, providerOrderId: result.providerOrderId });
+      setNotice(es ? 'Revisá el equivalente en USD y la tasa. Confirmá el pago en la ventana segura de PayPal Sandbox.' : 'Review the USD equivalent and rate. Confirm the payment in the secure PayPal Sandbox window.');
     } catch (failure) {
       const messages = {
         PAYPAL_NOT_CONFIGURED: es ? 'PayPal Sandbox todavía no está configurado en el servidor. Podés reportar un SINPE DEMO o volver luego.' : 'PayPal Sandbox is not configured on the server yet. You can submit a SINPE DEMO proof or return later.',
         PAYPAL_CREDENTIALS_INVALID: es ? 'El servidor rechazó las credenciales Sandbox. Revisá la app REST sin compartir su Secret.' : 'The server rejected the Sandbox credentials. Check the REST app without sharing its Secret.',
         FX_PROVIDER_UNAVAILABLE: es ? 'No se obtuvo un tipo de cambio actual; el pago no se inició. Intentá más tarde.' : 'A current exchange rate was unavailable; payment was not started. Try again later.',
+        CARD_NOT_AVAILABLE: es ? 'Esta cuenta Sandbox no habilita pago con tarjeta. No se inició el pago; elegí PayPal o SINPE DEMO.' : 'This Sandbox account does not enable card payments. No payment was started; choose PayPal or SINPE DEMO.',
       };
       setError(messages[failure.code] || (es ? 'No se pudo iniciar PayPal Sandbox. No se registró ningún pago; el pedido sigue pendiente.' : 'PayPal Sandbox could not start. No payment was recorded; the order remains pending.'));
     } finally { setSubmitting(false); }
   }
+
+  useEffect(() => {
+    if (!paypalSession || !paypalButtonHost.current) return undefined;
+    let cancelled = false;
+    const host = paypalButtonHost.current;
+    host.replaceChildren();
+    setPaypalButtonStatus('loading');
+    loadPaypalSdk(paypalSession.clientId).then(async paypal => {
+      if (cancelled) return;
+      const fundingSource = paypalSession.method === 'card' ? paypal.FUNDING.CARD : paypal.FUNDING.PAYPAL;
+      const buttons = paypal.Buttons({
+        fundingSource,
+        createOrder: () => paypalSession.providerOrderId,
+        onApprove: async data => {
+          if (cancelled || sdkCaptureInProgress.current) return;
+          sdkCaptureInProgress.current = true;
+          setSubmitting(true); setError(''); setNotice('');
+          try {
+            const result = await capturePaypalCheckout({ orderId, paypalOrderId: data.orderID }, { token });
+            setOrder(result.order);
+            if (!result.order.sourceQuoteId && !result.order.customPrintRequestId) clearCart();
+            navigate(`/pedidos/${encodeURIComponent(result.order.id)}`, { replace: true, state: { paymentConfirmation: result.order.paymentMode } });
+          } catch (failure) {
+            setError(failure.code === 'PAYMENT_REQUIRES_REVIEW'
+              ? (es ? 'PayPal devolvió un importe inesperado. El pedido quedó retenido para revisión; no intentes pagarlo otra vez.' : 'PayPal returned an unexpected amount. The order is on hold for review; do not try again.')
+              : (es ? 'No pudimos confirmar el pago. Revisá el estado del pedido antes de reintentar.' : 'We could not confirm the payment. Check the order status before retrying.'));
+          } finally { sdkCaptureInProgress.current = false; setSubmitting(false); }
+        },
+        onCancel: () => setNotice(es ? 'Cancelaste en PayPal. El pedido sigue pendiente y no se registró un pago.' : 'You cancelled in PayPal. The order remains pending and no payment was recorded.'),
+        onError: () => setError(es ? 'PayPal Sandbox no pudo completar este intento. No se confirmó el pago; podés reintentar o elegir otro método.' : 'PayPal Sandbox could not complete this attempt. Payment was not confirmed; retry or choose another method.'),
+      });
+      if (!buttons.isEligible()) {
+        if (!cancelled) setPaypalButtonStatus('unavailable');
+        return;
+      }
+      await buttons.render(host);
+      if (!cancelled) setPaypalButtonStatus('ready');
+    }).catch(() => {
+      if (!cancelled) {
+        setPaypalButtonStatus('unavailable');
+        setError(es ? 'No se pudo cargar PayPal Sandbox. El pedido sigue pendiente; probá de nuevo o usá SINPE DEMO.' : 'PayPal Sandbox could not load. The order remains pending; retry or use SINPE DEMO.');
+      }
+    });
+    return () => { cancelled = true; host.replaceChildren(); };
+  }, [paypalSession, orderId, token, es, navigate, clearCart]);
 
   async function sendSinpe(event) {
     event.preventDefault();
@@ -258,6 +342,13 @@ function PendingOrderCheckout({ orderId, routePayment, routeProviderToken, es, t
   }
 
   const amountCrc = order?.total ?? order?.subtotalCrc ?? order?.subtotal;
+  const hasUnconfirmedCharges = !Number.isFinite(order?.shipping) || !Number.isFinite(order?.taxes);
+  const checkoutBreakdown = [
+    ['subtotal', es ? 'Piezas' : 'Parts', order?.subtotal],
+    ['shipping', es ? 'Entrega' : 'Delivery', order?.shipping],
+    ['discount', es ? 'Descuento' : 'Discount', order?.discount],
+    ['taxes', es ? 'Impuestos' : 'Taxes', order?.taxes],
+  ].filter(([, , amount]) => Number.isFinite(amount));
   const canPay = order?.status === 'PENDING' && order?.paymentStatus !== 'PAID' && order?.paymentStatus !== 'REVIEW_REQUIRED'
     && order?.paymentProof?.status !== 'SUBMITTED';
 
@@ -268,8 +359,10 @@ function PendingOrderCheckout({ orderId, routePayment, routeProviderToken, es, t
     <span className="shop-facet-label">{order.sourceQuoteId ? (es ? 'COTIZACIÓN APROBADA' : 'APPROVED QUOTE') : (es ? 'ENCARGO DE CATÁLOGO' : 'CATALOG ORDER')}</span>
     <h2 id="checkout-order-heading">{order.scopeSnapshot?.name || (es ? `Pedido ${order.id}` : `Order ${order.id}`)}</h2>
     {order.scopeSnapshot && <p>{[order.scopeSnapshot.material, order.scopeSnapshot.dimensions, order.scopeSnapshot.quantity && `${order.scopeSnapshot.quantity} ${es ? 'unidad(es)' : 'unit(s)'}`].filter(Boolean).join(' · ')}</p>}
-    {(order.orderItems || []).map(item => <div className="shop-checkout-item" key={item.id || item.productId}><span>{item.productName || item.currentCatalogName || item.productId} · {item.color} · ×{item.quantity}</span><strong>{formatCRC(item.subtotal ?? item.unitPrice * item.quantity)}</strong></div>)}
-    <div className="shop-checkout-total"><span>{es ? 'Total acordado en CRC' : 'Agreed total in CRC'}</span><strong>{formatCRC(amountCrc)}</strong></div>
+    {(order.orderItems || []).map(item => <div className="shop-checkout-item" key={item.id || item.productId}><span>{[item.productName || item.currentCatalogName || item.productId, item.color, item.material, `×${item.quantity}`].filter(Boolean).join(' · ')}</span><strong>{formatCRC(item.subtotal ?? item.unitPrice * item.quantity)}</strong></div>)}
+    {checkoutBreakdown.length > 0 && <dl className="shop-checkout-breakdown" aria-label={es ? 'Desglose del monto' : 'Amount breakdown'}>{checkoutBreakdown.map(([key, label, amount]) => <div key={key}><dt>{label}</dt><dd>{formatCRC(amount)}</dd></div>)}</dl>}
+    <div className="shop-checkout-total"><span>{hasUnconfirmedCharges ? (es ? 'Importe registrado en CRC' : 'Recorded amount in CRC') : (es ? 'Total acordado en CRC' : 'Agreed total in CRC')}</span><strong>{formatCRC(amountCrc)}</strong></div>
+    {hasUnconfirmedCharges && <p className="shop-checkout-terms-note">{es ? 'El importe mostrado cubre solo los conceptos listados. Cualquier costo de entrega o impuesto que aún no esté confirmado se coordina aparte con el taller; no está incluido.' : 'The amount shown covers only the listed items. Any delivery charge or tax not yet confirmed will be arranged separately with the workshop; it is not included.'}</p>}
     <p className="shop-checkout-demo-note">{es ? 'Vértice es una demo académica. PayPal Sandbox usa saldo de prueba, no dinero real. La conversión es referencial; tu banco o PayPal podría aplicar otra tasa.' : 'Vértice is an academic demo. PayPal Sandbox uses test funds, not real money. Conversion is indicative; your bank or PayPal may apply another rate.'}</p>
     {order.paypalCheckout?.fxSnapshot && <dl className="shop-fx-snapshot"><div><dt>{es ? 'Equivalente PayPal Sandbox' : 'PayPal Sandbox equivalent'}</dt><dd>{new Intl.NumberFormat(es ? 'es-CR' : 'en-US', { style: 'currency', currency: 'USD' }).format(order.paypalCheckout.amountUsd)}</dd></div><div><dt>{es ? 'Tasa de referencia' : 'Reference rate'}</dt><dd>1 USD = {order.paypalCheckout.fxSnapshot.rate} CRC · {order.paypalCheckout.fxSnapshot.rateDate.slice(0, 10)}</dd></div><div><dt>{es ? 'Fuente' : 'Source'}</dt><dd><a href="https://www.exchangerate-api.com" target="_blank" rel="noreferrer">{order.paypalCheckout.fxSnapshot.source}</a></dd></div></dl>}
     {order.paymentProof?.status === 'SUBMITTED' && <p className="shop-checkout-status" role="status">{es ? 'Comprobante SINPE enviado · pendiente de revisión del taller.' : 'SINPE proof submitted · awaiting workshop review.'}</p>}
@@ -278,9 +371,28 @@ function PendingOrderCheckout({ orderId, routePayment, routeProviderToken, es, t
     {order.paymentStatus === 'REVIEW_REQUIRED' && <p role="alert">{es ? 'El proveedor devolvió un monto distinto al esperado. El pedido requiere revisión; no vuelvas a iniciar el pago.' : 'The provider returned a different amount. The order needs review; do not start another payment.'}</p>}
     {notice && <p className="shop-checkout-status" role="status">{notice}</p>}
     {canPay && <div className="shop-payment-options">
-      <button className="v-button v-button--primary v-button--pill" type="button" onClick={startPaypal} disabled={submitting}>{submitting ? (es ? 'Conectando…' : 'Connecting…') : order.paypalCheckout?.status === 'CREATED' ? (es ? 'Abrir PayPal Sandbox y aprobar pago' : 'Open PayPal Sandbox and approve payment') : (es ? 'Continuar con PayPal Sandbox' : 'Continue with PayPal Sandbox')}</button>
-      {order.paypalCheckout?.status !== 'CREATED' && <form className="shop-sinpe-form" onSubmit={sendSinpe}>
-        <h3>{es ? 'O reportá un SINPE Móvil · DEMO' : 'Or report a SINPE Móvil · DEMO'}</h3>
+      <fieldset className="shop-payment-methods">
+        <legend>{es ? 'Elegí cómo querés pagar' : 'Choose how to pay'}</legend>
+        <button type="button" className={`shop-payment-method${paymentMethod === 'paypal' ? ' is-selected' : ''}`} aria-pressed={paymentMethod === 'paypal'} disabled={order.paypalCheckout?.status === 'CREATED' && paymentMethod !== 'paypal'} onClick={() => setPaymentMethod('paypal')}>
+          <strong>PayPal</strong><span>{es ? 'Cuenta Sandbox · fondos de prueba' : 'Sandbox account · test funds'}</span>
+        </button>
+        <button type="button" className={`shop-payment-method${paymentMethod === 'card' ? ' is-selected' : ''}`} aria-pressed={paymentMethod === 'card'} disabled={order.paypalCheckout?.status === 'CREATED' && paymentMethod !== 'card'} onClick={() => setPaymentMethod('card')}>
+          <strong>{es ? 'Tarjeta de crédito o débito' : 'Credit or debit card'}</strong><span>{es ? 'Checkout seguro de PayPal Sandbox; disponibilidad según la cuenta de prueba' : 'PayPal Sandbox checkout; availability depends on the test account'}</span>
+        </button>
+        <button type="button" className={`shop-payment-method${paymentMethod === 'sinpe' ? ' is-selected' : ''}`} aria-pressed={paymentMethod === 'sinpe'} disabled={order.paypalCheckout?.status === 'CREATED' && paymentMethod !== 'sinpe'} onClick={() => setPaymentMethod('sinpe')}>
+          <strong>SINPE Móvil · DEMO</strong><span>{es ? 'Adjuntá el comprobante para revisión manual del taller' : 'Attach proof for manual workshop review'}</span>
+        </button>
+      </fieldset>
+      {order.paypalCheckout?.status === 'CREATED' && <p className="shop-checkout-status">{es ? 'Ya iniciaste el checkout de PayPal. Terminá o cancelá ese intento antes de cambiar de método.' : 'PayPal checkout has already started. Finish or cancel that attempt before changing payment methods.'}</p>}
+      {paymentMethod !== 'sinpe' && <div className="shop-payment-provider">
+        <p>{paymentMethod === 'card'
+          ? (es ? 'Vas a continuar al entorno Sandbox de PayPal. Si la cuenta de prueba permite pago con tarjeta, elegí esa opción allí; este sitio no almacena datos de tarjeta.' : 'You will continue to PayPal Sandbox. If the test account allows card payments, choose that option there; this site does not store card details.')
+          : (es ? 'El cobro de prueba se autoriza en PayPal Sandbox. Revisá el total y la conversión antes de aprobar.' : 'The test payment is authorized in PayPal Sandbox. Review the total and conversion before approving.')}</p>
+        {!paypalSession && <button className="v-button v-button--primary v-button--pill" type="button" onClick={startPaypal} disabled={submitting}>{submitting ? (es ? 'Conectando…' : 'Connecting…') : (paymentMethod === 'card' ? (es ? 'Continuar con tarjeta en PayPal Sandbox' : 'Continue with card in PayPal Sandbox') : (es ? 'Continuar con PayPal Sandbox' : 'Continue with PayPal Sandbox'))}</button>}
+        {paypalSession && <div className="shop-paypal-sdk"><div ref={paypalButtonHost} aria-label={paymentMethod === 'card' ? (es ? 'Pago con tarjeta por PayPal' : 'PayPal card payment') : (es ? 'Pago con PayPal' : 'PayPal payment')} />{paypalButtonStatus === 'loading' && <p role="status">{es ? 'Cargando checkout seguro…' : 'Loading secure checkout…'}</p>}{paypalButtonStatus === 'unavailable' && <p role="status">{paymentMethod === 'card' ? (es ? 'Esta cuenta Sandbox no habilita el pago con tarjeta. Elegí PayPal o SINPE DEMO.' : 'This Sandbox account does not enable card payments. Choose PayPal or SINPE DEMO.') : (es ? 'El botón PayPal no está disponible. Revisá conexión y configuración Sandbox.' : 'The PayPal button is unavailable. Check network and Sandbox setup.')}</p>}</div>}
+      </div>}
+      {paymentMethod === 'sinpe' && order.paypalCheckout?.status !== 'CREATED' && <form className="shop-sinpe-form" onSubmit={sendSinpe}>
+        <h3>{es ? 'Pago reportado · SINPE Móvil DEMO' : 'Reported payment · SINPE Móvil DEMO'}</h3>
         <p>{es ? 'El taller revisa el comprobante antes de confirmar. Este formulario no consulta BAC ni verifica transferencias automáticamente.' : 'The workshop reviews the proof before confirmation. This form does not query BAC or automatically verify transfers.'}</p>
         <label>{es ? 'Número de referencia' : 'Reference number'}<input required minLength="4" maxLength="100" value={proof.referenceNumber} onChange={event => setProof(current => ({ ...current, referenceNumber: event.target.value }))} /></label>
         <label>{es ? 'Teléfono SINPE del remitente' : 'Sender’s SINPE phone'}<input required minLength="8" maxLength="25" autoComplete="tel" value={proof.sinpePhone} onChange={event => setProof(current => ({ ...current, sinpePhone: event.target.value }))} /></label>
@@ -351,7 +463,7 @@ export function CartPage() {
     setSearchParams(next, { replace: true });
     setError('');
   }
-  if (routeOrderId) return <section className="shop-page"><header className="shop-heading"><span>{es ? 'Checkout seguro · Sandbox / DEMO' : 'Secure checkout · Sandbox / DEMO'}</span><h1>{es ? 'Revisá y pagá tu pedido.' : 'Review and pay your order.'}</h1><p>{es ? 'La cotización se aprueba en tu cuenta; el pago ocurre aquí. Ningún pedido se confirma antes de verificar el método elegido.' : 'Quotes are approved in your account; payment happens here. No order is confirmed before the selected method is verified.'}</p></header><PendingOrderCheckout orderId={routeOrderId} routePayment={routePayment} routeProviderToken={routeProviderToken} es={es} token={token} cart={cart} navigate={navigate} onBack={returnToSelection} /></section>;
+  if (routeOrderId) return <section className="shop-page"><header className="shop-heading"><span>{es ? 'Pago de prueba · Sandbox / DEMO' : 'Test payment · Sandbox / DEMO'}</span><h1>{es ? 'Revisá y pagá tu pedido.' : 'Review and pay your order.'}</h1><p>{es ? 'La cotización se aprueba en tu cuenta; el pago ocurre aquí. Ningún pedido se confirma antes de verificar el método elegido.' : 'Quotes are approved in your account; payment happens here. No order is confirmed before the selected method is verified.'}</p></header><PendingOrderCheckout orderId={routeOrderId} routePayment={routePayment} routeProviderToken={routeProviderToken} es={es} token={token} cart={cart} navigate={navigate} onBack={returnToSelection} /></section>;
   return <section className="shop-page"><header className="shop-heading"><span>{es ? 'Tu selección' : 'Your selection'}</span><h1>{es ? 'Carrito' : 'Cart'}</h1><p>{es ? 'Piezas para imprimir bajo pedido. Podés ajustar tu selección antes de continuar.' : 'Parts printed to order. Adjust your selection before continuing.'}</p></header>
     {!cart.ready ? <div role="status" aria-label={es ? 'Cargando tu carrito' : 'Loading your cart'}><Skeleton height="190px" /></div> : <>
     {cart.storageError && <p role="alert">{es ? 'Tu navegador no permite guardar el carrito. La selección se conserva mientras esta pestaña siga abierta.' : 'Your browser cannot save this cart. Your selection remains while this tab stays open.'}</p>}

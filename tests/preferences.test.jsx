@@ -116,6 +116,84 @@ describe('Preferencias de lectura', () => {
     expect(speechMock.speak).not.toHaveBeenCalled();
     expect(screen.getByRole('status')).toHaveTextContent('Primero seleccioná el texto que querés escuchar.');
   });
+
+  it('permite ajustar el tamaño del texto con el deslizador continuo', async () => {
+    renderReadingPanel();
+    const slider = screen.getByRole('slider', { name: 'Tamaño del texto' });
+    fireEvent.change(slider, { target: { value: '1.3' } });
+
+    await waitFor(() => {
+      expect(document.documentElement.style.getPropertyValue('--a11y-font-scale')).toBe('1.3');
+      expect(localStorage.getItem('vertice-text-scale')).toBe('1.3');
+    });
+  });
+
+  it('activa la lectura al pasar el cursor y lee elementos al apuntarlos', async () => {
+    jest.useFakeTimers();
+    try {
+      renderReadingPanel();
+      const hoverSwitch = screen.getByRole('switch', { name: 'Leer al pasar el cursor' });
+      fireEvent.click(hoverSwitch);
+
+      expect(hoverSwitch).toHaveAttribute('aria-checked', 'true');
+      expect(localStorage.getItem('vertice-read-on-hover')).toBe('true');
+      expect(document.documentElement.dataset.readOnHover).toBe('true');
+
+      const heading = screen.getByRole('heading', { name: 'Inicio' });
+      fireEvent.pointerOver(heading);
+
+      act(() => {
+        jest.advanceTimersByTime(200);
+      });
+
+      expect(utteranceMock).toHaveBeenCalledWith('Inicio');
+      expect(speechMock.speak).toHaveBeenCalled();
+      expect(heading.classList.contains('a11y-reading-highlight')).toBe(true);
+
+      fireEvent.pointerOut(heading);
+      expect(speechMock.cancel).toHaveBeenCalled();
+      expect(heading.classList.contains('a11y-reading-highlight')).toBe(false);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('lee elementos al recibir foco por teclado cuando lectura al cursor está activa', async () => {
+    jest.useFakeTimers();
+    try {
+      renderReadingPanel();
+      const hoverSwitch = screen.getByRole('switch', { name: 'Leer al pasar el cursor' });
+      fireEvent.click(hoverSwitch);
+
+      const paragraph = screen.getByText('Contenido de la página para escuchar.');
+      fireEvent.focusIn(paragraph);
+
+      act(() => {
+        jest.advanceTimersByTime(200);
+      });
+
+      expect(utteranceMock).toHaveBeenCalledWith('Contenido de la página para escuchar.');
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('restablece preferencias de lectura incluyendo el modo al cursor y la escala', async () => {
+    renderReadingPanel();
+    const slider = screen.getByRole('slider', { name: 'Tamaño del texto' });
+    fireEvent.change(slider, { target: { value: '1.5' } });
+    const hoverSwitch = screen.getByRole('switch', { name: 'Leer al pasar el cursor' });
+    fireEvent.click(hoverSwitch);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Restablecer preferencias' }));
+
+    await waitFor(() => {
+      expect(document.documentElement.style.getPropertyValue('--a11y-font-scale')).toBe('1');
+      expect(localStorage.getItem('vertice-text-scale')).toBe('1');
+      expect(hoverSwitch).toHaveAttribute('aria-checked', 'false');
+      expect(localStorage.getItem('vertice-read-on-hover')).toBe('false');
+    });
+  });
 });
 
 describe('Asistencia del taller', () => {

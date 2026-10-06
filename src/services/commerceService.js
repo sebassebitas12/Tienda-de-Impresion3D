@@ -8,6 +8,10 @@ export function createPaypalCheckout({ orderId }, { token, signal } = {}) {
   return automationAction('/orders/paypal/create', { orderId }, { token, signal });
 }
 
+export function fetchPaypalClientConfig({ orderId }, { token, signal } = {}) {
+  return automationAction('/orders/paypal/client-config', { orderId }, { token, signal });
+}
+
 export function capturePaypalCheckout({ orderId, paypalOrderId }, { token, signal } = {}) {
   return automationAction('/orders/paypal/capture', { orderId, paypalOrderId }, { token, signal });
 }

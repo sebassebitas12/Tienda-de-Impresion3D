@@ -6,14 +6,14 @@ import { useAuth } from '../src/hooks/useAuth.js';
 import { useCart } from '../src/hooks/useCart.js';
 import { useCatalog } from '../src/hooks/useCatalog.js';
 import { usePreferences } from '../src/hooks/usePreferences.js';
-import { fetchMyOrders, submitCatalogOrder, submitOrderPaymentProof } from '../src/services/commerceService.js';
+import { createPaypalCheckout, fetchMyOrders, fetchPaypalClientConfig, submitCatalogOrder, submitOrderPaymentProof } from '../src/services/commerceService.js';
 
 jest.mock('../src/hooks/useAuth.js', () => ({ useAuth: jest.fn() }));
 jest.mock('../src/hooks/useCart.js', () => ({ useCart: jest.fn() }));
 jest.mock('../src/hooks/useCatalog.js', () => ({ useCatalog: jest.fn() }));
 jest.mock('../src/hooks/usePreferences.js', () => ({ usePreferences: jest.fn() }));
 jest.mock('../src/services/commerceService.js', () => ({
-  submitCatalogOrder: jest.fn(), fetchMyOrders: jest.fn(), createPaypalCheckout: jest.fn(),
+  submitCatalogOrder: jest.fn(), fetchMyOrders: jest.fn(), createPaypalCheckout: jest.fn(), fetchPaypalClientConfig: jest.fn(),
   capturePaypalCheckout: jest.fn(), submitOrderPaymentProof: jest.fn(),
   createCatalogOrderIdempotencyKey: () => 'test-idempotency-123', fetchProductReviews: jest.fn().mockResolvedValue([]),
 }));
@@ -22,7 +22,7 @@ const cart = { lines: [{ productId: 'p1', color: 'Negro', quantity: 2 }], add: j
 const product = { id: 'p1', name: 'Organizador', description: 'Pieza útil para el taller.', status: 'ACTIVE', currency: 'CRC', material: 'PLA', price: 2500, availableColors: ['Negro'], images: ['/images/first.jpg', '/images/second.jpg'] };
 function PathProbe() {
   const location = useLocation();
-  return <output>{location.pathname}</output>;
+  return <><output>{location.pathname}</output><output data-testid="pending-cart-selection">{JSON.stringify(location.state?.pendingCartSelection || null)}</output></>;
 }
 
 function setup(user = { id: 'c1', role: 'customer' }, entry = '/carrito') {
@@ -37,18 +37,20 @@ function setup(user = { id: 'c1', role: 'customer' }, entry = '/carrito') {
   </Routes></MemoryRouter>);
 }
 
-function setupProduct(user = null) {
+function setupProduct(user = null, entry = '/producto/p1') {
   useAuth.mockReturnValue({ user, token: user ? 'sim-token' : null });
   useCart.mockReturnValue(cart);
   useCatalog.mockReturnValue({ status: 'success', products: [product], retry: jest.fn() });
   usePreferences.mockReturnValue({ language: 'es' });
-  return render(<MemoryRouter initialEntries={['/producto/p1']}><Routes>
+  return render(<MemoryRouter initialEntries={[entry]}><Routes>
     <Route path="/producto/:id" element={<ProductPage />} />
+    <Route path="/login" element={<PathProbe />} />
+    <Route path="/registro" element={<PathProbe />} />
   </Routes></MemoryRouter>);
 }
 
 describe('confirmación de encargo del carrito', () => {
-  afterEach(() => { cleanup(); jest.clearAllMocks(); });
+  afterEach(() => { cleanup(); jest.clearAllMocks(); delete window.paypal; delete window.__verticePaypalSdkPromise; });
 
   it('identifica al titular sin duplicar una tarjeta de estado de sesión', () => {
     setup({ id: 'c1', name: 'Ana Rodríguez', role: 'customer' });
@@ -61,9 +63,21 @@ describe('confirmación de encargo del carrito', () => {
   it('crea una orden pendiente, conserva el carrito y abre la elección del método de pago', async () => {
     submitCatalogOrder.mockResolvedValue({ order: { id: 'ord-123', subtotalCrc: 5000, status: 'PENDING', paymentStatus: 'UNPAID' } });
     setup();
+    fetchMyOrders.mockResolvedValueOnce({ orders: [{ id: 'ord-123', userId: 'c1', status: 'PENDING', paymentStatus: 'UNPAID', subtotal: 5000, total: 5000,
+      orderItems: [{ id: 'line-1', productId: 'p1', productName: 'Pieza educativa', color: '', material: '', quantity: 1, unitPrice: 5000, subtotal: 5000 }] }] });
     fireEvent.click(screen.getByRole('button', { name: /Continuar al pago/ }));
     expect(await screen.findByRole('heading', { name: /Revisá y pagá tu pedido/ })).toBeInTheDocument();
+    expect(await screen.findByText('Pieza educativa · ×1')).toBeInTheDocument();
+    expect(screen.getByText(/Pago de prueba · Sandbox/)).toBeInTheDocument();
+    expect(screen.getByText('Importe registrado en CRC')).toBeInTheDocument();
+    expect(screen.getByText(/costo de entrega o impuesto que aún no esté confirmado/)).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: /Continuar con PayPal Sandbox/ })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Elegí cómo querés pagar' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Tarjeta de crédito o débito/ })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /SINPE Móvil · DEMO/ })).toBeEnabled();
+    fireEvent.click(screen.getByRole('button', { name: /SINPE Móvil · DEMO/ }));
+    expect(screen.getByRole('heading', { name: /Pago reportado · SINPE Móvil DEMO/ })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Continuar con PayPal Sandbox/ })).not.toBeInTheDocument();
     expect(screen.getByText(/Pedido pendiente de pago/)).toBeInTheDocument();
     expect(submitCatalogOrder).toHaveBeenCalledWith(expect.objectContaining({
       items: [{ productId: 'p1', color: 'Negro', quantity: 2 }], idempotencyKey: expect.any(String),
@@ -79,6 +93,30 @@ describe('confirmación de encargo del carrito', () => {
     expect(cart.clear).not.toHaveBeenCalled();
   });
 
+  it('no crea un intent ni bloquea el pedido si PayPal Sandbox no permite tarjeta', async () => {
+    window.paypal = { FUNDING: { CARD: 'card' }, Buttons: jest.fn(() => ({ isEligible: () => false })) };
+    fetchPaypalClientConfig.mockResolvedValue({ clientId: 'public-client-id', environment: 'sandbox' });
+    setup({ id: 'c1', role: 'customer' }, '/carrito?orderId=ord-123');
+    fireEvent.click(await screen.findByRole('button', { name: /Tarjeta de crédito o débito/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Continuar con tarjeta en PayPal Sandbox/ }));
+    expect(await screen.findByText(/no habilita pago con tarjeta/i)).toBeInTheDocument();
+    expect(fetchPaypalClientConfig).toHaveBeenCalledWith({ orderId: 'ord-123' }, { token: 'sim-token' });
+    expect(createPaypalCheckout).not.toHaveBeenCalled();
+  });
+
+  it('desglosa entrega confirmada y la incluye en el total antes de pagar', async () => {
+    fetchMyOrders.mockResolvedValueOnce({ orders: [{ id: 'o4', userId: 'c1', status: 'PENDING', paymentStatus: 'UNPAID',
+      subtotal: 6500, shipping: 2000, discount: 0, taxes: 0, total: 8500,
+      orderItems: [{ id: 'oi-4', productId: 'p4', productName: 'Soporte', quantity: 1, unitPrice: 6500, subtotal: 6500 }] }] });
+    setup({ id: 'c1', role: 'customer' }, '/carrito?orderId=o4');
+    expect(await screen.findByRole('heading', { name: 'Pedido o4' })).toBeInTheDocument();
+    expect(await screen.findByText('Total acordado en CRC')).toBeInTheDocument();
+    expect(screen.getByText('Entrega')).toBeInTheDocument();
+    expect(screen.getByText(/₡2\s?000/)).toBeInTheDocument();
+    expect(screen.getByText('Impuestos')).toBeInTheDocument();
+    expect(screen.queryByText(/se coordina aparte con el taller/)).not.toBeInTheDocument();
+  });
+
   it('envía a revisión un comprobante SINPE con su imagen y mantiene el pedido pendiente', async () => {
     submitOrderPaymentProof.mockImplementation(async payload => ({ order: {
       id: 'ord-123', status: 'PENDING', paymentStatus: 'UNPAID', total: 5000,
@@ -86,6 +124,7 @@ describe('confirmación de encargo del carrito', () => {
     } }));
     setup({ id: 'c1', role: 'customer' }, '/carrito?orderId=ord-123');
     expect(await screen.findByRole('heading', { name: 'Pedido ord-123' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /SINPE Móvil · DEMO/ }));
     fireEvent.change(screen.getByLabelText(/Número de referencia/), { target: { value: 'SINPE-1234' } });
     fireEvent.change(screen.getByLabelText(/Teléfono SINPE del remitente/), { target: { value: '8888-8888' } });
     const file = new File(['proof'], 'comprobante.png', { type: 'image/png' });
@@ -171,11 +210,30 @@ describe('selección de producto sin sesión', () => {
   it('bloquea agregar al carrito a visitantes y los orienta a iniciar sesión o registrarse', async () => {
     setupProduct();
     fireEvent.click(screen.getByRole('radio', { name: 'Negro' }));
+    fireEvent.change(screen.getByLabelText('Cantidad'), { target: { value: '3' } });
     expect(screen.queryByRole('button', { name: /Agregar al carrito/u })).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Iniciar sesión para agregar/u })).toHaveAttribute('href', '/login');
-    expect(screen.getByRole('link', { name: /Crear cuenta/u })).toHaveAttribute('href', '/registro');
+    fireEvent.click(screen.getByRole('link', { name: /Iniciar sesión para agregar/u }));
+    expect(screen.getByTestId('pending-cart-selection')).toHaveTextContent(JSON.stringify({ productId: 'p1', color: 'Negro', quantity: 3 }));
+    cleanup();
+    setupProduct();
+    fireEvent.click(screen.getByRole('radio', { name: 'Negro' }));
+    fireEvent.change(screen.getByLabelText('Cantidad'), { target: { value: '3' } });
+    fireEvent.click(screen.getByRole('link', { name: /Crear cuenta/u }));
+    expect(screen.getByTestId('pending-cart-selection')).toHaveTextContent(JSON.stringify({ productId: 'p1', color: 'Negro', quantity: 3 }));
     expect(cart.add).not.toHaveBeenCalled();
     expect(screen.queryByRole('link', { name: 'Ver carrito →' })).not.toBeInTheDocument();
+  });
+
+  it('restaura la variante y cantidad al volver al producto autenticado', async () => {
+    setupProduct({ id: 'c1', role: 'customer' }, {
+      pathname: '/producto/p1',
+      state: { pendingCartSelection: { productId: 'p1', color: 'Negro', quantity: 3 } },
+    });
+    await act(async () => {});
+    expect(screen.getByRole('radio', { name: 'Negro' })).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByLabelText('Cantidad')).toHaveValue(3);
+    fireEvent.click(screen.getByRole('button', { name: /Agregar al carrito/u }));
+    expect(cart.add).toHaveBeenCalledWith('p1', 'Negro', 3);
   });
 
   it('ofrece ver el carrito directamente a una cuenta cliente', async () => {

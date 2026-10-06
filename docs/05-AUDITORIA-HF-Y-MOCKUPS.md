@@ -1,5 +1,175 @@
 # Vértice CR — Auditoría HF y mockups
 
+## R-H91 — Recuperación del resumen del cotizador y auditoría de correo — 2026-10-06
+
+### Hallazgo y cambio del cotizador
+
+La captura de `/solicitud/ayuda-diseno` mostraba «La IA respondió, pero no
+devolvió el resumen estructurado». Ese estado significa que no se envió ninguna
+solicitud, pero la conversación/formulario podían conservar información anterior;
+por tanto, esos valores no se deben presentar como una ficha recién generada por
+IA. El problema era doble: al comando explícito de preparar no se enviaban los
+campos visibles al agente y la UI no tenía una recuperación segura cuando n8n
+omitía `requestDraft`.
+
+Ahora el comando explícito envía al API únicamente campos de texto del formulario
+con allowlist y límites; el servidor valida de nuevo material y cantidad. No
+envía archivos, credenciales ni bytes de imágenes/STL al modelo. El prompt pide
+resumen JSON usando el historial y el contexto como datos no confiables. Si el
+proveedor responde sin `requestDraft` o falla, la UI ofrece un borrador local
+solo cuando ya hay una descripción identificable; lo rotula como **borrador
+local**, explica qué fuentes combinó y pide revisar todos los campos. No afirma
+que la IA lo haya creado y no envía la solicitud automáticamente. El cliente
+debe pulsar la acción de preparar/revisar y luego confirmar el envío al taller.
+Se agregaron pruebas de contrato/allowlist y de recuperación sin envío.
+
+Esta recuperación evita perder el flujo, pero **no hace perfecto ni demuestra
+el agente real**: aún se debe probar el n8n activo con una respuesta normal,
+una salida malformada, timeout y datos de referencia; confirmar que la versión
+publicada conserva `prepareDraft` y `requestDraft`. El contrato sigue siendo:
+el cliente describe el proyecto, la IA organiza únicamente sus datos, el cliente
+revisa y envía, y Admin valida la cotización. Fotos/STL no son analizados ni
+medidos por el modelo.
+
+### Correo recibido frente a la plantilla vigente
+
+Lectura de Gmail de solo lectura: hay un mensaje de prueba recibido por
+`sebasflores992@gmail.com`, enviado por la cuenta de taller el 2026-10-04. Es una
+versión antigua: no incluye CTA de regreso a `/cuenta`, mezcla rótulos de
+material/costos, expone desglose interno que confunde costo y total, y el saludo
+no corresponde claramente a la dirección receptora. Gmail no mostró BCC en el
+mensaje consultado; por ello la copia al taller no se da por probada. La búsqueda
+de mensajes recientes de cotización/pago solo encontró ese mensaje; no apareció
+un recibo de pago. No hubo pago confirmado ni se envió/reintentó correo en esta
+revisión.
+
+La plantilla fuente y el workflow JSON del repositorio ya tienen CTA a la cuenta
+y omiten el desglose interno; `npm run build:n8n` regenera el workflow oficial.
+Eso **no demuestra** que el n8n activo haya sido actualizado ni que Gmail renderice
+el nuevo HTML. Antes de volver a enviar, actualizar el workflow oficial activo,
+revisar mapeo de destinatario cliente + BCC taller y probar el render con una
+solicitud no sensible, sin repetir un envío de estado incierto.
+
+Corrección de diagnóstico anterior: las dos variables locales
+`VERTICE_QUOTE_EMAIL_WEBHOOK_URL` y `VERTICE_PAYMENT_EMAIL_WEBHOOK_URL` sí
+apuntan a `http://localhost:5678/...`; la lectura previa omitió el puerto al
+describirlo. n8n en `:5678/healthz` respondió 200. No cambiar `.env` por ese
+motivo. Esto tampoco acredita que las ramas de correo activas sean las últimas.
+
+### Verificación de código
+
+En esta pasada: Jest 57 suites / 412 tests, `check:ui`, `build` y `build:n8n`
+pasaron. `lint` primero detectó lectura de un `ref` durante render en la nueva
+propiedad del cotizador; se cambió a estado React y se repite la verificación.
+No se declara auditoría visual posterior a ese cambio: no se capturó la página
+actualizada en navegador. No se modificó ni se debe incluir el estado runtime de
+`db.json`.
+
+## R-H90 — Cotizador conversacional, checkout y portada p19 — 2026-10-06
+
+### Evidencia comprobada
+
+- En la UI real contra el workflow n8n publicado, se pidió cotizar solo el brazo
+  robótico de una banda transportadora para simulación. El agente preguntó por
+  faltantes sin bloquear el caso cuando no hay medidas. Al pulsar
+  «Preparar resumen para revisar», devolvió ficha estructurada: brazo (solo el
+  brazo), uso simulación, y material/cantidad/diseño explícitamente abiertos.
+  El formulario mostró «Resumen IA · listo para revisar» y el CTA
+  «Revisar el resumen y adjuntar referencias». No creó ni envió una solicitud.
+- p19: inspección visual de catálogo y detalle en `localhost:5173` confirmó que
+  la portada ahora muestra la regleta instalada desde una orientación legible.
+  Se reordenaron las fotos existentes; no se giró ni retocó la imagen. Las
+  demás vistas siguen disponibles en la galería.
+- La API local reiniciada obtuvo OAuth de PayPal Sandbox y creó un checkout para
+  un pedido de prueba pendiente de ₡5 100 (equivalente mostrado: aprox. USD
+  11.12, con tasa/fecha guardadas). La página hosted de PayPal está en login y
+  requiere que el usuario inicie sesión con su cuenta Sandbox Personal y
+  apruebe; Codex no hizo ni hará la aprobación/captura final.
+- El flujo de recibo permanece posterior a un pago confirmado: la rama de pago
+  está publicada en n8n y la app exige acuse con `messageId` para considerar el
+  correo entregado. Aún no existe ejecución de pago ni evidencia de mensaje
+  enviado/recibido; BCC de taller tampoco se considera probado.
+
+### Cambios y límites
+
+Checkout ahora presenta tres opciones explícitas: PayPal Sandbox, tarjeta vía
+PayPal SDK alojado (solo cuando el proveedor declara elegibilidad) y SINPE DEMO
+con revisión manual. Los datos de tarjeta nunca pasan por la app. Una orden con
+checkout PayPal ya creado mantiene bloqueado el cambio a otro método para evitar
+intents simultáneos. La interfaz muestra el equivalente CRC/USD y la tasa
+snapshot; ninguna de estas opciones representa dinero real. Antes de crear el
+intent, el cliente valida la elegibilidad de tarjeta en SDK; si no está
+habilitada el pedido no queda bloqueado. Jest cubre visibilidad/selección,
+permisos del Client ID público y ese rechazo seguro; la elegibilidad positiva
+depende del SDK real y sigue pendiente de observar en Sandbox.
+
+Verificación local: Jest 56 suites / 409 tests, `npm run lint`,
+`npm run check:ui`, `npm run build` y `git diff --check` pasan. El recorrido UI
+del agente y la portada p19 sí fueron observados en navegador. No se completó
+el login/aprobación de Sandbox, no se capturó pago, no se disparó el correo y no
+se verificó Gmail. El selector visual y el formulario SINPE sí se inspeccionaron
+en un pedido sin intento PayPal activo; la matriz responsive de checkout queda
+pendiente. La foto p19
+se considera legible en detalle, pero la vista contextual original sigue siendo
+menos comercial que un render aislado del objeto.
+
+## R-H89 — Recorrido de cliente: cuenta, cotización y checkout — 2026-10-06
+
+### Evidencia observada
+
+- Navegador local `localhost:5173`, Dark escritorio 1265×704, sesión demo de
+  cliente. Desde `/cuenta?tab=orders` se abrió `o4` en
+  `/carrito?orderId=o4`, sin enviar datos ni activar un pago. El registro
+  mostraba piezas por ₡6 500 + entrega ₡2 000 = ₡8 500; el checkout anterior
+  omitía el desglose. La pantalla actual ya enseña piezas, entrega, descuento,
+  impuestos y total antes de PayPal/SINPE.
+- `o1` figuraba como entregado sin `paymentStatus`/comprobante histórico. La UI
+  anterior lo rotulaba como pago pendiente; ahora se observa «Pago sin conciliar»
+  e historial incompleto, sin CTA de cobro. Ningún valor de `db.json` se cambió.
+- En `Mis cotizaciones`, `R5` tenía precio y estado `QUOTED`, pero todavía no
+  había sido enviado al cliente. Ahora se ve **Lista para enviar** y se explica
+  que la persona aún no puede aprobar ni pagar. `R1` permanece `IN_REVIEW` y sin
+  importe.
+- En `/solicitud/ayuda-diseno`, Dark escritorio, el chat y el resumen están
+  integrados; la UI permite iniciar sin medidas. La propia pantalla advierte
+  que las referencias llegan al taller pero no son analizadas por la IA y que
+  los archivos 3D no se miden automáticamente.
+- La entrada `/solicitud` ofrece dos caminos distinguibles: modelo/referencia o
+  idea/proyecto. En `/solicitud/archivo` se observan medidas y material
+  opcionales, adjuntos PNG/JPG/WebP/GIF/STL/OBJ y el aviso de que no se calcula
+  precio al enviar. No se adjuntó ni se envió nada.
+- En visitante Light escritorio, tab de origen aislado `127.0.0.1:5173`, se
+  probó selección de producto/color/cantidad y se observó el retorno al login
+  con aviso de que la selección se conserva. La transferencia real tras
+  autenticarse se verificó con Jest, no introduciendo credenciales en browser.
+- El input nativo de archivo de SINPE se veía fuera de la dirección visual de la
+  página; ahora su botón y contenedor usan los tokens del checkout, manteniendo
+  el input etiquetado y seleccionable.
+
+### Cambios y límites
+
+El resumen de checkout evita separadores vacíos en líneas antiguas y muestra
+solo cargos presentes en el registro. Cuando faltan entrega o impuestos, llama
+al total **Importe registrado** y advierte que no incluye esos conceptos. El
+estado `QUOTED` diferencia cotización preparada de cotización enviada. Las
+pruebas unitarias cubren ambos formatos de cargo, líneas incompletas, el mensaje
+de `QUOTED`, el pago legado sin conciliación y el traspaso de selección por
+login/registro.
+
+No se creó pedido, no se confirmó PayPal, no se adjuntó comprobante, no se envió
+correo y no se modificó `db.json`. Quedan fuera de evidencia: 375/768 px, Light
+autenticado, tasas/redirect PayPal reales, envío y revisión de SINPE, correo de
+recibo, vuelta autenticada visible de login, y el recorrido UI Admin con rol.
+La foto p19 del montaje bajo mesa se percibe «al revés» en catálogo; el detalle
+es una toma desde abajo de la instalación, así que no se rotó a ciegas. Conviene
+preparar una foto neutra/aislada o añadir una vista contextual antes de cerrar
+la galería. Análisis de imágenes/STL por IA tampoco está implementado: los
+adjuntos del intake llegan al taller, no al modelo.
+
+Verificación tras el cambio: Jest 56 suites / 406 tests, lint, `check:ui` y
+build pasan. Las cinco suites dirigidas también pasan (39 tests). Aún no hay
+commit ni CI para esta pasada.
+
 ## R-H88 — Reauditoría visual del Copiloto y cotización — 2026-10-05
 
 ### Evidencia en navegador QA aislado

@@ -62,7 +62,38 @@
 .institutional-boundary h2{margin:0 0 12px;font:600 1.4rem/1.2 var(--display)}
 .institutional-boundary p+p{margin-top:12px}
 .contact-assistant-trigger{margin-top:10px;padding:0;border:0;font-family:var(--mono);text-align:left;cursor:pointer}
-@media(max-width:900px){.contact-hero{grid-template-columns:minmax(0,1fr) minmax(280px,.88fr);gap:28px}.contact-hero__copy h1{font-size:clamp(2.65rem,5vw,3.75rem)}.contact-faq{grid-template-columns:minmax(180px,.7fr) minmax(0,1.3fr);gap:36px}}
+
+/* Canales directos de contacto */
+.contact-channels{padding:clamp(40px,6vw,72px) 0 0}
+.contact-channels__grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:20px}
+.contact-channel-card{display:flex;min-width:0;flex-direction:column;align-items:flex-start;padding:clamp(20px,2.5vw,28px);border:1px solid var(--line-strong);border-radius:var(--radius-panel);background:var(--panel);transition:border-color .15s ease}
+.contact-channel-card:hover{border-color:var(--lava)}
+.contact-channel-card--whatsapp{border-top:2px solid #25D366;background:linear-gradient(155deg,color-mix(in srgb,#25D366 8%,var(--panel)),var(--panel) 65%)}
+.contact-channel-card--location{border-top:2px solid var(--lava)}
+.contact-channel-card__badge{margin-bottom:8px}
+.contact-channel-card h3{margin:6px 0 8px;font:600 1.22rem/1.2 var(--display)}
+.contact-channel-card__val{display:block;margin-bottom:8px;color:var(--paper);font:700 1rem/1.3 var(--mono);word-break:break-all}
+.contact-channel-card p{margin:0 0 16px;color:var(--muted);font-size:.88rem;line-height:1.55}
+.contact-channel-card .v-button{margin-top:auto}
+.contact-channel-card__note{margin-top:auto;color:var(--muted);font: .78rem/1.4 var(--mono)}
+
+/* Formulario directo */
+.contact-form-section{display:grid;grid-template-columns:minmax(280px,.8fr) minmax(0,1.2fr);gap:clamp(30px,6vw,72px);align-items:start;padding:clamp(44px,6vw,76px) 0;border-bottom:1px solid var(--line)}
+.contact-form-section__copy h2{max-width:540px;margin:10px 0 14px;font:600 clamp(1.75rem,3.5vw,2.6rem)/1.1 var(--display);letter-spacing:-.04em}
+.contact-form-section__copy p{max-width:520px;margin:0;color:var(--muted);font-size:1rem;line-height:1.6}
+.contact-direct-form{display:flex;flex-direction:column;gap:16px;padding:clamp(22px,3vw,34px);border:1px solid var(--line-strong);border-radius:var(--radius-panel);background:var(--panel)}
+.contact-direct-form .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.contact-field{display:flex;flex-direction:column;gap:6px}
+.contact-field label{color:var(--paper);font-size:.88rem;font-weight:600}
+.contact-field input,.contact-field select,.contact-field textarea{width:100%;padding:10px 14px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:color-mix(in srgb,var(--ink) 65%,var(--panel));color:var(--paper);font:inherit;font-size:.95rem;transition:border-color .15s ease}
+.contact-field input:focus,.contact-field select:focus,.contact-field textarea:focus{border-color:var(--lava);outline:none;box-shadow:0 0 0 2px color-mix(in srgb,var(--lava) 25%,transparent)}
+.contact-field textarea{min-height:100px;resize:vertical}
+.contact-direct-form button[type="submit"]{align-self:flex-start}
+.contact-form__success{padding:14px 18px;border-left:3px solid var(--lava);border-radius:var(--radius-sm);background:color-mix(in srgb,var(--lava) 12%,var(--panel))}
+.contact-form__success p{margin:0;color:var(--paper);font-size:.92rem;line-height:1.5}
+.contact-form__success p+p{margin-top:4px;color:var(--muted)}
+.contact-form__error{margin:0;color:#ff6b6b;font-size:.88rem}
+@media(max-width:900px){.contact-hero{grid-template-columns:minmax(0,1fr) minmax(280px,.88fr);gap:28px}.contact-hero__copy h1{font-size:clamp(2.65rem,5vw,3.75rem)}.contact-faq{grid-template-columns:minmax(180px,.7fr) minmax(0,1.3fr);gap:36px}.contact-channels__grid{grid-template-columns:repeat(2,minmax(0,1fr))}.contact-form-section{grid-template-columns:1fr;gap:24px}}
 @media(max-width:700px){.institutional-page{width:calc(100% - 2 * var(--page-gutter-compact));padding-top:52px}.about-principle{grid-template-columns:1fr;gap:18px}.about-process header{align-items:start;flex-direction:column}.about-process ol{grid-template-columns:1fr}.about-process li,.about-process li+li{padding:20px 0;border-left:0}.about-process li+li{border-top:1px solid var(--line)}#main-content:has(> .contact-page){padding-top:104px}.contact-page{padding-top:0}.contact-hero{grid-template-columns:1fr;gap:26px;padding-top:0}.contact-hero__copy h1{max-width:580px;font-size:clamp(2.7rem,8vw,4rem)}.contact-hero__process{max-width:unset}.contact-option--file{grid-column:span 6}.contact-option--idea{grid-column:span 6}.contact-option--account{grid-template-columns:minmax(90px,.2fr) minmax(0,1fr) auto}.contact-help{grid-template-columns:minmax(0,1fr) auto}.contact-faq{grid-template-columns:1fr;gap:18px}}
-@media(max-width:560px){#main-content:has(> .contact-page){padding-top:92px}.contact-hero__copy h1{font-size:clamp(2.5rem,11vw,3.45rem)}.contact-section-heading{align-items:start;flex-direction:column;gap:10px}.contact-options{grid-template-columns:minmax(0,1fr);gap:12px}.contact-option--file,.contact-option--idea,.contact-option--account{grid-column:1}.contact-option{padding:22px}.contact-option--account{grid-template-columns:1fr;align-items:start;gap:12px}.contact-option--account h3{font-size:1.15rem}.contact-option--account .v-link-text{justify-self:start}.contact-help{grid-template-columns:1fr;gap:18px}.contact-help .v-button{justify-self:start}.contact-faq{padding-top:42px}.contact-faq>h2{font-size:1.85rem}}
+@media(max-width:560px){#main-content:has(> .contact-page){padding-top:92px}.contact-hero__copy h1{font-size:clamp(2.5rem,11vw,3.45rem)}.contact-section-heading{align-items:start;flex-direction:column;gap:10px}.contact-channels__grid{grid-template-columns:1fr}.contact-direct-form .form-grid{grid-template-columns:1fr}.contact-options{grid-template-columns:minmax(0,1fr);gap:12px}.contact-option--file,.contact-option--idea,.contact-option--account{grid-column:1}.contact-option{padding:22px}.contact-option--account{grid-template-columns:1fr;align-items:start;gap:12px}.contact-option--account h3{font-size:1.15rem}.contact-option--account .v-link-text{justify-self:start}.contact-help{grid-template-columns:1fr;gap:18px}.contact-help .v-button{justify-self:start}.contact-faq{padding-top:42px}.contact-faq>h2{font-size:1.85rem}}
 @media(prefers-reduced-motion:reduce){.institutional-page *{scroll-behavior:auto}}

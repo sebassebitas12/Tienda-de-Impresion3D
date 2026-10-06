@@ -20,10 +20,10 @@ describe('correo de cotización al cliente', () => {
     expect(html).not.toContain('Material Confirmado');
     expect(html).toContain('no confirma un pago');
   });
-  test('rotula prueba/demo y enlace local sin prometer sitio público', () => {
+  test('rotula prueba y enlace local sin prometer sitio público', () => {
     const result = prepareQuoteEmail({ ...fixture, test: true, mode: 'DEMO' });
-    expect(result.subject).toContain('[DEMO] [PRUEBA]');
-    expect(result.html).toContain('no solicita una transferencia');
+    expect(result.subject).toContain('[PRUEBA]');
+    expect(result.html).toContain('Esta es una prueba de la cotización.');
     expect(result.html).toContain('No es un sitio publicado');
   });
   test('escapa contenido e impide enlaces ejecutables', () => {

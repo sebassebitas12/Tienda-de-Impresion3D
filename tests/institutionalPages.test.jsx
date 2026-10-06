@@ -53,4 +53,21 @@ describe('páginas institucionales', () => {
     fireEvent.click(screen.getByText('¿Recibo un precio al enviar?'));
     expect(screen.getByText(/no automáticamente. primero se registra una solicitud/i)).toBeInTheDocument();
   });
+
+  it('presenta canales directos oficiales (WhatsApp, teléfono, correo) y permite enviar mensaje directo', () => {
+    renderPage(ContactPage);
+    const whatsappLink = screen.getByRole('link', { name: /abrir whatsapp/i });
+    expect(whatsappLink).toHaveAttribute('href', expect.stringContaining('https://wa.me/50688888888'));
+    expect(screen.getByRole('link', { name: /llamar al taller/i })).toHaveAttribute('href', 'tel:+50625500000');
+    expect(screen.getByRole('link', { name: /enviar correo/i })).toHaveAttribute('href', 'mailto:taller@verticecr.com');
+    expect(screen.getByText('+506 8888-8888')).toBeInTheDocument();
+    expect(screen.getByText('+506 2550-0000')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText(/nombre completo/i), { target: { value: 'Carlos Quesada' } });
+    fireEvent.change(screen.getByLabelText(/correo electrónico/i), { target: { value: 'carlos@ejemplo.cr' } });
+    fireEvent.change(screen.getByLabelText(/mensaje o descripción/i), { target: { value: 'Quisiera consultar por fabricación de 20 piezas en PETG.' } });
+    fireEvent.click(screen.getByRole('button', { name: /enviar mensaje al taller/i }));
+
+    expect(screen.getByRole('status')).toHaveTextContent(/mensaje recibido en el taller/i);
+  });
 });

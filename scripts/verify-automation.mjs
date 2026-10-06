@@ -248,7 +248,13 @@ try {
     if (mode === 'quote') {
       assert.match(toolNode.parameters.toolDescription, /no calcula precios, no consulta datos de Admin/);
       assert.doesNotMatch(toolNode.parameters.toolDescription, /quote_profiles|estimate_quote/);
-      assertions += 2;
+      const prepareDraft = run({ first: () => ({ json: { body: { ...input.first().json.body, prepareDraft: true,
+        draftContext: { values: { description: 'Brazo de banda', material: 'PETG' }, editedFields: ['description', 'material'] } } } }) });
+      assert.match(prepareDraft[0].json.systemPrompt, /TAREA ACTUAL: prepara el resumen revisable.*requestDraft no nulo/s);
+      assert.match(prepareDraft[0].json.agentInput, /Contexto actual del formulario.*Brazo de banda/s);
+      assert.match(prepareDraft[0].json.agentInput, /Devuelve exclusivamente el JSON solicitado/);
+      assert.throws(() => run({ first: () => ({ json: { body: { ...input.first().json.body, prepareDraft: 'yes' } } }) }), /Tarea de resumen inválida/);
+      assertions += 6;
     }
     assert.throws(() => run({ first: () => ({ json: { body: { ...input.first().json.body, mode: 'otro-rol' } } }) }), /Contexto de asistente inválido/);
     assertions += 12;

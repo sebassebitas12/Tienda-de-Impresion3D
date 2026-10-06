@@ -10,6 +10,7 @@
 .assistant-topics span{color:var(--lava)}
 .assistant-message{padding:14px 0;border-top:1px solid var(--line);margin-top:14px}
 .assistant-message--user{padding:14px;background:var(--ink-soft);border:1px solid var(--line);border-radius:8px;margin-left:24px}
+.assistant-message--fallback{padding:12px 14px;border-left:2px solid var(--warning);background:color-mix(in srgb,var(--warning) 6%,var(--panel))}
 .assistant-message p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;font-size:14px;margin:8px 0}
 .assistant-formatted-text{display:grid;gap:10px;margin-top:8px;overflow-wrap:anywhere;font-size:14px;line-height:1.6}
 .assistant-formatted-text p,.assistant-formatted-text h4{margin:0;white-space:normal;line-height:inherit}

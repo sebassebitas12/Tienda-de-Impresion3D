@@ -11,6 +11,7 @@ function tokenFor(id, role = 'customer') {
 }
 function setup(orderPatch = {}, capturedAmount = '10.00') {
   const db = { data: { users: [{ id: 'c1', role: 'customer', status: 'ACTIVE', name: 'Cliente' },
+    { id: 'c2', role: 'customer', status: 'ACTIVE', name: 'Otro cliente' },
     { id: 'a1', role: 'admin', status: 'ACTIVE' }], orders: [{ id: 'ord-1', userId: 'c1',
     status: 'PENDING', paymentStatus: 'UNPAID', total: 5000, currency: 'CRC', ...orderPatch }], activityLog: [] } };
   const routes = new Map();
@@ -32,6 +33,15 @@ function setup(orderPatch = {}, capturedAmount = '10.00') {
 }
 
 describe('PayPal Sandbox operations', () => {
+  it('expone solo el client ID público al cliente propietario con un pedido pendiente', async () => {
+    const { invoke, fetchImpl } = setup();
+    const config = await invoke('/orders/paypal/client-config', { orderId: 'ord-1' });
+    expect(config.body).toEqual({ clientId: 'mock-client', environment: 'sandbox' });
+    expect(fetchImpl).not.toHaveBeenCalled();
+    expect((await invoke('/orders/paypal/client-config', { orderId: 'ord-1' }, 'c2', 'customer')).statusCode).toBe(404);
+    expect((await invoke('/orders/paypal/client-config', { orderId: 'ord-1', secret: 'ignored' }, 'a1', 'admin')).statusCode).toBe(403);
+  });
+
   it('normaliza USD por CRC de la API a CRC por USD antes de calcular', async () => {
     const quote = await fetchCrcUsdQuote(async () => ({ ok: true, json: async () => ({ result: 'success', base_code: 'CRC',
       rates: { USD: 0.002 }, time_last_update_utc: now }) }));
@@ -43,6 +53,7 @@ describe('PayPal Sandbox operations', () => {
     const { invoke, db, fetchImpl } = setup();
     const created = await invoke('/orders/paypal/create', { orderId: 'ord-1' });
     expect(created.body.amountUsd).toBe(10);
+    expect(created.body).toMatchObject({ providerOrderId: 'pp-1', clientId: 'mock-client' });
     expect(db.data.orders[0]).toMatchObject({ status: 'PENDING', paymentStatus: 'UNPAID' });
     const captured = await invoke('/orders/paypal/capture', { orderId: 'ord-1', paypalOrderId: 'pp-1' });
     expect(captured.body.order).toMatchObject({ status: 'CONFIRMED', paymentStatus: 'PAID', paymentMode: 'PAYPAL_SANDBOX' });

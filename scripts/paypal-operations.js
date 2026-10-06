@@ -112,6 +112,23 @@ export function installPaypalPaymentOperations({ registerAction, db, serialize, 
   const failure = (res, code, status = 400) => res.status(status).json({ code });
   const apiBase = SANDBOX_API;
 
+  registerAction('/orders/paypal/client-config', async (req, res) => {
+    const actor = sessionActor(req.headers.authorization, db.data);
+    if (actor?.role !== 'customer' || actor.status !== 'ACTIVE') return failure(res, 'CUSTOMER_REQUIRED', 403);
+    const orderId = req.body?.orderId;
+    if (typeof orderId !== 'string' || !orderId) return failure(res, 'INVALID_ORDER', 400);
+    const order = (db.data.orders || []).find(item => String(item.id) === orderId && String(item.userId) === String(actor.id));
+    if (!order) return failure(res, 'ORDER_NOT_FOUND', 404);
+    if (order.status !== 'PENDING' || order.paymentStatus === 'PAID' || !validQuoteForPayment(order, db.data, clock().toISOString())) {
+      return failure(res, 'STATUS_CONFLICT', 409);
+    }
+    if (order.paymentProof?.status === 'SUBMITTED' || order.paymentProof?.status === 'CONFIRMED'
+      || order.paymentMode === 'SINPE_MANUAL') return failure(res, 'PAYMENT_METHOD_CONFLICT', 409);
+    if (!env.VERTICE_PAYPAL_CLIENT_ID || !env.VERTICE_PAYPAL_CLIENT_SECRET
+      || (env.VERTICE_PAYPAL_ENV || 'sandbox').toLowerCase() !== 'sandbox') return failure(res, 'PAYPAL_NOT_CONFIGURED', 503);
+    return res.json({ clientId: env.VERTICE_PAYPAL_CLIENT_ID, environment: 'sandbox' });
+  });
+
   registerAction('/orders/paypal/create', async (req, res) => {
     const actor = sessionActor(req.headers.authorization, db.data);
     if (actor?.role !== 'customer' || actor.status !== 'ACTIVE') return failure(res, 'CUSTOMER_REQUIRED', 403);
@@ -128,7 +145,7 @@ export function installPaypalPaymentOperations({ registerAction, db, serialize, 
         if (order.paymentProof?.status === 'SUBMITTED' || order.paymentProof?.status === 'CONFIRMED'
           || order.paymentMode === 'SINPE_MANUAL') return { error: 'PAYMENT_METHOD_CONFLICT', status: 409 };
         if (order.paypalCheckout?.status === 'CREATED' && order.paypalCheckout.approvalUrl) {
-          return { order, approvalUrl: order.paypalCheckout.approvalUrl, fxSnapshot: order.paypalCheckout.fxSnapshot, amountUsd: order.paypalCheckout.amountUsd, replay: true };
+          return { order, approvalUrl: order.paypalCheckout.approvalUrl, providerOrderId: order.paypalCheckout.providerOrderId, clientId: env.VERTICE_PAYPAL_CLIENT_ID, fxSnapshot: order.paypalCheckout.fxSnapshot, amountUsd: order.paypalCheckout.amountUsd, replay: true };
         }
 
         const rateQuote = await getFxQuote(fetchImpl);
@@ -160,10 +177,10 @@ export function installPaypalPaymentOperations({ registerAction, db, serialize, 
         const next = structuredClone(db.data);
         next.orders[orderIndex] = updated;
         await persist(next);
-        return { order: updated, approvalUrl, fxSnapshot, amountUsd: fxSnapshot.amountUsd, replay: false };
+        return { order: updated, approvalUrl, providerOrderId: paypalOrder.id, clientId: env.VERTICE_PAYPAL_CLIENT_ID, fxSnapshot, amountUsd: fxSnapshot.amountUsd, replay: false };
       });
       if (result.error) return failure(res, result.error, result.status);
-      return res.json({ orderId: result.order.id, approvalUrl: result.approvalUrl, fxSnapshot: result.fxSnapshot, amountUsd: result.amountUsd, replay: result.replay });
+      return res.json({ orderId: result.order.id, approvalUrl: result.approvalUrl, providerOrderId: result.providerOrderId, clientId: result.clientId, fxSnapshot: result.fxSnapshot, amountUsd: result.amountUsd, replay: result.replay });
     } catch (error) {
       const code = ['PAYPAL_NOT_CONFIGURED', 'PAYPAL_CREDENTIALS_INVALID', 'PAYPAL_UNAVAILABLE', 'PAYPAL_REQUEST_FAILED', 'FX_PROVIDER_UNAVAILABLE', 'FX_RESPONSE_INVALID'].includes(error.message)
         ? error.message : 'PAYPAL_UNAVAILABLE';

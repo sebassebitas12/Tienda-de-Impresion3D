@@ -4,18 +4,55 @@ const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300
 export function getExplicitlyClearedQuoteFields(message) {
   const normalized = normalize(message);
   const saysDimensionsAreUnknown = /\b(?:sin|no tengo|no se|no conozco|no defini|no dispongo de|todavia no tengo|aun no tengo|i do not have|i don't have|without)\s+(?:(?:las?|ninguna?|any|the)\s+)?(?:medidas|dimensiones|tamano|measurements|dimensions|size)\b/.test(normalized)
-    || /\b(?:deja|dejemos|dejen|manten|mantene|leave|keep)\s+(?:(?:las?|the)\s+)?(?:medidas|dimensiones|measurements|dimensions|size)\s+(?:en blanco|vacias?|sin definir|blank|empty|unspecified)\b/.test(normalized);
-  return saysDimensionsAreUnknown ? ['dimensions'] : [];
+    || /\b(?:deja|dejemos|dejen|manten|mantene|leave|keep)\s+(?:(?:las?|the)\s+)?(?:medidas|dimensiones|measurements|dimensions|size)\s+(?:en blanco|vacias?|sin definir|blank|empty|unspecified)\b/.test(normalized)
+    || /\b(?:borr[aá]|sac[aá]|quit[aá]|elimin[aá]|limpi[aá]|remov[eé]|clear|remove|delete)\s+(?:(?:las?|the)\s+)?(?:medidas|dimensiones|measurements|dimensions|size)\b/.test(normalized);
+
+  const saysClearUrl = /\b(?:sin|borr[aá]|sac[aá]|quit[aá]|elimin[aá]|clear|remove)\s+(?:(?:el|la|the)\s+)?(?:enlace|link|referencia|url)\b/.test(normalized);
+  const saysClearMaterial = /\b(?:sin|borr[aá]|sac[aá]|quit[aá]|clear|remove)\s+(?:(?:el|the)\s+)?(?:material)\b/.test(normalized);
+
+  const cleared = [];
+  if (saysDimensionsAreUnknown) cleared.push('dimensions');
+  if (saysClearUrl) cleared.push('referenceUrl');
+  if (saysClearMaterial) cleared.push('material');
+  return cleared;
 }
 
 const REQUEST_INTENT = [
-  /\bquiero que me (?:hagas|armes|prepares?) (?:(?:el|la) )?(?:pedido|resumen|solicitud)\b/,
-  /\b(?:haceme|hace|armame|arma|preparame|prepara|mandame|manda|enviame|envia) (?:(?:el|la) )?(?:pedido|resumen|solicitud)\b/,
-  /\bquiero (?:hacer|preparar|armar|mandar|enviar) (?:(?:el|la) )?(?:pedido|resumen|solicitud)\b/,
+  /\bquiero que me (?:hagas|armes|prepares?) (?:(?:el|la) )?(?:pedido|resumen|solicitud)(?:\s+de\s+la\s+solicitud)?\b/,
+  /\b(?:haceme|hace|armame|arma|preparame|prepara|preparar|mandame|manda|mandar|enviame|envia|enviar) (?:(?:el|la) )?(?:pedido|resumen|solicitud)(?:\s+de\s+la\s+solicitud)?\b/,
+  /\bquiero (?:hacer|preparar|armar|mandar|enviar) (?:(?:el|la) )?(?:pedido|resumen|solicitud)(?:\s+de\s+la\s+solicitud)?\b/,
+  /\b(?:cotizalo|cotizamelo|eso es todo|preparalo|armalo)\b/,
   /\b(?:prepare|send|submit|place) (?:the )?(?:request|order)\b/,
 ];
 
+const EDIT_INTENT = [
+  /\b(?:cambi[aá]|modific[aá]|actualiz[aá]|edit[aá]|correg[ií]|pon[eé]|sac[aá]|borr[aá]|quit[aá]|ajust[aá])\s+(?:la|el|las|los)?\s*(?:cantidad|material|medidas|dimensiones|descripci[oó]n|uso|enlace|referencia)\b/,
+  /\b(?:la\s+cantidad|el\s+material|las\s+medidas|la\s+descripci[oó]n|el\s+uso)\s*[:=]/,
+  /\b(?:sin\s+medidas|sin\s+material|sin\s+enlace)\b/,
+];
+
 function readDimensions(messages) {
+  for (const message of [...messages].reverse()) {
+    const text = message.trim();
+    if (!text) continue;
+    if (getExplicitlyClearedQuoteFields(text).includes('dimensions')) return '';
+
+    const dimFormat = text.match(/\b(\d+(?:[.,]\d+)?)\s*(?:[xX×*])\s*(\d+(?:[.,]\d+)?)(?:\s*(?:[xX×*])\s*(\d+(?:[.,]\d+)?))?\s*(mm|cm|m|in)?\b/i);
+    if (dimFormat) {
+      const d1 = dimFormat[1];
+      const d2 = dimFormat[2];
+      const d3 = dimFormat[3];
+      const unit = dimFormat[4] || '';
+      return `${d1} × ${d2}${d3 ? ` × ${d3}` : ''}${unit ? ` ${unit}` : ''}`.trim();
+    }
+
+    const explicitMedidas = text.match(/\b(?:(?:las\s+)?medidas\s+son|(?:las\s+)?dimensiones\s+son|cambi[aá](?:\s+las)?\s+(?:medidas|dimensiones)(?:\s+a)?|medidas|dimensiones)\s*[:=]?\s*([0-9.,xX×*\s]+(?:mm|cm|m|in)?)\b/i);
+    if (explicitMedidas) {
+      const rawDim = explicitMedidas[1].trim();
+      if (/\d/.test(rawDim)) return rawDim;
+    }
+  }
+
   const transcript = messages.join(' ');
   const lengthBefore = transcript.match(/\b(?:largo|longitud)(?:\s+total)?\s*(?:de|:)?\s*(\d+(?:[.,]\d+)?)\s*(mm|cm|m)?\b/i);
   const lengthAfter = transcript.match(/\b(\d+(?:[.,]\d+)?)\s*(mm|cm|m)?\s*(?:de\s+)?(?:largo|longitud)(?:\s+total)?\b/i);
@@ -33,20 +70,32 @@ function readDimensions(messages) {
     const dimensionLabel = normalize(widthLabel) === 'diametro' ? 'diámetro' : 'ancho';
     return `Largo ${lengthValue}; ${dimensionLabel} ${widthValue}${unitNote}`;
   }
+
   if (/\btamano promedio\b/.test(normalize(transcript))) return 'Tamaño promedio (sin medidas numéricas)';
   return '';
 }
 
 function readQuantity(messages) {
-  const transcript = normalize(messages.join(' '));
-  const numeric = transcript.match(/\b(\d{1,3})\s*(?:unidad(?:es)?|pieza(?:s)?)\b/);
-  if (numeric) return Number(numeric[1]);
-  if (/\b(?:una|un) unidad\b/.test(transcript)) return 1;
+  for (const message of [...messages].reverse()) {
+    const text = normalize(message);
+    const explicitChange = text.match(/\b(?:cantidad|pon[eé]|cambi[aá](?:\s+la\s+cantidad)?(?:\s+a)?|ajust[aá](?:\s+la\s+cantidad)?(?:\s+a)?)\s*[:=]?\s*(\d{1,3})\b/);
+    if (explicitChange) {
+      const num = Number(explicitChange[1]);
+      if (num >= 1 && num <= 100) return num;
+    }
+    const numeric = text.match(/\b(\d{1,3})\s*(?:unidad(?:es)?|pieza(?:s)?)\b/);
+    if (numeric) {
+      const num = Number(numeric[1]);
+      if (num >= 1 && num <= 100) return num;
+    }
+    if (/\b(?:una|un)\s*(?:unidad|pieza)\b/.test(text)) return 1;
+  }
   return undefined;
 }
 
 function readMaterial(userMessages, transcript) {
   for (const message of [...userMessages].reverse()) {
+    if (getExplicitlyClearedQuoteFields(message).includes('material')) return '';
     const materials = [...message.matchAll(/\b(PLA|PETG|ASA|ABS|TPU)\b/gi)].map(match => match[1].toUpperCase());
     const distinctMaterials = [...new Set(materials)];
     if (distinctMaterials.length === 1) return distinctMaterials[0];
@@ -64,6 +113,14 @@ function readProductFromMaterialQuestion(message) {
 }
 
 function readDescription(messages) {
+  for (const message of [...messages].reverse()) {
+    const explicitChange = message.match(/\b(?:cambi[aá](?:\s+la)?\s+descripci[oó]n(?:\s+a)?|descripci[oó]n\s*[:=]|la\s+pieza\s+es(?:\s+un|\s+una)?)\s+([^.!?\n]{3,200})/i);
+    if (explicitChange) {
+      const candidate = explicitChange[1].trim();
+      if (candidate.length >= 3) return candidate.charAt(0).toUpperCase() + candidate.slice(1);
+    }
+  }
+
   const cleaned = messages.map(message => {
     const text = stripRequestCommand(message)
       .replace(/^[\s¿¡]+/, '')
@@ -79,7 +136,7 @@ function readDescription(messages) {
       .replace(/(?:\s*[.!])+\s*$/, '')
       .trim();
   }).find(candidate => candidate.length >= 3
-    && !/^(?:\d|una?\s+unidad|largo\b|ancho\b|di[aá]metro\b|material\b|flexible\b|tama[ñn]o promedio\b|con lo que|por favor|para revisar)/i.test(candidate)
+    && !/^(?:\d|una?\s+unidad|largo\b|ancho\b|di[aá]metro\b|material\b|flexible\b|tama[ñn]o promedio\b|con lo que|por favor|para revisar|solicitud\b|resumen\b)/i.test(candidate)
     && !/^(?:ayudame|ayuda|decime|contame|que datos|como definimos|como hago|que usos|que (?:es|significa|material)|elegir (?:un )?material|compara)\b/i.test(normalize(candidate))) || '';
   return cleaned ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1) : '';
 }
@@ -94,30 +151,62 @@ function stripRequestCommand(message) {
 }
 
 function readIntendedUse(userMessages) {
+  for (const message of [...userMessages].reverse()) {
+    const explicitUse = message.match(/\b(?:cambi[aá](?:\s+el)?\s+uso(?:\s+a)?|uso\s*[:=]|el\s+uso\s+es\s+para)\s+([^.!?\n]{3,200})/i);
+    if (explicitUse) {
+      const candidate = explicitUse[1].trim();
+      if (candidate.length >= 3) return candidate;
+    }
+  }
+
   const transcript = userMessages.map(message => stripRequestCommand(message).split(/[¿?]/, 1)[0]).join(' ');
   const explicitUse = [...transcript.matchAll(/\b(?:para|for)\s+(?:(?:una?|el|la|un|a|an|the)\s+)?((?:simulaci[oó]n|simulation|prototipo|prototype|maqueta|mockup|banda transportadora|conveyor belt)\b[^,.;!?\n]{0,80})/gi)].at(-1)?.[1];
   if (explicitUse) return explicitUse.trim();
   const use = transcript.match(/\bpara\s+((?:poder\s+)?[a-záéíóúñ]+(?:ar|er|ir)\b[^,.;\n]{0,90})/i);
-  if (use && /^(?:celular|hogar|lugar|familiar|popular|similar|particular|solar|angular|circular|tubular|lineal|rectangular|singular)\b/i.test(normalize(use[1]))) return '';
+  if (use && /^(?:revisar|revisarlo|revisarla|enviar|mandar|ver|verlo|celular|hogar|lugar|familiar|popular|similar|particular|solar|angular|circular|tubular|lineal|rectangular|singular)\b/i.test(normalize(use[1]))) return '';
   return use?.[1]?.trim() || '';
 }
 
 function readReferenceUrl(userMessages) {
-  const match = userMessages.join(' ').match(/https:\/\/[^\s<>"')]+/i);
-  return match?.[0]?.replace(/[),.;!?]+$/, '') || '';
+  for (const message of [...userMessages].reverse()) {
+    if (getExplicitlyClearedQuoteFields(message).includes('referenceUrl')) return '';
+    const match = message.match(/https:\/\/[^\s<>"')]+/i);
+    if (match) return match[0].replace(/[),.;!?]+$/, '');
+  }
+  return '';
 }
 
-function buildDraft(userMessages, turns) {
+export function buildDraft(userMessages, turns) {
   const userText = userMessages.join(' ');
   const transcript = turns.filter(turn => typeof turn?.content === 'string').map(turn => turn.content).join(' ');
-  const draft = { description: readDescription(userMessages), intendedUse: '', dimensions: readDimensions(userMessages), material: readMaterial(userMessages, transcript), referenceUrl: readReferenceUrl(userMessages) };
+  const draft = {
+    description: readDescription(userMessages),
+    intendedUse: '',
+    dimensions: readDimensions(userMessages),
+    material: readMaterial(userMessages, transcript),
+    referenceUrl: readReferenceUrl(userMessages),
+  };
   const quantity = readQuantity(userMessages);
   if (quantity !== undefined) draft.quantity = quantity;
-  if (/\b(?:necesito|quiero) (?:ayuda )?(?:con el )?diseno\b/i.test(normalize(userText))) draft.needsDesign = true;
-  else if (/\bya tengo (?:el )?(?:archivo|modelo|diseno)\b/i.test(normalize(userText))) draft.needsDesign = false;
 
-  if (/\b(dildo|juguete sexual|pieza de contacto corporal)\b/i.test(normalize(userText))) draft.intendedUse = 'Uso personal; contacto corporal';
-  else draft.intendedUse = readIntendedUse(userMessages);
+  for (const message of [...userMessages].reverse()) {
+    const norm = normalize(message);
+    if (/\b(?:no necesito|sin|no requiero)\s+ayuda\s+(?:con\s+el\s+)?diseno\b/.test(norm)
+      || /\bya tengo (?:el )?(?:archivo|modelo|diseno)\b/.test(norm)) {
+      draft.needsDesign = false;
+      break;
+    }
+    if (/\b(?:necesito|quiero|requiero|con)\s+ayuda\s+(?:con\s+el\s+)?diseno\b/.test(norm)) {
+      draft.needsDesign = true;
+      break;
+    }
+  }
+
+  if (/\b(dildo|juguete sexual|pieza de contacto corporal)\b/i.test(normalize(userText))) {
+    draft.intendedUse = 'Uso personal; contacto corporal';
+  } else {
+    draft.intendedUse = readIntendedUse(userMessages);
+  }
   return draft;
 }
 
@@ -137,15 +226,19 @@ export function prepareExplicitQuoteDraft(turns, language = 'es') {
 
   const latestUser = userMessages.at(-1);
   const explicitRequestNow = REQUEST_INTENT.some(pattern => pattern.test(normalize(latestUser)));
+  const explicitEdit = EDIT_INTENT.some(pattern => pattern.test(normalize(latestUser)))
+    || getExplicitlyClearedQuoteFields(latestUser).length > 0;
   const priorExplicitRequest = normalizedUsers.slice(0, -1).some(message => REQUEST_INTENT.some(pattern => pattern.test(message)));
   const previousDraft = priorExplicitRequest ? buildDraft(userMessages.slice(0, -1), turns) : null;
   const currentDraft = buildDraft(userMessages, turns);
   const structuredFields = ['intendedUse', 'dimensions', 'material', 'quantity', 'needsDesign', 'referenceUrl'];
   const addedStructuredDetail = Boolean(previousDraft && !/[¿?]/.test(latestUser)
     && structuredFields.some(field => currentDraft[field] && currentDraft[field] !== previousDraft[field]));
-  if (!explicitRequestNow && !addedStructuredDetail) return null;
+  if (!explicitRequestNow && !addedStructuredDetail && !explicitEdit) return null;
 
   const draft = currentDraft;
+  const clearedFields = getExplicitlyClearedQuoteFields(latestUser);
+  clearedFields.forEach(field => { draft[field] = ''; });
 
   const sensitiveUse = Boolean(draft.intendedUse && /contacto corporal/i.test(draft.intendedUse));
   const replyKind = explicitRequestNow ? 'prepared' : 'updated';

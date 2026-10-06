@@ -7,10 +7,11 @@ export function PreferencesProvider({ children }) {
   const [language, setLanguage] = useState(() => readPreference('vertice-language', 'es') === 'en' ? 'en' : 'es');
   const [textScale, setTextScale] = useState(() => {
     const stored = Number(readPreference('vertice-text-scale', '1'));
-    return [1, 1.5, 2].includes(stored) ? stored : 1;
+    return Number.isFinite(stored) && stored >= 1 && stored <= 2 ? Math.round(stored * 100) / 100 : 1;
   });
   const [contrast, setContrast] = useState(() => readPreference('vertice-high-contrast', 'false') === 'true');
   const [reducedMotion, setReducedMotion] = useState(() => readPreference('vertice-no-motion', 'false') === 'true');
+  const [readOnHover, setReadOnHover] = useState(() => readPreference('vertice-read-on-hover', 'false') === 'true');
   useEffect(() => {
     const root = document.documentElement;
     const updateResponsiveTypeScale = () => {
@@ -23,21 +24,28 @@ export function PreferencesProvider({ children }) {
     root.dataset.motion = reducedMotion ? 'reduced' : 'full';
     root.dataset.contrast = contrast ? 'high' : 'normal';
     root.dataset.textScale = String(textScale);
+    root.dataset.readOnHover = String(readOnHover);
     updateResponsiveTypeScale();
     window.addEventListener('resize', updateResponsiveTypeScale);
     writePreference('vertice-language', language);
     writePreference('vertice-text-scale', textScale);
     writePreference('vertice-high-contrast', contrast);
     writePreference('vertice-no-motion', reducedMotion);
+    writePreference('vertice-read-on-hover', readOnHover);
     return () => window.removeEventListener('resize', updateResponsiveTypeScale);
-  }, [language, textScale, contrast, reducedMotion]);
+  }, [language, textScale, contrast, reducedMotion, readOnHover]);
 
   const value = useMemo(() => ({
     language, copy: messages[language],
     setLanguage: next => setLanguage(next === 'en' ? 'en' : 'es'),
-    textScale, setTextScale: next => setTextScale([1, 1.5, 2].includes(next) ? next : 1),
+    textScale,
+    setTextScale: next => {
+      const num = Number(next);
+      setTextScale(Number.isFinite(num) ? Math.min(2, Math.max(1, Math.round(num * 100) / 100)) : 1);
+    },
     contrast, setContrast, reducedMotion, setReducedMotion,
-    resetReading: () => { setTextScale(1); setContrast(false); setReducedMotion(false); },
-  }), [language, textScale, contrast, reducedMotion]);
+    readOnHover, setReadOnHover,
+    resetReading: () => { setTextScale(1); setContrast(false); setReducedMotion(false); setReadOnHover(false); },
+  }), [language, textScale, contrast, reducedMotion, readOnHover]);
   return <PreferencesContext value={value}>{children}</PreferencesContext>;
 }

@@ -14,48 +14,51 @@ export const DEMO_COSTS = Object.freeze({
 });
 
 export const DEMO_PROFILES = [
-  ['organizador', 'Organizador modular', 'producto-organizador-cajones.jpg', 150, 4.5, 12, ['organizador', 'herramienta', 'cajon']],
-  ['llavero', 'Llavero personalizado', 'producto-llavero-charm.jpg', 18, 0.65, 5, ['llavero', 'charm']],
-  ['maceta', 'Maceta decorativa', 'producto-maceta-escultural.jpg', 140, 4, 10, ['maceta']],
-  ['engranaje', 'Engranaje de prototipo', 'producto-engranaje.jpg', 65, 1.8, 8, ['engranaje']],
-  ['celular', 'Soporte para celular', 'producto-soporte-celular.jpg', 80, 2.5, 8, ['celular']],
-  ['laptop', 'Soporte para laptop', 'producto-soporte-laptop.jpg', 260, 7, 15, ['laptop']],
-  ['control', 'Base para control', 'producto-base-control.jpg', 110, 3.5, 8, ['control']],
-  ['brazo', 'Brazo articulado de mesa', 'producto-brazo-articulado.jpg', 220, 7.5, 20, ['brazo articulado']],
-  ['carcasa', 'Carcasa electrónica', 'producto-carcasa-raspberry.jpg', 65, 2.2, 12, ['carcasa', 'raspberry']],
-  ['clips', 'Clips de cables', 'producto-clips-cables.jpg', 15, 0.5, 4, ['clip', 'cable']],
-  ['bolsas', 'Dispensador de bolsas', 'producto-dispensador-bolsas.jpg', 75, 2.5, 8, ['dispensador', 'bolsa']],
-  ['cubiertos', 'Escurridor para cubiertos', 'producto-escurridor-cubiertos.jpg', 170, 5, 12, ['cubierto', 'escurridor']],
-  ['llaves', 'Ganchos para llaves', 'producto-ganchos-llaves.jpg', 70, 2, 8, ['gancho', 'llaves']],
-  ['letrero', 'Letrero de escritorio', 'producto-letrero-escritorio.jpg', 80, 2.8, 15, ['letrero']],
-  ['patas', 'Patas niveladoras', 'producto-patas-niveladoras.jpg', 35, 1.1, 6, ['niveladora', 'pata']],
-  ['regleta', 'Soporte para regleta', 'producto-soporte-regleta.jpg', 65, 2.2, 8, ['regleta']],
-  ['dados', 'Torre para dados', 'producto-torre-dados.jpg', 200, 6, 15, ['dado', 'torre']],
-  ['llanta', 'Neumático a escala', 'llanta_pirelli_editada.jpg', 90, 3.5, 12, ['llanta', 'neumatico']],
-  ['mascara', 'Máscara decorativa', 'mascara_calavera_editada.jpg', 190, 6.5, 25, ['mascara', 'calavera']],
-  ['oni', 'Soporte decorativo Oni', 'soporte_oni_editado.jpg', 150, 5, 18, ['oni']],
-  ['dragon', 'Figura articulada', 'producto-dragon.jpg', 180, 5.5, 15, ['dragon', 'figura']],
-  ['maqueta', 'Maqueta arquitectónica', 'producto-maqueta.jpg', 240, 9, 30, ['maqueta']],
-  ['soporte', 'Soporte funcional pequeño', 'hero-soporte.jpg', 85, 2.8, 10, ['soporte', 'prototipo']],
+  ['organizador', 'Organizador modular', 'producto-organizador-cajones.jpg', 150, 4.5, 12, ['organizador', 'herramienta', 'cajon', 'bandeja', 'contenedor']],
+  ['llavero', 'Llavero personalizado', 'producto-llavero-charm.jpg', 18, 0.65, 5, ['llavero', 'charm', 'llaveros']],
+  ['maceta', 'Maceta decorativa', 'producto-maceta-escultural.jpg', 140, 4, 10, ['maceta', 'planta', 'macetero']],
+  ['engranaje', 'Engranaje de prototipo', 'producto-engranaje.jpg', 65, 1.8, 8, ['engranaje', 'pinon', 'mecanismo', 'rueda dentada']],
+  ['celular', 'Soporte para celular', 'producto-soporte-celular.jpg', 80, 2.5, 8, ['celular', 'telefono', 'smartphone', 'movil']],
+  ['laptop', 'Soporte para laptop', 'producto-soporte-laptop.jpg', 260, 7, 15, ['laptop', 'computadora', 'portatil', 'notebook']],
+  ['control', 'Base para control', 'producto-base-control.jpg', 110, 3.5, 8, ['control', 'mando', 'joystick']],
+  ['brazo', 'Brazo articulado de mesa', 'producto-brazo-articulado.jpg', 220, 7.5, 20, ['brazo', 'articulado', 'robotico', 'robot', 'mecanico', 'brazo articulado']],
+  ['carcasa', 'Carcasa electrónica', 'producto-carcasa-raspberry.jpg', 65, 2.2, 12, ['carcasa', 'caja', 'case', 'gabinete', 'raspberry', 'arduino', 'chasis', 'box']],
+  ['clips', 'Clips de cables', 'producto-clips-cables.jpg', 15, 0.5, 4, ['clip', 'clips', 'cable', 'cables', 'sujetador']],
+  ['bolsas', 'Dispensador de bolsas', 'producto-dispensador-bolsas.jpg', 75, 2.5, 8, ['dispensador', 'bolsa', 'bolsas']],
+  ['cubiertos', 'Escurridor para cubiertos', 'producto-escurridor-cubiertos.jpg', 170, 5, 12, ['cubierto', 'cubiertos', 'escurridor', 'cocina']],
+  ['llaves', 'Ganchos para llaves', 'producto-ganchos-llaves.jpg', 70, 2, 8, ['gancho', 'ganchos', 'llaves', 'llave', 'perchero']],
+  ['letrero', 'Letrero de escritorio', 'producto-letrero-escritorio.jpg', 80, 2.8, 15, ['letrero', 'cartel', 'placa', 'nombre']],
+  ['patas', 'Patas niveladoras', 'producto-patas-niveladoras.jpg', 35, 1.1, 6, ['niveladora', 'pata', 'patas', 'pies', 'tope']],
+  ['regleta', 'Soporte para regleta', 'producto-soporte-regleta.jpg', 65, 2.2, 8, ['regleta', 'enchufe', 'toma']],
+  ['dados', 'Torre para dados', 'producto-torre-dados.jpg', 200, 6, 15, ['dado', 'dados', 'torre', 'juego']],
+  ['llanta', 'Neumático a escala', 'llanta_pirelli_editada.jpg', 90, 3.5, 12, ['llanta', 'llantas', 'neumatico', 'rueda', 'carro']],
+  ['mascara', 'Máscara decorativa', 'mascara_calavera_editada.jpg', 190, 6.5, 25, ['mascara', 'calavera', 'careta', 'casco']],
+  ['oni', 'Soporte decorativo Oni', 'soporte_oni_editado.jpg', 150, 5, 18, ['oni', 'demonio']],
+  ['dragon', 'Figura articulada', 'producto-dragon.jpg', 180, 5.5, 15, ['dragon', 'figura', 'miniatura', 'estatua', 'personaje']],
+  ['maqueta', 'Maqueta arquitectónica', 'producto-maqueta.jpg', 240, 9, 30, ['maqueta', 'arquitect', 'edificio', 'escala']],
+  ['soporte', 'Soporte funcional pequeño', 'hero-soporte.jpg', 85, 2.8, 10, ['soporte', 'prototipo', 'pieza', 'base', 'repuesto', 'stand', 'holder', 'proyecto']],
 ].map(([id, name, image, weightGrams, printHours, postProcessMinutes, keywords]) => ({
   id, name, image: `/images/${image}`, weightGrams, printHours, postProcessMinutes, keywords, source: 'DEMO',
 }));
 
 const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
-export function resolveDemoProfile({ profileId, description, fileName } = {}) {
+export function resolveDemoProfile({ profileId, description, fileName, attachments, intendedUse } = {}, { fallback = false } = {}) {
   if (profileId) return DEMO_PROFILES.find(profile => profile.id === profileId) || null;
-  const text = normalize(`${description || ''} ${fileName || ''}`);
-  return DEMO_PROFILES.find(profile => profile.keywords.some(keyword => text.includes(keyword))) || null;
+  const attachmentNames = Array.isArray(attachments) ? attachments.map(a => a?.name || '').join(' ') : '';
+  const text = normalize(`${description || ''} ${fileName || ''} ${attachmentNames} ${intendedUse || ''}`);
+  const matched = DEMO_PROFILES.find(profile => profile.keywords.some(keyword => new RegExp(`(?:^|[^a-z0-9])${keyword}(?:$|[^a-z0-9])`).test(text)));
+  if (matched) return matched;
+  return fallback ? (DEMO_PROFILES.find(profile => profile.id === 'soporte') || DEMO_PROFILES[0]) : null;
 }
 
-export function calculateAutomaticDemoQuote(request, rates = {}, now = new Date().toISOString()) {
+export function calculateAutomaticDemoQuote(request, rates = {}, now = new Date().toISOString(), { fallback = false } = {}) {
   if (!request || !Number.isSafeInteger(Number(request.quantity)) || Number(request.quantity) < 1 || Number(request.quantity) > 100) {
     return { error: 'INVALID_QUANTITY' };
   }
   const text = normalize(request.description);
   if (/\b(?:medic\w*|ortoped\w*|ferula\w*|implante\w*|alimento\w*|estructural\w*|frenos|armas?)\b/.test(text)) return { error: 'WORKSHOP_EXCEPTION' };
-  const profile = resolveDemoProfile(request);
+  const profile = resolveDemoProfile(request, { fallback });
   if (!profile) return { error: 'PROFILE_REQUIRED' };
   const material = String(request.material || 'PLA').toUpperCase();
   if (!FDM_MATERIALS.includes(material)) return { error: 'MATERIAL_UNSUPPORTED' };
@@ -87,6 +90,6 @@ export function calculateAutomaticDemoQuote(request, rates = {}, now = new Date(
     },
     profile: { id: profile.id, name: profile.name, image: profile.image },
     validUntil: new Date(Date.parse(now) + 7 * 86400000).toISOString().slice(0, 10),
-    notes: `SIMULACIÓN DEMO. Perfil análogo: ${profile.name}; ${request.quantity} pieza(s) en ${material}. Peso, tiempo, desgaste y mano de obra simulados; no se midieron desde una imagen o STL. Diseño: ${designHours} h. No incluye envío, impuestos ni certificación de uso. No autoriza producción ni cobros reales.`,
+    notes: `Estimación inicial basada en un perfil análogo (${profile.name}) para ${request.quantity} pieza(s) en ${material}. Peso, tiempo y costos son orientativos; no se midieron desde una imagen ni un archivo 3D. Diseño considerado: ${designHours} h. No incluye envío ni impuestos. Alcance y material sujetos a revisión final del taller.`,
   };
 }

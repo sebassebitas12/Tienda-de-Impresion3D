@@ -26,11 +26,16 @@ export function prepareOrderTransition(order, payload, now) {
 }
 
 export function prepareAutomaticRequest(request, quote, actorId, now) {
-  if (!['PENDING_QUOTE', 'IN_REVIEW', 'QUOTED'].includes(request.status)) return { error: 'TRANSITION_FORBIDDEN' };
+  if (!['PENDING_QUOTE', 'IN_REVIEW', 'QUOTED', 'CHANGES_REQUESTED'].includes(request.status)) return { error: 'TRANSITION_FORBIDDEN' };
   if (quote.error || quote.mode !== 'DEMO') return { error: quote.error || 'INVALID_QUOTE' };
   return { ...request, status: 'QUOTED', quotedPrice: quote.breakdown.amountCrc, currency: 'CRC', quotePricing: quote,
     quoteValidUntil: `${quote.validUntil}T23:59:59-06:00`, quoteNotes: quote.notes, quotedAt: now,
-    quotedBy: actorId, quoteVersion: (request.quoteVersion || 0) + 1, updatedAt: now, automationSource: 'DEMO_ENGINE' };
+    quotedBy: actorId, quoteVersion: (request.quoteVersion || 0) + 1, updatedAt: now, automationSource: 'DEMO_ENGINE',
+    ...(request.quoteVersion ? { quoteHistory: [...(request.quoteHistory || []), {
+      quoteVersion: request.quoteVersion, quotedPrice: request.quotedPrice, currency: request.currency,
+      quoteValidUntil: request.quoteValidUntil, quoteNotes: request.quoteNotes, quotePricing: request.quotePricing,
+      quotedAt: request.quotedAt, customerDecisionReason: request.customerDecisionReason,
+    }] } : {}) };
 }
 
 export function installAutomationOperations({ registerAction, db, serialize, persist, onPaymentConfirmed = async () => null }) {
@@ -181,7 +186,7 @@ export function installAutomationOperations({ registerAction, db, serialize, per
         const request = db.data.customPrintRequests[index];
         if (request.status !== payload.expectedStatus || (request.quoteVersion || 0) !== payload.expectedVersion) return { error: 'STATUS_CONFLICT' };
         const now = new Date().toISOString();
-        const quote = calculateAutomaticDemoQuote({ ...request, ...(payload.profileId ? { profileId: payload.profileId } : {}) }, rates, now);
+        const quote = calculateAutomaticDemoQuote({ ...request, ...(payload.profileId ? { profileId: payload.profileId } : {}) }, rates, now, { fallback: true });
         const quoted = prepareAutomaticRequest(request, quote, actor.id, now);
         if (quoted.error) return quoted;
         const next = structuredClone(db.data);

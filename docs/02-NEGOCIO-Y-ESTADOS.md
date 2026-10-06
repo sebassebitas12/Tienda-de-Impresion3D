@@ -1,6 +1,6 @@
 # Vértice CR — Negocio, entidades y estados
 
-> Última actualización: **2026-10-05**.
+> Última actualización: **2026-10-06**.
 
 > **Flujo vigente del MVP:** simulación académica con persistencia en JSON
 > Server; no hay cobros reales. Las secciones antiguas de SINPE que contradigan
@@ -45,14 +45,18 @@ analiza ni mide en el flujo actual.
 
 El carrito crea un pedido propio `PENDING`/`UNPAID` y abre el checkout en
 `/carrito?orderId=...`; crear el pedido no significa haber pagado ni reservado
-producción. Solo el cliente propietario puede continuar. La pantalla ofrece dos
-modalidades mutuamente excluyentes:
+producción. Solo el cliente propietario puede continuar. La pantalla ofrece tres
+modalidades de pago mutuamente excluyentes:
 
 - **PayPal Sandbox:** el servidor crea y captura la orden contra el entorno de
   pruebas de PayPal. Antes de salir se muestra el total CRC, equivalente USD,
   tasa y fecha de actualización. Una captura completada se valida contra monto y
   moneda esperados; entonces el pedido pasa a `CONFIRMED`/`PAID` con evidencia
   Sandbox. Usa fondos de prueba: no es un cobro real.
+- **Tarjeta por PayPal Sandbox:** usa los botones alojados por el SDK oficial y
+  solo aparece como alternativa operativa si PayPal informa que la cuenta de
+  prueba es elegible. Vértice no solicita ni almacena el número/CVV; si no es
+  elegible, se explica y quedan PayPal/SINPE como opciones.
 - **SINPE Móvil informado por el cliente:** se solicitan referencia, teléfono,
   imagen del comprobante y nota opcional. Esto no consulta BAC ni demuestra una
   transferencia. El taller debe revisar y confirmar manualmente para marcar
@@ -60,7 +64,7 @@ modalidades mutuamente excluyentes:
 
 No se permite combinar/alternar métodos una vez iniciada una modalidad o enviado
 un comprobante. Errores de proveedor o discrepancias de monto no muestran un
-recibo de éxito ni duplican captura. Las cotizaciones siguen un flujo distinto:
+  recibo de éxito ni duplican captura. Las cotizaciones siguen un flujo distinto:
 Admin envía la oferta, el cliente la aprueba en la app y solo entonces se crea
 el pedido pendiente; el pago se completa en el carrito, no al aprobar ni desde
 el detalle de pedido. La vigencia y versión aprobada se vuelven a validar.

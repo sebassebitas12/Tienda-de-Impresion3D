@@ -27,19 +27,20 @@ export function AutomaticQuote({ request, onSaved, language }) {
     try {
       await automationAction('/admin/actions/auto-quote', { requestId: request.id, expectedStatus: request.status,
         expectedVersion: request.quoteVersion || 0, ...(profileId ? { profileId } : {}) }, { token: auth?.token });
+      setState({ busy: false, error: '' });
       onSaved();
     } catch (error) { setState({ busy: false, error: automationError(error.code) }); }
   }
   const quote = request.quotePricing;
   return <section className="admin-auto-quote" aria-labelledby="auto-quote-title">
-    <header><div><span className="admin-eyebrow">{es ? 'Referencia académica · DEMO' : 'Academic reference · DEMO'}</span><h2 id="auto-quote-title">{es ? 'Una referencia. Un estimado DEMO.' : 'One reference. A DEMO estimate.'}</h2></div>
+    <header><div><span className="admin-eyebrow">{es ? 'CÁLCULO AUTOMATIZADO · PERFIL ANÁLOGO' : 'AUTOMATED ESTIMATE · ANALOG PROFILE'}</span><h2 id="auto-quote-title">{es ? 'Prepará una estimación para revisar.' : 'Prepare an estimate to review.'}</h2></div>
       {quote?.mode === 'DEMO' && <strong>{formatCRC(request.quotedPrice)}</strong>}</header>
-    <p>{es ? 'Usá una pieza análoga o su descripción para estimar peso y tiempo. El monto usa parámetros académicos simulados: no son mediciones de laminador ni tarifas vigentes del taller. Contrastá los datos antes de enviar una oferta al cliente.' : 'Use an analogous part or its description to estimate weight and time. The amount uses simulated academic parameters, not slicer measurements or current workshop rates. Verify the inputs before sending an offer to the customer.'}</p>
+    <p>{es ? 'Peso, tiempo y costos se aproximan desde una pieza de referencia; no son mediciones del archivo ni tarifas verificadas del taller. Revisá alcance y supuestos antes de enviar.' : 'Weight, time and costs are approximated from a reference part; they are not file measurements or verified workshop rates. Review scope and assumptions before sending.'}</p>
     <ReferencePicker profiles={profiles} value={profileId} onChange={setProfileId} disabled={state.busy} loading={loading} language={language} allowAutomatic />
-    <div className="admin-auto-quote__controls"><button type="button" className="v-button v-button--primary" disabled={state.busy || loading} onClick={() => { setState(current => ({ ...current, error: '' })); setConfirming(true); }}>{state.busy ? (es ? 'Guardando…' : 'Saving…') : (es ? 'Preparar cotización DEMO' : 'Prepare DEMO quote')}</button></div>
-    {confirming && <div className="admin-quote-send__summary" role="group" aria-label={es ? 'Confirmar cotización DEMO' : 'Confirm DEMO quote'}>
-      <p>{es ? 'Esta acción guarda una estimación DEMO y pasa la solicitud a «Cotizada». No envía ningún correo. ¿Querés continuar?' : 'This saves a DEMO estimate and moves the request to “Quoted”. It does not send an email. Continue?'}</p>
-      <div className="admin-next-action__buttons"><button type="button" className="v-button v-button--ghost" onClick={() => setConfirming(false)}>{es ? 'Cancelar' : 'Cancel'}</button><button type="button" className="v-button v-button--primary" onClick={saveEstimate}>{es ? 'Guardar estimación DEMO' : 'Save DEMO estimate'}</button></div>
+    <div className="admin-auto-quote__controls"><button type="button" className="v-button v-button--primary" disabled={state.busy || loading} onClick={() => { setState(current => ({ ...current, error: '' })); setConfirming(true); }}>{state.busy ? (es ? 'Guardando…' : 'Saving…') : (es ? 'Calcular cotización' : 'Calculate quote')}</button></div>
+    {confirming && <div className="admin-quote-send__summary" role="group" aria-label={es ? 'Confirmar cálculo automatizado' : 'Confirm automated estimate'}>
+      <p>{es ? 'Se guardará una estimación y la solicitud quedará lista para revisar y enviar. No se enviará ningún correo todavía. ¿Continuar?' : 'An estimate will be saved and the request will be ready for review and email. No email will be sent yet. Continue?'}</p>
+      <div className="admin-next-action__buttons"><button type="button" className="v-button v-button--ghost" onClick={() => setConfirming(false)}>{es ? 'Cancelar' : 'Cancel'}</button><button type="button" className="v-button v-button--primary" onClick={saveEstimate}>{es ? 'Guardar estimación' : 'Save estimate'}</button></div>
     </div>}
     {quote?.mode === 'DEMO' && <p>{quote.inputs.weightGrams} g · {quote.inputs.printHours} h / {es ? 'pieza' : 'piece'} · {quote.inputs.material} · {es ? 'Vigencia hasta' : 'Valid until'} {request.quoteValidUntil?.slice(0, 10)}<br />{es ? 'Tasa de cambio' : 'Exchange rate'}: {quote.provenance.exchange} · {es ? 'Tarifa eléctrica' : 'Electric tariff'}: {quote.provenance.electricity}</p>}
     {state.error && <p role="alert">{state.error}</p>}

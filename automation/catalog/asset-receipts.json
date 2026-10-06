@@ -485,16 +485,16 @@
       "modelSha256": "1089981f0d648f6afdc4637ad1af208d1f4f84b99bbd114bb7ee6d7dce82831a",
       "assets": [
         {
-          "path": "/images/catalog/p19/source-1.jpg",
-          "sourceUrl": "https://media.printables.com/media/prints/139614/images/1325956_92ab449b-74dc-48eb-8a63-42e3b6649e24/large_display_img_20220127_181840_139614.jpg",
-          "kind": "SOURCE_IMAGE",
-          "sha256": "f48c246278246753a4e8452deb03393b5ea40eb9a0aeee5b85333b38bc0c6fbe"
-        },
-        {
           "path": "/images/catalog/p19/source-2.jpg",
           "sourceUrl": "https://media.printables.com/media/prints/139614/images/1325957_f5236f68-469d-476d-aecb-e4124652d95b/large_display_img_20220127_181824_139614.jpg",
           "kind": "SOURCE_IMAGE",
           "sha256": "d3b83f84e8509186b088564a46c7164c99fc61d443ea6cae9ccc82ba8a46bb93"
+        },
+        {
+          "path": "/images/catalog/p19/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/139614/images/1325956_92ab449b-74dc-48eb-8a63-42e3b6649e24/large_display_img_20220127_181840_139614.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "f48c246278246753a4e8452deb03393b5ea40eb9a0aeee5b85333b38bc0c6fbe"
         },
         {
           "path": "/images/catalog/p19/source-3.jpg",

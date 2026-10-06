@@ -1,6 +1,20 @@
 # Vértice CR — Métricas, Admin e IA operativa
 
-## Estado de interfaz del Copiloto — 2026-10-05
+## Motor Operativo del Copiloto Admin y Resiliencia CRUD — 2026-10-06
+
+El Copiloto Admin (`/admin/asistente`) cuenta con un motor operativo autónomo (`scripts/admin-copilot-engine.js`) capaz de:
+1. **Lectura exhaustiva de CRUDs:**
+   - **Calidad del catálogo:** audita el catálogo real (`db.products`), identificando las 11 fichas con galería incompleta (< 4 vistas: `p4`, `p5`, `p7`, `p9`, `p10`, `p11`, `p12`, `p16`, `p18`, `p20`, `p21` con conteo exacto de fotos), estado de calibración (`DEMO_NOT_SLICED` en Creality K1C), borradores y enlaces directos de edición (`/admin/catalogo/:id/editar`).
+   - **Prioridades del taller:** desglosa solicitudes pendientes (`PENDING_QUOTE`, `IN_REVIEW`, `CHANGES_REQUESTED`) y pedidos activos por etapa, con enlaces directos (`/admin/solicitudes/:id`, `/admin/pedidos/:id`) y nota de gobernanza sobre ventas no confirmadas.
+   - **Consultas de catálogo y órdenes:** lista productos, categorías y pedidos con datos reales sin inventar.
+2. **Edición y propuestas de CRUD con confirmación interactiva:**
+   - **Crear piezas:** ante solicitudes como «Crear Soporte de Soldador en PETG, categoría Piezas funcionales, peso 50g, tiempo 2h», calcula automáticamente el precio DEMO FDM paramétrico y genera la propuesta canónica (`adminAction`).
+   - **Modificar piezas:** permite ocultar (`status: INACTIVE`), publicar (`ACTIVE`), actualizar precios o cambiar materiales.
+   - **Eliminar piezas / categorías:** prepara bajas de registros y resguarda la integridad impidiendo eliminar piezas con pedidos asociados o categorías en uso.
+   - **Confirmación interactiva:** `AdminCatalogActionPreview.jsx` despliega la ficha con la tabla de cambios y el botón `[Confirmar y guardar]`, el cual invoca `/admin/actions/catalog-ai-confirm` y registra el evento en `activityLog`.
+3. **Resiliencia ante fallos externos:**
+   - Si n8n o el webhook externo devuelve HTTP 500, no responde o falla por incompatibilidad de nodos (`supplyData method but no execute method`), `runAssistant` activa automáticamente el motor operativo local, garantizando disponibilidad inmediata y eliminando el mensaje de desconexión.
+
 
 El chat Admin muestra acciones de catálogo como una propuesta de vista previa y
 ofrece «Descartar propuesta» o «Confirmar y guardar»; la confirmación llama a

@@ -92,6 +92,54 @@ describe('intake de solicitudes personalizadas', () => {
     expect(submitQuoteIntake).not.toHaveBeenCalled();
   });
 
+  it('ofrece una acción visible para pedir al asistente que prepare el resumen', async () => {
+    automationAction
+      .mockResolvedValueOnce({ reply: 'Entendí la idea. ¿Qué largo aproximado tendría el brazo?', links: [] })
+      .mockResolvedValueOnce({ reply: 'Preparé el borrador para revisar; no se envió.', links: [], requestDraft: {
+        description: 'Brazo robótico para simulación de banda transportadora', intendedUse: 'Simulación', dimensions: '', material: '', quantity: 1, needsDesign: true,
+      } });
+    renderPage('/solicitud/ayuda-diseno');
+    const composer = screen.getByLabelText(/tu idea o tu siguiente pregunta/i);
+    fireEvent.change(composer, { target: { value: 'Quiero cotizar solo el brazo de una banda transportadora para una simulación.' } });
+    fireEvent.keyDown(composer, { key: 'Enter', code: 'Enter', charCode: 13 });
+    await screen.findByText(/¿qué largo aproximado tendría el brazo/i);
+    fireEvent.click(screen.getByRole('button', { name: /preparar resumen para revisar/i }));
+    expect(await screen.findByDisplayValue('Brazo robótico para simulación de banda transportadora')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /revisar el resumen y adjuntar referencias/i })).toBeInTheDocument();
+    expect(automationAction).toHaveBeenCalledTimes(2);
+    expect(automationAction.mock.calls[1][1].message).toMatch(/prepará el resumen/i);
+    expect(submitQuoteIntake).not.toHaveBeenCalled();
+  });
+
+  it('incluye los datos actuales del formulario y permite revisar un borrador local si n8n omite requestDraft', async () => {
+    const customer = { user: { id: 'customer-1', name: 'Cliente', email: 'customer@vertice.test', role: 'customer', status: 'ACTIVE' }, token: 'session-token' };
+    const draft = {
+      description: 'Brazo robótico para una simulación de banda transportadora',
+      intendedUse: 'Simulación académica de una banda', dimensions: 'Largo 15 cm; ancho 3 cm',
+      dimensionsUnit: 'cm', material: 'PETG', quantity: 1, needsDesign: true, referenceUrl: '',
+    };
+    localStorage.setItem('vertice.quote.draft', JSON.stringify({ draft, assistantDraftReady: false,
+      manuallyEditedFields: ['description', 'intendedUse', 'dimensions', 'material', 'needsDesign'], savedAt: Date.now() }));
+    automationAction.mockResolvedValue({ reply: 'Puedo ayudarte a revisar esos datos.', links: [], requestDraft: null });
+    renderPage('/solicitud/ayuda-diseno', customer);
+    await waitFor(() => expect(screen.queryByText(/Cuando el asistente prepare el borrador/i)).not.toBeInTheDocument());
+
+    const composer = screen.getByLabelText(/tu idea o tu siguiente pregunta/i);
+    fireEvent.change(composer, { target: { value: 'Prepará el resumen para revisar.' } });
+    fireEvent.keyDown(composer, { key: 'Enter', code: 'Enter', charCode: 13 });
+
+    expect(await screen.findByText(/borrador con tus mensajes y los datos del formulario/i)).toBeInTheDocument();
+    expect(screen.getByText(/BORRADOR LOCAL · REVISÁ LOS DATOS/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/¿qué querés fabricar/i)).toHaveValue(draft.description);
+    expect(screen.getByLabelText(/¿para qué la vas a usar/i)).toHaveValue(draft.intendedUse);
+    expect(screen.getByRole('button', { name: /revisé el resumen.*enviar al taller/i })).toBeEnabled();
+    expect(automationAction).toHaveBeenCalledWith('/assistants/chat', expect.objectContaining({
+      mode: 'quote', prepareDraft: true,
+      draftContext: expect.objectContaining({ values: expect.objectContaining({ description: draft.description, material: 'PETG' }) }),
+    }), expect.objectContaining({ token: 'session-token' }));
+    expect(submitQuoteIntake).not.toHaveBeenCalled();
+  });
+
   it('conserva las medidas y la ficha si n8n agota iteraciones en medio del intake', async () => {
     automationAction.mockRejectedValue({ code: 'ASSISTANT_ITERATION_LIMIT' });
     renderPage('/solicitud/ayuda-diseno');
@@ -210,5 +258,70 @@ describe('intake de solicitudes personalizadas', () => {
     expect(await screen.findByText('Tu proyecto ya está en el taller.')).toBeInTheDocument();
     expect(screen.queryByLabelText(/tu idea o tu siguiente pregunta/i)).not.toBeInTheDocument();
     expect(screen.getByText(/no necesitás responder el correo para aprobar/i)).toBeInTheDocument();
+  });
+
+  it('permite alternar entre formulario directo y asistente con el selector de modo', () => {
+    renderPage('/solicitud/ayuda-diseno');
+    const directTab = screen.getByRole('link', { name: /formulario directo \(modelo o archivo\)/i });
+    expect(directTab).toHaveAttribute('href', '/solicitud/archivo');
+    const assistantTab = screen.getByRole('link', { name: /con asistente ia \(ayuda de diseño\)/i });
+    expect(assistantTab).toHaveAttribute('href', '/solicitud/ayuda-diseno');
+    expect(assistantTab).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('valida medidas inválidas al pulsar enviar y ofrece limpiarlas con un botón', async () => {
+    renderPage('/solicitud/archivo', { user: { id: 'c1', name: 'Cliente', email: 'c@test.com', role: 'customer', status: 'ACTIVE' }, token: 'token' });
+    fireEvent.change(screen.getByLabelText(/¿qué querés fabricar/i), { target: { value: 'Soporte para celular' } });
+    const dimInput = screen.getByLabelText(/medidas aproximadas/i);
+    fireEvent.change(dimInput, { target: { value: 'EWQEWQ' } });
+
+    // Error visible en pantalla
+    expect(screen.getByRole('alert')).toHaveTextContent(/solo medidas legibles/i);
+
+    // Al hacer click en enviar, no se queda muerto: muestra el mensaje de error y enfoca el campo
+    const submitBtn = await screen.findByRole('button', { name: /revisé el resumen · enviar al taller/i });
+    fireEvent.click(submitBtn);
+    expect(dimInput).toHaveFocus();
+
+    // Botón de limpiar medidas sin definir
+    const clearBtn = screen.getByRole('button', { name: /dejar medidas sin definir/i });
+    fireEvent.click(clearBtn);
+    expect(dimInput).toHaveValue('');
+    expect(screen.queryByText(/solo medidas legibles/i)).not.toBeInTheDocument();
+  });
+
+  it('permite al asistente en chat editar y actualizar campos previamente tocados por el usuario', async () => {
+    automationAction
+      .mockResolvedValueOnce({
+        reply: 'Listo: cambié la cantidad a 5 y el material a PETG.',
+        links: [],
+        requestDraft: {
+          description: 'Brazo robótico de prueba',
+          intendedUse: 'Simulación',
+          dimensions: '15 × 8 cm',
+          material: 'PETG',
+          quantity: 5,
+          needsDesign: false,
+        },
+      });
+
+    renderPage('/solicitud/ayuda-diseno', { user: { id: 'c1', name: 'Cliente', email: 'c@test.com', role: 'customer', status: 'ACTIVE' }, token: 'token' });
+
+    // Usuario escribió manualmente primero en el formulario
+    const descField = screen.getByLabelText(/¿qué querés fabricar/i);
+    fireEvent.change(descField, { target: { value: 'QWEQWEW' } });
+    const qtyField = screen.getByLabelText(/cantidad/i);
+    fireEvent.change(qtyField, { target: { value: '3' } });
+
+    // Usuario le dice al bot que lo corrija
+    const composer = screen.getByLabelText(/tu idea o tu siguiente pregunta/i);
+    fireEvent.change(composer, { target: { value: 'Cambiá la cantidad a 5, el material a PETG y la descripción a Brazo robótico de prueba' } });
+    fireEvent.keyDown(composer, { key: 'Enter', code: 'Enter', charCode: 13 });
+
+    // Los campos del formulario deben haberse actualizado con lo que indicó el bot
+    expect(await screen.findByDisplayValue('Brazo robótico de prueba')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('5')).toBeInTheDocument();
+    expect(screen.getByLabelText(/material deseado/i)).toHaveValue('PETG');
+    expect(screen.getByDisplayValue('15 × 8 cm')).toBeInTheDocument();
   });
 });

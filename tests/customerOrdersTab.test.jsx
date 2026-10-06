@@ -41,6 +41,7 @@ describe('pestaña Mis pedidos del cliente', () => {
     fireEvent.click(await screen.findByRole('tab', { name: /Mis pedidos/i }));
     expect(await screen.findByText('Brazo Robótico')).toBeInTheDocument();
     expect(screen.getByText('ord-test-999')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Encargo · 2 piezas' })).toBeInTheDocument();
     expect(screen.getByText('Pedido pendiente de pago')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Continuar al carrito para pagar/ })).toHaveAttribute('href', '/carrito?orderId=ord-test-999');
     expect(screen.queryByRole('button', { name: /Pagar/ })).not.toBeInTheDocument();
@@ -60,5 +61,30 @@ describe('pestaña Mis pedidos del cliente', () => {
     setupOrders([{ ...mockOrder, id: 'ord-done-1', status: 'COMPLETED', paymentStatus: 'PAID', paymentMode: 'DEMO' }]);
     fireEvent.click(await screen.findByRole('tab', { name: /Mis pedidos/i }));
     expect(await screen.findByText('Dejar opinión sobre este modelo ↗')).toBeInTheDocument();
+  });
+
+  it('no presenta como pendiente de pago un pedido legado ya entregado sin historial de pago', async () => {
+    setupOrders([{ ...mockOrder, status: 'DELIVERED', paymentStatus: undefined }]);
+    fireEvent.click(await screen.findByRole('tab', { name: /Mis pedidos/i }));
+    expect(await screen.findByText('Pago sin conciliar')).toBeInTheDocument();
+    expect(screen.getByText('Historial de pago incompleto')).toBeInTheDocument();
+    expect(screen.getByText(/No vuelvas a pagar desde aquí/)).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Continuar al carrito para pagar/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Consultar al taller/ })).toHaveAttribute('href', '/contacto');
+  });
+
+  it('no deja separadores vacíos en piezas antiguas sin color ni material registrados', async () => {
+    setupOrders([{ ...mockOrder, orderItems: [{ ...mockOrder.orderItems[0], color: '', material: '' }] }]);
+    fireEvent.click(await screen.findByRole('tab', { name: /Mis pedidos/i }));
+    expect(await screen.findByText('Material no registrado · Cant: 2')).toBeInTheDocument();
+    expect(screen.queryByText(/^ · /)).not.toBeInTheDocument();
+  });
+
+  it('no ofrece reiniciar un pago que ya requiere revisión', async () => {
+    setupOrders([{ ...mockOrder, paymentStatus: 'REVIEW_REQUIRED' }]);
+    fireEvent.click(await screen.findByRole('tab', { name: /Mis pedidos/i }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Pago requiere revisión');
+    expect(screen.getByRole('alert')).toHaveTextContent('No vuelvas a iniciar el pago');
+    expect(screen.queryByRole('link', { name: /Continuar al carrito para pagar/ })).not.toBeInTheDocument();
   });
 });

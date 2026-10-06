@@ -59,6 +59,8 @@ describe('vista de cotizaciones del cliente', () => {
   it('no ofrece decisiones a una cotización que todavía no se envió al cliente', async () => {
     setup({ ...offer, status: 'QUOTED' });
     await screen.findByText('Soporte modular');
+    expect(screen.getByText('Lista para enviar')).toBeInTheDocument();
+    expect(screen.getByText(/ya preparó el monto, pero todavía no te envió la cotización/)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Aprobar cotización' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Solicitar cambios / Rechazar' })).not.toBeInTheDocument();
   });

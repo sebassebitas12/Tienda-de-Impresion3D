@@ -128,4 +128,36 @@ describe('preparación explícita del borrador de solicitud', () => {
       draft: expect.objectContaining({ description: 'Organizador para el escritorio', dimensions: 'Largo 15 cm; ancho 3 cm' }),
     }));
   });
+
+  it('permite al cliente editar y corregir detalles en el chat (cantidad, material, medidas, descripción)', () => {
+    const turns = [
+      { role: 'user', content: 'Quiero un engranaje para motor, 1 unidad, material PLA, 5 x 5 cm.' },
+      { role: 'user', content: 'Prepará el resumen.' },
+    ];
+    const initial = prepareExplicitQuoteDraft(turns);
+    expect(initial.draft.quantity).toBe(1);
+    expect(initial.draft.material).toBe('PLA');
+    expect(initial.draft.dimensions).toBe('5 × 5 cm');
+
+    // Cambiar cantidad
+    const updatedQty = prepareExplicitQuoteDraft([...turns, { role: 'user', content: 'Cambiá la cantidad a 5 unidades' }]);
+    expect(updatedQty.draft.quantity).toBe(5);
+    expect(updatedQty.reply).toMatch(/Actualicé el borrador/);
+
+    // Cambiar material
+    const updatedMat = prepareExplicitQuoteDraft([...turns, { role: 'user', content: 'Cambiá el material a PETG' }]);
+    expect(updatedMat.draft.material).toBe('PETG');
+
+    // Cambiar medidas con formato estándar 3D
+    const updatedDim = prepareExplicitQuoteDraft([...turns, { role: 'user', content: 'Las medidas son 15 x 8 x 4 cm' }]);
+    expect(updatedDim.draft.dimensions).toBe('15 × 8 × 4 cm');
+
+    // Borrar medidas
+    const clearedDim = prepareExplicitQuoteDraft([...turns, { role: 'user', content: 'Borrá las medidas, no las tengo' }]);
+    expect(clearedDim.draft.dimensions).toBe('');
+
+    // Cambiar descripción
+    const updatedDesc = prepareExplicitQuoteDraft([...turns, { role: 'user', content: 'Cambiá la descripción a soporte para soldador' }]);
+    expect(updatedDesc.draft.description).toBe('Soporte para soldador');
+  });
 });

@@ -1,14 +1,23 @@
 # Vértice CR — UX, navegación y estados
 
-## Cotización conversacional y continuidad — 2026-10-05
+## Cotización conversacional y continuidad — 2026-10-06
 
 Visitante puede preparar su idea con IA; antes de enviar ve acceso explícito a
 login con retorno al borrador. En navegador se comprobó conservación de uso,
 medidas, material, cantidad y diseño tras login. Envío evita doble clic. Éxito
 oculta composer y muestra revisión→oferta→aprobación en Cuenta→checkout común
 del carrito. Chat fallido ofrece reintentar la misma pregunta, sin duplicarla
-en el hilo. El workflow de correo de oferta tuvo una ejecución fallida antes de
-Gmail; su corrección local aún requiere importación/publicación y evidencia live.
+en el hilo. En la UI real, después de una idea el agente pregunta faltantes; una
+acción visible «Preparar resumen para revisar» produce el borrador estructurado
+editable y permite pasar a adjuntar referencias sin enviar automáticamente.
+Se cuenta con una barra de navegación por pestañas (`quote-mode-switcher`) que permite
+alternar entre el formulario directo (`/solicitud/archivo`) y la ayuda con bot
+(`/solicitud/ayuda-diseno`) preservando 100% de los datos del borrador. Asimismo,
+el chatbot soporta edición y corrección conversacional (material, cantidad, medidas,
+descripción o borrado de campos) actualizando el formulario sin quedar bloqueado por
+modificaciones manuales previas, y el botón de revisión ofrece pulso visual interactivo.
+Esto fue verificado con el workflow n8n publicado. La entrega de correo de pago
+continúa pendiente de captura Sandbox y acuse Gmail real.
 
 ## R-H85 — Recorridos visitante/cliente/Admin (2026-10-05)
 
@@ -23,7 +32,8 @@ Cuenta y llevan al mismo checkout.
 El catálogo se puede explorar sin cuenta. Para agregar piezas y abrir el carrito
 se requiere sesión customer; login conserva el destino de retorno. El pedido solo
 se crea tras autenticar. El carrito crea `PENDING`/`UNPAID`, y el cliente elige
-PayPal Sandbox o reporta SINPE para revisión manual. Una cotización personalizada
+PayPal Sandbox, tarjeta mediante PayPal (si el SDK la habilita) o reporta SINPE
+DEMO para revisión manual. Una cotización personalizada
 no depende del catálogo: Admin registra y envía monto/alcance, el cliente
 aprueba en la app y continúa al checkout común. Admin no paga por el cliente,
 pero sí revisa comprobantes SINPE. Búsqueda y filtros del catálogo se conservan
@@ -321,6 +331,26 @@ Los dashboards y pantallas `/admin/*` usan navegación administrativa propia y o
 
 El **footer completo de marca** aplica a páginas públicas/cliente donde la navegación comercial y el contenido institucional tienen sentido: Home, Catálogo, Producto, Solicitud, FAQ, About, Contacto y páginas públicas equivalentes.
 
+### Página de Contacto (`/contacto`) — Canales directos del taller y enrutamiento lógico (2026-10-06)
+
+La página de contacto no es un formulario genérico desvinculado del taller; centraliza la comunicación operativa y el enrutamiento según la etapa del proyecto:
+1. **Canales directos del taller:**
+   - **WhatsApp del Taller (Demo +506 8888-8888):** Enlace directo `wa.me` para consultas rápidas de viabilidad técnica, fotos de piezas y orientación ágil.
+   - **Teléfono de Taller (Demo +506 2550-0000):** Llamada directa (`tel:`) para coordinación técnica urgente o retiro de piezas terminadas.
+   - **Correo institucional (`taller@verticecr.com`):** Enlace `mailto:` para el envío de planos, compras corporativas o requerimientos formales.
+   - **Ubicación y Horario:** Taller en Cartago / San José, Costa Rica; Lunes a Viernes 8:00 AM – 6:00 PM y Sábados 9:00 AM – 1:00 PM.
+2. **Formulario de contacto directo:**
+   - Permite enviar mensajes clasificados por motivo (materiales/tolerancias, estado de pedido/cotización, manufactura por volumen u otra consulta).
+   - Incluye validación de campos obligatorios (nombre, correo y mensaje) y mensaje de confirmación accesible (modo DEMO).
+3. **Puntos de partida (enrutamiento de intake):**
+   - «Ya tengo el modelo» dirige a `/solicitud/archivo`.
+   - «Quiero darle forma» dirige a `/solicitud/ayuda-diseno`.
+   - «Seguimiento» dirige al espacio de cuenta del cliente (`/cuenta`) o login.
+4. **Asistencia y preguntas frecuentes:**
+   - Disparador directo del asistente general (`openGeneralAssistant`).
+   - Respuestas sobre envíos nacionales (Correos de Costa Rica / mensajería GAM), retiros en taller, cotizaciones y revisión de archivos.
+
+
 ### Footer en dashboards
 
 El footer comercial completo **no es obligatorio en dashboards**. En `/admin/*` la prioridad es densidad informativa, operaciones y foco; puede existir un footer técnico compacto (versión, soporte, privacidad, accesibilidad) o no existir cuando la interfaz no lo necesite.
@@ -491,3 +521,46 @@ rol. El Catálogo Admin ofrece «Cotizar DEMO» en cada ficha y lleva al calcula
 de esa pieza. Sigue siendo una sugerencia local: no mide imágenes ni cambia un
 precio publicado por sí sola. La validación estática y los tests pasaron; la
 inspección visual del copiloto requiere una sesión Admin en el mismo origen.
+
+### Reauditoría R-H89 — decisión de cotización y checkout — 2026-10-06
+
+En `/cuenta`, `QUOTED` significa que Admin guardó el importe pero aún no lo
+entregó al cliente. La vista lo etiqueta **Lista para enviar** y explica que la
+persona no puede aprobar ni pagar hasta que el correo se entregue y el estado
+pase a `AWAITING_APPROVAL`. La acción de decisión solo aparece en ese último
+estado.
+
+En `/carrito?orderId=...`, el resumen muestra los conceptos financieros que el
+pedido realmente registra (piezas, entrega, descuento, impuestos) antes de
+abrir PayPal o recibir un comprobante SINPE. Si entrega/impuestos faltan, el
+monto se llama **Importe registrado** y se advierte que no los incluye ni los
+considera gratuitos. El precio cotizado de una pieza personalizada sigue
+separado de la decisión de aprobación: solo una solicitud aprobada crea el
+pedido pendiente que se paga desde este checkout. El comprobante SINPE requiere
+referencia, teléfono e imagen, y espera revisión del taller; PayPal Sandbox no
+se inició en esta pasada.
+
+La entrada `/solicitud` separa dos necesidades: enviar un modelo/referencia o
+conversar para definir una idea. `/solicitud/archivo` permite dejar medidas y
+material sin definir; las referencias se envían al taller y la pantalla
+advierte que no genera precio automático. No se completaron ni adjuntaron datos
+en esta inspección.
+
+Las variantes elegidas por una persona visitante (producto, color y cantidad)
+se transportan al login/registro y vuelven a la ficha para que el cliente
+confirme «Agregar al carrito»; no se agrega ni se crea un pedido antes de esa
+confirmación. El test de integración cubre el retorno autenticado simulado, pero
+no se usaron credenciales en el navegador.
+
+En pedidos antiguos sin metadatos de pago, la Cuenta no debe inventar un pago ni
+mostrar una segunda acción de cobro. Se informa **Pago sin conciliar / Historial
+de pago incompleto** y se deriva a soporte; un pedido que sí tiene entrega e
+importe registrado mantiene su estado de taller independiente del pago.
+
+Evidencia limitada a navegador local Dark escritorio 1265×704 en R-H89 y tests
+Jest. No se inició PayPal, no se envió SINPE, correo ni solicitud; tampoco se
+verificaron las vistas Light y 375/768 px, el retorno real de login, el correo
+posterior al pago ni las pantallas Admin autenticadas. `/solicitud/ayuda-diseno`
+confirma que las referencias llegan al taller pero no se entregan al modelo de
+IA: análisis visual de imágenes y medición de STL/OBJ siguen pendientes, no son
+capacidades que deba prometer la interfaz.

@@ -27,7 +27,10 @@ export function LoginPage() {
     try {
       const user = await auth.login(form);
       const requested = location.state?.from;
-      navigate(requested || (user.role === 'admin' ? '/admin' : '/cuenta'), { replace: true });
+      const returnState = user.role === 'customer' && location.state?.pendingCartSelection
+        ? { pendingCartSelection: location.state.pendingCartSelection }
+        : undefined;
+      navigate(requested || (user.role === 'admin' ? '/admin' : '/cuenta'), { replace: true, state: returnState });
     } catch {
       // Provider exposes the normalized error state to the UI.
     }
@@ -58,7 +61,7 @@ export function LoginPage() {
           : 'Iniciá sesión o creá una cuenta de cliente para ver tu carrito y continuar.'}
       </p>}
       {location.state?.reason === 'catalog-customer-required' && <p className="auth-context-notice" role="status">
-        {language === 'en' ? 'Sign in with a customer account to add this part. You will return to the product page.' : 'Iniciá sesión con una cuenta de cliente para agregar esta pieza. Después volverás a la ficha del producto.'}
+        {language === 'en' ? 'Sign in with a customer account to add this part. Your selected color and quantity will be waiting on the product page.' : 'Iniciá sesión con una cuenta de cliente para agregar esta pieza. Al volver, conservarás el color y la cantidad elegidos.'}
       </p>}
 
       <form className="auth-form" onSubmit={onSubmit} noValidate>
@@ -89,6 +92,30 @@ export function LoginPage() {
           {copy.login}
         </Button>
       </form>
+
+      <div className="auth-demo-helper" aria-label={language === 'en' ? 'Quick demo access' : 'Acceso rápido de evaluación (Demo)'}>
+        <span className="auth-demo-helper__label">
+          {language === 'en' ? 'Demo evaluation accounts:' : 'Cuentas demo de evaluación:'}
+        </span>
+        <div className="auth-demo-helper__buttons">
+          <button
+            type="button"
+            className="auth-demo-btn"
+            onClick={() => setForm({ email: 'sebas@example.com', password: 'demo-admin-2026' })}
+            aria-label={language === 'en' ? 'Fill Admin demo credentials' : 'Cargar credenciales Admin Demo'}
+          >
+            {language === 'en' ? 'Admin Demo' : 'Admin Demo'}
+          </button>
+          <button
+            type="button"
+            className="auth-demo-btn"
+            onClick={() => setForm({ email: 'ana@example.com', password: 'demo-customer-2026' })}
+            aria-label={language === 'en' ? 'Fill Customer demo credentials' : 'Cargar credenciales Cliente Demo'}
+          >
+            {language === 'en' ? 'Customer Demo' : 'Cliente Demo'}
+          </button>
+        </div>
+      </div>
 
       <p className="auth-switch">
         {copy.authNoAccount} <Link to="/registro" state={{ from: location.state?.from, reason: location.state?.reason }}>{copy.register}</Link>

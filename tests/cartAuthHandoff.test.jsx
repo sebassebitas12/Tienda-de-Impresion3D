@@ -11,11 +11,12 @@ const mockAuth = { login: jest.fn(), register: jest.fn() };
 jest.mock('../src/hooks/useAuth.js', () => ({ useAuth: () => mockAuth }));
 
 function PathProbe() {
-  return <output data-testid="path">{useLocation().pathname}</output>;
+  const location = useLocation();
+  return <><output data-testid="path">{location.pathname}</output><output data-testid="selection">{JSON.stringify(location.state?.pendingCartSelection || null)}</output></>;
 }
 
 function renderAuthPage(Page, path) {
-  return render(<MemoryRouter initialEntries={[{ pathname: path, state: { from: '/producto/p1?material=PLA', reason: 'catalog-customer-required' } }]}><PreferencesProvider>
+  return render(<MemoryRouter initialEntries={[{ pathname: path, state: { from: '/producto/p1?material=PLA', reason: 'catalog-customer-required', pendingCartSelection: { productId: 'p1', color: 'Negro', quantity: 3 } } }]}><PreferencesProvider>
     <Routes><Route path={path} element={<Page />} /><Route path="/producto/:id" element={<PathProbe />} /></Routes>
   </PreferencesProvider></MemoryRouter>);
 }
@@ -26,9 +27,10 @@ describe('regreso a la pieza después de autenticarse', () => {
   it('inicia sesión, vuelve al producto y exige que el cliente agregue la pieza', async () => {
     mockAuth.login.mockResolvedValue(mockCustomer);
     renderAuthPage(LoginPage, '/login');
-    expect(screen.getByRole('status')).toHaveTextContent('Después volverás a la ficha del producto.');
+    expect(screen.getByRole('status')).toHaveTextContent('conservarás el color y la cantidad elegidos');
     fireEvent.submit(screen.getByRole('button', { name: /iniciar sesión/i }).closest('form'));
     expect(await screen.findByTestId('path')).toHaveTextContent('/producto/p1');
+    expect(screen.getByTestId('selection')).toHaveTextContent(JSON.stringify({ productId: 'p1', color: 'Negro', quantity: 3 }));
   });
 
   it('crea una cuenta y vuelve al producto sin transferir artículos de un carrito visitante', async () => {
@@ -36,5 +38,6 @@ describe('regreso a la pieza después de autenticarse', () => {
     renderAuthPage(RegisterPage, '/registro');
     fireEvent.submit(screen.getByRole('button', { name: /crear cuenta/i }).closest('form'));
     expect(await screen.findByTestId('path')).toHaveTextContent('/producto/p1');
+    expect(screen.getByTestId('selection')).toHaveTextContent(JSON.stringify({ productId: 'p1', color: 'Negro', quantity: 3 }));
   });
 });

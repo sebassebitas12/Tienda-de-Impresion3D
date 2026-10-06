@@ -102,6 +102,29 @@ describe('rutas informativas y detalle de pedido del cliente', () => {
     expect(await screen.findByText('We could not find that order in your account.')).toBeInTheDocument();
   });
 
+  it('explica el historial de pago ausente en un pedido avanzado sin ofrecer cobrarlo de nuevo', async () => {
+    useAuth.mockReturnValue({ token: 'sim-customer' });
+    usePreferences.mockReturnValue({ language: 'es' });
+    fetchMyOrders.mockResolvedValue({ orders: [{ ...order, status: 'DELIVERED', paymentStatus: undefined }] });
+    render(<MemoryRouter initialEntries={['/pedidos/ord-customer-7']}><Routes>
+      <Route path="/pedidos/:id" element={<CustomerOrderDetailPage />} />
+    </Routes></MemoryRouter>);
+    expect(await screen.findByText(/no incluye constancia de pago en el registro disponible/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /consultar al taller/i })).toHaveAttribute('href', '/contacto');
+    expect(screen.queryByRole('link', { name: /continuar al pago/i })).not.toBeInTheDocument();
+  });
+
+  it('bloquea reiniciar el pago desde un detalle marcado para revisión', async () => {
+    useAuth.mockReturnValue({ token: 'sim-customer' });
+    usePreferences.mockReturnValue({ language: 'es' });
+    fetchMyOrders.mockResolvedValue({ orders: [{ ...order, paymentStatus: 'REVIEW_REQUIRED' }] });
+    render(<MemoryRouter initialEntries={['/pedidos/ord-customer-7']}><Routes>
+      <Route path="/pedidos/:id" element={<CustomerOrderDetailPage />} />
+    </Routes></MemoryRouter>);
+    expect(await screen.findByText(/no lo vuelvas a iniciar/i)).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /continuar al pago/i })).not.toBeInTheDocument();
+  });
+
   it('permite reintentar una lectura temporalmente fallida', async () => {
     useAuth.mockReturnValue({ token: 'sim-customer' });
     usePreferences.mockReturnValue({ language: 'en' });
