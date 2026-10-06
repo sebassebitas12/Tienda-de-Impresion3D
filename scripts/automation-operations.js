@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import process from 'node:process';
 import { DEMO_PROFILES, calculateAutomaticDemoQuote } from '../src/utils/quoteAutomation.js';
 import { FDM_MATERIALS } from '../src/utils/quotePricing.js';
+import { isValidQuoteDimensions } from '../src/utils/quoteDimensions.js';
 import { sessionActor } from './session-access.js';
 import { executeAssistantToolCapability, runAssistant } from './assistant-runtime.js';
 import { createRatesProvider } from './quote-rates.js';
@@ -9,6 +10,7 @@ import { prepareCustomerQuoteDecision } from './customer-quote-operations.js';
 import { parseMultipartForm } from './multipart-form.js';
 import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { queuePaymentEmail } from './payment-email-delivery.js';
 
 export const ORDER_NEXT = { PENDING: 'CONFIRMED', CONFIRMED: 'IN_PRODUCTION', IN_PRODUCTION: 'READY', READY: 'SHIPPED', SHIPPED: 'DELIVERED' };
 
@@ -31,7 +33,7 @@ export function prepareAutomaticRequest(request, quote, actorId, now) {
     quotedBy: actorId, quoteVersion: (request.quoteVersion || 0) + 1, updatedAt: now, automationSource: 'DEMO_ENGINE' };
 }
 
-export function installAutomationOperations({ registerAction, db, serialize, persist }) {
+export function installAutomationOperations({ registerAction, db, serialize, persist, onPaymentConfirmed = async () => null }) {
   const getRates = createRatesProvider();
   const attempts = new Map();
   const attachmentRoot = resolve(process.cwd(), process.env.VERTICE_ATTACHMENT_DIR || '.local-data/quote-attachments');
@@ -65,7 +67,7 @@ export function installAutomationOperations({ registerAction, db, serialize, per
     }
     if (typeof description !== 'string' || description.trim().length < 3 || description.length > 2000 ||
         (intendedUse !== '' && intendedUse !== null && (typeof intendedUse !== 'string' || intendedUse.length > 500)) ||
-        (dimensions !== '' && dimensions !== null && (typeof dimensions !== 'string' || dimensions.length > 200 || !/\d/.test(dimensions))) ||
+        (dimensions !== '' && dimensions !== null && !isValidQuoteDimensions(dimensions)) ||
         (material && !FDM_MATERIALS.includes(String(material).toUpperCase())) ||
         !Number.isSafeInteger(Number(quantity)) || Number(quantity) < 1 || Number(quantity) > 100 ||
         (needsDesign !== undefined && typeof needsDesign !== 'boolean') || !safeUrl ||
@@ -315,6 +317,122 @@ export function installAutomationOperations({ registerAction, db, serialize, per
       }
       return res.json(result);
     } catch { failure(res, 'ACTION_PERSISTENCE_FAILED', 500); }
+  });
+
+  registerAction('/admin/actions/verify-payment', async (req, res) => {
+    try {
+      const result = await serialize(async () => {
+        const actor = actorFor(req);
+        if (actor?.role !== 'admin' || actor.status !== 'ACTIVE') return { error: 'ADMIN_REQUIRED' };
+
+        const payload = req.body || {};
+        const orderId = String(payload.orderId || '').trim();
+        const index = (db.data.orders || []).findIndex(order => String(order.id) === orderId);
+        if (!orderId || index < 0) return { error: 'ORDER_NOT_FOUND' };
+
+        const order = db.data.orders[index];
+        const paymentProof = order.paymentProof;
+        if (Object.hasOwn(payload, 'expectedProofSubmittedAt')
+          && payload.expectedProofSubmittedAt !== (paymentProof?.submittedAt || null)) return { error: 'PAYMENT_PROOF_OUTDATED' };
+        if (order.status === 'CONFIRMED' && order.paymentStatus === 'PAID'
+          && paymentProof?.status === 'CONFIRMED' && payload.decision === 'CONFIRM') {
+          return { order, replay: true };
+        }
+        if (order.status !== 'PENDING' || !paymentProof || !['SUBMITTED', 'REJECTED'].includes(paymentProof.status)) {
+          return { error: 'STATUS_CONFLICT' };
+        }
+        if (!['CONFIRM', 'REJECT'].includes(payload.decision)) return { error: 'INVALID_DECISION' };
+        if (payload.decision === 'CONFIRM' && paymentProof.status !== 'SUBMITTED') return { error: 'STATUS_CONFLICT' };
+
+        const now = new Date().toISOString();
+        let updatedOrder;
+        let action;
+        let metadata = {
+          referenceNumber: paymentProof.referenceNumber,
+          sinpePhone: paymentProof.sinpePhone,
+          decision: payload.decision,
+        };
+
+        if (payload.decision === 'CONFIRM') {
+          const quoteRequestId = order.sourceQuoteId || order.customPrintRequestId;
+          const quoteIndex = quoteRequestId
+            ? (db.data.customPrintRequests || []).findIndex(row => String(row.id) === String(quoteRequestId))
+            : -1;
+          const quote = quoteIndex >= 0 ? db.data.customPrintRequests[quoteIndex] : null;
+          const proofSubmittedAt = Date.parse(paymentProof.submittedAt || '');
+          const quoteExpiresAt = Date.parse(quote?.quoteValidUntil || '');
+          if (quoteRequestId && (!quote || quote.status !== 'APPROVED'
+            || quote.quoteVersion !== order.scopeSnapshot?.quoteVersion
+            || !Number.isFinite(quoteExpiresAt)
+            || !Number.isFinite(proofSubmittedAt)
+            || proofSubmittedAt > quoteExpiresAt)) return { error: 'STATUS_CONFLICT' };
+          updatedOrder = queuePaymentEmail({
+            ...order,
+            status: 'CONFIRMED',
+            paymentStatus: 'PAID',
+            paymentMode: 'SINPE_MANUAL',
+            paymentProof: { ...paymentProof, status: 'CONFIRMED' },
+            paidAt: now,
+            updatedAt: now,
+          }, now);
+          if (updatedOrder.error) throw new Error('PAYMENT_EMAIL_QUEUE_FAILED');
+          action = 'ORDER_PAYMENT_CONFIRMED';
+        } else {
+          if (typeof payload.notes !== 'string' || payload.notes.trim().length < 3 || payload.notes.trim().length > 500) return { error: 'REASON_REQUIRED' };
+          const reason = payload.notes.trim();
+          if (paymentProof.status === 'REJECTED' && paymentProof.rejectionReason === reason) {
+            return { order, replay: true };
+          }
+          updatedOrder = {
+            ...order,
+            status: 'PENDING',
+            paymentProof: { ...paymentProof, status: 'REJECTED', rejectionReason: reason },
+            updatedAt: now,
+          };
+          action = 'ORDER_PAYMENT_PROOF_REJECTED';
+          metadata = { ...metadata, reason };
+        }
+
+        const next = structuredClone(db.data);
+        next.orders[index] = updatedOrder;
+        next.activityLog ||= [];
+        next.activityLog.push({
+          id: `evt-${randomUUID()}`,
+          entity: 'order',
+          entityId: String(order.id),
+          action,
+          fromStatus: 'PENDING',
+          toStatus: updatedOrder.status,
+          actorId: String(actor.id),
+          actorName: actor.name,
+          occurredAt: now,
+          metadata,
+        });
+        if (payload.decision === 'CONFIRM' && (order.sourceQuoteId || order.customPrintRequestId)) {
+          const quoteRequestId = String(order.sourceQuoteId || order.customPrintRequestId);
+          const quoteIndex = (next.customPrintRequests || []).findIndex(row => String(row.id) === quoteRequestId);
+          const quote = next.customPrintRequests[quoteIndex];
+          next.customPrintRequests[quoteIndex] = { ...quote, status: 'PAID', orderId: order.id,
+            paidAt: now, paymentMode: 'SINPE_MANUAL', updatedAt: now };
+          next.activityLog.push({ id: `evt-${randomUUID()}`, entity: 'customPrintRequest', entityId: quoteRequestId,
+            action: 'REQUEST_SINPE_PAYMENT_CONFIRMED', fromStatus: 'APPROVED', toStatus: 'PAID', actorId: String(actor.id),
+            actorName: actor.name, occurredAt: now, metadata: { orderId: order.id, referenceNumber: paymentProof.referenceNumber } });
+        }
+        await persist(next);
+        return { order: updatedOrder };
+      });
+
+      if (result.error) {
+        const status = result.error === 'ADMIN_REQUIRED' ? 403
+          : result.error === 'ORDER_NOT_FOUND' ? 404
+            : ['STATUS_CONFLICT', 'PAYMENT_PROOF_OUTDATED'].includes(result.error) ? 409 : 400;
+        return failure(res, result.error, status);
+      }
+      const paymentEmail = req.body?.decision === 'CONFIRM' && !result.replay
+        ? await Promise.resolve().then(() => onPaymentConfirmed(result.order.id)).catch(() => ({ status: 'UNKNOWN' })) : null;
+      const latestOrder = db.data.orders.find(order => String(order.id) === String(result.order.id)) || result.order;
+      return res.json({ order: latestOrder, ...(result.replay ? { replay: true } : {}), ...(paymentEmail ? { paymentEmail } : {}) });
+    } catch { return failure(res, 'ACTION_PERSISTENCE_FAILED', 500); }
   });
 
   registerAction('/admin/actions/quote-fulfillment', async (req, res) => {

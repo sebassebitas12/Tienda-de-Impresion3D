@@ -211,6 +211,7 @@ textarea.v-input { min-height: 8rem; resize: vertical; }
 .v-product-body { display: flex; flex: 1; flex-direction: column; gap: .5625rem; padding: 1.25rem; }
 .v-product-body h3 { margin: .25rem 0 0; font-size: calc(1.0625rem * var(--a11y-font-scale)); line-height: 1.2; }
 .v-product-body p { flex: 1; margin: 0 0 .75rem; color: var(--muted); font-size: calc(.8125rem * var(--a11y-font-scale)); line-height: 1.55; }
+.v-product-price-note { margin-top: -.35rem; color: var(--muted); font: calc(.625rem * var(--a11y-font-scale))/1.4 var(--mono); letter-spacing: .035em; }
 .v-product-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; margin-top: .5rem; padding-top: .5rem; border-top: 1px solid var(--line); }
 .v-product-footer > span { color: var(--muted); font: calc(.625rem * var(--a11y-font-scale)) var(--mono); text-transform: uppercase; }
 .v-cart-item { display: flex; align-items: center; flex-wrap: wrap; gap: 1.5rem; padding: 1.25rem 0; border-bottom: 1px solid var(--line); }

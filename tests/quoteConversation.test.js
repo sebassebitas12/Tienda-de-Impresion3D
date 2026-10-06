@@ -13,7 +13,7 @@ describe('preparación explícita del borrador de solicitud', () => {
     ]);
 
     expect(result.draft).toEqual(expect.objectContaining({
-      description: 'Un dildo de juguete', intendedUse: 'Uso personal; contacto corporal',
+      description: 'Dildo de juguete', intendedUse: 'Uso personal; contacto corporal',
       dimensions: 'Largo 15; ancho 3 (unidad por confirmar)', material: 'TPU', quantity: 1,
     }));
     expect(result.reply).toMatch(/No se envió nada/);
@@ -32,7 +32,7 @@ describe('preparación explícita del borrador de solicitud', () => {
       { role: 'assistant', content: '¿Qué medidas aproximadas necesitás?' },
       { role: 'user', content: 'Una unidad, material PETG, largo 15 cm y ancho 3 cm.' },
     ]);
-    expect(result).toEqual(expect.objectContaining({ description: 'Una base para celular', intendedUse: '', quantity: 1, material: 'PETG', dimensions: 'Largo 15 cm; ancho 3 cm' }));
+    expect(result).toEqual(expect.objectContaining({ description: 'Base para celular', intendedUse: '', quantity: 1, material: 'PETG', dimensions: 'Largo 15 cm; ancho 3 cm' }));
   });
 
   it('no convierte una pregunta sobre materiales en la descripción de una pieza', () => {
@@ -61,7 +61,7 @@ describe('preparación explícita del borrador de solicitud', () => {
     ]);
 
     expect(result.draft).toEqual(expect.objectContaining({
-      description: 'Un organizador de cables, una unidad, aproximadamente 15 cm de largo por 3 cm de ancho',
+      description: 'Organizador de cables, una unidad, aproximadamente 15 cm de largo por 3 cm de ancho',
       intendedUse: '',
       dimensions: 'Largo 15 cm; ancho 3 cm',
       quantity: 1,
@@ -72,7 +72,7 @@ describe('preparación explícita del borrador de solicitud', () => {
     const result = prepareExplicitQuoteDraft([
       { role: 'user', content: 'Quiero un soporte para teléfono de escritorio. Prepará el resumen para revisarlo.' },
     ]);
-    expect(result.draft.description).toBe('Un soporte para teléfono de escritorio');
+    expect(result.draft.description).toBe('Soporte para teléfono de escritorio');
   });
 
   it('preserva diámetro cuando el cliente lo nombra así', () => {
@@ -102,7 +102,7 @@ describe('preparación explícita del borrador de solicitud', () => {
 
     const result = prepareExplicitQuoteDraft(turns);
     expect(result.draft).toEqual(expect.objectContaining({
-      description: 'Un organizador de cables para escritorio',
+      description: 'Organizador de cables para escritorio',
       intendedUse: '',
       dimensions: 'Largo 15 cm; ancho 3 cm',
       material: 'PETG',
@@ -125,7 +125,7 @@ describe('preparación explícita del borrador de solicitud', () => {
       role: 'user', content: 'Largo de 15 cm y ancho de 3 cm.',
     }])).toEqual(expect.objectContaining({
       reply: expect.stringMatching(/Actualicé el borrador.*No se envió nada/),
-      draft: expect.objectContaining({ description: 'Un organizador para el escritorio', dimensions: 'Largo 15 cm; ancho 3 cm' }),
+      draft: expect.objectContaining({ description: 'Organizador para el escritorio', dimensions: 'Largo 15 cm; ancho 3 cm' }),
     }));
   });
 });

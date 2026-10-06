@@ -4,13 +4,13 @@
 
 Importa **solo `vertice-cr-unificado.json`**. En n8n: **Workflows → Import from File** y selecciona ese JSON. No importes por separado los archivos `vertice-assistant-*.json`, `vertice-rates.json` ni `vertice-quote-email.json`; son componentes internos usados para generar y verificar el workflow unificado.
 
-El canvas trae cinco entradas Webhook dentro del mismo workflow: asistente general, asistente Admin, asistente de cotización, tasas y correo de cotización. Los tres chatbots siguen tres ramas completas: cada una tiene su contexto fijo, su **AI Agent nativo**, sus permisos y su HTTP Request Tool. El chat general corresponde al botón flotante de la tienda, Admin a una página de asistencia operativa dentro del panel protegido y cotización al flujo de solicitud. Los tres Agents comparten únicamente el nodo/credencial **DeepSeek Chat Model**; nunca convergen en un solo Agent. Seleccioná la credencial DeepSeek existente en n8n. La herramienta de cada rama llama a la API Vértice con una capacidad aleatoria y temporal. La API limita el rol, valida el nombre y argumentos de cada herramienta y consulta datos, calcula y prepara propuestas CRUD; la app ejecuta cambios únicamente al confirmar como Admin; no se entrega el JWT académico a n8n ni se habilita acceso directo a JSON Server. El historial viene acotado desde la app, por lo que no se duplica memoria. Tasas y Gmail son ramas deterministas separadas; los Agents no deciden envíos ni fuentes de tarifas.
+El canvas trae seis entradas Webhook: tres asistentes, tasas, correo de cotización y recibo de pago. Los Agents tienen contextos y herramientas por rol; comparten la credencial del modelo, no un único Agent. Tasas y Gmail son ramas deterministas: el agente no decide destinatarios ni envíos. La API autoriza las herramientas mediante capacidades temporales; el JWT académico no se entrega a n8n y los cambios CRUD requieren confirmación Admin.
 
 El JSON no incluye secretos ni permisos de cuentas. Tras importarlo, asigna las credenciales indicadas abajo en los nodos correspondientes. El workflow se importa inactivo; no lo publiques/actives hasta conectar las credenciales y poner las URLs correctas en el `.env` del backend.
 
 ## 1. Token compartido de Webhook
 
-En n8n abre cada nodo **Entrada — asistente general**, **Entrada — asistente admin**, **Entrada — asistente quote**, **Entrada — tasas** y **Entrada — cotización por correo**. En la autenticación Header Auth, crea o selecciona la misma credencial en los cinco nodos:
+Asigna Header Auth en las seis entradas, incluida **Entrada — recibo de pago**. Usa la misma credencial salvo que configures el override de pago descrito abajo:
 
 - **Name:** `X-Vertice-Webhook-Token`
 - **Value:** un secreto aleatorio propio
@@ -43,8 +43,17 @@ En `.env`, configura cada variable con la URL de producción que muestra su nodo
 | `VERTICE_ASSISTANT_TOOLS_URL` | `/assistants/tools` (callback desde n8n hacia la API Vértice) |
 | `VERTICE_RATES_WEBHOOK_URL` | `/webhook/vertice-rates` |
 | `VERTICE_QUOTE_EMAIL_WEBHOOK_URL` | `/webhook/vertice-quote-email` |
+| `VERTICE_PAYMENT_EMAIL_WEBHOOK_URL` | `/webhook/vertice-payment-email` |
 
 Los valores de `.env.example` apuntan a `localhost:5678`; solo sirven si n8n está escuchando en ese host y puerto. Si usas n8n Cloud u otra computadora, copia las URLs que muestra tu instancia. No uses una URL de prueba `/webhook-test/` en las variables del backend: el backend necesita que el workflow esté activo y su URL de producción disponible.
+
+Selecciona Gmail OAuth también en el segundo nodo Gmail (recibo de pago).
+`VERTICE_WORKSHOP_EMAIL` fija la copia BCC del taller; el cliente proviene de la
+orden en DB. El recibo comparte `VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN` por defecto;
+`VERTICE_PAYMENT_EMAIL_WEBHOOK_TOKEN` permite una credencial distinta.
+La API registra el intento antes del envío y exige acuse con orderId,
+deliveryKey y messageId. `UNKNOWN` no se reintenta ciegamente. Importar/publicar
+no prueba entrega: las verificaciones automatizadas usan Gmail mock.
 
 Los nodos Webhook requieren el mismo Header Auth que espera el backend. La URL de `VERTICE_ASSISTANT_TOOLS_URL` debe ser alcanzable **desde el entorno de n8n**: si n8n corre en Docker Desktop y la API en Windows, prueba `http://host.docker.internal:3000/assistants/tools`; si ambos corren en el mismo host fuera de Docker, `http://localhost:3000/assistants/tools` puede servir. El API de demo se enlaza a `localhost` por defecto. No abras todo JSON Server/API a Internet para resolver conectividad; en n8n Cloud o redes separadas usa una URL accesible con TLS que exponga solo el callback autorizado, o prueba n8n local junto a la API. No compartas la URL pública con el token ni pongas secretos en el navegador.
 

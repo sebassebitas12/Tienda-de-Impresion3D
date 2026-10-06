@@ -12,19 +12,19 @@ function getBaseUrl() {
   return globalThis.__VERTICE_JSON_SERVER_URL__ || DEFAULT_BASE_URL;
 }
 
-async function readCollection(name, { signal, fetchImpl, baseUrl }) {
-  const response = await fetchImpl(`${baseUrl}/${name}`, { signal });
+async function readCollection(name, { signal, fetchImpl, baseUrl, token }) {
+  const response = await fetchImpl(`${baseUrl}/${name}`, { signal, ...(name === 'orders' && token ? { headers: { Authorization: `Bearer ${token}` } } : {}) });
   if (!response.ok) throw new AdminOverviewError(`JSON Server respondió ${response.status} al consultar ${name}.`);
   const data = await response.json();
   if (!Array.isArray(data)) throw new AdminOverviewError(`La respuesta de ${name} no es una lista válida.`);
   return data;
 }
 
-export async function getAdminOverviewData({ signal, fetchImpl = globalThis.fetch, baseUrl = getBaseUrl() } = {}) {
+export async function getAdminOverviewData({ signal, token, fetchImpl = globalThis.fetch, baseUrl = getBaseUrl() } = {}) {
   if (typeof fetchImpl !== 'function') throw new AdminOverviewError('No hay una conexión disponible con JSON Server.');
   try {
     const [orders, customPrintRequests, users] = await Promise.all([
-      readCollection('orders', { signal, fetchImpl, baseUrl }),
+      readCollection('orders', { signal, fetchImpl, baseUrl, token }),
       readCollection('customPrintRequests', { signal, fetchImpl, baseUrl }),
       readCollection('users', { signal, fetchImpl, baseUrl }),
     ]);

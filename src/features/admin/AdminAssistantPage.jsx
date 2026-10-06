@@ -37,7 +37,9 @@ export function AdminAssistantPage() {
   const [sessionRejected, setSessionRejected] = useState(false);
 
   useEffect(() => () => abort.current?.abort(), []);
-  useEffect(() => { if (log.current) log.current.scrollTop = log.current.scrollHeight; }, [thread, busy]);
+  useEffect(() => {
+    if (log.current && (thread.length || busy)) log.current.scrollTop = log.current.scrollHeight;
+  }, [thread, busy]);
 
   async function send(value = message) {
     const text = value.trim();
@@ -73,7 +75,7 @@ export function AdminAssistantPage() {
     <header className="admin-copilot__header">
       <div><span className="admin-eyebrow">ADMINISTRACIÓN / ASISTENCIA OPERATIVA</span>
         <h1 id="admin-copilot-title">{es ? 'Copiloto del taller' : 'Workshop copilot'}</h1>
-        <p>{es ? 'Describí una pieza o pedí un cambio. La IA consulta el taller, prepara la ficha y guarda cuando confirmás la propuesta.' : 'Describe a part or request a change. AI queries the workshop, prepares the record and saves after you confirm.'}</p>
+        <p>{es ? 'Consultá el taller o describí un cambio de catálogo. La IA prepara una propuesta; vos revisás y confirmás antes de guardar.' : 'Ask about the workshop or describe a catalog change. AI prepares a proposal; you review and confirm before saving.'}</p>
       </div>
       <Link className="admin-copilot__return" to="/admin">{es ? 'Volver al resumen' : 'Back to overview'} <span aria-hidden="true">↗</span></Link>
     </header>
@@ -109,6 +111,6 @@ export function AdminAssistantPage() {
         </form>
       </section>
     </div>
-    <p className="admin-copilot__scope"><span>{es ? 'ALCANCE' : 'SCOPE'}</span>{es ? 'Creá, editá u ocultá piezas y categorías desde la conversación. Cada propuesta se revisa antes de guardar. También podés consultar pedidos y solicitudes.' : 'Create, edit or hide parts and categories through conversation. Review each proposal before saving. You can also query orders and requests.'}</p>
+    <p className="admin-copilot__scope"><span>{es ? 'ALCANCE' : 'SCOPE'}</span>{es ? 'Propone crear, editar o retirar piezas y categorías, siempre con tu confirmación. Consulta pedidos y solicitudes; las cotizaciones se finalizan en el detalle de cada solicitud.' : 'Proposes creating, editing or removing parts and categories, always with your confirmation. It can query orders and requests; quotes are finalized in each request detail.'}</p>
   </section>;
 }

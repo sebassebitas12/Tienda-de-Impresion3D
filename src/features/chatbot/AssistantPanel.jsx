@@ -4,18 +4,31 @@ import { Panel } from '../../components/ui/index.js';
 import { useAuth } from '../../hooks/useAuth.js';
 import { usePreferences } from '../../hooks/usePreferences.js';
 import { automationAction, automationError } from '../../services/automationService.js';
-import { extractQuoteDraft, prepareExplicitQuoteDraft } from '../../utils/quoteConversation.js';
+import { extractQuoteDraft, getExplicitlyClearedQuoteFields, prepareExplicitQuoteDraft } from '../../utils/quoteConversation.js';
 import { AssistantFormattedText } from './AssistantFormattedText.jsx';
 import './assistant.css';
 
 const TOPICS = {
   general: ['¿Qué material me conviene?', '¿Cómo hago un pedido?', 'Busco un organizador'],
-  quote: ['¿Qué datos necesitás?', 'Ayudame a elegir un material', '¿Cómo definimos las medidas?'],
+  quote: ['¿Podemos empezar aunque todavía no tenga medidas?'],
 };
 const TOPICS_EN = {
   general: ['Which material should I use?', 'How do I place an order?', 'Find a desk organizer'],
-  quote: ['What information do you need?', 'Help me choose a material', 'How do we define dimensions?'],
+  quote: ['Can we start even if I do not know the dimensions yet?'],
 };
+const QUOTE_THREAD_STORAGE_KEY = 'vertice.quote.thread';
+
+function restoreQuoteThread(mode, embedded) {
+  if (mode !== 'quote' || !embedded) return [];
+  try {
+    const stored = JSON.parse(sessionStorage.getItem(QUOTE_THREAD_STORAGE_KEY) || '[]');
+    if (!Array.isArray(stored)) return [];
+    return stored.filter(turn => (turn?.role === 'user' || turn?.role === 'assistant')
+      && typeof turn.content === 'string').slice(-20).map(turn => ({ role: turn.role, content: turn.content.slice(0, 5000) }));
+  } catch {
+    return [];
+  }
+}
 
 export function AssistantPanel({ mode = 'general', open, onClose, triggerRef, id = 'chat-panel', embedded = false, onDraftChange, draftReady = false, onReviewDraft }) {
   const auth = useAuth();
@@ -25,45 +38,78 @@ export function AssistantPanel({ mode = 'general', open, onClose, triggerRef, id
   const abort = useRef(null);
   const log = useRef(null);
   const [draft, setDraft] = useState('');
-  const [thread, setThread] = useState([]);
+  const [thread, setThread] = useState(() => restoreQuoteThread(mode, embedded));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [failedTurn, setFailedTurn] = useState(null);
+  const sending = useRef(false);
   useEffect(() => () => abort.current?.abort(), []);
+  useEffect(() => {
+    if (mode !== 'quote' || !embedded) return;
+    try {
+      if (thread.length) sessionStorage.setItem(QUOTE_THREAD_STORAGE_KEY, JSON.stringify(thread.slice(-20).map(({ role, content }) => ({ role, content }))));
+      else sessionStorage.removeItem(QUOTE_THREAD_STORAGE_KEY);
+    } catch {
+      // The request summary remains the durable source if tab storage is unavailable.
+    }
+  }, [embedded, mode, thread]);
   useEffect(() => { if (log.current) log.current.scrollTop = log.current.scrollHeight; }, [thread, busy]);
   const allowed = mode === 'general' || mode === 'quote';
   const title = mode === 'quote' ? (es ? 'Asistente de cotización' : 'Quote assistant') : (es ? 'Asistente Vértice' : 'Vértice assistant');
 
-  async function send(text = draft) {
-    if (busy || !text.trim() || !allowed) return;
+  async function send(text = draft, retry = null) {
+    if (sending.current || busy || !text.trim() || !allowed) return;
+    sending.current = true;
     const message = text.trim();
     setDraft(''); setError(''); setBusy(true);
-    const history = thread.map(item => ({ role: item.role, content: item.content })).slice(-10);
+    const history = retry?.history || thread.map(item => ({ role: item.role, content: item.content })).slice(-10);
     const conversation = [...thread, { role: 'user', content: message }];
     const capturedDraft = mode === 'quote' ? extractQuoteDraft(conversation) : null;
-    if (capturedDraft) onDraftChange?.(capturedDraft);
-    const prepared = mode === 'quote' ? prepareExplicitQuoteDraft(conversation, language) : null;
-    if (prepared) {
-      setThread(current => [...current, { role: 'user', content: message }, { role: 'assistant', content: prepared.reply, source: 'REQUEST_DRAFT' }]);
-      onDraftChange?.(prepared.draft);
-      setBusy(false);
-      return;
-    }
-    setThread(current => [...current, { role: 'user', content: message }]);
+    if (capturedDraft) onDraftChange?.(capturedDraft, { ready: false, source: 'message-preview' });
+    const explicitDraftIntent = mode === 'quote' ? prepareExplicitQuoteDraft(conversation, language) : null;
+    if (!retry) setThread(current => [...current, { role: 'user', content: message }]);
     abort.current = new AbortController();
     try {
       const result = await automationAction('/assistants/chat', { mode, message, history, language }, { token: auth?.token, signal: abort.current.signal });
+      if (typeof result?.reply !== 'string' || !result.reply.trim()) throw Object.assign(new Error('Invalid assistant response'), { code: 'ASSISTANT_INVALID_RESPONSE' });
+      if (mode === 'quote' && explicitDraftIntent && !result.requestDraft) {
+        setError(language === 'en'
+          ? 'The assistant replied but did not return a structured request summary. Retry; nothing has been submitted.'
+          : 'La IA respondió, pero no devolvió el resumen estructurado. Reintentá; no se envió nada.');
+        setFailedTurn({ message, history });
+        return;
+      }
+      setFailedTurn(null);
       setThread(current => [...current, { role: 'assistant', content: result.reply, links: result.links || [], source: result.source }]);
-      if (mode === 'quote' && result.requestDraft) onDraftChange?.(result.requestDraft);
+      if (mode === 'quote' && result.requestDraft) onDraftChange?.(result.requestDraft, {
+        ready: true,
+        source: 'assistant',
+        clearFields: getExplicitlyClearedQuoteFields(message),
+      });
     } catch (failure) {
       if (failure.name !== 'AbortError') {
         if (mode === 'quote' && failure.code === 'ASSISTANT_ITERATION_LIMIT' && capturedDraft) {
           setThread(current => [...current, { role: 'assistant', content: language === 'en'
-            ? 'n8n could not finish this reply, but I kept the details you wrote in the summary. Review them and continue or ask me to prepare the request; nothing was submitted.'
-            : 'n8n no pudo completar esta respuesta, pero conservé en el resumen los datos que escribiste. Revisalos y podés seguir o pedirme que prepare la solicitud; no se envió nada.' }]);
-        } else setError(automationError(failure.code, language));
+            ? 'n8n could not finish this reply. I kept a local preview of the details you wrote, but the AI has not prepared the request. Retry before sending; nothing was submitted.'
+            : 'n8n no pudo completar la respuesta. Conservé una previsualización local de tus datos, pero la IA no preparó la solicitud. Reintentá antes de enviarla; no se mandó nada.' }]);
+          setError(automationError(failure.code, language));
+          setFailedTurn({ message, history });
+        } else {
+          setError(automationError(failure.code, language));
+          setFailedTurn({ message, history });
+        }
       }
-    } finally { setBusy(false); }
+    } finally { setBusy(false); sending.current = false; }
   }
+
+  const composerFields = <>
+    <label htmlFor={`${id}-message`}>{embedded ? (es ? 'Tu idea o tu siguiente pregunta' : 'Your idea or next question') : copy.message}</label><div><textarea id={`${id}-message`} ref={input} maxLength={2000} rows={embedded ? 3 : 1}
+      value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => {
+        if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); send(); }
+      }} disabled={busy || !allowed} placeholder={embedded ? (es ? 'Ej.: cotizar solo el brazo robótico de una banda transportadora…' : 'Example: quote only the robotic arm on a conveyor belt…') : copy.messagePlaceholder} />
+    <button type={embedded ? 'button' : 'submit'} onClick={embedded ? () => send() : undefined} className="v-button v-button--primary" disabled={busy || !allowed || !draft.trim()} aria-label={copy.send}>↑</button></div>
+    <small>{es ? (mode === 'quote' ? 'Enter envía · Shift+Enter agrega una línea · Revisá el resumen antes de enviarlo.' : 'Enter envía · Shift+Enter agrega una línea · El asistente no modifica datos ni envía correos.') : (mode === 'quote' ? 'Enter sends · Shift+Enter adds a line · Review the summary before submitting.' : 'Enter sends · Shift+Enter adds a line · The assistant does not change records or send email.')}</small>
+  </>;
 
   const content = <>
     <div ref={log} className="assistant-thread" role="log" aria-label={es ? 'Conversación' : 'Conversation'} aria-live="polite">
@@ -82,15 +128,9 @@ export function AssistantPanel({ mode = 'general', open, onClose, triggerRef, id
       {busy && <p role="status">{es ? 'Consultando las herramientas…' : 'Checking tools…'}</p>}
     </div>
     {embedded && mode === 'quote' && draftReady && <button type="button" className="assistant-review-draft" onClick={onReviewDraft}>{es ? 'Revisar el resumen y adjuntar referencias' : 'Review summary and add references'} <span aria-hidden="true">↘</span></button>}
-    {error && <p className="assistant-error" role="alert">{error}</p>}
-    <form className="assistant-composer" onSubmit={event => { event.preventDefault(); send(); }}>
-      <label htmlFor={`${id}-message`}>{embedded ? (es ? 'Tu idea o tu siguiente pregunta' : 'Your idea or next question') : copy.message}</label><div><textarea id={`${id}-message`} ref={input} maxLength={2000} rows={embedded ? 3 : 1}
-        value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => {
-          if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); send(); }
-        }} disabled={busy || !allowed} placeholder={embedded ? (es ? 'Por ejemplo: quiero una base para mi celular que también sostenga el cargador…' : 'For example: a phone stand that also holds the charger…') : copy.messagePlaceholder} />
-      <button type="submit" className="v-button v-button--primary" disabled={busy || !allowed || !draft.trim()} aria-label={copy.send}>↑</button></div>
-      <small>{es ? (mode === 'quote' ? 'Enter envía · Shift+Enter agrega una línea · Revisá el resumen antes de enviarlo.' : 'Enter envía · Shift+Enter agrega una línea · El asistente no modifica datos ni envía correos.') : (mode === 'quote' ? 'Enter sends · Shift+Enter adds a line · Review the summary before submitting.' : 'Enter sends · Shift+Enter adds a line · The assistant does not change records or send email.')}</small>
-    </form>
+    {error && <div className="assistant-error" role="alert"><p>{error}</p>{failedTurn && <button type="button" className="v-button v-button--secondary" disabled={busy} onClick={() => send(failedTurn.message, failedTurn)}>{es ? 'Reintentar esta respuesta' : 'Retry this reply'}</button>}</div>}
+    {embedded ? <div className="assistant-composer">{composerFields}</div>
+      : <form className="assistant-composer" onSubmit={event => { event.preventDefault(); send(); }}>{composerFields}</form>}
   </>;
   if (embedded) return <section id={id} className="quote-design-chat" aria-label={title}>{content}</section>;
   return <Panel id={id} className={`chat-panel assistant-panel assistant-panel--${mode}`} open={open} onClose={onClose}

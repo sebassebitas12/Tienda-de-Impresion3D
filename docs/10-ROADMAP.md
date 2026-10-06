@@ -1,5 +1,22 @@
 # Vértice CR — Roadmap
 
+## Continuidad inmediata — checkpoint 2026-10-05
+
+El flujo de compra ya no confirma ni cobra al crear la orden: catálogo y
+cotización aprobada generan `PENDING`/`UNPAID` y continúan al checkout común del
+carrito. Allí el cliente puede usar PayPal Sandbox (CRC con equivalente USD,
+tasa/fecha) o reportar SINPE con imagen para verificación manual Admin. El
+detalle solo permite retomar ese checkout. Métodos excluyentes; personalizados
+no se pueden pagar antes de aprobar la cotización en la app.
+
+Pendientes inmediatos: ejecutar gates completos; importar/publicar y probar el
+export n8n vigente sin duplicar workflows; comprobar un único acuse Gmail real;
+ejecutar los dos métodos en Sandbox
+con cliente y Admin; después auditoría visual/responsive de carrito, pago,
+Cuenta y solicitudes. El outbox y la rama n8n están conectados y pasan HTTP
+aislado sin duplicados. No marcar recibido/enviado ni afirmar recorrido completo
+hasta observar los resultados. Los JSON individuales son insumos del generador.
+
 ## Presentación de 15 minutos — alcance confirmado 2026-10-05
 
 Este bloque supersede restricciones históricas que impiden pagos DEMO o CRUD
@@ -27,6 +44,26 @@ existente; se alcanza 10 solo con recorrido real coherente y verificable.
 Total inicial: 45/100. Es una estimación de preparación para la exposición,
 no un porcentaje de código terminado ni garantía de calidad absoluta.
 
+### Diferencial de producto actualizado por el usuario (2026-10-05)
+
+La demo debe mostrar IA operando en los flujos, no tres ventanas de chat
+decorativas. Cliente describe/sube referencias → IA organiza y obtiene evidencia
+técnica con herramientas → botones permiten revisar/enviar → Admin atiende
+excepciones y cotización → cliente aprueba/paga DEMO → seguimiento. No se debe
+pedir al cliente que conozca gramos, horas o costo del material. “Automático” no
+significa inventar datos: si falta evidencia para medir, pedir la aclaración
+mínima y explicarla.
+
+El estado técnico está por detrás de esa promesa: el agente recibe texto, no
+analiza los adjuntos; el estimador de precio es DEMO. Para cerrarla hace falta
+conectar referencias de imagen con visión, geometría de STL/OBJ, un laminador
+real, parámetros de tarifas, validar resultados/archivos y recorrer
+Cliente→Admin→Cliente. Meshy (`@meshy-ai/meshy-mcp-server`) queda aplazado por
+decisión explícita del usuario (2026-10-05); no bloqueará esta entrega. La app
+actual no analiza adjuntos. Primero se cerrará el flujo con la IA y las
+capacidades ya disponibles; cualquier futura generación 3D requiere evaluación
+separada y no sustituye al slicer/perfil real para gramos/horas.
+
 ### Orden y criterios de cierre
 
 1. Guardar checkpoint local, corregir documentación, estabilizar arranque/login.
@@ -41,6 +78,32 @@ no un porcentaje de código terminado ni garantía de calidad absoluta.
    de errores, navegación cruzada, casos extremos, feedback y ergonomía móvil.
 6. Verificar recorridos autenticados y correo real solo cuando el usuario autorice
    el envío; documentar configuración manual imprescindible y ensayo de 15 minutos.
+
+### Checkpoint local de catálogo y siguiente dependencia (2026-10-05)
+
+El seed local de `Pruebas` ya reconcilia intencionalmente solo `products`: 25
+fichas `ACTIVE`, imágenes y categorías presentes, importes declarados DEMO; no
+se copiaron pedidos, cuentas ni solicitudes de la base local a la rama. La pasada
+visual comprobada es solo catálogo Dark escritorio; Light y 375/768 siguen
+pendientes. No reabrir este trabajo cambiando precios a valores “reales” sin
+fuente comercial.
+
+Siguiente slice: (a) recuperar los archivos originales de los diseños y verificar
+licencia/atribución comercial por modelo (esa procedencia no está en el checkout);
+(b) ejecutar Creality Print CLI en lote con el preset K1C para obtener medidas
+reproducibles y renderizar la galería 2D desde el mismo modelo; (c) conectar
+adjuntos al agente n8n con estados y fallos claros, usando visión solo si el
+modelo disponible la admite; (d) automatizar nuevos STL/OBJ con el mismo worker
+y calcular desde las tarifas del taller; (e) recorrer el flujo completo con los
+tres roles. Meshy queda fuera por ahora. Mantener botones de
+revisión/aprobación acordes al contrato:
+cliente inicia con IA, Admin valida la cotización, cliente aprueba y paga DEMO.
+“Cero captura técnica manual” no autoriza a inventar escala, peso, duración o
+precio ni elimina la aprobación de negocio. La K1C está confirmada por el
+usuario, pero la potencia nominal de placa no reemplaza una medición media. Antes
+de afirmar que cotiza automáticamente deben existir archivos con licencia,
+ejecuciones verificables del slicer y tarifas del taller. Si faltan, conservar
+estimación DEMO y explicar sus supuestos.
 
 Los hallazgos nuevos se añaden a esta matriz. No reemplazan lo acordado.
 La IA no afirma haber interpretado imágenes si el proveedor no admite esa entrada.

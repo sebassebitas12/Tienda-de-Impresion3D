@@ -1,5 +1,154 @@
 # Vértice CR — Datos, API externa, JWT y N8N
 
+## Intake conversacional y medidas — reauditoría 2026-10-05
+
+`AssistantPanel` envía texto e historial a `/assistants/chat`; las fotos/STL/OBJ
+no forman parte del payload del agente. Las referencias sí se adjuntan al envío
+posterior de la solicitud y quedan disponibles para el taller. En QA, el
+workflow devolvió un `requestDraft` estructurado para «solo el brazo robótico»
+de una simulación de banda transportadora, con medidas y material vacíos. No se
+derivó precio, material, gramos u horas a partir de la imagen o del uso.
+
+`src/utils/quoteDimensions.js` comparte las reglas legibles de medidas para UI y
+API. Un valor vacío es permitido. En `QuoteRequestPage`, el intake con archivo
+usa su selector `mm/cm/in` como unidad por defecto solo para valores numéricos
+sin unidad; una unidad incluida en el texto prevalece y no se duplica al enviar.
+La ayuda de diseño no ofrece selector y exige unidades cuando hay medidas. Cero,
+texto ilegible o magnitudes sin unidad donde no existe selector se rechazan antes
+del envío y la API vuelve a validar. El volumen K1C excedido se advierte, no se
+bloquea automáticamente porque el taller puede evaluar orientación/división.
+
+El hilo conversacional se conserva en `sessionStorage` (hasta 20 turnos) y el
+resumen en `sessionStorage` y `localStorage` para sostener el retorno de login;
+los archivos binarios no se serializan en esos borradores y el navegador exige
+seleccionarlos otra vez después de autenticarse. Persistir borrador por cuenta,
+caducidad/limpieza y evitar mezcla entre usuarios del mismo perfil siguen siendo
+pendientes.
+
+## Actualización de integración real — 2026-10-05
+
+Tras publicación del usuario, asistente general devuelve HTTP 200 source N8N
+y cotización responde desde UI real. Supera el bloqueo histórico descrito abajo.
+Una sola entrega autorizada en base QA aislada quedó UNKNOWN; n8n ejecución 73
+falla en preparar correo (`URL is not defined`), antes del nodo Gmail. Sin
+reintento y sin mensaje encontrado en Gmail en la consulta posterior. El renderer
+compartido ya evita URL global: acepta solo origen HTTP(S) sin credenciales,
+con puerto válido. Workflow oficial regenerado, pendiente de importar/publicar.
+No cambiar UNKNOWN a SENT ni avanzar a aprobación sin un acuse real.
+
+## Catálogo + archivos para la presentación (2026-10-05)
+
+### Estado del proveedor de asistentes — 2026-10-05
+
+En el checkout actual `.env` define las URLs GENERAL, ADMIN y QUOTE de
+asistentes en `localhost:5678`. No define `DEEPSEEK_API_KEY` para el proveedor
+directo. El runtime utiliza n8n; ese servicio no respondía durante la pasada. Un POST
+local a `/assistants/chat` general dio HTTP 502. Para conectar créditos
+existentes, o se configura la credencial DeepSeek en n8n y se publican las URLs
+de webhook accesibles para la API, o se configura el proveedor directo con su
+secreto local. No compartir la clave en el chat. Las herramientas por rol y sus
+permisos deben probarse desde cada UI tras reconectar.
+
+Recomprobación posterior: n8n `/healthz` responde 200; el webhook general
+registrado responde 500 "Error in workflow" y la API devuelve 502. El navegador
+Brave muestra el unificado y un diálogo Publish pendiente del usuario. Abrir
+n8n no demuestra que el proveedor/modelo del workflow ejecute correctamente.
+
+### Recuperación de fuentes ejecutada
+
+`scripts/fetch-catalog-sources.mjs` consulta los 25 IDs en Printables y genera
+`automation/catalog/printables-sources.json`. `catalog-selection.json` determina
+el objeto y archivo seleccionado. `scripts/download-catalog-assets.mjs` descarga
+las fotografías disponibles y un original por diseño, verifica tamaño y registra
+SHA-256 en `asset-receipts.json`. Los modelos quedan fuera de Git en
+`.local-data/catalog/models/`. `scripts/import-catalog-sources.mjs` actualiza
+únicamente productos, preservando usuarios, pedidos y solicitudes.
+
+El detalle atribuye autor y licencia. Uso educativo: las fotos no acreditan
+fabricación del taller. Los kits pueden tener solo un componente descargado,
+identificado en `modelEvidence`; no se ha medido el conjunto. Los gramos y
+tiempos heredados siguen siendo DEMO. No se ejecutó Creality Print en este
+bloque: quedan pendientes el preset K1C, el laminado y las vistas estáticas
+adicionales donde la fuente no ofrece cuatro imágenes. La auditoría visual de
+estas nuevas galerías tampoco se declara ejecutada.
+
+- La diferencia intencional de `db.json` casa vs. semilla remota es `products`.
+  El catálogo local de presentación lleva 25 fichas visibles; los importes se
+  etiquetan `priceSource: 'DEMO'`. Los seis registros iniciales tienen fuente
+  desconocida y `priceConfirmation: null`; no son tarifas confirmadas.
+- `stock`/`minStock` heredados no equivalen a inventario. `ACTIVE` solo publica
+  la ficha en la demo. Las imágenes no acreditan fabricación, escala ni
+  rendimiento del objeto.
+- El usuario confirma que el equipo del taller es una Creality K1C. La ficha
+  oficial indica volumen 220×220×250 mm, boquilla estándar 0.4 mm y potencia
+  nominal 350 W; esta potencia nominal **no** es el consumo promedio para
+  calcular electricidad. El promedio debe medirse durante trabajos reales.
+- Auditoría de los activos locales (2026-10-05): `db.json` no conserva URL de
+  modelo, autor ni licencia por producto; en el checkout no hay STL/3MF/OBJ/G-code
+  de catálogo. p1–p6 tienen peso/horas heredados sin procedencia ni validación
+  local; p7–p25 están explícitamente marcados `DEMO`. No se ejecutó un slicer
+  sobre estos modelos, por lo que no se deben llamar datos reales.
+- El intake guarda referencias con la solicitud y permite que el taller las
+  revise, pero `/assistants/chat` actualmente serializa mensajes de texto y no
+  envía bytes de imagen/STL/OBJ al agente. No existe extracción geométrica ni
+  laminado automático en ese trayecto; es una brecha respecto a la promesa.
+- DeepSeek documenta entrada de imágenes en APIs compatibles, pero integrarla
+  requiere consentimiento visible, límites/tipos de archivo, lectura segura,
+  extracción estructurada y prueba de extremo a extremo. STL/OBJ requiere un
+  analizador/laminador real; el modelo de visión no lo reemplaza.
+- Meshy queda aplazado por decisión del usuario (2026-10-05); no es dependencia
+  ni requisito del bloque actual. Como referencia futura, su MCP oficial
+  (`@meshy-ai/meshy-mcp-server`) incluye generación desde una o varias imágenes,
+  análisis de imprimibilidad geométrica, reparación y envío al slicer local.
+  El análisis puede informar propiedades de malla (p. ej. volumen, agujeros y
+  aristas no-manifold); no demuestra escala elegida por el cliente, resistencia,
+  ajuste, seguridad de uso ni que la pieza terminada funcione.
+- `meshy_send_to_slicer` detecta slicers instalados y devuelve un comando de
+  lanzamiento: no es una ejecución desatendida del laminado. Meshy no entrega
+  por esa vía gramos de filamento/tiempo de impresión para Vértice. La cotización
+  debe ejecutar un slicer real con impresora, boquilla, perfil, altura de capa,
+  material e infill definidos. El peso depende también de paredes y soportes;
+  no se debe inferir como si todo el volumen fuera plástico sólido.
+- Aunque se evaluara más adelante, el MCP de Codex no sería invocable desde el
+  navegador de la tienda. Una eventual integración de Meshy iría por n8n/API y
+  su credencial quedaría del lado servidor, nunca en React, `db.json` ni en el
+  chat. El acceso de n8n a un adjunto local debe respetar el control de dueño,
+  tamaño, tipos permitidos, consentimiento y vencimiento/borrado.
+- Datos aún necesarios para cotizar sin captura técnica manual: un laminado
+  verificable con perfil K1C exportado (programa y versión, boquilla, proceso y
+  material), costo de filamento por kg, tarifa eléctrica vigente, consumo
+  promedio medido por perfil, desgaste por material y reglas de diseño/acabado.
+  Si una foto no tiene escala, la IA debe pedir solo la dimensión/uso mínima que
+  no pueda deducir; no debe presentar estimaciones visuales como medidas.
+- No se necesita procesar cada archivo manualmente. Creality Print documenta un
+  CLI que puede laminar modelos en lote (`--slice`, `--outputdir`, con presets
+  de impresora/proceso y filamento). Flujo previsto para catálogo: recuperar los
+  archivos originales y su licencia comercial → validar formato/unidades/escala
+  → correr un job por combinación de producto, material y preset → recoger
+  G-code/reporte → comprobar cómo la versión instalada expone gramos/tiempo y
+  contrastar una muestra con el preview de Creality Print → guardar valores,
+  archivo/modelo de origen, versión/hash del preset y fecha. El CLI ya permite
+  automatizar el lote; el extractor de resultados todavía debe implementarse y
+  probarse. No publicar el STL si solo se requieren imágenes comerciales.
+- Para el gallery del producto, renderizar cuatro imágenes fijas (hero y tres
+  ángulos) desde el mismo modelo licenciado mantiene la forma consistente; son
+  archivos de imagen, mientras el STL original puede permanecer privado para
+  laminar. Si solo hay una foto sin modelo, no se puede obtener un laminado real.
+  Para solicitudes nuevas con STL/OBJ, la API local puede ejecutar el mismo
+  worker con preset permitido después de validar dueño, tamaño y formato; el
+  cliente no introduce gramos ni horas.
+
+Referencias oficiales para evaluar integraciones, no equivalen a integración ya
+hecha: [DeepSeek Vision](https://api-docs.deepseek.com/guides/vision/),
+[Meshy AI integration](https://docs.meshy.ai/en/api/ai) y
+[Meshy Image-to-3D](https://docs.meshy.ai/en/api/image-to-3d), [Meshy Analyze
+Printability](https://docs.meshy.ai/en/api/analyze-printability), el [MCP
+oficial de Meshy](https://github.com/meshy-dev/meshy-mcp-server), la [ficha y
+manual oficial de K1C](https://cdn.creality.com/ow/official/8d7f37c1-06b3-481a-a051-c0369ffdacb8.pdf)
+y el [CLI oficial de Creality Print](https://github.com/CrealityOfficial/CrealityPrint).
+Meshy está aplazado por el usuario. Estas referencias describen capacidades
+externas, no una integración ni una verificación de Vértice.
+
 R-H81: /orders/mine agrega currentCatalogName a líneas sin productName cuando
 existe el producto. Es enriquecimiento de lectura, no snapshot retroactivo.
 No incorpora material/precios actuales ni escribe db.json. API local requiere
@@ -24,6 +173,41 @@ costos internos con otro total. El workflow unificado se ve Published en n8n
 (2026-10-05); Gmail aún solo muestra el mensaje anterior del 4 oct. Falta un
 correo real controlado para comprobar el HTML publicado y su acuse; hasta
 entonces el renderer probado no prueba la salida del workflow activo.
+
+## Checkout PayPal Sandbox — 2026-10-05
+
+`POST /orders/paypal/create` y `/orders/paypal/capture` exigen cliente activo,
+propiedad del pedido `PENDING`/no pagado y, para pedidos de cotización, oferta
+APPROVED de la versión vigente. El servidor calcula CRC→USD usando una API
+pública de tasas y conserva monto, tasa y fecha como snapshot; consulta el token
+OAuth de PayPal Sandbox exclusivamente con `VERTICE_PAYPAL_CLIENT_ID` y
+`VERTICE_PAYPAL_CLIENT_SECRET` en el entorno local. La app recibe URL de
+aprobación y muestra CRC junto con su equivalente USD/tasa/fecha.
+
+El capture valida que PayPal devuelva `COMPLETED`, USD y el monto exacto antes
+de persistir `CONFIRMED`/`PAID`, `paymentEvidence` y el evento. Discrepancia deja
+`REVIEW_REQUIRED`; no presenta éxito. La clave `PayPal-Request-Id` es estable
+por pedido/acción. SINPE y PayPal son excluyentes. API externa sandbox y tasa
+pública no fueron probadas en este checkpoint desde un recorrido real; Jest y
+`check:automation` usan respuestas controladas. Client ID/Secret no se guardan
+en frontend ni en Git; no documentar sus valores.
+
+## Correo de recibo de pago — integrado, pendiente prueba Gmail real (2026-10-05)
+
+El export unificado local tiene la entrada `vertice-payment-email`, valida el
+recibo y produce HTML con modo Sandbox/SINPE, líneas, monto CRC, fecha y
+`deliveryKey`; Gmail devuelve `messageId`. `scripts/payment-email-outbox.js`
+valida destinatarios fijos (cliente registrado + taller en BCC), contenido y
+transiciones sin permitir reenvíos ciegos. PayPal capture y confirmación Admin
+SINPE persisten el intent con el pago. `payment-email-delivery.js` reserva
+`SENDING`, libera la cola durante HTTP y persiste `SENT` solo con acuse completo
+(orderId/deliveryKey/messageId). Errores de configuración quedan `FAILED`;
+timeout o respuesta ambigua quedan `UNKNOWN`, sin reenvío automático.
+Configurar `VERTICE_PAYMENT_EMAIL_WEBHOOK_URL`, `VERTICE_WORKSHOP_EMAIL` y
+Header Auth; por defecto usa `VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN`, con override
+opcional `VERTICE_PAYMENT_EMAIL_WEBHOOK_TOKEN`. Los destinatarios vienen de DB
+y configuración del taller, no de texto del agente. La prueba HTTP aislada
+confirma dos recibos mock y ausencia de duplicados. No se envió correo real.
 
 ## Reporte y verificación de pago por pedido — 2026-10-04
 
@@ -69,7 +253,7 @@ save-quote admite CHANGES_REQUESTED con expectedStatus/expectedVersion coinciden
 Guarda quoteHistory, incrementa quoteVersion y vuelve a QUOTED; el envío confirmado
 existente pasa a AWAITING_APPROVAL. Los importes se recalculan con quotePricing.
 
-> Última actualización: **2026-10-04**.
+> Última actualización: **2026-10-05**.
 
 ## Propósito
 

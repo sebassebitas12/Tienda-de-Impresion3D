@@ -197,6 +197,11 @@ describe('Separación de catálogo y cotización', () => {
     expect(screen.getByRole('link')).toHaveAttribute('href', '/producto/test-only');
   });
 
+  test('ProductCard identifica un precio DEMO junto al monto visible', () => {
+    render(<UI.ProductCard product={{ ...product, priceSource: 'DEMO' }} href="/producto/test-only" showPrice />);
+    expect(screen.getByText('Precio referencial')).toBeVisible();
+  });
+
   test('CartItem permite pedir una cantidad sin consultar stock del dataset', () => {
     render(<UI.CartItem product={{ ...product, stock: 0 }} quantity={1} />);
     expect(screen.getByRole('spinbutton', { name: /Cantidad de/ })).toBeEnabled();

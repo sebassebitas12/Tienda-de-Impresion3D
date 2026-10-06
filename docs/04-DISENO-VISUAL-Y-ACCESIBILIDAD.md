@@ -1,5 +1,38 @@
 # Vértice CR — Diseño visual, temas y accesibilidad
 
+## Reauditoría de Admin Copiloto y cotización — 2026-10-05
+
+En Light a 1265×720, el Copiloto Admin desplazaba su panel al fondo incluso
+antes de que hubiera mensajes: el rótulo de bienvenida quedaba cortado bajo la
+cabecera aunque las sugerencias y el composer siguieran visibles. Se corrigió
+para auto-desplazar solo cuando hay conversación o una consulta en curso. La
+captura posterior deja la bienvenida completa, mantiene las tres sugerencias y
+el campo de consulta a la vista, y separa el scroll del historial del scroll de
+la página. En el intake con archivo, el campo de medidas ya explica que el
+selector aplica a números sin unidad; medidas vacías siguen permitidas y los
+valores ilegibles muestran error junto al campo.
+
+Esta verificación es escritorio Light; no sustituye una pasada de 375/768 px,
+teclado/lector de pantalla ni una prueba de mutación real del Copiloto. No se
+declara aprobado el responsive completo ni la IA de Admin de punta a punta.
+
+## Formulario conversacional — 2026-10-05
+
+Cabecera y altura inicial del chat se compactan para acercar el composer al
+primer viewport. Tras enviar, no se deja una conversación que parezca editable:
+se muestra confirmación y próximo paso; encabezado cambia a Solicitud recibida.
+Errores del chat incluyen recuperación local accesible, sin duplicar el mensaje.
+
+## Regla de catálogo para la demo académica (2026-10-05)
+
+La tienda conserva una experiencia de compra coherente, pero no disfraza datos
+de prueba como oferta final. La cabecera explica que las imágenes son
+ilustrativas y que el monto es orientativo; cada precio de origen DEMO lleva una
+marca pequeña «Precio referencial» junto al precio. En la ficha se aclara, antes
+de agregar al carrito, que el pago de prueba no confirma fabricación ni entrega.
+El aviso debe ser directo, localizado y secundario: informa sin convertir cada
+tarjeta en un panel de advertencias.
+
 Carrito a 761–1100 px apila resumen y líneas para evitar superposición de
 controles/precios. Cuenta móvil conserva las tres pestañas visibles, etapas
 en rejilla 2 columnas (3 en anchos mayores) y campos sin mínimo que exceda su
@@ -8,6 +41,17 @@ contenedor. Se mantienen tokens existentes; ver evidencia R-H78 en docs/05.
 > Última actualización: **2026-10-05**.
 
 ## Contraste Light en flujos operativos — R-H85
+
+### Collage de Acceso y catálogo reconciliado — auditoría R-H87
+
+El collage conserva su composición y controles accesibles, pero su contenido
+debe reflejar el catálogo vigente. El collage actual proviene de las piezas
+hero antiguas de Home y ya no coincide con las 25 fichas activas. El próximo
+ajuste debe poblarlo desde productos publicados (nombre, material e imagen
+principal), con fallback de carga/error que no oculte el formulario de acceso.
+La ficha de producto muestra la procedencia; la galería final requiere cuatro
+vistas estáticas por diseño, generadas desde el modelo fuente y etiquetadas como
+ángulos, con fondos/superficies coherentes y sin recortar la geometría.
 
 Se oscureció `--dim` de Light a `#6b6259`: contraste calculado 5.26:1 sobre
 `--ink` (`#f4f0e9`) y 4.77:1 sobre `--panel` (`#ebe5dc`). En esas superficies,

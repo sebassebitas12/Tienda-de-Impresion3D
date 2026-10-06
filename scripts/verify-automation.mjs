@@ -18,8 +18,9 @@ const users = [
   { id: 'customer-test', name: 'Cliente QA', email: 'qa-customer@vertice.cr', role: 'customer', status: 'ACTIVE' },
   { id: 'other-test', name: 'Otro QA', email: 'qa-other@vertice.cr', role: 'customer', status: 'ACTIVE' },
 ];
-await writeFile(dbFile, JSON.stringify({ users, products: [], categories: [], orderItems: [], orders: [{ id: 'qa-order', userId: 'customer-test', status: 'PENDING', total: 5000 }], customPrintRequests: [], activityLog: [] }));
+await writeFile(dbFile, JSON.stringify({ users, products: [], categories: [], orderItems: [], orders: [{ id: 'qa-order', userId: 'customer-test', status: 'PENDING', paymentStatus: 'UNPAID', currency: 'CRC', total: 5000, orderItems: [{ productName: 'Pieza QA', quantity: 1 }] }], customPrintRequests: [], activityLog: [] }));
 let mails = 0;
+let paymentMails = 0;
 const provider = createServer(async (req, res) => {
   let raw = ''; for await (const chunk of req) raw += chunk;
   const body = JSON.parse(raw || '{}');
@@ -27,6 +28,7 @@ const provider = createServer(async (req, res) => {
   let payload;
   if (req.url === '/rates') payload = { exchange: { venta: { valor: 460, fecha: new Date().toISOString().slice(0, 10) } }, electricity: { value: [] } };
   else if (req.url === '/email') { mails++; payload = { delivered: true, deliveryKey: body.deliveryKey, messageId: 'mock-gmail-1' }; }
+  else if (req.url === '/payment-email') { paymentMails++; payload = { delivered: true, orderId: body.orderId, deliveryKey: body.deliveryKey, messageId: `mock-payment-${paymentMails}` }; }
   else if (req.url === '/assistant' && body.messages?.at(-1)?.content === 'QA_PROVIDER_DOWN') {
     res.writeHead(503, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'provider unavailable' })); return;
   }
@@ -47,6 +49,7 @@ const portProbe = createServer(); await new Promise(resolve => portProbe.listen(
 const port = portProbe.address().port; await new Promise(resolve => portProbe.close(resolve));
 const api = spawn(process.execPath, ['scripts/api-server.js'], { cwd: process.cwd(), env: { ...process.env, PORT: String(port), HOST: '127.0.0.1', VERTICE_DB_FILE: dbFile,
   VERTICE_ATTACHMENT_DIR: attachmentDirectory,
+  VERTICE_PAYMENT_EMAIL_WEBHOOK_URL: `${mockUrl}/payment-email`,
   VERTICE_QUOTE_EMAIL_WEBHOOK_URL: `${mockUrl}/email`, VERTICE_QUOTE_EMAIL_WEBHOOK_TOKEN: 'qa-only-token', VERTICE_RATES_WEBHOOK_URL: `${mockUrl}/rates`,
   VERTICE_ASSISTANT_GENERAL_URL: `${mockUrl}/assistant`, VERTICE_ASSISTANT_ADMIN_URL: `${mockUrl}/assistant`, VERTICE_ASSISTANT_QUOTE_URL: `${mockUrl}/assistant`,
   VERTICE_ASSISTANT_TOOLS_URL: `http://127.0.0.1:${port}/assistants/tools`, VERTICE_WORKSHOP_EMAIL: 'qa-admin@vertice.cr',
@@ -129,22 +132,36 @@ try {
   const own = await post('/quotes/mine', {}, 'customer-test'); assert.equal(own.requests[0].status, 'APPROVED'); assertions++;
   await post('/admin/actions/quote-fulfillment', { requestId: intake.request.id, expectedVersion: 1, mode: 'DEMO' }, 'customer-test', 403);
   await post('/admin/actions/quote-fulfillment', { requestId: intake.request.id, expectedVersion: 1, mode: 'DEMO' }, 'admin-test', 409);
-  const fulfilled = await post('/quotes/pay-demo', { requestId: intake.request.id, expectedVersion: 1 }, 'customer-test');
-  assert.equal(fulfilled.order.pricingMode, 'DEMO'); assert.equal(fulfilled.order.paymentEvidence.mode, 'DEMO'); assertions += 2;
+  await post('/quotes/pay-demo', { requestId: intake.request.id, expectedVersion: 1 }, 'customer-test', 409);
+  const fulfilled = await post('/quotes/checkout', { requestId: intake.request.id, expectedVersion: 1 }, 'customer-test');
+  assert.equal(fulfilled.order.status, 'PENDING'); assert.equal(fulfilled.order.paymentStatus, 'UNPAID'); assertions += 2;
   assert.equal(fulfilled.order.scopeSnapshot.fileName, 'pieza.stl'); assertions++;
-  const repeated = await post('/quotes/pay-demo', { requestId: intake.request.id, expectedVersion: 1 }, 'customer-test'); assert.equal(repeated.replay, true); assertions++;
+  const repeated = await post('/quotes/checkout', { requestId: intake.request.id, expectedVersion: 1 }, 'customer-test'); assert.equal(repeated.replay, true); assertions++;
+  const proofImageDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aZ1kAAAAASUVORK5CYII=';
+  async function payWithReviewedProof(orderId) {
+    const submitted = await post('/orders/submit-payment-proof', { orderId, referenceNumber: 'QA-123456', sinpePhone: '8888-8888', proofFileName: 'qa.png', proofImageDataUrl }, 'customer-test');
+    const confirmation = { orderId, decision: 'CONFIRM', expectedProofSubmittedAt: submitted.order.paymentProof.submittedAt };
+    const paid = await post('/admin/actions/verify-payment', confirmation, 'admin-test');
+    assert.equal(paid.order.paymentEmail.status, 'SENT'); assertions++;
+    const mailCount = paymentMails;
+    const replay = await post('/admin/actions/verify-payment', confirmation, 'admin-test');
+    assert.equal(replay.replay, true); assert.equal(paymentMails, mailCount); assertions += 2;
+    return paid;
+  }
+  await payWithReviewedProof(fulfilled.order.id);
   const other = await post('/quotes/mine', {}, 'other-test'); assert.equal(other.requests.length, 0); assertions++;
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', nextStatus: 'CONFIRMED' }, 'customer-test', 403);
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', nextStatus: 'READY' }, 'admin-test', 400);
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', expectedUpdatedAt: null, nextStatus: 'CONFIRMED' }, 'admin-test', 409);
-  const paidCatalog = await post('/orders/pay-demo', { orderId: 'qa-order' }, 'customer-test');
-  assert.equal(paidCatalog.order.paymentMode, 'DEMO'); assert.equal(paidCatalog.order.status, 'CONFIRMED'); assertions += 2;
+  await post('/orders/pay-demo', { orderId: 'qa-order' }, 'customer-test', 409);
+  const paidCatalog = await payWithReviewedProof('qa-order');
+  assert.equal(paidCatalog.order.paymentMode, 'SINPE_MANUAL'); assert.equal(paidCatalog.order.status, 'CONFIRMED'); assert.equal(paymentMails, 2); assertions += 3;
   await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'PENDING', nextStatus: 'CONFIRMED' }, 'admin-test', 409);
   const advanced = await post('/admin/actions/order-transition', { orderId: 'qa-order', expectedStatus: 'CONFIRMED', expectedUpdatedAt: paidCatalog.order.updatedAt, nextStatus: 'IN_PRODUCTION' }, 'admin-test');
   assert.equal(advanced.order.status, 'IN_PRODUCTION'); assertions++;
   const persisted = JSON.parse(await readFile(dbFile, 'utf8')); assert.equal(persisted.quoteDeliveries[0].status, 'SENT');
-  assert.ok(persisted.activityLog.some(event => event.action === 'ORDER_DEMO_PAYMENT_RECORDED'));
-  assert.ok(persisted.activityLog.some(event => event.action === 'REQUEST_DEMO_PAYMENT_RECORDED')); assertions += 3;
+  assert.ok(persisted.activityLog.some(event => event.action === 'ORDER_PAYMENT_CONFIRMED'));
+  assert.ok(persisted.activityLog.some(event => event.action === 'REQUEST_SINPE_PAYMENT_CONFIRMED')); assertions += 3;
 
   const files = (await readdir('automation/n8n')).filter(name => name.endsWith('.json') && name !== 'vertice-cr-unificado.json'); assert.equal(files.length, 5); assertions++;
   for (const file of files) {
@@ -175,7 +192,7 @@ try {
   const unifiedNames = new Set(unified.nodes.map(node => node.name));
   const unifiedIds = unified.nodes.map(node => node.id);
   assert.equal(unified.active, false); assert.equal(new Set(unifiedIds).size, unifiedIds.length); assertions += 2;
-  const expectedWebhookPaths = ['vertice-assistant-general', 'vertice-assistant-admin', 'vertice-assistant-quote', 'vertice-rates', 'vertice-quote-email'];
+  const expectedWebhookPaths = ['vertice-assistant-general', 'vertice-assistant-admin', 'vertice-assistant-quote', 'vertice-rates', 'vertice-quote-email', 'vertice-payment-email'];
   const unifiedWebhooks = unified.nodes.filter(node => node.type.endsWith('.webhook'));
   assert.deepEqual(unifiedWebhooks.map(node => node.parameters.path).sort(), [...expectedWebhookPaths].sort()); assertions++;
   assert.ok(unifiedWebhooks.every(node => node.parameters.authentication === 'headerAuth' && node.parameters.responseData === 'firstEntryJson')); assertions++;
@@ -247,7 +264,7 @@ try {
   assert.deepEqual(runNormalizer(fromAgent('Agent stopped due to max iterations'))[0].json.output,
     { error: 'ASSISTANT_ITERATION_LIMIT' });
   assertions += 3;
-  assert.equal(unified.nodes.filter(node => node.type.endsWith('.gmail')).length, 1); assertions++;
+  assert.equal(unified.nodes.filter(node => node.type.endsWith('.gmail')).length, 2); assertions++;
   for (const [from, output] of Object.entries(unified.connections)) {
     assert.ok(unifiedNames.has(from));
     for (const branch of output.main || []) for (const connection of branch) assert.ok(unifiedNames.has(connection.node));

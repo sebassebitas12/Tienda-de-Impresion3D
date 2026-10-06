@@ -1,5 +1,46 @@
 # Vértice CR — Testing y calidad
 
+## Cierre local de checkout y recibos — 2026-10-06
+
+- `npm test -- --runInBand`: 56 suites, 399 pruebas pasando.
+- `npm run lint`, `npm run check:ui`, `npm run build`: pasan.
+- `npm run check:automation`: 292 comprobaciones HTTP con base temporal;
+  solicitud/aprobación/checkout/SINPE/Admin/recibo mock, sin duplicados.
+- `npm run check:n8n-payment-email`: export, HTML y acuse validados sin Gmail.
+- Conversión API USD por CRC invertida a CRC por USD antes del cálculo;
+  captura PayPal mock verifica monto y moneda, replay y permisos.
+- Admin no aprueba evidencia reemplazada: expectedProofSubmittedAt devuelve
+  409 sin persistir. REST genérico orders/orderItems protegido.
+- No se declara recorrido PayPal/Gmail real ni nueva auditoría visual móvil.
+  CI remoto debe confirmarse para el commit publicado antes de recomendar pull.
+
+## Cotización IA y fallo de correo observado — 2026-10-05
+
+Gate local antes del fix n8n: 51 suites / 318 tests, lint, check:ui y build pasan.
+Tras el fix: 51 suites / 323 tests verdes; lint detectó escapes innecesarios en
+el test nuevo, corregidos. check:ui/build pasan; lint se vuelve a ejecutar.
+Pruebas nuevas: respuesta inválida/reintento sin duplicación; login explícito de
+visitante; éxito sin composer. Renderer probado además en node:vm sin global URL
+y contra orígenes inseguros (13 tests de plantilla verdes). QA real aislado:
+idea→resumen IA→login con borrador→envío→revisión Admin→oferta DEMO. Correo falla
+en ejecución n8n 73 antes de Gmail; UNKNOWN preservado sin duplicado/reintento.
+No equivale a aprobación/pago en pantalla, prueba responsive ni CI verde.
+
+## R-H87 — Pago desde el detalle — 2026-10-05
+
+`customerInformationAndOrderDetail` verifica pago de pedido propio desde el
+detalle, bloqueo de doble clic, actualización del recibo, ausencia de pago en
+pedido pagado y conservación de datos tras error. Fixtures/mocks, sin escribir
+`db.json` ni enviar correos. Verificación local: 51 suites / 307 tests verdes;
+lint, check:ui, build y diff --check pasan. No equivale a recorrido visual
+autenticado ni a CI del cambio local, todavía sin commit.
+
+Ampliación: UI bloquea pago directo en personalizados con customPrintRequestId
+o sourceQuoteId; endpoint también bloquea ambos vínculos. Quote fulfillment
+rechaza seis estados anteriores/distintos de APPROVED sin crear pedido/evento.
+Suite completa previa: 309 tests verdes, lint/check:ui/build pasan. Después de
+añadir los seis casos, suites afectadas: 21 tests verdes. No hubo envío de correo.
+
 ## R-H85 — Rutas informativas, pedido propio y teclado Admin — 2026-10-05
 
 `customerInformationAndOrderDetail` cubre contenido bilingüe de páginas

@@ -9,6 +9,7 @@ import { automationAction } from '../src/services/automationService.js';
 jest.mock('../src/hooks/useAuth.js', () => ({ useAuth: jest.fn() }));
 jest.mock('../src/hooks/usePreferences.js', () => ({ usePreferences: jest.fn() }));
 jest.mock('../src/services/automationService.js', () => ({ automationAction: jest.fn(), automationError: code => code || 'Error' }));
+jest.mock('../src/services/commerceService.js', () => ({ fetchMyOrders: jest.fn().mockResolvedValue({ orders: [] }) }));
 
 const offer = {
   id: 'r1', userId: 'c1', status: 'AWAITING_APPROVAL', description: 'Soporte modular',
@@ -68,13 +69,12 @@ describe('vista de cotizaciones del cliente', () => {
     expect(screen.getByText(/No se transfirió dinero real/)).toBeInTheDocument();
   });
 
-  it('aprueba la cotización y luego paga el cliente para abrir su comprobante', async () => {
+  it('lleva al carrito una cotización aprobada para continuar el pago', async () => {
     setup({ ...offer, status: 'APPROVED' }, '/cuenta', undefined, async path => path === '/quotes/mine'
       ? { requests: [{ ...offer, status: 'APPROVED' }] }
       : { order: { id: 'ord-quote-1' } });
-    fireEvent.click(await screen.findByRole('button', { name: /Pagar .*DEMO/ }));
-    expect(await screen.findByText('recibo:ord-quote-1')).toBeInTheDocument();
-    expect(automationAction).toHaveBeenCalledWith('/quotes/pay-demo', { requestId: 'r1', expectedVersion: 2 }, { token: 'sim-token' });
+    fireEvent.click(await screen.findByRole('button', { name: /Continuar al carrito/ }));
+    expect(automationAction).toHaveBeenCalledWith('/quotes/checkout', { requestId: 'r1', expectedVersion: 2 }, { token: 'sim-token' });
   });
 
   it('orienta al administrador a su panel en vez de dejar un enlace suelto en /cuenta', async () => {

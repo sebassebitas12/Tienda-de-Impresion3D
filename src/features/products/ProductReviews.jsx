@@ -114,7 +114,7 @@ export function ProductReviews({ productId, es = true }) {
     <section className="product-reviews" aria-labelledby="product-reviews-title">
       <header className="product-reviews__header">
         <div className="product-reviews__heading">
-          <span className="product-reviews__eyebrow">{es ? 'Control de calidad y acabados' : 'Quality & finish feedback'}</span>
+          <span className="product-reviews__eyebrow">{es ? 'Comentarios sobre este modelo' : 'Feedback on this model'}</span>
           <h2 id="product-reviews-title">{es ? 'Opiniones de clientes' : 'Customer reviews'}</h2>
         </div>
         {average !== null && (
@@ -123,7 +123,7 @@ export function ProductReviews({ productId, es = true }) {
             <div>
               <StarRating rating={Number(average)} size={16} />
               <small className="product-reviews__count">
-                {reviews.length} {reviews.length === 1 ? (es ? 'opinión verificada' : 'verified review') : (es ? 'opiniones verificadas' : 'verified reviews')}
+                {reviews.length} {reviews.length === 1 ? (es ? 'opinión publicada' : 'published review') : (es ? 'opiniones publicadas' : 'published reviews')}
               </small>
             </div>
           </div>
@@ -136,7 +136,7 @@ export function ProductReviews({ productId, es = true }) {
       {!loading && !error && reviews.length === 0 && (
         <div className="product-reviews__empty">
           <p>{es ? 'Este modelo todavía no tiene opiniones publicadas.' : 'This model has no published reviews yet.'}</p>
-          <small>{es ? 'Las piezas se fabrican bajo pedido y los clientes pueden retroalimentar el acabado final.' : 'Parts are made to order and verified customers can review the final finish.'}</small>
+          <small>{es ? 'Esta demo no verifica que quien opina haya comprado el modelo.' : 'This demo does not verify that reviewers purchased the model.'}</small>
         </div>
       )}
 
@@ -227,8 +227,8 @@ export function ProductReviews({ productId, es = true }) {
           <div className="product-reviews__signin-prompt">
             <p>
               {es
-                ? '¿Compraste esta pieza? Iniciá sesión con tu cuenta de cliente para evaluar la calidad y precisión de la impresión.'
-                : 'Ordered this part? Sign in with your customer account to review print quality and tolerances.'}
+                ? '¿Querés compartir una opinión sobre este modelo? Iniciá sesión con tu cuenta de cliente.'
+                : 'Want to share an opinion about this model? Sign in with your customer account.'}
             </p>
             <Link className="v-button v-button--ghost v-button--pill" to="/login">
               {es ? 'Iniciar sesión para opinar' : 'Sign in to review'} ↗

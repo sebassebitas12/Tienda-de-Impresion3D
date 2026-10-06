@@ -1,5 +1,31 @@
 # Vértice CR — Métricas, Admin e IA operativa
 
+## Estado de interfaz del Copiloto — 2026-10-05
+
+El chat Admin muestra acciones de catálogo como una propuesta de vista previa y
+ofrece «Descartar propuesta» o «Confirmar y guardar»; la confirmación llama a
+`/admin/actions/catalog-ai-confirm` y requiere rol Admin. También permite
+consultar pedidos/solicitudes y conserva la cotización en el detalle de cada
+solicitud, en lugar de mezclarla con el CRUD. En esta reauditoría se comprobó
+visualmente la pantalla Light y se corrigió el scroll inicial que cortaba el
+saludo. No se ejecutó una operación de escritura desde el copiloto ni se
+comprobó aquí el webhook publicado, así que la disponibilidad de las tools y su
+resultado persistido siguen pendientes de validación en vivo.
+
+La conversación del cliente sí organizó por mensajes una petición de solo el
+brazo robótico para una simulación de banda transportadora y produjo un borrador
+estructurado sin forzar dimensiones/material. Los archivos adjuntos aún llegan
+al taller, no al agente; analizar imágenes/archivos y obtener medidas/laminado
+automático siguen siendo trabajo pendiente, no capacidad actual.
+
+## Corrección de correo n8n — 2026-10-05
+
+Ejecución real 73: rama de correo falla antes de Gmail porque el sandbox no
+expone URL. Renderer compartido corregido y probado sin ese global; regenerado
+`automation/n8n/vertice-cr-unificado.json` con el builder oficial. Importar y
+publicar esa versión, preservando credenciales. El único intento autorizado queda
+UNKNOWN sin reintento. No se declara entrega ni aprobación posterior verificadas.
+
 ## Requisito vigente del usuario — 2026-10-05
 
 La IA de Admin debe hacer CRUD real, con propuesta visible y confirmación antes
@@ -10,7 +36,7 @@ inicia la cotización; Admin revisa/aprueba, cliente paga DEMO, luego fabricaci�
 Las restricciones históricas de solo consulta son deuda por resolver, no requisito.
 El orden de bloques y porcentaje de preparación están en docs/10.
 
-> Última actualización: **2026-10-03**.
+> Última actualización: **2026-10-05**.
 
 ## Cierre del handoff A — 2026-10-03
 

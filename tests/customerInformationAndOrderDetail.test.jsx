@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { PreferencesProvider } from '../src/app/providers/PreferencesProvider.jsx';
 import { CustomerInformationPage } from '../src/pages/CustomerInformationPage.jsx';
@@ -26,7 +26,7 @@ describe('rutas informativas y detalle de pedido del cliente', () => {
     usePreferences.mockReturnValue({ language: 'es' });
     render(<MemoryRouter><CustomerInformationPage pageKey="faq" /></MemoryRouter>);
     expect(screen.getByRole('heading', { level: 1, name: /respuestas para seguir/i })).toBeInTheDocument();
-    expect(screen.getByText(/no cobra dinero/i)).toBeInTheDocument();
+    expect(screen.getByText(/no se cobra dinero/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /catálogo de piezas/i })).toHaveAttribute('href', '/catalogo');
   });
 
@@ -65,6 +65,30 @@ describe('rutas informativas y detalle de pedido del cliente', () => {
     expect(screen.getByText(/Archivo de referencia: soporte\.stl/)).toBeInTheDocument();
     expect(screen.getByText(/Pago simulado registrado · DEMO/)).toBeInTheDocument();
     expect(screen.getByText('Sin envío.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /pagar/i })).not.toBeInTheDocument();
+  });
+
+  it('mantiene el pago en el carrito y no confirma una orden pendiente desde el detalle', async () => {
+    useAuth.mockReturnValue({ token: 'sim-customer' });
+    usePreferences.mockReturnValue({ language: 'es' });
+    fetchMyOrders.mockResolvedValue({ orders: [order] });
+    render(<MemoryRouter initialEntries={['/pedidos/ord-customer-7']}><Routes>
+      <Route path="/pedidos/:id" element={<CustomerOrderDetailPage />} />
+    </Routes></MemoryRouter>);
+    expect(await screen.findByRole('link', { name: 'Continuar al pago en el carrito' })).toHaveAttribute('href', '/carrito?orderId=ord-customer-7');
+    expect(screen.getByText(/todavía no está confirmado/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /pagar/i })).not.toBeInTheDocument();
+  });
+
+  it.each(['customPrintRequestId', 'sourceQuoteId'])('no ofrece pago directo para un pedido personalizado identificado por %s', async field => {
+    useAuth.mockReturnValue({ token: 'sim-customer' });
+    usePreferences.mockReturnValue({ language: 'es' });
+    fetchMyOrders.mockResolvedValue({ orders: [{ ...order, [field]: 'rq-1' }] });
+    render(<MemoryRouter initialEntries={['/pedidos/ord-customer-7']}><Routes>
+      <Route path="/pedidos/:id" element={<CustomerOrderDetailPage />} />
+    </Routes></MemoryRouter>);
+    expect(await screen.findByRole('link', { name: 'Continuar al pago en el carrito' })).toHaveAttribute('href', '/carrito?orderId=ord-customer-7');
+    expect(screen.queryByRole('button', { name: /pagar/i })).not.toBeInTheDocument();
   });
 
   it('no muestra un pedido que no pertenece a la colección entregada por el servicio', async () => {
@@ -87,7 +111,7 @@ describe('rutas informativas y detalle de pedido del cliente', () => {
     </Routes></PreferencesProvider></MemoryRouter>);
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Error');
-    screen.getByRole('button', { name: 'Try again' }).click();
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
     expect(await screen.findByRole('heading', { name: 'Order details' })).toBeInTheDocument();
     expect(fetchMyOrders).toHaveBeenCalledTimes(2);
   });

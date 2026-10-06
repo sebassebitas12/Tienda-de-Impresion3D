@@ -6,40 +6,79 @@
 > Server; no hay cobros reales. Las secciones antiguas de SINPE que contradigan
 > el estado `DEMO` descrito aquí son historial de diseño reemplazado.
 
+## Estado del catálogo de presentación (2026-10-05)
+
+La semilla de presentación local conserva 25 fichas `ACTIVE` y sus imágenes;
+`ACTIVE` significa visible en la demo, no que haya inventario, un producto
+fabricado ni capacidad de entrega confirmada. Los precios de los 25 se marcan
+`priceSource: 'DEMO'`: los seis registros iniciales no tienen fuente comercial
+trazable y llevan `priceConfirmation: null`; p7–p25 conservan la procedencia de
+benchmark ya guardada. Ningún monto de esta semilla debe presentarse como tarifa
+vigente del taller.
+
+En p7–p25, `aiProductionEstimate.source: 'DEMO'` y
+`verifiedWithSlicer: false` identifican estimaciones analógicas sin laminar. En
+p1–p6, `weightGrams` y `estimatedProductionHours` son valores heredados sin
+evidencia de laminado asociada. Los campos heredados `stock` y `minStock` no son
+inventario operativo y se ignoran para visibilidad y compra.
+
+Las imágenes son referencias visuales de las fichas, no prueba fotográfica de
+una pieza fabricada ni verificación de geometría, escala, resistencia o
+imprimibilidad. La tienda identifica las imágenes como ilustrativas y precios
+como referenciales; el checkout DEMO permite recorrer el proceso, no cobra ni
+promete fabricación o entrega. La diferencia intencional de la base local de
+casa frente a la semilla remota está en `products`; no se llevan
+pedidos/solicitudes/runtime a este seed.
+
+Las descripciones basadas únicamente en imagen expresan una intención de
+prototipo, no una garantía de compatibilidad o desempeño. En especial, p12 no
+está certificado para contacto alimentario, p13 no es un dispositivo médico,
+p24 no está validado para vuelo y las escalas de p21/p25 no están verificadas.
+
+El asistente de solicitud recibe texto, no imágenes/STL/OBJ. Los adjuntos se
+guardan con la solicitud y quedan para revisión del Admin; el modelo no los
+analiza ni mide en el flujo actual.
+
 ## Entidades
 
-### Pago DEMO — flujo vigente (2026-10-05)
+### Pago del pedido — flujo vigente (2026-10-05)
 
-El pago solo es un evento simulado guardado por JSON Server: no consulta bancos,
-no mueve dinero, no valida comprobantes y no dispara un correo de pago. Las
-operaciones exigen sesión `customer` activa y propiedad del registro; Admin no
-puede pagar ni generar pedidos por el cliente. La respuesta es idempotente y
-guarda evento de actividad con `paymentMode: 'DEMO'` y referencia explícita de
-simulación.
+El carrito crea un pedido propio `PENDING`/`UNPAID` y abre el checkout en
+`/carrito?orderId=...`; crear el pedido no significa haber pagado ni reservado
+producción. Solo el cliente propietario puede continuar. La pantalla ofrece dos
+modalidades mutuamente excluyentes:
 
-- **Catálogo:** `Pagar · DEMO` crea pedido `CONFIRMED`/`PAID`, muestra el recibo
-  en `/pedidos/:id` y aclara que no se cobró dinero real. El servidor vuelve a
-  validar producto, variante, cantidad y precio desde catálogo. Envío, impuestos
-  y fecha se coordinan aparte y no se presentan como incluidos o gratuitos.
-- **Cotización personalizada:** Admin puede guardar monto, vigencia y alcance
-  aunque la pieza no exista en catálogo. La oferta publicada se envía por el
-  flujo de correo existente; el cliente la aprueba en `/cuenta`, paga DEMO desde
-  su propia sesión y recibe el pedido/recibo con snapshot del alcance.
-- **Producción:** solo un pedido pagado en el modelo DEMO puede avanzar a
-  producción. El cliente no puede pagar cotizaciones vencidas ni órdenes de
-  otro usuario. Reintentar no duplica pago, pedido ni evento.
+- **PayPal Sandbox:** el servidor crea y captura la orden contra el entorno de
+  pruebas de PayPal. Antes de salir se muestra el total CRC, equivalente USD,
+  tasa y fecha de actualización. Una captura completada se valida contra monto y
+  moneda esperados; entonces el pedido pasa a `CONFIRMED`/`PAID` con evidencia
+  Sandbox. Usa fondos de prueba: no es un cobro real.
+- **SINPE Móvil informado por el cliente:** se solicitan referencia, teléfono,
+  imagen del comprobante y nota opcional. Esto no consulta BAC ni demuestra una
+  transferencia. El taller debe revisar y confirmar manualmente para marcar
+  `PAID`; si lo rechaza, el pedido sigue `PENDING` y el cliente puede corregir.
+
+No se permite combinar/alternar métodos una vez iniciada una modalidad o enviado
+un comprobante. Errores de proveedor o discrepancias de monto no muestran un
+recibo de éxito ni duplican captura. Las cotizaciones siguen un flujo distinto:
+Admin envía la oferta, el cliente la aprueba en la app y solo entonces se crea
+el pedido pendiente; el pago se completa en el carrito, no al aprobar ni desde
+el detalle de pedido. La vigencia y versión aprobada se vuelven a validar.
+
+Las dos confirmaciones crean un outbox de recibo en la misma persistencia del
+pago y lo despachan después, sin mantener bloqueada la cola de operaciones.
+Un acuse válido registra `SENT` y `messageId`; fallos inciertos quedan `UNKNOWN`
+y no se reintentan automáticamente. El pago permanece registrado aunque falle
+el correo. La integración está probada con HTTP/Gmail mock, no entrega real.
+Admin envía la fecha del comprobante abierto: evidencia reemplazada devuelve
+`PAYMENT_PROOF_OUTDATED`, sin cobrar ni enviar. El correo de oferta
+mantiene su rama separada en Gmail/n8n; la publicación local del export tampoco
+prueba por sí sola la instancia activa. No guardar secretos PayPal ni de Header
+Auth en frontend/repositorio.
 
 ### Preservación de solicitud personalizada durante autenticación (E01, 2026-10-04)
 
 El formulario de solicitud personalizada (`/solicitud`) guarda de forma reactiva el borrador en almacenamiento de sesión/local (`vertice.quote.draft`), incluyendo campos manuales, interpretaciones del asistente y nombres de archivos seleccionados. Si un visitante no autenticado redacta su solicitud y navega a `/login` o `/registro`, el estado `from` preserva la ruta con retorno transparente; al volver, el formulario restaura íntegramente los campos y despliega un aviso informativo que aclara que, por políticas de seguridad del navegador, los archivos binarios adjuntos deben seleccionarse nuevamente antes del envío.
-
-### Procedencia y benchmarks demo del catálogo (2026-10-04)
-
-Los productos `p7` a `p25` corresponden a ítems de benchmark y demostración académica. Están identificados explícitamente en el modelo con `priceSource: 'DEMO'`, `priceConfirmation.mode: 'DEMO'`, y `aiProductionEstimate: { source: 'DEMO', verifiedWithSlicer: false }`. No se presentan como medidas certificadas por laminador ni precios confirmados por el taller. Que su precio sea DEMO no significa que estén publicados: el estado `ACTIVE` controla la aparición en `/catalogo` y los `DRAFT` siguen ocultos hasta completar sus datos y publicarlos.
-
-`PLA Silk` es una variante de acabado incluida bajo la familia PLA en la lista
-de materiales del catálogo. El perfil de costo del producto la aproxima con la
-referencia DEMO de PLA; no declara una calibración de taller específica.
 
 ### Reseñas y revisión de ofertas (2026-10-04)
 
@@ -315,11 +354,12 @@ aprobación implícitos. Adjuntos y enlace de referencia explican el encargo; no
 son mediciones de laminador.
 
 La cotización de una pieza nueva del catálogo es un flujo distinto y pertenece
-al formulario Admin del producto. Allí peso, horas y postprocesado se ingresan
-o parten de un perfil análogo explícitamente DEMO; el motor guarda procedencia y
-desglose. El operador debe revisar y confirmar antes de publicar un precio DEMO.
-No se infieren costos de una foto ni se actualiza automáticamente el precio del
-cliente por una respuesta del bot.
+al formulario Admin del producto. El perfil análogo puede proponer un cálculo
+DEMO, pero no mide una foto/STL ni conoce tarifas reales. El operador debe
+revisar y confirmar antes de publicar. La meta vigente del usuario es retirar
+la carga manual de datos técnicos mediante IA + herramientas; hoy esa
+automatización multimodal todavía no existe y ningún precio se actualiza por
+una respuesta de texto del bot.
 
 En la ayuda de diseño, una orden explícita de preparar/enviar la solicitud
 termina la entrevista y genera un borrador con los datos disponibles; los
@@ -333,9 +373,10 @@ explícita puede iniciar la preparación. Una intención vieja no debe intercept
 una pregunta nueva; sí permite que el siguiente mensaje sin interrogación y con
 detalles estructurados complete el borrador. La guía determinista del taller es
 la única fuente para comparar materiales en la conversación: no se agregan
-temperaturas, precios ni claims de seguridad que no estén en ella. No se
-interpreta una imagen/STL como medición; fotos, modelos y referencias se adjuntan
-desde el formulario y quedan para revisión del taller.
+temperaturas, precios ni claims de seguridad que no estén en ella. Las
+referencias adjuntas se guardan para la solicitud y el Admin puede consultarlas,
+pero el agente actual recibe solo mensajes de texto: todavía no analiza las
+imágenes ni extrae geometría de STL/OBJ. No afirmar lo contrario.
 
 Para fichas del catálogo, el operador llega al cálculo DEMO desde «Cotizar DEMO»
 en la lista de modelos. El resultado no se considera precio confirmado hasta

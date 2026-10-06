@@ -1,0 +1,688 @@
+{
+  "purpose": "EDUCATIONAL_DEMO",
+  "retrievedAt": "2026-10-06T00:17:19.201Z",
+  "receipts": [
+    {
+      "productId": "p1",
+      "modelId": "997093",
+      "fileId": "4172905",
+      "fileName": "panel 69x69x10 with threaded holes.stl",
+      "modelPath": ".local-data/catalog/models/p1.stl",
+      "modelSha256": "3eb450f9abe5960ceddcb374bd5c22b9569f1ce8e48869ca5558ab12654fd5fa",
+      "assets": [
+        {
+          "path": "/images/catalog/p1/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/997093/images/7588035_d7065cf8-9944-4100-8a56-20d248219c68_4bb51630-c133-448d-99e1-549a74c1ac42/zrzut-ekranu-2024-09-04-123326.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "ec3904693deacd7bc317b148fc2062e4c97ef54995e6c6959cb5de52649c6bab"
+        },
+        {
+          "path": "/images/catalog/p1/source-2.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/997093/images/7588036_9363e801-19eb-47ad-878f-96326d7f5f6d_51b077f4-e2fc-4af5-95c1-a56b9077fef5/zrzut-ekranu-2024-09-04-123347.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "f8c6ab1f80d1807c6eb8273b932f8b45b4cb3c739a43f3a436693c8ed540d328"
+        },
+        {
+          "path": "/images/catalog/p1/source-3.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/997093/images/7588037_f8b131c9-303a-4ffd-b6ca-2382f231f93e_7b602d16-101f-4709-aa32-8c75d68be35a/zrzut-ekranu-2024-09-04-123405.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "269ea7ea6974a4fea20f095ec2cb328cda4849abd4946604cdeb12db7d790fde"
+        },
+        {
+          "path": "/images/catalog/p1/source-4.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/997093/images/7588063_a2ff80ed-642c-4c27-88a1-c559fa2d490d_7d9634ea-876d-4605-aee6-fa33ce31aa49/zrzut-ekranu-2024-09-04-123433.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "6a25c7d5f62cd0c0cca2095a5fd51dda8d559847dc612d8c7e73b0771c170b59"
+        }
+      ]
+    },
+    {
+      "productId": "p2",
+      "modelId": "179001",
+      "fileId": "755809",
+      "fileName": "Headphone_Stand.STL",
+      "modelPath": ".local-data/catalog/models/p2.stl",
+      "modelSha256": "41f0cbedc2fbaff6d832de03b14166d76aa8e7e5dad3666ecf02b91e9ccb5f4f",
+      "assets": [
+        {
+          "path": "/images/catalog/p2/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/179001/images/1674865_778f6bf8-57c0-4844-afde-75cf03024cb3/headphone-stand2.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "0c6a758b532d44f359bd8334b713dd7958317e07dbb557d790decbf3e06ccf05"
+        },
+        {
+          "path": "/images/catalog/p2/source-2.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/179001/images/1674870_b756d2cc-9776-45b1-b1db-f0b30e3d517c/headphone-stand5.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "72a3a931779f1c630467d2e44158bfb58d391f9e3851a61c4773e922d6f8e3a4"
+        },
+        {
+          "path": "/images/catalog/p2/source-3.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/179001/images/1674866_283a6124-9456-422c-a29f-3be2922ca00c/headphone-stand4.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "2d829918dad66f76625b5d487744d50a0240b315dc14daa0dd9304b9dab8bbde"
+        },
+        {
+          "path": "/images/catalog/p2/source-4.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/179001/images/1674889_2ce4241a-6b16-400c-9a61-f6ea723737ea/headphone-stand7.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "a05b6c0a253aaa5c826f2bb3746c257c3ba95cc9e8da10d86832b07af3a6e673"
+        }
+      ]
+    },
+    {
+      "productId": "p3",
+      "modelId": "816298",
+      "fileId": "3526123",
+      "fileName": "Dragon Flapping Wings V2.stl",
+      "modelPath": ".local-data/catalog/models/p3.stl",
+      "modelSha256": "2c58ebdc1a047f7a6726bd295bb6a602152b9b7ea4f696253a4e8340ef0f92a4",
+      "assets": [
+        {
+          "path": "/images/catalog/p3/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/816298/images/6426453_1958a5d4-a186-45a1-8e31-f95b93e5009f_1926ed73-b438-4145-9090-d91101c0febb/win_20240405_23_21_04_pro-2.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "fdc471b76bd9dd9271b454a5ee8d63e39052e638494f9933d852c1c3dd6d7616"
+        },
+        {
+          "path": "/images/catalog/p3/source-2.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/816298/images/6306898_79ef9eba-8417-4ca3-9555-20820cceedac_214aece9-0086-48ce-a982-9e5b954158f4/win_20240323_09_02_08_pro.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "d3616060506e381fc0a4e7d9908e8f6261e287757a1c57749ec63d5189c163ab"
+        },
+        {
+          "path": "/images/catalog/p3/source-3.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/816298/images/6306886_a692de0f-f876-4b22-8fa9-6363fde35c16_b7ecf32b-60d3-4db1-bc10-8a266f88257c/win_20240323_09_00_09_pro.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "7ec0cf57581de8b35f7d69ee614546e0a16d000ab7bdc160581c1211f4759262"
+        },
+        {
+          "path": "/images/catalog/p3/source-4.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/816298/images/6306905_342d9492-47b2-4307-9d93-3a7f77f982df_80b909de-373d-45d0-8c4e-fa5523657375/win_20240323_09_02_47_pro.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "bc7b1f8d6c79cf1deb3d5c13b6948aa60cf091e886d6fa173be24399a0b65cf1"
+        }
+      ]
+    },
+    {
+      "productId": "p4",
+      "modelId": "1064446",
+      "fileId": "4439395",
+      "fileName": "geo planter v4.stl",
+      "modelPath": ".local-data/catalog/models/p4.stl",
+      "modelSha256": "9e525e50cc094f5b02c8b009d6e8e5d902d38e7bdd91a391cf90caaef3a7ce76",
+      "assets": [
+        {
+          "path": "/images/catalog/p4/source-1.jpeg",
+          "sourceUrl": "https://media.printables.com/media/prints/1064446/images/8054705_43248866-e0dd-4b49-bb51-9420c5760a6a_205dda57-f5e7-4b1f-9312-eff3a537f1c4/5c0938b21e9629d0f1f583b940a3e89943c5ddf3-1.jpeg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "edb9c7a5792696ee907296e7ed5a665e76745cb1664131cae1a91dfd661511dd"
+        }
+      ]
+    },
+    {
+      "productId": "p5",
+      "modelId": "3119",
+      "fileId": "140339",
+      "fileName": "gear_bearing.3mf",
+      "modelPath": ".local-data/catalog/models/p5.3mf",
+      "modelSha256": "e66e915eeb422d65b06306cdb730b2b38744b3a849ed7ea3ea3751293e325de4",
+      "assets": [
+        {
+          "path": "/images/catalog/p5/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/3119/images/19951_a4523329-41f7-4834-b0ce-6d1b6137691a/gear.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "6f3f95f2aa628e7f7adf1c21b3c686363a33d7e613d17b2a1335cb56da74013f"
+        }
+      ]
+    },
+    {
+      "productId": "p6",
+      "modelId": "820622",
+      "fileId": "3486786",
+      "fileName": "Sebastian.stl",
+      "modelPath": ".local-data/catalog/models/p6.stl",
+      "modelSha256": "5fee74e141f9bd3d8fb8cf638e09bf638ccb6edbb6b830c49584b797f5f47a74",
+      "assets": [
+        {
+          "path": "/images/catalog/p6/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/820622/images/6501599_51a88b59-bb90-4bc7-902a-ed92067e80ab_de8ce1a5-ea65-4dcf-98b1-fe5a31447a2e/17131805170423134247825190002855.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "4e06fd8f2cbbe9077deefec38cb8bffb6cb08721ab68d160b97daa1a28f32bbf"
+        },
+        {
+          "path": "/images/catalog/p6/source-2.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/820622/images/6501608_83a98611-d827-4aff-8d98-b5850e88ae16_09177944-e553-4af1-a84a-6975e3e1bed1/17131807616145905710516860775107.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "ae8388b24d48de5fe35a1c17072a30ee2de9f9a55465f901ab59ff738a3d5505"
+        },
+        {
+          "path": "/images/catalog/p6/source-3.png",
+          "sourceUrl": "https://media.printables.com/media/prints/820622/images/6602570_01ac7972-930f-4962-887f-5bd849eb9c4f_9e0ab061-44cf-4f98-abca-323e1f03fd5d/2024-04-27_12-24.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "1e23b5084ff5bc4b20b7c1c215d0b18c72a9d3b57cdf9735c33a88881fad5a5b"
+        },
+        {
+          "path": "/images/catalog/p6/source-4.png",
+          "sourceUrl": "https://media.printables.com/media/prints/820622/images/6602569_5063c09a-8da9-4a9d-afeb-2b92391f99ce_5b75f226-95f9-4a45-a245-a43188e662b3/2024-04-27_12-27.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "c59cf50012f341fbdafea98f12f27b68e06bc53110a0ca5038be3d2bbad2a994"
+        }
+      ]
+    },
+    {
+      "productId": "p7",
+      "modelId": "459406",
+      "fileId": "1990397",
+      "fileName": "PS5 controller mount v2.stl",
+      "modelPath": ".local-data/catalog/models/p7.stl",
+      "modelSha256": "c8481fa4bcf3d116bf528ae81e5ebd672953337bbcab89f8be6de851c19b344d",
+      "assets": [
+        {
+          "path": "/images/catalog/p7/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/459406/images/3772346_8a4d5f2a-d91e-408d-b487-e99ce8deeae7/pxl_20230422_024447382.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "7e4b45d6aa779fb723d7f6923efba5538fe7411d8e80b84a81b60030f567ff75"
+        },
+        {
+          "path": "/images/catalog/p7/source-2.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/459406/images/3772347_941d3a36-7534-4023-9e78-3ce467846de7/pxl_20230421_230335717.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "94f889ff682ad541ec74ac05c76e1fe621a3c835b78b7baeba02049e45709594"
+        }
+      ]
+    },
+    {
+      "productId": "p8",
+      "modelId": "655759",
+      "fileId": "2790738",
+      "fileName": "7 - Brazo.stl",
+      "modelPath": ".local-data/catalog/models/p8.stl",
+      "modelSha256": "eb668348bcd3ba3a901ff3ea669856965e6e1f8a36658bdcd664a45e0ae283f1",
+      "assets": [
+        {
+          "path": "/images/catalog/p8/source-1.png",
+          "sourceUrl": "https://media.printables.com/media/prints/655759/images/5169123_e79e7e8d-565c-419f-afdc-6b670c6daadc_4895818e-8b02-4582-80a8-d2c8e49e5a5a/0210001.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "f39be991f037beee6c599ffb6209c2e769bdd413daa5776fb7f210eb71175e8b"
+        },
+        {
+          "path": "/images/catalog/p8/source-2.png",
+          "sourceUrl": "https://media.printables.com/media/prints/655759/images/5169128_383a49b7-fe4e-4f83-b960-987764dba597_029634c6-0058-40c6-a11b-88f277f88248/0210032.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "85a66296f59a6514bdc2abd69629a8ec407fc0223f4f3eba5f2fc464bc53bf74"
+        },
+        {
+          "path": "/images/catalog/p8/source-3.png",
+          "sourceUrl": "https://media.printables.com/media/prints/655759/images/5169125_1213d35f-3a1b-4014-9405-7f8da4fbf537_a509f5fc-b4e5-451e-8f64-2ce9f108b8a1/0210036.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "03e91c6fa0e278966f3264e9a4a665fdf5443d05a9dfd0cc48ee8ddd8c73ca42"
+        },
+        {
+          "path": "/images/catalog/p8/source-4.png",
+          "sourceUrl": "https://media.printables.com/media/prints/655759/images/5169138_4cace611-e70c-460b-8bb0-45a139d2c684_a0ec57b7-ef97-4c3f-89ab-7a6314d230d0/0210009.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "436bb499e658651472e9aac2f238753d7c219f590d2e49cf66c67ed2c7ffae2d"
+        }
+      ]
+    },
+    {
+      "productId": "p9",
+      "modelId": "174099",
+      "fileId": "737806",
+      "fileName": "pi 4 case.3mf",
+      "modelPath": ".local-data/catalog/models/p9.3mf",
+      "modelSha256": "d10272b62a039d62918c7b0df6389ec121d91e319894828915da395cf170e414",
+      "assets": [
+        {
+          "path": "/images/catalog/p9/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/174099/images/1635799_ce35ebdf-58bf-4bff-8604-be1b5b391680/raspberry-pi-case.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "cebf14c14966ee4a4dbd94b53025944315d9bbd306f8a209ff5d24f50043f268"
+        }
+      ]
+    },
+    {
+      "productId": "p10",
+      "modelId": "359285",
+      "fileId": "1760369",
+      "fileName": "klamma-cable-clip-medium.stl",
+      "modelPath": ".local-data/catalog/models/p10.stl",
+      "modelSha256": "d4fee7d8ca374a2280ab42dc13fc7eb5b4998009cc1b42e9c979f50dbb5a1d1a",
+      "assets": [
+        {
+          "path": "/images/catalog/p10/source-1.png",
+          "sourceUrl": "https://media.printables.com/media/prints/d8a9826f-5eb8-4f8d-ba42-c4a2dc492bd3/images/12979836_2a48c3c0-f03f-4782-9fe3-7f529a6b15c0_ec5e7689-6c9a-47ef-9cec-129c2e5df5ad/hero.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "167a5d297ae69e39f08f5a63f26eab124ef6dbc636f0e6637f023d3be2a301d1"
+        },
+        {
+          "path": "/images/catalog/p10/source-2.png",
+          "sourceUrl": "https://media.printables.com/media/prints/359285/images/3679121_b852ca7e-a8fc-45f6-85f5-44bb8102bbf0/klamma-hero.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "d6d2629a42ba1486b2aa007bcc56bc906f0411f647dc8a1671e7a079300711c6"
+        },
+        {
+          "path": "/images/catalog/p10/source-3.png",
+          "sourceUrl": "https://media.printables.com/media/prints/359285/images/3367173_925777cf-23ed-42b6-9a6e-739e6eb7b114/hero.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "3dc568cad5aa7c0dcc914fe851de94aa0cc29edc36629778907efcaed448c7b6"
+        }
+      ]
+    },
+    {
+      "productId": "p11",
+      "modelId": "1654733",
+      "fileId": "6960397",
+      "fileName": "trash-bag-dispenser_d54xh140.stl",
+      "modelPath": ".local-data/catalog/models/p11.stl",
+      "modelSha256": "30f8b47ac025a72fef3b47977aa82550a36d4ba043fced2483405b12660deae3",
+      "assets": [
+        {
+          "path": "/images/catalog/p11/source-1.jpeg",
+          "sourceUrl": "https://media.printables.com/media/prints/8dc46d84-cdf6-45f0-8379-ab5a25506626/images/12434952_77c4f719-8ad4-4d89-8861-4e8011675546_d09af625-a436-4151-939d-4ec34710c4a2/img_0103.jpeg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "2e4fcb2ae0a533290456a386f90018a93f0f1899dc338e6af33a8c2f4b6b41cf"
+        }
+      ]
+    },
+    {
+      "productId": "p12",
+      "modelId": "872395",
+      "fileId": "3680094",
+      "fileName": "ForkBottom.stl",
+      "modelPath": ".local-data/catalog/models/p12.stl",
+      "modelSha256": "72d43f6b7f5b8f05f680f886105c92bcf9fef862e9ef5807082a834c5d71b9d4",
+      "assets": [
+        {
+          "path": "/images/catalog/p12/source-1.jpeg",
+          "sourceUrl": "https://media.printables.com/media/prints/872395/images/6695495_c30e2e7d-1a7c-4bf1-84d8-3ae9348e9a0a_a2b1cb57-8bd7-4c2f-bd37-0663b15b2fcd/img_4990.jpeg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "29488aeea4d77bd40debfc657ae82fca72046a6998167042b70d837bb6619c24"
+        },
+        {
+          "path": "/images/catalog/p12/source-2.jpeg",
+          "sourceUrl": "https://media.printables.com/media/prints/872395/images/6695496_8a513c98-e27d-49c1-af24-9e5b16751198_fc431170-7b51-4ede-80f6-db0bebd8955a/img_4989.jpeg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "94a29c41ace5b41c94f2a32a8dd783e801470bd778b91133c412d87c5d386735"
+        }
+      ]
+    },
+    {
+      "productId": "p13",
+      "modelId": "157304",
+      "fileId": "644902",
+      "fileName": "2021-05-24 Large Wrist Splint 15deg RH (1) (1).STL",
+      "modelPath": ".local-data/catalog/models/p13.stl",
+      "modelSha256": "d3c4155af825696b34fd858f7c781af45038e7eff49d406600c9da1c04a82de4",
+      "assets": [
+        {
+          "path": "/images/catalog/p13/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/157304/images/1470953_695a9aae-d2bb-441a-9868-a68a5ea73e6f/img_3132.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "6f0c44c01486811d51466709668b5e68de24abcfd33dce034bd56424cd5d552e"
+        },
+        {
+          "path": "/images/catalog/p13/source-2.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/157304/images/1470954_2b395f93-c295-4331-8433-526895682da9/img_2713.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "446fe521e7391040fa9839e8acd112be033563963b312a22d7992ca4980c4c90"
+        },
+        {
+          "path": "/images/catalog/p13/source-3.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/157304/images/1470955_18f60658-e037-4938-9bb8-af38fc0ff28d/img_2691.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "b69e4fd0fefde1702529854aa8e6811ac543aa82e725c831d062052b68dcdcf3"
+        },
+        {
+          "path": "/images/catalog/p13/source-4.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/157304/images/1470956_0b9e375c-8a74-4b7f-a093-17be2c9e2cf5/img_3131.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "9f10472f7b1d873c85fcd80e4778275a5432bc9234d9b82a77ca9295795b29d4"
+        }
+      ]
+    },
+    {
+      "productId": "p14",
+      "modelId": "159941",
+      "fileId": "653982",
+      "fileName": "BaseHex.stl",
+      "modelPath": ".local-data/catalog/models/p14.stl",
+      "modelSha256": "38e438199c8e1741d87c1188015548c3370278f9a7e650054c11896c94d88fd3",
+      "assets": [
+        {
+          "path": "/images/catalog/p14/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/159941/images/1491277_47d04820-2b11-48aa-9500-2b3e1ccce72e/large_display_two_159941.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "ef2c070c2df1c59a1d53adf18ab351928e787fbfdb8a644a57630f57c5ac9f3f"
+        },
+        {
+          "path": "/images/catalog/p14/source-2.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/159941/images/1491278_ee32a422-9833-44c0-8edb-bcf42fb60abd/large_display_img_0317_159941.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "d04dcfa508d4fb6df9d4efa7fd427d734a906f935215e4e7d02b9af44ccabd5c"
+        },
+        {
+          "path": "/images/catalog/p14/source-3.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/159941/images/1491279_3d9765b8-81e4-4eee-baa9-b0b1dd4f167c/large_display_img_0315_159941.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "ff88e4b4de712adff9d7aecd5f6a31287a5e82451c7309c4336f3df3f4cae8bf"
+        },
+        {
+          "path": "/images/catalog/p14/source-4.png",
+          "sourceUrl": "https://media.printables.com/media/prints/159941/images/1491280_5eec7ab4-b557-4789-8699-c56a82bf3580/large_display_55mm_spacer_159941.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "6d9e7c2e65716d2b56ef87b3febf2c3b3b51223c32e859aace3918af38a85f4b"
+        }
+      ]
+    },
+    {
+      "productId": "p15",
+      "modelId": "1190568",
+      "fileId": "4961275",
+      "fileName": "Holder V1.stl",
+      "modelPath": ".local-data/catalog/models/p15.stl",
+      "modelSha256": "bd60951ee1e9e49102dbf7e7c40fe1e38c0559dabe6a35df9a0ec064e3ae1d5b",
+      "assets": [
+        {
+          "path": "/images/catalog/p15/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/1190568/images/9022542_e0ca328c-23d3-4ad4-a0c3-a131848cf9a0_ee7c2b2f-16c0-465f-b621-bd40f42a6909/20250221_130847.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "8aee2da1740f972fd240a0e18f07e7748ca9562d1dcdd320dffc28e32716ecbd"
+        },
+        {
+          "path": "/images/catalog/p15/source-2.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/1190568/images/9023298_8ae00c88-35a0-4fa2-93d4-9fa9d4d883ed_1ea1ced5-dfcd-47db-bd6c-a926a7402184/20250221_132706.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "86739dc197fd19c086377211fa356f739023846138439b7f86b54343ae9c0081"
+        },
+        {
+          "path": "/images/catalog/p15/source-3.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/1190568/images/9023299_dc051748-2e80-44ef-8919-10a7f424a517_efaef878-ed94-4d5f-8ffe-4e0c1c131b8f/20250221_132827.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "a61b4d1f3f9739aa4cb2c4f9f39473f422694134757dfc0bb23211f49b0141d9"
+        },
+        {
+          "path": "/images/catalog/p15/source-4.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/1190568/images/8965099_88c4bcc7-7bd2-4769-ab88-f5eb0aa801a5_dc990f81-dfaa-4632-adbc-6d72c2a6f53c/20250215_115346.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "71bed87b45f4c0c5f1b5129174261ab832a4d9199902a3d4bb4a6b0561022114"
+        }
+      ]
+    },
+    {
+      "productId": "p16",
+      "modelId": "1318189",
+      "fileId": "5540784",
+      "fileName": "adjustable_foot.stl",
+      "modelPath": ".local-data/catalog/models/p16.stl",
+      "modelSha256": "97a6cd4a9384a242a08eb695dd7e9a2d0adef21d681df7254d43fe5f820f8468",
+      "assets": [
+        {
+          "path": "/images/catalog/p16/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/ffbb4d9b-bf36-452e-9632-0e6424440d05/images/9945246_c1220583-0a80-4e0f-8f80-ea213371476a_9300c7bc-fd45-4bc5-890d-3a3eac2457e1/img_0001_05.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "ba676dff0208fba9c7184290bd81faa30e92506fd29ac662b4f97d8ad8849496"
+        }
+      ]
+    },
+    {
+      "productId": "p17",
+      "modelId": "560322",
+      "fileId": "2860677",
+      "fileName": "A.stl",
+      "modelPath": ".local-data/catalog/models/p17.stl",
+      "modelSha256": "b6372c813c36e901c468aa842c29e0ca43652889303cd6f3f50c3f46c57028ba",
+      "assets": [
+        {
+          "path": "/images/catalog/p17/source-1.png",
+          "sourceUrl": "https://media.printables.com/media/prints/555e3637-e21c-4351-b837-24a3838b1062/images/13529592_bf77a2aa-dae0-4644-b0d4-61d126a31ad8_acb50386-94af-4c18-aeef-668e679eb65d/x.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "20e331ced0bab51cdd92bdfdb195bb09f0f4fa694f9d6218bd68b570ff37bdb9"
+        },
+        {
+          "path": "/images/catalog/p17/source-2.png",
+          "sourceUrl": "https://media.printables.com/media/prints/560322/images/6180414_8ae9e3c0-793e-41fa-b643-e7535725b71c_33eebbc9-be5b-482e-a543-315145da2d42/k.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "832da3f86e27bdfe164baa11b2a97c307e954c53695a0b5b4fa906b8718227f2"
+        },
+        {
+          "path": "/images/catalog/p17/source-3.png",
+          "sourceUrl": "https://media.printables.com/media/prints/f007da7f-bdef-463e-b377-92df860fd821/images/13451526_ced96ebd-ff28-4df7-8c24-1e2b4eb74c36_acb0ee8a-2f93-4d5a-9143-dd13dbd1b3e4/w.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "2d4a6c15356518c1fff93b08d7aff5320b92ad96897cc4309da34702260ce692"
+        },
+        {
+          "path": "/images/catalog/p17/source-4.png",
+          "sourceUrl": "https://media.printables.com/media/prints/560322/images/7619115_01ba1652-8d73-49c5-819b-388d7e8c2ba0_c0877b0a-920f-4924-b36d-6c7d4be1214e/r.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "d6dce5e60a53579011d2cbfadf2f3ce3901fb1b88e53e2ec268bb506b796e1d5"
+        }
+      ]
+    },
+    {
+      "productId": "p18",
+      "modelId": "1125173",
+      "fileId": "4695398",
+      "fileName": "Stand-conect.stl",
+      "modelPath": ".local-data/catalog/models/p18.stl",
+      "modelSha256": "7849c3882d2efa71c713cb3d95d016da28e4864c50d1a98e9629d15823593509",
+      "assets": [
+        {
+          "path": "/images/catalog/p18/source-1.png",
+          "sourceUrl": "https://media.printables.com/media/prints/1125173/images/8491940_b11d5ea1-cf25-4e8e-a4ba-a02dcc6d8613_a9287df0-c979-40ae-87c4-688e810fe69e/laptop-stand-picture1.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "fcd6b850f64440437870848fa1b89ce4df73cacbe5d13f5c7db311d732df6563"
+        }
+      ]
+    },
+    {
+      "productId": "p19",
+      "modelId": "139614",
+      "fileId": "574194",
+      "fileName": "Power_Strip_Mount.3mf",
+      "modelPath": ".local-data/catalog/models/p19.3mf",
+      "modelSha256": "1089981f0d648f6afdc4637ad1af208d1f4f84b99bbd114bb7ee6d7dce82831a",
+      "assets": [
+        {
+          "path": "/images/catalog/p19/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/139614/images/1325956_92ab449b-74dc-48eb-8a63-42e3b6649e24/large_display_img_20220127_181840_139614.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "f48c246278246753a4e8452deb03393b5ea40eb9a0aeee5b85333b38bc0c6fbe"
+        },
+        {
+          "path": "/images/catalog/p19/source-2.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/139614/images/1325957_f5236f68-469d-476d-aecb-e4124652d95b/large_display_img_20220127_181824_139614.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "d3b83f84e8509186b088564a46c7164c99fc61d443ea6cae9ccc82ba8a46bb93"
+        },
+        {
+          "path": "/images/catalog/p19/source-3.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/139614/images/1329750_4f41c7bb-add0-4dba-be88-5b0c0dd2e4e7/img_20220226_164958.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "4d34e3f7b3922f84b452d9fe77c99213763b156873d9b599e97e31a60332b1bb"
+        },
+        {
+          "path": "/images/catalog/p19/source-4.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/139614/images/1329751_cb51e351-d4b5-4716-8ce3-319e23d8d36d/img_20220226_165006.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "b332604da10bb313461e23f37918ed4d8f42320eb1174fee7aab23af0f738031"
+        }
+      ]
+    },
+    {
+      "productId": "p20",
+      "modelId": "863767",
+      "fileId": "3644365",
+      "fileName": "D20Slots_DiceMachine v10_SlotMachine.stl",
+      "modelPath": ".local-data/catalog/models/p20.stl",
+      "modelSha256": "89173910450499f0919c96cecd57aa18b3587cedd2beec29cf13b13f79da6f6e",
+      "assets": [
+        {
+          "path": "/images/catalog/p20/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/863767/images/6658514_651fdb42-9095-4bb8-beab-76b064a692b3_78d64ff4-d353-412a-a42f-38b85995c85b/d20-slot-machine-3.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "8ff8a1dc00707695c957af89c025d17677d2c9799dd68a8da40ac669fcfb0087"
+        },
+        {
+          "path": "/images/catalog/p20/source-2.jpeg",
+          "sourceUrl": "https://media.printables.com/media/prints/863767/images/6632193_f60f2de1-9f9e-4fe2-a273-072e4933b694_f7566e45-c6e5-496e-a42f-3a366c5fe604/img_1911.jpeg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "36fb90a9c325c58fde252e55b5c035908e4577218e8bf5f6cf64e251352649d9"
+        }
+      ]
+    },
+    {
+      "productId": "p21",
+      "modelId": "383022",
+      "fileId": "1676010",
+      "fileName": "rc tire.stl",
+      "modelPath": ".local-data/catalog/models/p21.stl",
+      "modelSha256": "3a478afe6d6c9a8043351a2e2b084c5158bb84180dd3b18464d086c3b5afa2f6",
+      "assets": [
+        {
+          "path": "/images/catalog/p21/source-1.png",
+          "sourceUrl": "https://media.printables.com/media/prints/383022/images/3211864_7e0b0af5-9f43-4fb4-99ce-2526de171e9c/rc-tire.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "ddddc452157d88019c87505ec202f34ade4dc396f6387890f3974b636a278fbb"
+        }
+      ]
+    },
+    {
+      "productId": "p22",
+      "modelId": "596844",
+      "fileId": "2590357",
+      "fileName": "SkullMask_v2.stl",
+      "modelPath": ".local-data/catalog/models/p22.stl",
+      "modelSha256": "0a2ec75d3543341ccfb42a15054ed07f3cad6db7cc1307c3eb3c92bdf82e4aec",
+      "assets": [
+        {
+          "path": "/images/catalog/p22/source-1.jpeg",
+          "sourceUrl": "https://media.printables.com/media/prints/596844/images/4752465_03b3b42d-b098-4aed-abae-7358a25ac100_df8ef404-afec-4ef7-86e2-049189c8a9a7/large_display_skullmask_596844.jpeg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "ab18d05983b111c909850c187b28d4ceba07ea4bc3f4497ba3c08b55eb562f3c"
+        },
+        {
+          "path": "/images/catalog/p22/source-2.png",
+          "sourceUrl": "https://media.printables.com/media/prints/596844/images/4752466_bfb4744f-0714-4b75-9031-9d5d5ac79460_1b6ca2f8-cd1b-418b-af99-2ac39fbd8897/large_display_skullmask_v2_596844.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "dcff70b9aede7e62fa20848f2d55bff68822b9ba22cbdf0f234f8242b96567ef"
+        },
+        {
+          "path": "/images/catalog/p22/source-3.png",
+          "sourceUrl": "https://media.printables.com/media/prints/596844/images/4752469_4f924872-3ad6-4a26-9db6-49040e8b15c1_a5a160c3-9dbf-4fd6-a90a-1549146c8731/large_display_skullmask_left_lower_596844.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "ecc0336701a33e61f95edadc708954dffe7baa0c63893c986847b70592a647d4"
+        },
+        {
+          "path": "/images/catalog/p22/source-4.png",
+          "sourceUrl": "https://media.printables.com/media/prints/596844/images/4752470_02b1990b-2f96-4a23-9381-928838762085_a8c038d4-b616-4741-9869-ca39773fed07/large_display_skullmask_right_lower_596844.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "b15990a5d78ad5d8d9fa15926b77742a692b2dc92e8bbae6ae87011eda1156df"
+        }
+      ]
+    },
+    {
+      "productId": "p23",
+      "modelId": "988521",
+      "fileId": "4141063",
+      "fileName": "Oni Mask 3 Assembly - Monocolor.3mf",
+      "modelPath": ".local-data/catalog/models/p23.3mf",
+      "modelSha256": "47bce4f5ad78f0631441278520987ed0e4a6dcb9ca027a1c49e03b12a90c8fa3",
+      "assets": [
+        {
+          "path": "/images/catalog/p23/source-1.png",
+          "sourceUrl": "https://media.printables.com/media/prints/988521/images/7532068_645a94fc-fcc8-4024-b9f9-cc835c81e54d_4695b81c-29ed-4e41-bfd4-e5bc26e7de1d/0012.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "1b6a8106f3a4410c2a3c4ef1d5ad7433360a2e9517bff0151b947908719f6c16"
+        },
+        {
+          "path": "/images/catalog/p23/source-2.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/988521/images/7531510_447bda59-6e3c-4612-9ab9-121b3b502436_5f0a3e39-e423-4bcb-bc60-e4589ab6ac7e/pxl_20240827_202232600.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "7da0ca98ec289f4ae5183524a995294729af82a0947f9cb4510091b1144f4c8f"
+        },
+        {
+          "path": "/images/catalog/p23/source-3.png",
+          "sourceUrl": "https://media.printables.com/media/prints/988521/images/7532069_2ab09975-8d64-496f-80ef-e5f661633114_b9807513-3cc6-4026-95e8-e6e4cff6cee6/0013.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "b7fe014d114e958561fb0d84008dba0e9ae2050eaf95710990996ea54392ab01"
+        },
+        {
+          "path": "/images/catalog/p23/source-4.png",
+          "sourceUrl": "https://media.printables.com/media/prints/988521/images/7532067_fc5c1467-c591-48f4-b662-72ad91ad0799_a7c4f88e-99eb-41db-9c87-7fa356111a31/0014.png",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "c5e7333d09a88e05b8d2aee7cf1e93a80a455f486aa9e761a4c664f9f4a34ccc"
+        }
+      ]
+    },
+    {
+      "productId": "p24",
+      "modelId": "339099",
+      "fileId": "6369488",
+      "fileName": "JeNo 5_1.6.0.stl",
+      "modelPath": ".local-data/catalog/models/p24.stl",
+      "modelSha256": "7099a933128ad65fc45363d4a1c5049fea976a34b7e5bb9e05aa919c0b704000",
+      "assets": [
+        {
+          "path": "/images/catalog/p24/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/339099/images/6624457_3a4264f4-b6a4-4c8b-9dbe-c78ed3827f67_a4929a1e-96ae-4ce0-af7b-e05f5b412367/jeno_5_3d_render.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "3b900aebd509a69e79735436053cdb5cb6c34851f0a1f4d94d1233aa328f5bd9"
+        },
+        {
+          "path": "/images/catalog/p24/source-2.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/339099/images/3881571_4053828f-f560-40d3-8069-e58a04073490/img_20230507_184300-copie.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "3276a0499b59d188978947eb501fc3631a5af6a3d1418742d3f5bcfdc821fa25"
+        },
+        {
+          "path": "/images/catalog/p24/source-3.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/339099/images/2905215_dc298a3a-7358-4145-8087-e5db6c691f6e/jeno_3d_classic.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "cf0cb6c7107a268248addbbb492f0f16a913bf4cf56d19e46559e695edfd4868"
+        },
+        {
+          "path": "/images/catalog/p24/source-4.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/339099/images/2906411_eae5c7b3-3208-4ef3-bf57-6469a1d7f392/untitled4_2.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "f56b0825e6171394f3c1726c4f017826280724689891c621cd8fb1c99e9ddf2b"
+        }
+      ]
+    },
+    {
+      "productId": "p25",
+      "modelId": "1251149",
+      "fileId": "5211642",
+      "fileName": "ROUNDUP UPPER FLOOR 05.stl",
+      "modelPath": ".local-data/catalog/models/p25.stl",
+      "modelSha256": "6d0a08fc11c7bbbbdbc81fad0105f9ec7edc0e31950b210271375f1c03a7138c",
+      "assets": [
+        {
+          "path": "/images/catalog/p25/source-1.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/76457410-e47a-4fc1-848b-867899419cfe/images/9392400_e1c8640f-453d-4993-b87b-dabe777b372e_aee3734b-80df-499f-abf8-e437a3660967/img_1330.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "ea32fc692540396abc6522a5b7464a71b61856d00c254e7a3aa26294707fb049"
+        },
+        {
+          "path": "/images/catalog/p25/source-2.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/41823ceb-f2b9-4719-8029-26c0c3528e06/images/9392360_fd55afea-ce23-424a-861e-5f3c1cc7dc15_0e546244-8d05-4626-a32c-af11139ae702/option-01_1-photo.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "aac8c94db02b88ec8bcdf8f7b63c9208448abdc807d2f4181704bf791315f31e"
+        },
+        {
+          "path": "/images/catalog/p25/source-3.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/ba26ba8c-5d4f-491b-9a1a-eed6c1622e32/images/9392361_962813c7-93aa-44a4-a8b1-96751787e016_f37aaf6c-301a-43e7-b576-ff3c3b19ae70/option-01_5-photo.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "610d88998899ce97cef78e05c0f0d629eef3d340ebf96bce8ec840d75cacc50e"
+        },
+        {
+          "path": "/images/catalog/p25/source-4.jpg",
+          "sourceUrl": "https://media.printables.com/media/prints/97d0b4a6-0ba4-4c0d-8448-20f6f432561e/images/9392362_20dc7d58-3181-4a47-bc27-8197f090d2db_7c41101d-638a-4208-b9f0-4679410063d3/option-01_3-photo.jpg",
+          "kind": "SOURCE_IMAGE",
+          "sha256": "0daa036ed487d384347c6893476b593db2905b69271710288afd462e10bcd793"
+        }
+      ]
+    }
+  ]
+}

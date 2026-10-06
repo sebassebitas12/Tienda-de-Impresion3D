@@ -9,7 +9,7 @@ const content = {
       intro: 'Lo importante antes de elegir un modelo, enviar una solicitud o consultar un pedido.',
       sections: [
         { title: 'Catálogo y materiales', items: [
-          ['¿Las piezas están listas para entrega?', 'Los modelos publicados se fabrican bajo pedido. La disponibilidad de color y la viabilidad se confirman antes de producir.'],
+          ['¿Las piezas están listas para entrega?', 'No. Este catálogo es parte de una demostración académica: permite recorrer el encargo, pero no confirma fabricación, disponibilidad ni fecha de entrega. Imágenes y precios son referenciales.'],
           ['¿Qué materiales trabajan?', 'El catálogo contempla FDM con PLA, PETG, ASA, ABS y TPU. La elección depende de la geometría y el uso; la guía es orientativa y no sustituye una revisión técnica.'],
         ] },
         { title: 'Solicitudes y cotizaciones', items: [
@@ -19,7 +19,7 @@ const content = {
         ] },
         { title: 'Cuenta y pago académico', items: [
           ['¿Por qué debo iniciar sesión para ver el carrito?', 'La cuenta permite asociar el encargo a una persona y separar sus pedidos. La selección previa puede conservarse en ese navegador hasta iniciar sesión.'],
-          ['¿El pago se realiza de verdad?', 'No. El botón registra un pago DEMO en la base académica para completar el recorrido; no cobra dinero ni recibe información bancaria.'],
+          ['¿El pago se realiza de verdad?', 'No se cobra dinero real en esta demo. PayPal Sandbox usa saldo de prueba. Un comprobante SINPE queda pendiente hasta que el taller revise manualmente los datos y la imagen adjunta.'],
         ] },
       ],
       actions: [['Catálogo de piezas', '/catalogo'], ['Enviar una solicitud', '/solicitud'], ['Ver mi cuenta', '/cuenta']],
@@ -53,7 +53,7 @@ const content = {
       sections: [
         { title: 'Cotizaciones y catálogo', body: 'Los precios, perfiles y estimaciones identificados como DEMO son orientativos. La disponibilidad, materiales, acabados, cargos y precio final requieren confirmación del taller antes de fabricar.' },
         { title: 'Pedidos y producción', body: 'Confirmar un encargo en esta versión no acredita un pago ni garantiza una fecha de entrega. Los estados representan el flujo de demostración y seguimiento del taller.' },
-        { title: 'Pagos', body: 'El pago se simula dentro de la base académica para completar el recorrido y emitir un comprobante DEMO. No se conecta a bancos, no cobra dinero ni solicita datos de pago reales.' },
+        { title: 'Pagos', body: 'No se cobra dinero real en esta demo. PayPal Sandbox usa saldo de prueba; los comprobantes SINPE son evidencia de demostración y requieren revisión manual del taller.' },
         { title: 'Uso responsable', body: 'El cliente debe compartir archivos que tenga derecho a utilizar. La fabricación depende de la revisión de viabilidad y del uso declarado.' },
       ],
       notice: 'Esta demostración no debe usarse para realizar una compra o un pago real.',
@@ -88,7 +88,7 @@ const content = {
       intro: 'What to know before choosing a model, sending a request or checking an order.',
       sections: [
         { title: 'Catalog and materials', items: [
-          ['Are catalog parts ready to ship?', 'Published models are made to order. Color availability and feasibility are confirmed before production.'],
+          ['Are catalog parts ready to ship?', 'No. This catalog is part of an academic demo: you can explore the order flow, but it does not confirm real production, availability or delivery dates. Images and prices are illustrative.'],
           ['Which materials are supported?', 'The catalog covers FDM with PLA, PETG, ASA, ABS and TPU. Choice depends on geometry and use; this guide is general and does not replace technical review.'],
         ] },
         { title: 'Requests and quotes', items: [
@@ -98,7 +98,7 @@ const content = {
         ] },
         { title: 'Account and academic payment', items: [
           ['Why sign in to open the cart?', 'An account associates an order with a customer. A selection may remain in that browser until you sign in.'],
-          ['Is the payment real?', 'No. The button records a DEMO payment in the academic database to complete the flow; it does not charge money or collect banking information.'],
+          ['Is the payment real?', 'No real money is charged in this demo. PayPal Sandbox uses test funds. A SINPE proof remains pending until a workshop admin manually reviews the submitted details and proof image.'],
         ] },
       ],
       actions: [['Parts catalog', '/catalogo'], ['Send a request', '/solicitud'], ['My account', '/cuenta']],

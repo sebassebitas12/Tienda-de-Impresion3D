@@ -102,7 +102,7 @@ export function AdminCatalogPage() {
           <ProductImage product={product} label={text.imageFallback} className="admin-catalog-row__image" />
           <Link className="admin-catalog-row__main" to={`/admin/catalogo/${encodeURIComponent(product.id)}`}><strong>{product.name}</strong><small>{product.category?.name || product.slug || product.id}</small></Link>
           <span className="admin-catalog-row__material">{product.material || '—'}</span>
-          <span className="admin-catalog-row__price">{formatCRC(product.price) || '—'}</span>
+          <span className="admin-catalog-row__price"><strong>{formatCRC(product.price) || '—'}</strong>{product.priceSource === 'DEMO' && <small>{language === 'es' ? 'PRECIO DEMO · REFERENCIAL' : 'DEMO · REFERENCE'}</small>}{product.priceSource === 'NEEDS_RECALCULATION' && <small>{language === 'es' ? 'REQUIERE RECÁLCULO' : 'RECALCULATION NEEDED'}</small>}</span>
           <span className="admin-catalog-row__status" data-status={product.status}>{publicationLabel(product.status, language, text)}<small>{product.featured ? text.featured : text.regular}</small></span>
           <Link className="admin-catalog-row__quote" aria-label={language === 'es' ? `Calcular precio DEMO para ${product.name}` : `Calculate DEMO price for ${product.name}`} to={`/admin/catalogo/${encodeURIComponent(product.id)}/editar#cotizador`}>
             {language === 'es' ? 'Cotizar DEMO' : 'Quote DEMO'} <span aria-hidden="true">↗</span>

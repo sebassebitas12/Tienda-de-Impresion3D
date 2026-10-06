@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-do
 import { useAuth } from '../hooks/useAuth.js';
 import { usePreferences } from '../hooks/usePreferences.js';
 import { automationAction, automationError } from '../services/automationService.js';
-import { fetchMyOrders, submitDemoOrderPayment } from '../services/commerceService.js';
+import { fetchMyOrders } from '../services/commerceService.js';
 import { StepperBar } from '../components/ui/StepperBar.jsx';
 import { formatCRC } from '../utils/money.js';
 import './quotes.css';
@@ -57,26 +57,16 @@ export function CustomerQuotesPage() {
     } catch (failure) { setState(current => ({ ...current, error: automationError(failure.code) })); }
     finally { setSubmitting(null); }
   }
-  async function payQuote(request) {
+  async function continueQuoteInCart(request) {
     if (submitting) return;
     setSubmitting(request.id);
     try {
-      const result = await automationAction('/quotes/pay-demo', {
+      const result = await automationAction('/quotes/checkout', {
         requestId: request.id, expectedVersion: request.quoteVersion,
       }, { token });
       setVersion(value => value + 1);
-      navigate(`/pedidos/${encodeURIComponent(result.order.id)}`);
+      navigate(`/carrito?orderId=${encodeURIComponent(result.order.id)}`);
     } catch (failure) { setState(current => ({ ...current, error: automationError(failure.code) })); }
-    finally { setSubmitting(null); }
-  }
-  async function payPendingOrder(order) {
-    if (submitting) return;
-    setSubmitting(order.id);
-    try {
-      const result = await submitDemoOrderPayment({ orderId: order.id }, { token });
-      setVersion(value => value + 1);
-      navigate(`/pedidos/${encodeURIComponent(result.order.id)}`);
-    } catch (failure) { setOrdersState(current => ({ ...current, error: automationError(failure.code) })); }
     finally { setSubmitting(null); }
   }
   async function respond(request, event) {
@@ -127,7 +117,7 @@ export function CustomerQuotesPage() {
     ? ['Recibido', 'Confirmado', 'En producción', 'Listo', 'Enviado', 'Entregado']
     : ['Received', 'Confirmed', 'In production', 'Ready', 'Shipped', 'Delivered'];
   const orderStatusLabel = status => ({
-    PENDING: es ? 'Pago DEMO pendiente' : 'DEMO payment pending',
+    PENDING: es ? 'Pago pendiente' : 'Payment pending',
     CONFIRMED: es ? 'Confirmado' : 'Confirmed',
     IN_PRODUCTION: es ? 'En taller' : 'In workshop',
     READY: es ? 'Listo' : 'Ready',
@@ -285,14 +275,14 @@ export function CustomerQuotesPage() {
                           </button>
                         </form>
                       )}
-                      <p>{es ? 'Aprobar confirma que aceptás el monto y las condiciones. Después podés registrar el pago simulado DEMO para recibir el comprobante y crear el pedido.' : 'Approving confirms that you accept the amount and terms. Then record the simulated DEMO payment to get a receipt and create the order.'}</p>
+                      <p>{es ? 'Aprobar confirma el monto y las condiciones. El pago se completa después desde el carrito.' : 'Approving confirms the amount and terms. Payment is completed later from the cart.'}</p>
                     </section>
                   )}
                   {request.status === 'APPROVED' && (
                     <div className="customer-quote__actions">
-                      <p>{es ? 'Cotización aprobada. Podés completar el pago simulado para recibir el recibo DEMO y crear el pedido.' : 'Quote approved. Complete the simulated payment to receive a DEMO receipt and create the order.'}</p>
-                      <button className="v-button v-button--primary" disabled={Boolean(submitting) || request.quotePricing?.mode !== 'DEMO'} onClick={() => payQuote(request)}>
-                        {submitting === request.id ? (es ? 'Registrando pago…' : 'Recording payment…') : (es ? `Pagar ${formatCRC(request.quotedPrice)} · DEMO` : `Pay ${formatCRC(request.quotedPrice)} · DEMO`)}
+                      <p>{es ? 'Cotización aprobada. Revisá el total y elegí PayPal Sandbox o SINPE desde el carrito.' : 'Quote approved. Review the total and choose PayPal Sandbox or SINPE from your cart.'}</p>
+                      <button className="v-button v-button--primary" disabled={Boolean(submitting) || request.quotePricing?.mode !== 'DEMO'} onClick={() => continueQuoteInCart(request)}>
+                        {submitting === request.id ? (es ? 'Preparando carrito…' : 'Preparing cart…') : (es ? `Continuar al carrito · ${formatCRC(request.quotedPrice)}` : `Continue to cart · ${formatCRC(request.quotedPrice)}`)}
                       </button>
                     </div>
                   )}
@@ -363,7 +353,7 @@ export function CustomerQuotesPage() {
                     </div>
                     <div className="customer-quote-price-col">
                       <strong>{formatCRC(order.total ?? order.subtotalCrc)}</strong>
-                      <small>{order.paymentMode === 'DEMO' && order.paymentStatus === 'PAID' ? (es ? 'Pago simulado · DEMO' : 'Simulated payment · DEMO') : (order.paymentStatus === 'PAID' ? (es ? 'Pago registrado' : 'Payment recorded') : (es ? 'Pago DEMO pendiente' : 'DEMO payment pending'))}</small>
+                      <small>{order.paymentMode === 'PAYPAL_SANDBOX' && order.paymentStatus === 'PAID' ? (es ? 'PayPal Sandbox · pago de prueba' : 'PayPal Sandbox · test payment') : order.paymentMode === 'SINPE_MANUAL' && order.paymentStatus === 'PAID' ? (es ? 'SINPE revisado por taller' : 'SINPE reviewed by workshop') : order.paymentMode === 'DEMO' && order.paymentStatus === 'PAID' ? (es ? 'Pago simulado · DEMO' : 'Simulated payment · DEMO') : order.paymentStatus === 'PAID' ? (es ? 'Pago registrado' : 'Payment recorded') : order.paymentProof?.status === 'SUBMITTED' ? (es ? 'Comprobante en revisión' : 'Proof under review') : order.paymentProof?.status === 'REJECTED' ? (es ? 'Comprobante observado' : 'Proof needs changes') : (es ? 'Pago pendiente' : 'Payment pending')}</small>
                     </div>
                   </header>
 
@@ -414,13 +404,13 @@ export function CustomerQuotesPage() {
                           : (es ? 'El pago registrado y el avance del taller son pasos separados.' : 'Recorded payment and workshop progress are separate steps.')}
                       </p>
                     </div>
-                  ) : order.status === 'PENDING' && !order.customPrintRequestId && (
+                  ) : order.status === 'PENDING' && (
                     <div className="customer-order-payment-box">
-                      <strong>{es ? 'Pago DEMO pendiente' : 'DEMO payment pending'}</strong>
-                      <p>{es ? 'Al confirmar se guardará un recibo de simulación en tu cuenta. No se realiza una transferencia ni un cobro real.' : 'Confirming records a simulated receipt in your account. No transfer or real charge occurs.'}</p>
-                      <button type="button" className="v-button v-button--primary" disabled={Boolean(submitting)} onClick={() => payPendingOrder(order)}>
-                        {submitting === order.id ? (es ? 'Registrando…' : 'Recording…') : (es ? `Pagar ${formatCRC(order.total ?? order.subtotalCrc)} · DEMO` : `Pay ${formatCRC(order.total ?? order.subtotalCrc)} · DEMO`)}
-                      </button>
+                      <strong>{order.paymentProof?.status === 'SUBMITTED' ? (es ? 'Comprobante en revisión manual' : 'Proof under manual review') : order.paymentProof?.status === 'REJECTED' ? (es ? 'Comprobante observado · requiere corrección' : 'Proof rejected · correction needed') : (es ? 'Pedido pendiente de pago' : 'Order awaiting payment')}</strong>
+                      <p>{order.paymentProof?.status === 'SUBMITTED' ? (es ? 'El pedido no se confirma hasta que el taller valide el comprobante. Podés consultar el estado desde el carrito.' : 'The order is not confirmed until the workshop verifies the proof. Check its status in the cart.') : order.paymentProof?.status === 'REJECTED' ? (es ? `Revisá el motivo y enviá una nueva imagen desde el carrito: ${order.paymentProof.rejectionReason || 'comprobante observado'}.` : `Review the reason and submit a new image from the cart: ${order.paymentProof.rejectionReason || 'proof rejected'}.`) : (es ? 'El pedido está guardado, pero aún no está pagado ni confirmado. Elegí PayPal Sandbox o reportá un SINPE desde el carrito.' : 'The order is saved but is not paid or confirmed. Choose PayPal Sandbox or report SINPE from the cart.')}</p>
+                      <Link className="v-button v-button--primary" to={`/carrito?orderId=${encodeURIComponent(order.id)}`}>
+                        {order.paymentProof?.status === 'REJECTED' ? (es ? 'Corregir en el carrito' : 'Correct proof in cart') : order.paymentProof?.status === 'SUBMITTED' ? (es ? 'Ver estado en el carrito' : 'View status in cart') : (es ? 'Continuar al carrito para pagar' : 'Continue to cart to pay')} ↗
+                      </Link>
                     </div>
                   )}
                   {['DELIVERED', 'COMPLETED'].includes(order.status) && (

@@ -1,5 +1,13 @@
 const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
+/** Fields explicitly withdrawn in the current message may replace an earlier manual value. */
+export function getExplicitlyClearedQuoteFields(message) {
+  const normalized = normalize(message);
+  const saysDimensionsAreUnknown = /\b(?:sin|no tengo|no se|no conozco|no defini|no dispongo de|todavia no tengo|aun no tengo|i do not have|i don't have|without)\s+(?:(?:las?|ninguna?|any|the)\s+)?(?:medidas|dimensiones|tamano|measurements|dimensions|size)\b/.test(normalized)
+    || /\b(?:deja|dejemos|dejen|manten|mantene|leave|keep)\s+(?:(?:las?|the)\s+)?(?:medidas|dimensiones|measurements|dimensions|size)\s+(?:en blanco|vacias?|sin definir|blank|empty|unspecified)\b/.test(normalized);
+  return saysDimensionsAreUnknown ? ['dimensions'] : [];
+}
+
 const REQUEST_INTENT = [
   /\bquiero que me (?:hagas|armes|prepares?) (?:(?:el|la) )?(?:pedido|resumen|solicitud)\b/,
   /\b(?:haceme|hace|armame|arma|preparame|prepara|mandame|manda|enviame|envia) (?:(?:el|la) )?(?:pedido|resumen|solicitud)\b/,
@@ -58,17 +66,21 @@ function readProductFromMaterialQuestion(message) {
 function readDescription(messages) {
   const cleaned = messages.map(message => {
     const text = stripRequestCommand(message)
+      .replace(/^[\s¿¡]+/, '')
       .replace(/\bpara\s+(?:revisarlo|revisarla|revisar(?:\s+el\s+resumen)?|que\s+lo\s+revise)\b/gi, '')
       .trim();
     const productFromQuestion = readProductFromMaterialQuestion(text);
     if (productFromQuestion) return productFromQuestion;
-    return text.split(/[¿?]/, 1)[0]
-      .replace(/^\s*(?:(?:yo\s+)?quiero(?:\s+(?:hacerme|hacer|crear|fabricar|diseñar|imprimir))?|estoy pensando en|me gustar[ií]a(?:\s+(?:hacer|crear|fabricar))?|quisiera(?:\s+(?:hacer|crear|fabricar))?|necesito|busco|de)\s+/i, '')
+    return text.split(/[.!?\n]/, 1)[0]
+      .replace(/\s+(?:para|for)\s+(?:(?:una?|el|la|un|a|an|the)\s+)?(?:simulaci[oó]n|simulation|prototipo|prototype|maqueta|mockup|banda transportadora|conveyor belt)\b[^,.;!?]*/i, '')
+      .replace(/^\s*(?:(?:yo\s+)?quiero(?:\s+(?:hacerme|hacer|crear|fabricar|diseñar|imprimir|cotizar))?|estoy pensando en|me gustar[ií]a(?:\s+(?:hacer|crear|fabricar|cotizar))?|quisiera(?:\s+(?:hacer|crear|fabricar|cotizar))?|necesito|busco|de)\s+/i, '')
+      .replace(/^(?:cotizar|coticen|cotización|cotizacion|presupuestar|solicitar cotización)\s+(?:solo\s+)?/i, '')
+      .replace(/^(?:solo\s+)?(?:un|una|el|la|a|an|the)\s+/i, '')
       .replace(/(?:\s*[.!])+\s*$/, '')
       .trim();
   }).find(candidate => candidate.length >= 3
     && !/^(?:\d|una?\s+unidad|largo\b|ancho\b|di[aá]metro\b|material\b|flexible\b|tama[ñn]o promedio\b|con lo que|por favor|para revisar)/i.test(candidate)
-    && !/^(?:ayudame|ayuda|decime|contame|que datos|como definimos|como hago|que usos|elegir (?:un )?material)\b/i.test(normalize(candidate))) || '';
+    && !/^(?:ayudame|ayuda|decime|contame|que datos|como definimos|como hago|que usos|que (?:es|significa|material)|elegir (?:un )?material|compara)\b/i.test(normalize(candidate))) || '';
   return cleaned ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1) : '';
 }
 
@@ -83,6 +95,8 @@ function stripRequestCommand(message) {
 
 function readIntendedUse(userMessages) {
   const transcript = userMessages.map(message => stripRequestCommand(message).split(/[¿?]/, 1)[0]).join(' ');
+  const explicitUse = [...transcript.matchAll(/\b(?:para|for)\s+(?:(?:una?|el|la|un|a|an|the)\s+)?((?:simulaci[oó]n|simulation|prototipo|prototype|maqueta|mockup|banda transportadora|conveyor belt)\b[^,.;!?\n]{0,80})/gi)].at(-1)?.[1];
+  if (explicitUse) return explicitUse.trim();
   const use = transcript.match(/\bpara\s+((?:poder\s+)?[a-záéíóúñ]+(?:ar|er|ir)\b[^,.;\n]{0,90})/i);
   if (use && /^(?:celular|hogar|lugar|familiar|popular|similar|particular|solar|angular|circular|tubular|lineal|rectangular|singular)\b/i.test(normalize(use[1]))) return '';
   return use?.[1]?.trim() || '';

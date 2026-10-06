@@ -1,5 +1,153 @@
 # Vértice CR — Auditoría HF y mockups
 
+## R-H88 — Reauditoría visual del Copiloto y cotización — 2026-10-05
+
+### Evidencia en navegador QA aislado
+
+- Se revisó Admin en `localhost:5181` y cotización en `127.0.0.1:5182`, con
+  sesión QA y tema Light, viewport de escritorio 1265×720. La API de estas
+  páginas utiliza una copia temporal de datos; no se usó el `db.json` del taller.
+- En Admin Copiloto, el primer render desplazaba el área de conversación hacia
+  abajo aunque aún no existieran mensajes, cortando el rótulo de bienvenida. Se
+  corrigió y la captura posterior muestra el título completo, las tres consultas
+  sugeridas y el composer, con scroll solo dentro del historial cuando hace
+  falta. Catálogo Admin deja visible «PRECIO DEMO · REFERENCIAL» junto al monto.
+- En cotización, la persona pidió únicamente un brazo robótico para simular una
+  banda transportadora, sin medidas ni material definidos. El asistente devolvió
+  un `requestDraft` estructurado que preserva ese alcance, dejó medidas/material
+  abiertos y no añadió la banda completa. Tras recargar y volver de login, el
+  resumen y la conversación permanecieron. No se envió la solicitud.
+- En `/solicitud/archivo`, `15 × 8 × 4` con unidad `cm` seleccionada se reconoce
+  como válido; «15 cm y lo que sea» presenta error junto al campo y desactiva el
+  envío; vacío sigue siendo válido. Se restauró el borrador de QA a medidas
+  vacías y no se envió. El ajuste alinea la unidad seleccionada con el parser de
+  interfaz y servidor y evita duplicar `cm` al serializar.
+
+### Límites y pendientes
+
+La IA todavía recibe mensajes de texto, no los bytes de las referencias; no
+analiza imágenes ni mide STL/OBJ y tampoco obtiene gramos/horas de un laminador.
+El Copiloto presenta una propuesta de catálogo con confirmación, pero no se
+ejecutó aquí una mutación real desde el chat ni se verificó cada tool/permiso del
+workflow publicado. Esta pasada no cubrió 375/768 px, el checkout/pago, Gmail ni
+el recorrido completo de cada pestaña Admin; no equivale a aprobar la app entera.
+Los hallazgos antiguos R-H87 sobre IA desconectada corresponden a un corte previo
+y no reemplazan la respuesta estructurada observada aquí. No se modificó ni
+reimportó n8n; el correo queda en el estado registrado en R-H87.
+
+Verificación de código posterior a los ajustes: `npm run lint`,
+`npm run check:ui`, `npm run build` y `git diff --check` pasan. Jest no se ejecutó
+en esta pasada.
+
+## Pasada real de cotización — 2026-10-05
+
+Navegador QA aislado, Dark escritorio: idea de soporte celular/cargador en PETG,
+15×8 cm→IA completa resumen→login cliente conserva borrador→envío confirmado.
+Admin abre solicitud, inicia revisión y guarda oferta DEMO ₡9 306. Correo: único
+intento autorizado falla antes de Gmail (`URL is not defined`, ejecución 73).
+No se repite. Corrección del renderer requiere reimportar workflow; no se declara
+entrega verificada, ni Light/móvil ni aprobación/pago de esta solicitud.
+
+## R-H87 — Tienda, acceso, cotización e integración IA (2026-10-05)
+
+### Evidencia observada en navegador
+
+- Se levantó el checkout `Pruebas` en `127.0.0.1:5173` con su API local.
+  `/catalogo` muestra 25 modelos; la ficha p4 acredita el autor/licencia y deja
+  visible una sola imagen (`Vista del diseño 1 / 1`). La tienda está disponible
+  en esa URL. El navegador conservaba además otra instancia en `5175`; no usarla
+  para validar estos datos.
+- `/carrito` como visitante redirige a `/login` y explica que se necesita una
+  cuenta de cliente. La separación entre carritos por cliente está confirmada
+  estáticamente en `CartProvider`, pero el checkout no se ejecutó con sesión.
+- `/solicitud/ayuda-diseno` abre el agente de cotización y el resumen editable.
+  El formulario informa que no calcula precio y permite referencias adjuntas.
+  En este perfil se restauró un borrador previamente guardado.
+- El collage de Login presenta seis piezas antiguas de `homeContent.js` (incluye
+  “Soporte Modular de Carga” y “Pieza Flexible de Precisión”), que no coinciden
+  con el catálogo de 25. Hallazgo visual/funcional confirmado en el árbol
+  accesible; requiere sincronizar el collage con los productos actuales.
+
+### Hallazgos fuente/configuración y límites de recorrido
+
+- `QuoteRequestPage` persiste el borrador en las claves globales
+  `vertice.quote.draft` de sessionStorage y localStorage, sin vencimiento ni
+  separación por cuenta. Código + borrador restaurado observado indican riesgo
+  de mostrar la tarea previa al siguiente usuario del mismo navegador (P2).
+- `.env` contiene URLs de asistentes apuntando a n8n local, pero no una clave
+  DeepSeek para el proveedor directo; n8n
+  no responde en `localhost:5678`. Una llamada local a
+  `POST /assistants/chat` en modo general devolvió HTTP 502. Créditos del
+  proveedor no implican conexión desde esta instancia (bloqueador P1 de demo IA).
+- Se eliminó el desvío obligatorio a Cuenta para pagar un pedido pendiente:
+  el detalle permite pagar DEMO, bloquea doble clic y actualiza el recibo.
+  Es un cambio funcional probado por Jest, no una revisión visual autenticada.
+- Admin está protegido por rol. En esta pasada no se abrió el panel con una
+  sesión Admin; estados de cotización/acciones se contrastaron en JSX solamente.
+  No se declara auditoría visual ni recorrido completo de Admin, compra, pago,
+  correo o cliente autenticado. Light, 768/375 y teclado siguen pendientes.
+
+### Orden de continuación
+
+1. Actualizar el collage de Acceso para mostrar productos/imágenes del catálogo.
+2. Aislar y vencer el borrador local conservando retorno de login sin pérdida.
+3. Generar cuatro vistas estáticas desde cada diseño fuente y contrastar ficha.
+4. Conectar DeepSeek/n8n y recorrer Admin → correo → aprobación → pago DEMO.
+
+Veredicto actual de preparación para presentación: **no listo para demostrar IA en
+vivo**; el endpoint general falla 502. El catálogo sí puede recorrerse en
+`127.0.0.1:5173/catalogo`. No se usaron los tests como evidencia de navegador.
+
+## R-H86 — Reconciliación y presentación del catálogo (2026-10-05)
+
+Se comparó la base de casa con `HEAD:db.json`: la única colección diferente es
+`products`. La semilla local presenta 25 modelos `ACTIVE`; no se copiaron las
+colecciones runtime de pedidos, usuarios o solicitudes. Se corrigió la ruta de
+imagen del soporte para audífonos y se normalizó el material de la figura de
+dragón a `PLA`. Todos los importes llevan origen `DEMO`; en catálogo las imágenes
+se identifican como ilustrativas y los importes como referenciales. Los valores
+de gramos/horas heredados o analógicos no son mediciones de laminador y los
+campos `stock`/`minStock` no son inventario. Se suavizaron afirmaciones de
+compatibilidad/carga y se retiraron afirmaciones no verificadas de uso alimentario,
+médico, escala y vuelo; p12/p13/p24 explicitan sus límites y p21/p25 no prometen
+escala definida. En la ficha, el pie de imagen dejó de decir «Fabricado bajo
+pedido» y ahora identifica la foto como ilustrativa. La sección de opiniones ya
+no las llama verificadas: el endpoint no exige compra previa. El FAQ de catálogo
+explica que el encargo de esta demo no confirma producción/disponibilidad.
+
+**Evidencia visual:** recorrido de visitante sin sesión en `/catalogo`, tema
+Dark, escritorio (captura 1265 × 720). La cabecera separa catálogo de cotización,
+explica el carácter ilustrativo de imágenes/precios y mantiene búsqueda y
+facetas antes de la rejilla. En tarjetas revisadas se ven fotografía, nombre,
+precio, marca «Precio referencial», categoría y acción «Elegir pieza» sin
+anidar otro panel. El árbol accesible reporta 25 modelos y las 25 fichas con
+imágenes; la captura de rejilla confirma tres columnas en ese viewport. Esto no
+verifica Light ni móvil, ni demuestra que cada objeto se pueda fabricar.
+
+Una discrepancia de la primera captura provenía de la API temporal de auditoría,
+que tenía una copia anterior de p1–p6 sin `priceSource`; luego se resincronizaron
+sus 25 productos con el seed actual y se recargó la página. Esta resincronización
+afectó solo la base aislada de QA; no alteró pedidos/cotizaciones del `db.json`
+del proyecto.
+
+La ficha individual de p13 también se volvió a capturar: el pie solo identifica
+la foto como ilustrativa, se ve el aviso médico específico y queda un único
+disclaimer DEMO antes de elegir color/cantidad. No se completó compra ni se
+presentó el producto como dispositivo clínico.
+
+**Gates locales:** 51 suites / 304 pruebas, lint, `check:ui`,
+`check:automation` (270 comprobaciones), build y `git diff --check` pasan. El CI
+verde sigue siendo solo el del baseline `e41099d`; estos cambios aún no tienen
+ejecución remota.
+
+**Pendiente antes de presentarlo como negocio real:** confirmar origen de los 25
+precios, revisar la ficha/categoría/uso de cada diseño y reemplazar las
+estimaciones de peso/tiempo por resultados de laminador. La procedencia de los
+25 diseños ya está registrada para la demo educativa en `automation/catalog/`;
+14 tienen cuatro o más fotos fuente y 11 todavía no completan cuatro vistas.
+La fuente declara escala 1/10 para p21, pero el ajuste del prototipo no se ha
+verificado. No prometer stock, fabricación o entrega a partir de esta semilla.
+
 ## R-H85 — Cierre de rutas del cliente y revisión Light Admin (2026-10-05)
 
 Se implementaron las seis páginas informativas que estaban vacías (FAQ,

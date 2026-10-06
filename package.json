@@ -12,6 +12,7 @@
     "test:coverage": "jest --runInBand --coverage",
     "check:ui": "node scripts/check-ui-build.mjs",
     "check:automation": "node scripts/verify-automation.mjs",
+    "check:n8n-payment-email": "node scripts/verify-n8n-payment-email.mjs",
     "build:n8n": "node scripts/build-n8n-workflows.mjs",
     "preview": "vite preview"
   },

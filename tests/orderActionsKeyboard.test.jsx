@@ -26,12 +26,43 @@ describe('acciones de pedidos Admin', () => {
     expect(screen.getByRole('button', { name: 'Iniciar producción' })).toHaveFocus();
   });
 
-  it('no permite adelantar un pedido pendiente sin que el cliente registre el pago DEMO', () => {
+  it('no permite adelantar un pedido pendiente antes de la revisión del pago', () => {
     renderActions({ id: 'ord-2', status: 'PENDING', paymentStatus: 'UNPAID' });
-    expect(screen.getByText(/Pago DEMO pendiente: el cliente lo registra desde su cuenta/)).toBeInTheDocument();
+    expect(screen.getByText(/Pago pendiente: el cliente continúa desde el carrito/)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Confirmar pedido' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cancelar pedido' })).toBeInTheDocument();
     expect(screen.queryByText(/SINPE|transferencia bancaria/i)).not.toBeInTheDocument();
+  });
+
+  it('permite revisar un comprobante SINPE y confirmar solo con acción administrativa', async () => {
+    const onSaved = jest.fn();
+    automationAction.mockResolvedValueOnce({ order: { status: 'CONFIRMED', paymentStatus: 'PAID' } });
+    useAuth.mockReturnValue(admin);
+    render(<OrderActions order={{ id: 'ord-proof', status: 'PENDING', paymentStatus: 'UNPAID', paymentProof: {
+      status: 'SUBMITTED', referenceNumber: 'SINPE-1234', sinpePhone: '8888-8888', proofNotes: 'Pago de prueba',
+      proofFileName: 'comprobante.png', imageDataUrl: 'data:image/png;base64,abc', submittedAt: '2026-10-05T12:00:00Z',
+    } }} onSaved={onSaved} language="es" />);
+    expect(screen.getByText('SINPE-1234')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Comprobante adjunto por el cliente' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmar pago verificado' }));
+    await waitFor(() => expect(automationAction).toHaveBeenCalledWith('/admin/actions/verify-payment', {
+      orderId: 'ord-proof', decision: 'CONFIRM', expectedProofSubmittedAt: '2026-10-05T12:00:00Z',
+    }, { token: admin.token }));
+    await waitFor(() => expect(onSaved).toHaveBeenCalled());
+  });
+
+  it('exige un motivo antes de devolver el comprobante al cliente', async () => {
+    automationAction.mockResolvedValueOnce({ order: { status: 'PENDING' } });
+    useAuth.mockReturnValue(admin);
+    renderActions({ id: 'ord-proof', status: 'PENDING', paymentProof: { status: 'SUBMITTED', referenceNumber: 'SINPE-1234', sinpePhone: '8888-8888' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Rechazar comprobante' }));
+    const submit = screen.getByRole('button', { name: 'Enviar observación' });
+    expect(submit).toBeDisabled();
+    fireEvent.change(screen.getByLabelText('Motivo para el cliente'), { target: { value: 'Referencia no coincide' } });
+    fireEvent.click(submit);
+    await waitFor(() => expect(automationAction).toHaveBeenCalledWith('/admin/actions/verify-payment', {
+      orderId: 'ord-proof', decision: 'REJECT', notes: 'Referencia no coincide', expectedProofSubmittedAt: null,
+    }, { token: admin.token }));
   });
 
   it('guarda la etapa en el historial y no expone acciones de comprobante bancario', async () => {

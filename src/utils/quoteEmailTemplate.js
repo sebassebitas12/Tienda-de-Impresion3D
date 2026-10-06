@@ -9,10 +9,12 @@ export function prepareQuoteEmail(data) {
   }
   const money = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC', maximumFractionDigits: 0 }).format(amount);
   const until = new Intl.DateTimeFormat('es-CR', { dateStyle: 'long', timeZone: 'UTC' }).format(date);
-  const appUrl = new URL(data.appUrl || 'http://localhost:5173');
-  if (!['http:', 'https:'].includes(appUrl.protocol) || appUrl.username || appUrl.password) throw new Error('Dirección de la app inválida.');
-  const accountUrl = escape(new URL('/cuenta', appUrl).href);
-  const local = ['localhost', '127.0.0.1', '[::1]'].includes(appUrl.hostname);
+  // n8n Code nodes do not expose the browser/Node URL global. Keep this
+  // embedded renderer self-contained and accept only explicit HTTP origins.
+  const origin = /^(https?):\/\/([a-z0-9.-]+|\[::1\])(?::([0-9]{1,5}))?(?:[/?#][^\s]*)?$/i.exec(String(data.appUrl || 'http://localhost:5173'));
+  if (!origin || (origin[3] && (Number(origin[3]) < 1 || Number(origin[3]) > 65535))) throw new Error('Dirección de la app inválida.');
+  const accountUrl = escape(`${origin[1]}://${origin[2]}${origin[3] ? `:${origin[3]}` : ''}/cuenta`);
+  const local = ['localhost', '127.0.0.1', '[::1]'].includes(origin[2].toLowerCase());
   const demo = data.mode === 'DEMO';
   const row = (label, value) => `<tr><td style="padding:12px 0;border-bottom:1px solid #ded7cd;color:#71675e;width:35%;font-size:14px">${label}</td><td style="padding:12px 0;border-bottom:1px solid #ded7cd;color:#201b16;font-size:15px;text-align:right;word-break:break-word">${escape(value)}</td></tr>`;
   const html = `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0;background:#ece6dc;font-family:Arial,Helvetica,sans-serif;color:#201b16">

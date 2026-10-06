@@ -108,25 +108,27 @@ describe('decisiones de cotización del cliente', () => {
   });
 });
 
-describe('pago DEMO de cotización aprobada', () => {
-  it('lo inicia únicamente el cliente, persiste el alcance y permite repetir sin duplicar', async () => {
+describe('checkout de cotización aprobada', () => {
+  it('prepara en carrito una orden propia pendiente y permite repetir sin duplicar', async () => {
     const { db, persist, invoke } = setupActions('APPROVED');
-    const result = await invoke('/quotes/pay-demo', { requestId: 'r-1', expectedVersion: 3 });
+    const result = await invoke('/quotes/checkout', { requestId: 'r-1', expectedVersion: 3 });
     expect(result.status).toBe(200);
-    expect(result.body.order).toMatchObject({ status: 'CONFIRMED', paymentStatus: 'PAID', paymentMode: 'DEMO', scopeSnapshot: { name: 'Soporte a medida', quantity: 1 } });
-    expect(db.data.customPrintRequests[0]).toMatchObject({ status: 'PAID', orderId: result.body.order.id });
-    expect(db.data.activityLog.at(-1)).toMatchObject({ action: 'REQUEST_DEMO_PAYMENT_RECORDED', actorId: customer.id });
-    const replay = await invoke('/quotes/pay-demo', { requestId: 'r-1', expectedVersion: 3 });
+    expect(result.body.order).toMatchObject({ status: 'PENDING', paymentStatus: 'UNPAID', currency: 'CRC', total: 9000, scopeSnapshot: { name: 'Soporte a medida', quantity: 1, quoteVersion: 3 } });
+    expect(result.body.order).not.toHaveProperty('paymentEvidence');
+    expect(db.data.customPrintRequests[0]).toMatchObject({ status: 'APPROVED', checkoutOrderId: result.body.order.id });
+    expect(db.data.activityLog.at(-1)).toMatchObject({ action: 'REQUEST_CHECKOUT_CREATED', actorId: customer.id, fromStatus: 'APPROVED', toStatus: 'APPROVED' });
+    const replay = await invoke('/quotes/checkout', { requestId: 'r-1', expectedVersion: 3 });
     expect(replay.body.replay).toBe(true);
     expect(persist).toHaveBeenCalledTimes(1);
     expect(db.data.orders).toHaveLength(1);
   });
 
-  it('rechaza otro usuario, Admin, estado/version obsoletos y pago desde Admin', async () => {
+  it('rechaza otro usuario, Admin, estado/version obsoletos y el antiguo pago fuera del carrito', async () => {
     const { db, persist, invoke, token, admin, otherCustomer } = setupActions('APPROVED');
-    expect((await invoke('/quotes/pay-demo', { requestId: 'r-1', expectedVersion: 3 }, token(otherCustomer))).status).toBe(404);
-    expect((await invoke('/quotes/pay-demo', { requestId: 'r-1', expectedVersion: 3 }, token(admin))).status).toBe(403);
-    expect((await invoke('/quotes/pay-demo', { requestId: 'r-1', expectedVersion: 2 })).status).toBe(409);
+    expect((await invoke('/quotes/checkout', { requestId: 'r-1', expectedVersion: 3 }, token(otherCustomer))).status).toBe(404);
+    expect((await invoke('/quotes/checkout', { requestId: 'r-1', expectedVersion: 3 }, token(admin))).status).toBe(403);
+    expect((await invoke('/quotes/checkout', { requestId: 'r-1', expectedVersion: 2 })).status).toBe(409);
+    expect((await invoke('/quotes/pay-demo', { requestId: 'r-1', expectedVersion: 3 })).body).toEqual({ code: 'PAYMENT_MUST_START_IN_CART' });
     expect(await invoke('/admin/actions/quote-fulfillment', { requestId: 'r-1', expectedVersion: 3, mode: 'DEMO' }, token(admin))).toEqual({ status: 409, body: { code: 'CUSTOMER_PAYMENT_REQUIRED' } });
     expect(db.data.orders).toEqual([]);
     expect(persist).not.toHaveBeenCalled();

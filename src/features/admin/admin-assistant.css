@@ -51,8 +51,7 @@
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-panel);
   background:
-    linear-gradient(132deg, color-mix(in srgb, var(--lava) 6%, var(--ink-soft)), transparent 43%),
-    repeating-linear-gradient(132deg, transparent 0 46px, color-mix(in srgb, var(--line) 30%, transparent) 47px 48px),
+    radial-gradient(ellipse at 12% 0%, color-mix(in srgb, var(--lava) 7%, transparent), transparent 54%),
     var(--ink-soft);
 }
 
@@ -215,9 +214,24 @@
 .admin-copilot__scope span { flex: none; color: var(--lava); font: 10px/1.4 var(--mono); letter-spacing: .12em; }
 
 @media (min-width: 851px) and (max-height: 900px) {
-  .admin-copilot__conversation { min-height: min(590px, calc(100dvh - 300px)); }
-  .admin-copilot__thread { min-height: 260px; padding-block: 24px; }
-  .admin-copilot__welcome { padding-block: 12px; }
+  .admin-copilot__header { margin-bottom: 16px; padding-bottom: 14px; }
+  .admin-copilot__header h1 { margin-block: 6px; font-size: clamp(32px, 3.5vw, 44px); }
+  .admin-copilot__header p { font-size: 14px; line-height: 1.4; }
+  .admin-copilot__conversation { height: min(560px, calc(100dvh - 390px)); min-height: 0; }
+  .admin-copilot__thread { min-height: 0; padding-block: 9px; }
+  .admin-copilot__welcome { padding-block: 4px; }
+  .admin-copilot__welcome h2 { margin: 6px 0 4px; font-size: clamp(27px, 3vw, 36px); }
+  .admin-copilot__welcome > p { display: none; }
+  .admin-copilot__prompts { margin-top: 9px; }
+  .admin-copilot__prompts button { min-height: 54px; gap: 8px; padding-block: 7px; }
+  .admin-copilot__prompt-copy { gap: 3px; }
+  .admin-copilot__prompt-copy strong { font-size: 12px; }
+  .admin-copilot__prompt-copy small { font-size: 10px; line-height: 1.25; }
+  .admin-copilot__composer { flex: none; padding-block: 10px 8px; }
+  .admin-copilot__composer label { margin-bottom: 5px; }
+  .admin-copilot__composer textarea { min-height: 48px; }
+  .admin-copilot__composer > small { margin-top: 5px; font-size: 10px; }
+  .admin-copilot__scope { margin-top: 8px; font-size: 11px; }
 }
 
 @keyframes admin-copilot-arrive {

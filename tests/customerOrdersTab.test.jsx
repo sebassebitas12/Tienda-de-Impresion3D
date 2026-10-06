@@ -5,12 +5,12 @@ import { CustomerQuotesPage } from '../src/pages/CustomerQuotesPage.jsx';
 import { useAuth } from '../src/hooks/useAuth.js';
 import { usePreferences } from '../src/hooks/usePreferences.js';
 import { automationAction } from '../src/services/automationService.js';
-import { fetchMyOrders, submitDemoOrderPayment } from '../src/services/commerceService.js';
+import { fetchMyOrders } from '../src/services/commerceService.js';
 
 jest.mock('../src/hooks/useAuth.js', () => ({ useAuth: jest.fn() }));
 jest.mock('../src/hooks/usePreferences.js', () => ({ usePreferences: jest.fn() }));
 jest.mock('../src/services/automationService.js', () => ({ automationAction: jest.fn(), automationError: code => code || 'Error' }));
-jest.mock('../src/services/commerceService.js', () => ({ fetchMyOrders: jest.fn(), submitDemoOrderPayment: jest.fn() }));
+jest.mock('../src/services/commerceService.js', () => ({ fetchMyOrders: jest.fn() }));
 
 const mockOrder = {
   id: 'ord-test-999', userId: 'c1', status: 'PENDING', total: 8500, subtotalCrc: 8500,
@@ -36,23 +36,15 @@ function setupOrders(orders = [mockOrder]) {
 describe('pestaña Mis pedidos del cliente', () => {
   afterEach(() => { cleanup(); jest.clearAllMocks(); });
 
-  it('muestra un pedido antiguo pendiente y deja al cliente registrar su pago DEMO', async () => {
+  it('muestra una orden pendiente y dirige el pago al carrito', async () => {
     setupOrders();
     fireEvent.click(await screen.findByRole('tab', { name: /Mis pedidos/i }));
     expect(await screen.findByText('Brazo Robótico')).toBeInTheDocument();
     expect(screen.getByText('ord-test-999')).toBeInTheDocument();
-    expect(screen.getAllByText('Pago DEMO pendiente').length).toBeGreaterThan(1);
-    expect(screen.getByRole('button', { name: /Pagar .*DEMO/ })).toBeInTheDocument();
-    expect(screen.queryByText(/SINPE|comprobante de transferencia/i)).not.toBeInTheDocument();
-  });
-
-  it('registra el pago DEMO, conserva el pedido y abre su recibo', async () => {
-    submitDemoOrderPayment.mockResolvedValue({ order: { ...mockOrder, status: 'CONFIRMED', paymentStatus: 'PAID', paymentMode: 'DEMO' } });
-    setupOrders();
-    fireEvent.click(await screen.findByRole('tab', { name: /Mis pedidos/i }));
-    fireEvent.click(await screen.findByRole('button', { name: /Pagar .*DEMO/ }));
-    expect(await screen.findByText('recibo:ord-test-999')).toBeInTheDocument();
-    expect(submitDemoOrderPayment).toHaveBeenCalledWith({ orderId: 'ord-test-999' }, { token: 'sim-token' });
+    expect(screen.getByText('Pedido pendiente de pago')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Continuar al carrito para pagar/ })).toHaveAttribute('href', '/carrito?orderId=ord-test-999');
+    expect(screen.queryByRole('button', { name: /Pagar/ })).not.toBeInTheDocument();
+    expect(screen.getByText(/Elegí PayPal Sandbox o reportá un SINPE desde el carrito/)).toBeInTheDocument();
   });
 
   it('un pedido pagado exhibe recibo DEMO sin pedir otro pago', async () => {
@@ -60,7 +52,7 @@ describe('pestaña Mis pedidos del cliente', () => {
     fireEvent.click(await screen.findByRole('tab', { name: /Mis pedidos/i }));
     expect(await screen.findByText('PAGO SIMULADO · DEMO')).toBeInTheDocument();
     expect(screen.getByText(/no se transfirió ni cobró dinero/i)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Pagar .*DEMO/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Pagar/ })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Ver detalle del pedido/i })).toHaveAttribute('href', '/pedidos/ord-test-999');
   });
 

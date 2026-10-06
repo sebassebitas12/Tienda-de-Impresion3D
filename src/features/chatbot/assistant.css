@@ -25,6 +25,7 @@
 .assistant-composer button{padding:10px 16px;flex-shrink:0}
 .assistant-composer small{display:block;margin-top:8px}
 .assistant-error{padding:12px 20px;color:var(--lava);margin:0;font-size:13px}
+.assistant-error p{margin:0 0 10px;line-height:1.5}.assistant-error button{min-height:44px;font-size:13px}
 .admin-utilities{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding-top:16px;border-top:1px solid var(--line)}
 .admin-assistant-trigger{font-size:13px!important;padding:10px 14px!important}
 @media(max-width:760px){.assistant-panel{right:12px!important;bottom:80px!important;max-height:calc(100dvh - 96px)}.admin-utilities{padding-top:8px;gap:8px}}

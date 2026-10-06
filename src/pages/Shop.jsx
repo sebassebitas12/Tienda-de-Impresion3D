@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { EmptyState, ErrorState, ProductCard, Skeleton } from '../components/ui/index.js';
 import { FilterChips } from '../components/ui/FilterChips.jsx';
@@ -6,7 +6,7 @@ import { useCatalog } from '../hooks/useCatalog.js';
 import { useCart } from '../hooks/useCart.js';
 import { useAuth } from '../hooks/useAuth.js';
 import { usePreferences } from '../hooks/usePreferences.js';
-import { createCatalogOrderIdempotencyKey, submitCatalogOrder } from '../services/commerceService.js';
+import { capturePaypalCheckout, createCatalogOrderIdempotencyKey, createPaypalCheckout, fetchMyOrders, submitCatalogOrder, submitOrderPaymentProof } from '../services/commerceService.js';
 import { isOrderableProduct, MAX_CATALOG_ORDER_QUANTITY, reconcileCart } from '../utils/cart.js';
 import { matchesFacet, toggleFacetParams } from '../utils/facetFilters.js';
 import { formatCRC } from '../utils/money.js';
@@ -27,10 +27,10 @@ function ProductMedia({ product, es }) {
   return <div className="shop-gallery"><figure className="shop-product-media">
     {src ? <img src={src} alt={`${product.name} · ${es ? 'vista' : 'view'} ${selected + 1}`} onError={() => setFailed(true)} />
       : <div className="shop-media-unavailable" role="status">{es ? 'Esta foto no está disponible.' : 'This photo is unavailable.'}</div>}
-    <figcaption>{es ? 'Fabricado bajo pedido' : 'Made to order'} · {product.material}</figcaption>
+    <figcaption>{product.source ? `${es ? 'Vista del diseño' : 'Design view'} ${selected + 1} / ${images.length}` : (es ? 'Imagen ilustrativa' : 'Illustrative image')}</figcaption>
   </figure>{images.length > 1 && <div className="shop-gallery-thumbs" role="group" aria-label={es ? 'Fotos de la pieza' : 'Product photos'}>
     {images.map((image, index) => <button type="button" key={`${image}-${index}`} aria-pressed={selected === index} aria-label={`${es ? 'Ver foto' : 'View photo'} ${index + 1}`} onClick={() => { setSelected(index); setFailed(false); }}><img src={image} alt="" loading="lazy" /></button>)}
-  </div>}</div>;
+  </div>}{product.source?.platform === 'Printables' && /^https:\/\/www\.printables\.com\/model\/\d+$/.test(product.source.url || '') && <p className="shop-source-credit"><a href={product.source.url} target="_blank" rel="noopener noreferrer">{es ? 'Diseño fuente' : 'Source design'} ↗</a> · {product.source.author} · {product.source.license}{product.source.originalAuthor && ` · ${product.source.originalAuthor}`}<br />{es ? 'Referencia para demostración educativa. Los accesorios visibles no están incluidos.' : 'Educational demonstration reference. Visible accessories are not included.'}</p>}</div>;
 }
 
 export function CatalogPage() {
@@ -42,14 +42,14 @@ export function CatalogPage() {
   const orderable = products.filter(isOrderableProduct);
   const categoryOptions = [...new Map(orderable.filter(product => product.category?.id && product.category?.name).map(product => [String(product.category.id), product.category.name])).entries()];
   const filtered = orderable.filter(product => matchesFacet(product.material, materials) && matchesFacet(String(product.category?.id || ''), categories) && `${product.name} ${product.description || ''} ${product.category?.name || ''}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
-  return <section className="shop-page"><header className="shop-heading"><span>{es ? 'Fabricado para vos' : 'Made for you'}</span><h1>{es ? 'Elegí tu próxima pieza.' : 'Choose your next piece.'}</h1><p>{es ? 'Modelos que imprimimos bajo pedido. Elegí la pieza, el color y la cantidad.' : 'Models printed to order. Choose a part, color and quantity.'}</p></header>
+  return <section className="shop-page"><header className="shop-heading"><span>{es ? 'Diseños para fabricar bajo pedido' : 'Designed for made-to-order printing'}</span><h1>{es ? 'Elegí tu próxima pieza.' : 'Choose your next part.'}</h1><p>{es ? 'Explorá los modelos y sus opciones. Las imágenes son ilustrativas y los precios mostrados, referenciales.' : 'Explore the models and their options. Images are illustrative and displayed prices are estimates.'}</p></header>
     <CatalogState status={status} retry={retry} es={es} />
     {status === 'success' && <><label className="shop-search">{es ? 'Buscar modelo' : 'Search models'}<input type="search" value={query} onChange={event => { const next = new URLSearchParams(params); if (event.target.value) next.set('buscar', event.target.value); else next.delete('buscar'); setParams(next, { replace: true }); }} /></label>
       {categoryOptions.length > 0 && <><p className="shop-facet-label">{es ? 'Tipo de pieza' : 'Part type'}</p><FilterChips label={es ? 'Tipo de pieza' : 'Part type'} selected={categories} onToggle={value => setParams(toggleFacetParams(params, 'categoria', value))} options={[{ value: 'all', label: es ? 'Todos' : 'All' }, ...categoryOptions.map(([value, label]) => ({ value, label }))]} /></>}
       <p className="shop-facet-label">{es ? 'Material' : 'Material'}</p>
       <FilterChips label={es ? 'Materiales' : 'Materials'} selected={materials} onToggle={value => setParams(toggleFacetParams(params, 'material', value))} options={[{ value: 'all', label: es ? 'Todos' : 'All' }, ...[...new Set(orderable.map(product => product.material))].map(value => ({ value, label: value }))]} />
       <p role="status">{filtered.length} {es ? 'modelos' : 'models'}</p>
-      {filtered.length ? <div className="shop-grid">{filtered.map(product => <ProductCard key={product.id} product={{ ...product, categoryName: product.category?.name }} linkAs={Link} to={`/producto/${encodeURIComponent(product.id)}${location.search}`} showPrice showMadeToOrder viewLabel={es ? 'Elegir pieza' : 'Choose part'} imageUnavailableLabel={es ? 'Imagen de producto próximamente' : 'Product image coming soon'} />)}</div> : <EmptyState title={es ? 'No hay modelos con esos filtros' : 'No models match these filters'} />}</>}
+      {filtered.length ? <div className="shop-grid">{filtered.map(product => <ProductCard key={product.id} product={{ ...product, categoryName: product.category?.name }} linkAs={Link} to={`/producto/${encodeURIComponent(product.id)}${location.search}`} showPrice showMadeToOrder demoPriceLabel={es ? 'Precio referencial' : 'Reference price'} viewLabel={es ? 'Elegir pieza' : 'Choose part'} imageUnavailableLabel={es ? 'Imagen de producto próximamente' : 'Product image coming soon'} />)}</div> : <EmptyState title={es ? 'No hay modelos con esos filtros' : 'No models match these filters'} />}</>}
   </section>;
 }
 
@@ -84,11 +84,10 @@ function ProductSelection({ product, es }) {
     {product.priceSource === 'DEMO' && (
       <p className="shop-product-demo-note">
         {es
-          ? 'Estimación académica referencial: precio y tiempos calculados por perfil análogo FDM; parámetros no certificados por laminador de producción.'
-          : 'Benchmark academic estimate: price and print times calculated via analogue FDM profile; parameters not certified by a production slicer.'}
+          ? 'Precio referencial. El encargo y el pago son DEMO: no se cobra dinero, ni se confirma fabricación o fecha de entrega.'
+          : 'Reference price. The order and payment are DEMO: no money is charged, and production or delivery dates are not confirmed.'}
       </p>
     )}
-    <p>{es ? 'Se fabrica bajo pedido. La entrega se coordina después de confirmar el encargo.' : 'Made to order. Delivery is arranged after confirming the job.'}</p>
     <p className="shop-selection-hint">{es ? '¿Necesitás otro tamaño o modificar la pieza?' : 'Need a different size or a modified part?'} <Link to="/solicitud">{es ? 'Solicitar una versión personalizada' : 'Request a custom version'} →</Link></p>
     {product.availableColors?.length > 0 && (
       <div className="shop-color-selection">
@@ -157,10 +156,153 @@ export function ProductPage() {
     ) : <EmptyState title={es ? 'Este modelo no está publicado' : 'This model is not published'} />)}</section>;
 }
 
+function PendingOrderCheckout({ orderId, routePayment, routeProviderToken, es, token, cart, navigate, onBack }) {
+  const [order, setOrder] = useState(null);
+  const [loadedKey, setLoadedKey] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [proof, setProof] = useState({ referenceNumber: '', sinpePhone: '', proofNotes: '', proofFileName: '', proofImageDataUrl: '' });
+  const [readingProof, setReadingProof] = useState(false);
+  const captureRef = useRef('');
+  const clearCart = cart.clear;
+  const requestKey = `${orderId}:${routePayment || ''}:${routeProviderToken || ''}`;
+
+  useEffect(() => {
+    const abort = new AbortController();
+    fetchMyOrders({ token, signal: abort.signal }).then(async result => {
+      const current = (result.orders || []).find(item => String(item.id) === String(orderId));
+      if (!current) throw Object.assign(new Error('ORDER_NOT_FOUND'), { code: 'ORDER_NOT_FOUND' });
+      setOrder(current);
+      if (routePayment === 'cancel') {
+        setNotice(es ? 'Volviste de PayPal sin confirmar el pago. Podés retomar el checkout de Sandbox desde aquí.' : 'You returned from PayPal without confirming payment. Resume the Sandbox checkout here.');
+        return;
+      }
+      if (routePayment !== 'return' || !routeProviderToken || captureRef.current === routeProviderToken) return;
+      captureRef.current = routeProviderToken;
+      setSubmitting(true);
+      const captured = await capturePaypalCheckout({ orderId, paypalOrderId: routeProviderToken }, { token, signal: abort.signal });
+      setOrder(captured.order);
+      if (!captured.order.sourceQuoteId && !captured.order.customPrintRequestId) clearCart();
+      navigate(`/pedidos/${encodeURIComponent(captured.order.id)}`, { replace: true, state: { paymentConfirmation: captured.order.paymentMode } });
+    }).catch(failure => {
+      if (failure.name === 'AbortError') return;
+      setError(failure.code === 'PAYMENT_REQUIRES_REVIEW'
+        ? (es ? 'PayPal devolvió un importe inesperado. El pedido quedó retenido para revisión; no intentes pagarlo otra vez.' : 'PayPal returned an unexpected amount. The order is on hold for review; do not try to pay again.')
+        : failure.code === 'ORDER_NOT_FOUND'
+          ? (es ? 'No encontramos este pedido en tu cuenta. Revisá Mis pedidos antes de continuar.' : 'This order was not found in your account. Check My orders before continuing.')
+          : (es ? 'No se pudo confirmar el pago con PayPal. El pedido sigue pendiente; verificá el estado antes de volver a intentar.' : 'PayPal could not confirm payment. The order remains pending; check its status before retrying.'));
+    }).finally(() => { if (!abort.signal.aborted) { setLoadedKey(requestKey); setSubmitting(false); } });
+    return () => abort.abort();
+  }, [orderId, routePayment, routeProviderToken, token, es, navigate, clearCart, requestKey]);
+
+  async function startPaypal() {
+    if (submitting || !order || order.status !== 'PENDING') return;
+    if (order.paypalCheckout?.status === 'CREATED' && order.paypalCheckout.approvalUrl) {
+      window.location.assign(order.paypalCheckout.approvalUrl);
+      return;
+    }
+    setSubmitting(true); setError(''); setNotice('');
+    try {
+      const result = await createPaypalCheckout({ orderId: order.id }, { token });
+      setOrder(current => ({ ...current, paypalCheckout: { status: 'CREATED', approvalUrl: result.approvalUrl,
+        amountUsd: result.amountUsd, fxSnapshot: result.fxSnapshot } }));
+      setNotice(es ? 'Revisá el equivalente en USD y la tasa. Al continuar abrirás PayPal Sandbox para aprobar el pago.' : 'Review the USD amount and exchange rate. Continue to PayPal Sandbox to approve the payment.');
+    } catch (failure) {
+      const messages = {
+        PAYPAL_NOT_CONFIGURED: es ? 'PayPal Sandbox todavía no está configurado en el servidor. Podés reportar un SINPE DEMO o volver luego.' : 'PayPal Sandbox is not configured on the server yet. You can submit a SINPE DEMO proof or return later.',
+        PAYPAL_CREDENTIALS_INVALID: es ? 'El servidor rechazó las credenciales Sandbox. Revisá la app REST sin compartir su Secret.' : 'The server rejected the Sandbox credentials. Check the REST app without sharing its Secret.',
+        FX_PROVIDER_UNAVAILABLE: es ? 'No se obtuvo un tipo de cambio actual; el pago no se inició. Intentá más tarde.' : 'A current exchange rate was unavailable; payment was not started. Try again later.',
+      };
+      setError(messages[failure.code] || (es ? 'No se pudo iniciar PayPal Sandbox. No se registró ningún pago; el pedido sigue pendiente.' : 'PayPal Sandbox could not start. No payment was recorded; the order remains pending.'));
+    } finally { setSubmitting(false); }
+  }
+
+  async function sendSinpe(event) {
+    event.preventDefault();
+    if (submitting || !order || order.status !== 'PENDING') return;
+    setSubmitting(true); setError(''); setNotice('');
+    try {
+      const result = await submitOrderPaymentProof({ orderId: order.id, ...proof }, { token });
+      setOrder(result.order);
+      setNotice(es ? 'Comprobante DEMO enviado al taller. El pedido sigue pendiente hasta que Admin lo verifique.' : 'DEMO proof sent to the workshop. The order remains pending until Admin verifies it.');
+      if (!result.order.sourceQuoteId && !result.order.customPrintRequestId) cart.clear();
+    } catch (failure) {
+      const messages = {
+        INVALID_REFERENCE: es ? 'La referencia debe tener entre 4 y 100 caracteres.' : 'Reference must be 4–100 characters.',
+        INVALID_PHONE: es ? 'El teléfono SINPE debe tener entre 8 y 25 caracteres.' : 'SINPE phone must be 8–25 characters.',
+        INVALID_PROOF_IMAGE: es ? 'Adjuntá una imagen PNG, JPG o WebP válida de hasta 1.5 MB.' : 'Attach a valid PNG, JPG or WebP image up to 1.5 MB.',
+        PROOF_ALREADY_SUBMITTED: es ? 'Ya hay un comprobante en revisión para este pedido.' : 'A proof is already being reviewed for this order.',
+        STATUS_CONFLICT: es ? 'Este pedido ya no admite el envío de un comprobante.' : 'This order can no longer accept a payment proof.',
+      };
+      setError(messages[failure.code] || (es ? 'No se pudo guardar el comprobante. Revisá los datos e intentá de nuevo.' : 'The proof could not be saved. Check the details and retry.'));
+    } finally { setSubmitting(false); }
+  }
+
+  function selectProofImage(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 1_500_000) {
+      setError(es ? 'Elegí un comprobante PNG, JPG o WebP de máximo 1.5 MB.' : 'Choose a PNG, JPG or WebP proof image under 1.5 MB.');
+      event.target.value = '';
+      return;
+    }
+    setReadingProof(true); setError('');
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') setProof(current => ({ ...current, proofFileName: file.name, proofImageDataUrl: reader.result }));
+      setReadingProof(false);
+    };
+    reader.onerror = () => { setReadingProof(false); setError(es ? 'No se pudo leer la imagen. Probá con otro archivo.' : 'The image could not be read. Try another file.'); };
+    reader.readAsDataURL(file);
+  }
+
+  const amountCrc = order?.total ?? order?.subtotalCrc ?? order?.subtotal;
+  const canPay = order?.status === 'PENDING' && order?.paymentStatus !== 'PAID' && order?.paymentStatus !== 'REVIEW_REQUIRED'
+    && order?.paymentProof?.status !== 'SUBMITTED';
+
+  if (loadedKey !== requestKey) return <p role="status">{es ? 'Recuperando pedido y estado del pago…' : 'Retrieving order and payment status…'}</p>;
+  if (!order) return <div className="shop-checkout-card"><p role="alert">{error}</p><Link className="v-link-text" to="/cuenta?tab=orders">{es ? 'Revisar Mis pedidos' : 'Check My orders'} ↗</Link></div>;
+
+  return <div className="shop-checkout-layout"><section className="shop-checkout-card" aria-labelledby="checkout-order-heading">
+    <span className="shop-facet-label">{order.sourceQuoteId ? (es ? 'COTIZACIÓN APROBADA' : 'APPROVED QUOTE') : (es ? 'ENCARGO DE CATÁLOGO' : 'CATALOG ORDER')}</span>
+    <h2 id="checkout-order-heading">{order.scopeSnapshot?.name || (es ? `Pedido ${order.id}` : `Order ${order.id}`)}</h2>
+    {order.scopeSnapshot && <p>{[order.scopeSnapshot.material, order.scopeSnapshot.dimensions, order.scopeSnapshot.quantity && `${order.scopeSnapshot.quantity} ${es ? 'unidad(es)' : 'unit(s)'}`].filter(Boolean).join(' · ')}</p>}
+    {(order.orderItems || []).map(item => <div className="shop-checkout-item" key={item.id || item.productId}><span>{item.productName || item.currentCatalogName || item.productId} · {item.color} · ×{item.quantity}</span><strong>{formatCRC(item.subtotal ?? item.unitPrice * item.quantity)}</strong></div>)}
+    <div className="shop-checkout-total"><span>{es ? 'Total acordado en CRC' : 'Agreed total in CRC'}</span><strong>{formatCRC(amountCrc)}</strong></div>
+    <p className="shop-checkout-demo-note">{es ? 'Vértice es una demo académica. PayPal Sandbox usa saldo de prueba, no dinero real. La conversión es referencial; tu banco o PayPal podría aplicar otra tasa.' : 'Vértice is an academic demo. PayPal Sandbox uses test funds, not real money. Conversion is indicative; your bank or PayPal may apply another rate.'}</p>
+    {order.paypalCheckout?.fxSnapshot && <dl className="shop-fx-snapshot"><div><dt>{es ? 'Equivalente PayPal Sandbox' : 'PayPal Sandbox equivalent'}</dt><dd>{new Intl.NumberFormat(es ? 'es-CR' : 'en-US', { style: 'currency', currency: 'USD' }).format(order.paypalCheckout.amountUsd)}</dd></div><div><dt>{es ? 'Tasa de referencia' : 'Reference rate'}</dt><dd>1 USD = {order.paypalCheckout.fxSnapshot.rate} CRC · {order.paypalCheckout.fxSnapshot.rateDate.slice(0, 10)}</dd></div><div><dt>{es ? 'Fuente' : 'Source'}</dt><dd><a href="https://www.exchangerate-api.com" target="_blank" rel="noreferrer">{order.paypalCheckout.fxSnapshot.source}</a></dd></div></dl>}
+    {order.paymentProof?.status === 'SUBMITTED' && <p className="shop-checkout-status" role="status">{es ? 'Comprobante SINPE enviado · pendiente de revisión del taller.' : 'SINPE proof submitted · awaiting workshop review.'}</p>}
+    {order.paymentProof?.status === 'REJECTED' && <p className="shop-checkout-status shop-checkout-status--error" role="alert">{es ? `Comprobante observado: ${order.paymentProof.rejectionReason || 'revisá los datos y enviá uno nuevo.'}` : `Proof rejected: ${order.paymentProof.rejectionReason || 'check details and submit again.'}`}</p>}
+    {order.status === 'PENDING' && !order.paymentProof?.status && <p className="shop-checkout-status" role="status">{es ? 'Pedido pendiente de pago · elegí un método para confirmarlo.' : 'Order awaiting payment · choose a method to confirm it.'}</p>}
+    {order.paymentStatus === 'REVIEW_REQUIRED' && <p role="alert">{es ? 'El proveedor devolvió un monto distinto al esperado. El pedido requiere revisión; no vuelvas a iniciar el pago.' : 'The provider returned a different amount. The order needs review; do not start another payment.'}</p>}
+    {notice && <p className="shop-checkout-status" role="status">{notice}</p>}
+    {canPay && <div className="shop-payment-options">
+      <button className="v-button v-button--primary v-button--pill" type="button" onClick={startPaypal} disabled={submitting}>{submitting ? (es ? 'Conectando…' : 'Connecting…') : order.paypalCheckout?.status === 'CREATED' ? (es ? 'Abrir PayPal Sandbox y aprobar pago' : 'Open PayPal Sandbox and approve payment') : (es ? 'Continuar con PayPal Sandbox' : 'Continue with PayPal Sandbox')}</button>
+      {order.paypalCheckout?.status !== 'CREATED' && <form className="shop-sinpe-form" onSubmit={sendSinpe}>
+        <h3>{es ? 'O reportá un SINPE Móvil · DEMO' : 'Or report a SINPE Móvil · DEMO'}</h3>
+        <p>{es ? 'El taller revisa el comprobante antes de confirmar. Este formulario no consulta BAC ni verifica transferencias automáticamente.' : 'The workshop reviews the proof before confirmation. This form does not query BAC or automatically verify transfers.'}</p>
+        <label>{es ? 'Número de referencia' : 'Reference number'}<input required minLength="4" maxLength="100" value={proof.referenceNumber} onChange={event => setProof(current => ({ ...current, referenceNumber: event.target.value }))} /></label>
+        <label>{es ? 'Teléfono SINPE del remitente' : 'Sender’s SINPE phone'}<input required minLength="8" maxLength="25" autoComplete="tel" value={proof.sinpePhone} onChange={event => setProof(current => ({ ...current, sinpePhone: event.target.value }))} /></label>
+        <label>{es ? 'Foto o captura del comprobante' : 'Proof photo or screenshot'}<input type="file" accept="image/png,image/jpeg,image/webp" required onChange={selectProofImage} disabled={submitting || readingProof} /><span>{proof.proofFileName || (es ? 'PNG, JPG o WebP · máximo 1.5 MB' : 'PNG, JPG or WebP · 1.5 MB max')}</span></label>
+        {proof.proofImageDataUrl && <img className="shop-sinpe-proof-preview" src={proof.proofImageDataUrl} alt={es ? 'Vista previa del comprobante seleccionado' : 'Preview of selected payment proof'} />}
+        <label>{es ? 'Nota opcional' : 'Optional note'}<textarea maxLength="500" value={proof.proofNotes} onChange={event => setProof(current => ({ ...current, proofNotes: event.target.value }))} /></label>
+        <button className="v-button v-button--secondary" type="submit" disabled={submitting || readingProof || !proof.proofImageDataUrl || order.paymentProof?.status === 'SUBMITTED'}>{readingProof ? (es ? 'Leyendo imagen…' : 'Reading image…') : submitting ? (es ? 'Enviando…' : 'Sending…') : (es ? 'Enviar comprobante para revisión' : 'Submit proof for review')}</button>
+      </form>}
+    </div>}
+    {error && <p className="shop-cart-error" role="alert">{error}</p>}
+    <div className="shop-checkout-links"><button type="button" className="v-link-text" onClick={onBack}>{es ? 'Volver a mi selección' : 'Back to my selection'}</button><Link className="v-link-text" to={`/pedidos/${encodeURIComponent(order.id)}`}>{es ? 'Ver estado del pedido' : 'View order status'} ↗</Link></div>
+  </section></div>;
+}
+
 export function CartPage() {
   const { language } = usePreferences(); const es = language === 'es';
   const cart = useCart(); const { status, products, retry } = useCatalog();
   const { user, token } = useAuth(); const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const routeOrderId = searchParams.get('orderId');
+  const routePayment = searchParams.get('paypal');
+  const routeProviderToken = searchParams.get('token');
   const lines = reconcileCart(cart.lines, products);
   const subtotal = lines.reduce((sum, line) => sum + (line.subtotal || 0), 0);
   const [error, setError] = useState('');
@@ -188,9 +330,9 @@ export function CartPage() {
         items: lines.map(line => ({ productId: line.productId, color: line.color, quantity: line.quantity })),
         idempotencyKey: idempotencyRef.current.key,
       }, { token });
-      cart.clear();
-      idempotencyRef.current = null;
-      navigate(`/pedidos/${encodeURIComponent(result.order.id)}`);
+      const next = new URLSearchParams(searchParams);
+      next.set('orderId', result.order.id);
+      setSearchParams(next, { replace: true });
     } catch (failure) {
       const messages = {
         PRODUCT_UNAVAILABLE: es ? 'Un modelo o color dejó de estar publicado. Actualizá el carrito antes de reintentar.' : 'A model or color is no longer published. Refresh the cart before trying again.',
@@ -203,6 +345,13 @@ export function CartPage() {
       setSubmitting(false);
     }
   }
+  function returnToSelection() {
+    const next = new URLSearchParams(searchParams);
+    next.delete('orderId'); next.delete('paypal'); next.delete('token');
+    setSearchParams(next, { replace: true });
+    setError('');
+  }
+  if (routeOrderId) return <section className="shop-page"><header className="shop-heading"><span>{es ? 'Checkout seguro · Sandbox / DEMO' : 'Secure checkout · Sandbox / DEMO'}</span><h1>{es ? 'Revisá y pagá tu pedido.' : 'Review and pay your order.'}</h1><p>{es ? 'La cotización se aprueba en tu cuenta; el pago ocurre aquí. Ningún pedido se confirma antes de verificar el método elegido.' : 'Quotes are approved in your account; payment happens here. No order is confirmed before the selected method is verified.'}</p></header><PendingOrderCheckout orderId={routeOrderId} routePayment={routePayment} routeProviderToken={routeProviderToken} es={es} token={token} cart={cart} navigate={navigate} onBack={returnToSelection} /></section>;
   return <section className="shop-page"><header className="shop-heading"><span>{es ? 'Tu selección' : 'Your selection'}</span><h1>{es ? 'Carrito' : 'Cart'}</h1><p>{es ? 'Piezas para imprimir bajo pedido. Podés ajustar tu selección antes de continuar.' : 'Parts printed to order. Adjust your selection before continuing.'}</p></header>
     {!cart.ready ? <div role="status" aria-label={es ? 'Cargando tu carrito' : 'Loading your cart'}><Skeleton height="190px" /></div> : <>
     {cart.storageError && <p role="alert">{es ? 'Tu navegador no permite guardar el carrito. La selección se conserva mientras esta pestaña siga abierta.' : 'Your browser cannot save this cart. Your selection remains while this tab stays open.'}</p>}
@@ -216,7 +365,7 @@ export function CartPage() {
         <div className="shop-cart-controls"><label><span className="v-sr-only">{es ? 'Cantidad de ' : 'Quantity of '}{line.product?.name || line.productId}</span><span className="shop-cart-qty-label">{es ? 'Cantidad' : 'Qty'}</span><input type="number" min="1" max={MAX_CATALOG_ORDER_QUANTITY} step="1" value={line.quantity} onChange={event => { const value = Number(event.target.value); setError(cart.update(line.productId, line.color, value) ? '' : (es ? `La cantidad debe ser un entero entre 1 y ${MAX_CATALOG_ORDER_QUANTITY}.` : `Quantity must be a whole number from 1 to ${MAX_CATALOG_ORDER_QUANTITY}.`)); }} /></label>
         <strong className="shop-cart-subtotal">{line.available ? formatCRC(line.subtotal) : '—'}</strong><button className="v-button v-button--ghost shop-cart-remove" aria-label={`${es ? 'Quitar' : 'Remove'} ${line.product?.name || line.productId}, ${line.color}`} onClick={() => cart.remove(line.productId, line.color)}>{es ? 'Quitar' : 'Remove'}</button></div></article>)}</div>
         <aside className="shop-cart-summary"><h2>{es ? 'Tu encargo' : 'Your order'}</h2><p>{es ? 'Subtotal de piezas' : 'Parts subtotal'}</p><strong className="shop-price">{formatCRC(subtotal)}</strong>
-          <p className="shop-cart-fabrication-note">{es ? 'Pago simulado · DEMO. Al continuar se registra el pago en la base académica y recibirás el comprobante del pedido. No se transfiere ni cobra dinero real. El total mostrado cubre las piezas; entrega y fecha se coordinan aparte con el taller.' : 'Simulated payment · DEMO. Continuing records the payment in the academic database and creates your order receipt. No real money is transferred or charged. The displayed total covers the parts; delivery and date are arranged separately with the workshop.'}</p>
+          <p className="shop-cart-fabrication-note">{es ? 'Todavía no se registra un pago. Al continuar se guarda un pedido pendiente; luego elegís PayPal Sandbox o reportás SINPE para revisión.' : 'No payment is recorded yet. Continuing saves a pending order; then choose PayPal Sandbox or submit SINPE for review.'}</p>
           {!canConfirm && <p className="shop-cart-error" role="status">{es ? 'Hay piezas o variantes no disponibles. Quitalas o elegí otra opción en la tienda para confirmar el encargo; no se incluyen en el subtotal.' : 'Some parts or variants are unavailable. Remove them or select another option in the shop to confirm; they are excluded from the subtotal.'}</p>}
           {!user && (
             <div className="shop-cart-session-state shop-cart-session-state--guest">
@@ -256,19 +405,19 @@ export function CartPage() {
           )}
           {user?.role === 'admin' ? (
             <div className="shop-cart-admin-cta">
-              <button className="v-button v-button--secondary v-button--pill" type="button" aria-label={es ? 'Pago reservado para clientes' : 'Payment reserved for customers'} disabled={true} title={es ? 'Acción reservada para cuentas de cliente' : 'Action reserved for customer accounts'}>
-                {es ? 'Pagar · DEMO (solo clientes)' : 'Pay · DEMO (customers only)'}
+              <button className="v-button v-button--secondary v-button--pill" type="button" aria-label={es ? 'Checkout reservado para clientes' : 'Checkout reserved for customers'} disabled={true} title={es ? 'Acción reservada para cuentas de cliente' : 'Action reserved for customer accounts'}>
+                {es ? 'Confirmar encargo (solo clientes)' : 'Confirm order (customers only)'}
               </button>
               <p className="shop-cart-admin-hint">
                 {es ? 'Ingresá con una cuenta de cliente para comprar y recibir su comprobante DEMO.' : 'Sign in with a customer account to purchase and receive its DEMO receipt.'}
               </p>
             </div>
           ) : (
-            <button className="v-button v-button--primary v-button--pill" type="button" onClick={confirmOrder} disabled={!canConfirm || submitting || user?.role !== 'customer'} aria-label={es ? `Pagar ${formatCRC(subtotal)} · DEMO` : `Pay ${formatCRC(subtotal)} · DEMO`}>
-              {submitting ? (es ? 'Registrando pago…' : 'Recording payment…') : (es ? `Pagar ${formatCRC(subtotal)} · DEMO` : `Pay ${formatCRC(subtotal)} · DEMO`)}
+            <button className="v-button v-button--primary v-button--pill" type="button" onClick={confirmOrder} disabled={!canConfirm || submitting || user?.role !== 'customer'} aria-label={es ? `Continuar al pago ${formatCRC(subtotal)}` : `Continue to payment ${formatCRC(subtotal)}`}>
+              {submitting ? (es ? 'Guardando encargo…' : 'Saving order…') : (es ? `Continuar al pago · ${formatCRC(subtotal)}` : `Continue to payment · ${formatCRC(subtotal)}`)}
             </button>
           )}
-          {!user && <p className="shop-cart-guest-note">{es ? 'Iniciá sesión o creá una cuenta para elegir productos y pagarlos en modo DEMO.' : 'Sign in or create an account to choose products and pay in DEMO mode.'}</p>}
+          {!user && <p className="shop-cart-guest-note">{es ? 'Iniciá sesión o creá una cuenta para vincular tu selección a tu cuenta y continuar al pago.' : 'Sign in or create an account to link your selection to your account and continue to payment.'}</p>}
           {error && <p className="shop-cart-error" role="alert">{error}</p>}
           <Link className="v-link-text" to="/catalogo">{es ? 'Seguir eligiendo piezas' : 'Keep choosing parts'} ↗</Link></aside></div>}
       </>}

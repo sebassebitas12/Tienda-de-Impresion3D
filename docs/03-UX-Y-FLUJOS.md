@@ -1,18 +1,34 @@
 # Vértice CR — UX, navegación y estados
 
+## Cotización conversacional y continuidad — 2026-10-05
+
+Visitante puede preparar su idea con IA; antes de enviar ve acceso explícito a
+login con retorno al borrador. En navegador se comprobó conservación de uso,
+medidas, material, cantidad y diseño tras login. Envío evita doble clic. Éxito
+oculta composer y muestra revisión→oferta→aprobación en Cuenta→checkout común
+del carrito. Chat fallido ofrece reintentar la misma pregunta, sin duplicarla
+en el hilo. El workflow de correo de oferta tuvo una ejecución fallida antes de
+Gmail; su corrección local aún requiere importación/publicación y evidencia live.
+
 ## R-H85 — Recorridos visitante/cliente/Admin (2026-10-05)
+
+El detalle de pedido no es una pasarela: ofrece volver/continuar al checkout
+central en `/carrito?orderId=...`. El pedido sigue `PENDING` hasta una captura
+PayPal Sandbox validada o una confirmación manual del comprobante SINPE. Los
+pedidos vinculados a cotización solo se crean después de aprobar la oferta en
+Cuenta y llevan al mismo checkout.
 
 ### Revisión de coherencia actual (2026-10-05)
 
-El catálogo se puede explorar sin cuenta. Agregar una pieza, abrir el carrito y
-pagar requieren sesión `customer`; un visitante recibe enlaces para iniciar
-sesión/registrarse y vuelve a la ficha del producto. No se conserva carrito
-anónimo. La compra de catálogo termina en un recibo DEMO. Una cotización
-personalizada no depende del catálogo: Admin registra monto y alcance, el
-cliente aprueba, paga DEMO desde su cuenta y recibe el recibo. Admin administra
-productos, solicitudes y pedidos, pero no paga ni valida comprobantes por el
-cliente. Búsqueda y filtros del catálogo se conservan al abrir la ficha y
-volver. Gmail/n8n de cotizaciones se conservan; el pago DEMO no envía correo.
+El catálogo se puede explorar sin cuenta. Para agregar piezas y abrir el carrito
+se requiere sesión customer; login conserva el destino de retorno. El pedido solo
+se crea tras autenticar. El carrito crea `PENDING`/`UNPAID`, y el cliente elige
+PayPal Sandbox o reporta SINPE para revisión manual. Una cotización personalizada
+no depende del catálogo: Admin registra y envía monto/alcance, el cliente
+aprueba en la app y continúa al checkout común. Admin no paga por el cliente,
+pero sí revisa comprobantes SINPE. Búsqueda y filtros del catálogo se conservan
+al abrir la ficha y volver. La rama de correo de pago se dispara después de las
+confirmaciones; su acuse está probado con proveedor mock, no con Gmail real.
 
 Las rutas FAQ, Materiales, Requisitos, Términos, Privacidad y Envíos tienen
 contenido ES/EN con límites académicos y acciones hacia flujos reales. Las rutas
@@ -23,20 +39,21 @@ solo presenta pedidos que devuelve el servicio del usuario. Admin que abre
 `/cuenta` recibe una derivación clara a Administración; Perfil se declara de
 consulta, no de edición.
 
-El pago `DEMO` está rotulado y no representa cobro ni transferencia real. La
-operación solo registra estados y muestra el recibo de la simulación. Una
-pasarela bancaria real queda fuera del alcance actual.
+PayPal Sandbox usa fondos de prueba; no es un cobro real. Reportar SINPE tampoco
+confirma una transferencia: Admin revisa datos e imagen antes de marcar el pago.
+Una integración bancaria real queda fuera del alcance.
 El acceso de visitante queda en el control «Mi espacio» del navbar; su nombre
 accesible ahora anuncia el destino y el panel ofrece Iniciar sesión/Crear cuenta.
 No se duplica un CTA de login que compita con Cotizar en el header.
 
-Admin ya no ofrece verificación de comprobantes de pago: ese paso se retiró del
-recorrido vigente. El historial puede conservar eventos antiguos, etiquetados
-como registros sin validar del flujo anterior.
+Admin puede confirmar o rechazar el comprobante SINPE reportado; el rechazo deja
+el pedido pendiente para que el cliente corrija. No hay validación bancaria ni
+análisis automático del comprobante con IA.
 
 La ficha Admin conserva la publicación de cotizaciones por el flujo n8n/Gmail
-existente, dirigida al correo de la cuenta customer y con la copia al taller
-configurada en la integración. Esta revisión no cambia ni envía el workflow.
+dirigida al correo de la cuenta customer y con copia al taller. El export local
+incluye una rama para recibo de pago, pero la app aún no la invoca ni se ha
+confirmado entrega. No reintentar un correo con estado `UNKNOWN` sin reconciliarlo.
 
 R-H83: Contacto deriva a rutas ejecutables según pieza/idea/seguimiento; la
 redacción evita insinuar un equipo grande y asigna al admin su propia acción.
@@ -54,17 +71,14 @@ a aprobación/pago. Versiones importadas y render Gmail requieren verificación.
 
 ## Recorrido carrito y pago — revisión vigente (2026-10-05)
 
-La compra de catálogo exige sesión, registra pago DEMO con idempotencia y abre
-`/pedidos/:id` con el recibo. Si el API falla, el carrito se conserva para
-corregir o reintentar. Las cotizaciones tienen un recorrido separado: Admin
-prepara alcance y monto libre, el cliente aprueba y paga desde su cuenta, y el
-sistema guarda el snapshot en el pedido. Admin no valida pagos ficticios ni crea
-pedidos en nombre del cliente. Ningún paso mueve dinero real.
-
-La vista del pedido distingue pago DEMO y etapas del taller. Entrega e impuestos
-no confirmados se muestran como pendientes de coordinación, nunca como incluidos
-o gratuitos. Los eventos antiguos de SINPE pueden permanecer en datos de prueba,
-pero sus controles ya no forman parte del recorrido actual.
+La compra de catálogo exige sesión y crea `PENDING`/`UNPAID`; el checkout ofrece
+PayPal Sandbox o SINPE manual. Un fallo conserva el pedido y permite retomarlo
+desde carrito/detalle. Solo captura Sandbox coincidente o verificación Admin
+SINPE puede moverlo a `CONFIRMED`/`PAID`. Para una cotización, la aprobación en
+`/cuenta` precede la creación del pedido y redirige al mismo checkout. La vista
+distingue fondos de prueba y comprobante revisado. Entrega e impuestos no
+confirmados siguen pendientes; el correo posterior al pago ya integra el
+outbox con API/n8n. Falta comprobar entrega Gmail en vivo.
 
 > Última actualización: **2026-10-05**.
 
@@ -99,22 +113,33 @@ La entrada `/solicitud` ahora presenta dos caminos explícitos y no los mezcla:
 1. **Ya tengo la pieza/archivo:** el cliente solicita revisión técnica de su
    STL/OBJ para cotizarlo. Esta ruta debe entregar el archivo al taller; no debe
    convertirse en una conversación de diseño.
-2. **Quiero ayuda para crearla:** el chatbot conversa para aclarar uso,
-   dimensiones, material y cantidad, orienta el diseño y prepara la cotización.
+2. **Quiero ayuda para definirla:** el chatbot parte de lo que la persona ya
+   sabe y organiza sus mensajes en un resumen de solicitud. Uso, dimensiones,
+   material y cantidad pueden quedar sin definir; no se debe bloquear a quien
+   solo sabe nombrar la pieza y explicar para qué la necesita. El asistente no
+   fija el precio final ni inicia producción.
 
 La implementación React muestra ambas opciones y separa la ruta de ayuda
 (`/solicitud/ayuda-diseno`) del intake de archivo (`/solicitud/archivo`). En la
 ruta de archivo el cliente puede adjuntar hasta cinco imágenes PNG/JPG/WebP/GIF
-o archivos STL/OBJ de hasta 5 MiB cada uno; indica dimensiones con unidad
-seleccionable (mm/cm/in), uso, material deseado y cantidad. Con sesión de cliente
-y confirmación explícita, crea una solicitud `PENDING_QUOTE`, no un pedido ni un
-precio. Admin puede leer los adjuntos solo con acceso autorizado; no se laminan
-ni se miden automáticamente. El asistente general está disponible en esta ruta;
+o archivos STL/OBJ de hasta 5 MiB cada uno; dimensiones, uso, material deseado
+y cantidad son opcionales. En medidas, la unidad seleccionada (mm/cm/in) se
+aplica a números sin unidad; unidades escritas explícitamente se respetan. El
+campo vacío es válido, pero texto ilegible, cero o unidades no admitidas bloquean
+el envío tanto en UI como en API. Con sesión de cliente y confirmación explícita,
+crea una solicitud `PENDING_QUOTE`, no un pedido ni un precio. Admin puede leer
+los adjuntos solo con acceso autorizado; no se laminan ni se miden
+automáticamente. El agente recibe texto, no los bytes de las fotos/STL/OBJ; por
+ahora esas referencias se conservan para revisión del taller. El asistente general está disponible en esta ruta;
 el chat flotante se oculta únicamente en `/solicitud/ayuda-diseno`, que tiene su
 asistente de cotización integrado.
 
-El asistente de cotización ordena la idea y puede preparar un borrador editable;
-la persona lo revisa, agrega referencias y confirma el envío. La calculadora de
+El asistente de cotización responde al flujo real y, ante la petición de preparar
+la solicitud, devuelve un resumen estructurado editable a partir de los mensajes.
+La persona lo revisa, agrega referencias y confirma el envío. La ruta no exige
+que conozca medidas o material para una idea como «solo un brazo robótico para
+una simulación de banda transportadora». La cotización económica y la decisión
+de fabricación continúan sujetas a revisión del taller. La calculadora de
 perfiles sigue rotulada DEMO y no envía montos como oferta.
 
 El compositor compartido de los tres asistentes envía con `Enter`; `Shift+Enter`
@@ -131,22 +156,22 @@ de puntero y táctil.
 4. Admin envía la cotización al cliente con un enlace para verla en su cuenta y
    copia oculta al taller. Solo la confirmación de entrega del proveedor avanza
    a `AWAITING_APPROVAL`; recibir el correo no equivale a aceptar.
-5. El cliente aprueba la cotización vigente desde la app. La app registra la
-   decisión; no se aprueba por responder el email. La confirmación al cliente y
-   el aviso interno al taller son notificaciones posteriores deseadas, aún no
-   implementadas. Rechazar o pedir cambios desde la app sigue pendiente.
-6. Después de la aprobación, el cliente paga por el flujo disponible. El correo
-   interno debe identificar con precisión si se trata de una solicitud aprobada,
-   un pedido creado o un pago verificado; no debe presentar una etapa como otra.
-   Cuando exista un pedido, los cambios de etapa registrados por Admin pueden
-   enviar avances al correo del cliente. Estas notificaciones también están
-   pendientes de implementación.
+5. Desde `/cuenta`, el cliente puede aprobar la versión vigente o solicitar
+   cambios/rechazar con un motivo. La app registra la decisión; responder el
+   correo no aprueba nada. Admin puede leer el motivo y preparar una versión
+   nueva. La app no debe permitir aprobar una versión vencida o desactualizada.
+6. Tras la aprobación, el cliente completa el pago DEMO desde su cuenta; recién
+   entonces se crea el pedido y su recibo. Admin registra después las etapas del
+   taller. El email actual entrega la cotización inicial; las notificaciones
+   automáticas de aprobación/cambios y los avisos de cada avance por correo no
+   están implementados, aunque la app conserva estado/historial.
 
-Hoy están implementadas la preparación/envío de cotización desde Admin, la
-aprobación demo del cliente, el intake de requisitos y la recepción local de
-adjuntos privados. Siguen pendientes el procesamiento/laminado real de archivos,
-el pago real y las notificaciones de avance. El botón de correo
-del cliente no debe enviar una cotización demo directamente como precio final.
+Hoy están implementados el intake conversacional/de archivo, la propuesta
+económica DEMO revisada por Admin, el email de cotización inicial, la decisión
+del cliente en la app y el pago DEMO que crea un pedido. Siguen pendientes el
+análisis de imágenes/archivos por IA, el procesamiento/laminado real, el pago
+real y los correos transaccionales de aprobación y avance. Una cifra DEMO no es
+un precio real ni una promesa de fabricación/entrega.
 
 ### Páginas institucionales y contexto de sesión — 2026-10-04
 

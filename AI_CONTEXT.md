@@ -5,7 +5,130 @@
 > **Rama:** `Pruebas`  
 > **No es un diario:** este archivo resume el presente. El historial detallado vive en los documentos de dominio.
 
-## Estado vigente para continuar (2026-10-05, revisión de flujo)
+## Estado vigente — catálogo, cotización y pagos (2026-10-05)
+
+- Pasada en QA aislado (API 3219 / UI 5181; copia temporal, sin tocar usuarios
+  del db principal): IA n8n real completa el resumen; login conserva los campos;
+  cliente envía solicitud; Admin revisa y guarda oferta DEMO de ₡9 306.
+- Un único correo autorizado se intentó a la cuenta del taller. Entrega UNKNOWN,
+  sin reintento. Ejecución n8n #73 falla antes de Gmail: `URL is not defined`
+  en Validar y preparar correo. Gmail no encontró el mensaje al consultar.
+  Renderer corregido sin URL global y workflow oficial regenerado; falta
+  importar/publicar esa corrección y autorizar otra prueba si se desea enviar.
+- Chat permite reintentar respuesta fallida sin duplicar mensaje; envío de
+  solicitud bloquea doble clic y el éxito reemplaza conversación por siguientes
+  pasos. La reauditoría visual de escritorio Light descrita en R-H88 corrigió un
+  Copiloto Admin cuyo saludo quedaba cortado por auto-scroll inicial. Móvil no se
+  verificó en esta pasada.
+
+- Recuperación ejecutada: 25 fuentes consultadas en Printables; fotografías en
+  `public/images/catalog/` y un archivo original por diseño en
+  `.local-data/catalog/models/` (ignorado). Manifiestos y hashes en
+  `automation/catalog/`. Las fichas corresponden ahora al objeto fuente y el
+  detalle muestra atribución. Alcance educativo, no autorización comercial.
+- `node scripts/import-catalog-sources.mjs` modifica únicamente `products`.
+  Una selección de componente se identifica en `modelEvidence.componentLabel`.
+- Las 25 fichas tienen al menos una foto fuente; 14 tienen cuatro o más y 11
+  necesitan completar galería. Aún no hay vistas renderizadas desde los STL.
+  Pendientes: galería principal + tres vistas estáticas y laminado K1C. Los campos
+  `productionDataSource: DEMO_NOT_SLICED` y `slicingStatus: PENDING` distinguen
+  estimaciones heredadas de resultados del laminador.
+
+- Rama `Pruebas`, HEAD publicado `e41099d`; `main` permanece fuera del alcance.
+- La base local tiene cambios intencionales solo en `products`. En comparación
+  con `HEAD:db.json`, usuarios, pedidos, solicitudes y demás colecciones son
+  iguales; no se debe copiar el archivo entero al llevar el catálogo remoto.
+- **Flujo vigente de pago:** el carrito crea `PENDING`/`UNPAID` y abre
+  `/carrito?orderId=...`; no cobra ni confirma al crear. El cliente elige PayPal
+  Sandbox (CRC + equivalente USD, tasa/fecha) o reporta SINPE con imagen para
+  revisión manual. No son opciones acumulables. Una cotización solo genera un
+  pedido pendiente después de aprobarse en la app; también se paga en el carrito.
+  El detalle es para retomar checkout, no una pasarela paralela.
+- `VERTICE_PAYPAL_CLIENT_ID`, `VERTICE_PAYPAL_CLIENT_SECRET`,
+  `VERTICE_PAYPAL_ENV=sandbox` y `VERTICE_APP_URL` son configuración local de
+  servidor; nunca poner el secreto en React/Git. La conversión obtiene tasa
+  pública con fecha; ni el sandbox ni SINPE han sido verificados en un recorrido
+  de navegador real en este checkpoint.
+- La captura PayPal y confirmación SINPE crean un outbox y disparan
+  `vertice-payment-email` después de persistir el pago. El servidor registra
+  `SENDING/SENT/FAILED/UNKNOWN`; valida `orderId`, `deliveryKey` y `messageId`
+  del acuse y no reenvía resultados inciertos. URL: `VERTICE_PAYMENT_EMAIL_WEBHOOK_URL`;
+  Header Auth comparte el token de cotización salvo override local. La integración
+  HTTP aislada pasa con dos recibos mock y confirmaciones repetidas sin duplicar.
+  Falta comprobar Gmail y PayPal Sandbox en vivo. El correo autorizado anterior quedó `UNKNOWN`
+  antes de Gmail; no reintentar sin reconciliar ni afirmar que llegó.
+- Se bloqueó el REST genérico de `/orders` para operaciones no autorizadas; las
+  lecturas administrativas requieren token y los cambios pasan por acciones
+  auditadas. Las rutas de negocio de cliente se mantienen explícitamente
+  permitidas.
+- El seed local tiene 25 productos `ACTIVE` con imágenes
+  existentes. `ACTIVE` significa visible en la demo, no inventario ni promesa de
+  fabricación/entrega. Todos los precios se identifican como `DEMO`; las fuentes
+  se registraron para uso educativo, sin validar peso/tiempo ni fabricación.
+  Gramos/horas heredados no
+  tienen prueba de laminador; `stock`/`minStock` son campos legados.
+- El usuario confirma una impresora Creality K1C. Hay un archivo fuente por
+  diseño en `.local-data/catalog/models/` (ignorado); no se ha laminado el seed.
+  Creality Print tiene CLI para procesar un lote con presets:
+  recuperar/validar una vez la lista de modelos y automatizar las mediciones, no
+  exigir al usuario abrir uno por uno. La potencia nominal de 350 W no equivale
+  al promedio medido y no debe usarse como costo de energía.
+- La tienda explica que imágenes/precios son referencias; cada precio DEMO
+  muestra «Precio referencial» y la ficha/checkout aclaran que no confirman
+  producción/entrega. Se inspeccionó Dark escritorio (1265 × 720), 25 modelos,
+  rejilla de 3 columnas y tarjetas cargadas. La reauditoría de Admin/Copiloto
+  incluyó Light escritorio, pero tienda Light y móvil siguen pendientes.
+- Diferencial confirmado por el usuario: IA integrada que organiza la idea y
+  referencias y evita captura manual de datos técnicos; herramientas calculan
+  con evidencia, con acciones para enviar/revisar/aprobar/pagar en Sandbox o
+  reportar SINPE. Flujo: `cliente → IA → Admin/revisión → aprobación en app →
+  checkout → pago/validación → seguimiento`.
+- Brecha comprobada en código: el intake guarda imagen/STL/OBJ, pero
+  `/assistants/chat` solo recibe mensajes de texto. No hay análisis visual ni
+  extracción geométrica/laminado automático; el motor de precio sigue DEMO.
+- Meshy (`@meshy-ai/meshy-mcp-server`) quedó aplazado por el usuario para esta
+  entrega; no se requiere ni se integra en el siguiente bloque. La generación
+  image-to-3D es una herramienta opcional futura y no sustituye un laminado real.
+  La galería deseada es solo imagen (principal + tres vistas); puede renderizarse
+  desde el mismo modelo fuente y mantener ese archivo privado. Para gramos/horas
+  hacen falta los modelos fuente autorizados y un laminado K1C reproducible.
+- Verificación del catálogo: Jest 51 suites / 305 tests, lint,
+  `check:ui`, `check:automation` (270 comprobaciones), build y `git diff --check`
+  pasan. CI aún corresponde al baseline publicado `e41099d`, no a estos cambios
+  locales.
+
+## Reauditoría visual y cotización conversacional — 2026-10-05
+
+- QA aislado: UI `localhost:5181` (Admin), `127.0.0.1:5182` (cliente), API
+  `127.0.0.1:3219` con copia temporal. No se tocó el `db.json` de trabajo ni se
+  envió pedido, correo o pago.
+- El agente de cotización respondió a una petición de solo el brazo robótico
+  para simulación de banda transportadora y devolvió un resumen estructurado con
+  dimensiones/material sin definir. La conversación y su borrador sobrevivieron
+  recarga y retorno de login. No se envió la solicitud.
+- Medidas de `/solicitud/archivo`: vacío permitido; `15 × 8 × 4` con selector
+  `cm` válido; «15 cm y lo que sea» bloqueado con error. La unidad seleccionada
+  se usa si el texto no incluye unidades, y el payload evita duplicar `cm`.
+- Copiloto Admin Light a 1265×720: corregido auto-scroll que recortaba el saludo;
+  se ven saludo, sugerencias y composer. Catálogo Admin identifica junto al
+  importe cuándo el precio es `DEMO · REFERENCIAL`.
+- Revisión visual comprobada en escritorio Light; no se hizo matriz 375/768,
+  teclado/lector ni recorrido completo post-cambio. No se corrieron pruebas Jest
+  en esta pasada. `npm run lint`, `npm run check:ui`, `npm run build` y
+  `git diff --check` pasan.
+- No se verificó una escritura CRUD desde el Copiloto. El chat Cliente aún no
+  transmite imágenes/STL/OBJ al modelo y el cotizador no obtiene grams/horas de
+  un laminador. Correo permanece UNKNOWN por el fallo anterior de n8n antes de
+  Gmail; no reintentar sin autorización expresa.
+
+Siguiente trabajo de mayor impacto: conectar de forma segura las referencias
+del cliente al flujo IA con consentimiento/validación, terminar la ruta
+laminador K1C reproducible, ejecutar y observar una operación Admin CRUD de QA,
+y luego recorrer catálogo → carrito → pago DEMO y cotización → aprobación → pago
+con matriz responsive. Ver evidencia y límites de esta pasada en `docs/05`,
+contrato de negocio en `docs/02`/`docs/03`, APIs en `docs/07` y orden en `docs/10`.
+
+## Snapshot previo — historial, no usar como estado actual
 
 - Integración casa–curso: recuperados `1e086a9`, `7e0c2dd` y `ba497da`
   mediante bundle Git autorizado, SHA256 comprobado y fast-forward desde

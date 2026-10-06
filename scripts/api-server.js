@@ -10,11 +10,14 @@ import { prepareRequestAction } from './request-actions.js';
 import { installAutomationOperations } from './automation-operations.js';
 import { installCustomerQuoteOperations } from './customer-quote-operations.js';
 import { installCatalogOrderOperations } from './catalog-order-operations.js';
+import { installPaypalPaymentOperations } from './paypal-operations.js';
 import { installProductReviewOperations } from './product-review-operations.js';
 import { deliverQuote } from './quote-email.js';
 import { sessionActor } from './session-access.js';
 import { multipartBufferMiddleware } from './multipart-form.js';
 import { applyAdminCatalogAction } from './admin-ai-catalog.js';
+import { createOrderResourceGuard } from './order-resource-guard.js';
+import { dispatchPaymentEmail } from './payment-email-delivery.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const databasePath = resolve(root, process.env.VERTICE_DB_FILE || 'db.json');
@@ -63,6 +66,11 @@ if (!db.data.customPrintRequests || !db.data.activityLog) {
 }
 
 const app = createApp(db);
+app.use('/', createOrderResourceGuard(() => db.data));
+const orderGuard = app.middleware.pop();
+const genericResourceRoute = app.middleware.findIndex(entry => entry.type === 'route' && entry.path === '/:name');
+if (genericResourceRoute < 0) throw new Error('No se pudo proteger el CRUD genérico de pedidos.');
+app.middleware.splice(genericResourceRoute, 0, orderGuard);
 const multipartParser = multipartBufferMiddleware(26 * 1024 * 1024);
 const bodyParserEntry = app.middleware.find(entry => entry.type === 'mw' && entry.handler?.toString().includes('checkType(req, type)'));
 if (!bodyParserEntry) throw new Error('No se pudo instalar el parser multipart antes del parser JSON.');
@@ -224,11 +232,13 @@ async function persistData(nextData) {
 }
 
 const port = Number(process.env.PORT || 3000);
+const onPaymentConfirmed = orderId => dispatchPaymentEmail({ orderId, db, serialize: serializeReviewAction, persist: persistData });
 installAutomationOperations({ registerAction, db, serialize: serializeReviewAction,
-  persist: persistData,
+  persist: persistData, onPaymentConfirmed,
 });
 installCustomerQuoteOperations({ registerAction, db, serialize: serializeReviewAction, persist: persistData });
 installCatalogOrderOperations({ registerAction, db, serialize: serializeReviewAction, persist: persistData });
+installPaypalPaymentOperations({ registerAction, db, serialize: serializeReviewAction, persist: persistData, onPaymentConfirmed });
 installProductReviewOperations({ registerAction, registerRead, db, serialize: serializeReviewAction, persist: persistData });
 const host = process.env.HOST || '127.0.0.1';
 app.listen(port, () => {

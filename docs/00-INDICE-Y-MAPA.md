@@ -1,6 +1,6 @@
 # Vértice CR — Índice de documentación
 
-> **Última actualización:** 2026-10-02
+> **Última actualización:** 2026-10-05
 > **Estado:** ACTIVO  
 > **Uso:** mapa rápido para humanos y agentes.
 

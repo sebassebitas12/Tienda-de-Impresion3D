@@ -1,7 +1,15 @@
 import { automationAction } from './automationService.js';
 
-export function submitDemoOrderPayment({ orderId }, { token, signal } = {}) {
-  return automationAction('/orders/pay-demo', { orderId }, { token, signal });
+export function submitOrderPaymentProof(payload, { token, signal } = {}) {
+  return automationAction('/orders/submit-payment-proof', payload, { token, signal });
+}
+
+export function createPaypalCheckout({ orderId }, { token, signal } = {}) {
+  return automationAction('/orders/paypal/create', { orderId }, { token, signal });
+}
+
+export function capturePaypalCheckout({ orderId, paypalOrderId }, { token, signal } = {}) {
+  return automationAction('/orders/paypal/capture', { orderId, paypalOrderId }, { token, signal });
 }
 
 export function fetchMyOrders({ token, signal } = {}) {

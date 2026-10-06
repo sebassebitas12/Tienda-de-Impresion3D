@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { describe, expect, it, jest } from '@jest/globals';
-import { installCatalogOrderOperations, prepareCatalogOrder } from '../scripts/catalog-order-operations.js';
+import { installCatalogOrderOperations, prepareCatalogOrder, prepareOrderPaymentProof } from '../scripts/catalog-order-operations.js';
 import { buildAdminOrders } from '../src/utils/adminOrders.js';
 
 const actor = { id: 'c1', name: 'Cliente Uno', role: 'customer' };
@@ -64,14 +64,16 @@ describe('creación de encargos de catálogo', () => {
     const user = { id: 'empty', role: 'customer', status: 'ACTIVE' };
     expect(mineFixture([user]).invoke(tokenFor(user)).body).toEqual({ orders: [] });
   });
-  it('recalcula el precio, registra el pago DEMO y crea recibo/items/actividad en una persistencia', () => {
+  it('recalcula el precio y crea un pedido pendiente con items y actividad, sin fingir un pago', () => {
     let sequence = 0;
     const result = prepareCatalogOrder(fixture(), actor, payload, now, () => `id-${++sequence}`);
-    expect(result.order).toMatchObject({ id: 'ord-id-2', userId: 'c1', status: 'CONFIRMED', paymentStatus: 'PAID', paymentMode: 'DEMO', paidAt: now, currency: 'CRC', createdAt: now, subtotalCrc: 5000, total: 5000, pricingScope: 'CATALOG_SUBTOTAL_ONLY' });
+    expect(result.order).toMatchObject({ id: 'ord-id-2', userId: 'c1', status: 'PENDING', paymentStatus: 'UNPAID', currency: 'CRC', createdAt: now, updatedAt: now, subtotalCrc: 5000, total: 5000, pricingScope: 'CATALOG_SUBTOTAL_ONLY' });
+    expect(result.order).not.toHaveProperty('paymentMode');
+    expect(result.order).not.toHaveProperty('paymentEvidence');
     expect(result.order.orderItems[0]).toMatchObject({ productId: 'p1', color: 'Negro', quantity: 2, unitPrice: 2500, subtotal: 5000 });
     expect(result.nextData.orders).toEqual([result.order]);
     expect(result.nextData.orderItems[0]).toMatchObject({ orderId: result.order.id, productId: 'p1', quantity: 2 });
-    expect(result.nextData.activityLog[0]).toMatchObject({ action: 'CATALOG_DEMO_PURCHASE_COMPLETED', entityId: result.order.id, actorId: 'c1', toStatus: 'CONFIRMED', metadata: { paymentMode: 'DEMO', reference: 'SIMULATED-NO-REAL-PAYMENT' } });
+    expect(result.nextData.activityLog[0]).toMatchObject({ action: 'CATALOG_ORDER_CREATED', entityId: result.order.id, actorId: 'c1', toStatus: 'PENDING', metadata: { paymentStatus: 'UNPAID', pricingScope: 'CATALOG_SUBTOTAL_ONLY' } });
     expect(buildAdminOrders(result.nextData)[0]).toMatchObject({ id: result.order.id, customer: actor, total: 5000, items: [{ productId: 'p1', quantity: 2, product }] });
   });
 
@@ -109,8 +111,35 @@ describe('creación de encargos de catálogo', () => {
     const first = await invoke();
     const replay = await invoke();
     expect(first.status).toBe(200);
-    expect(first.body.order).toMatchObject({ userId: actor.id, status: 'CONFIRMED', paymentStatus: 'PAID', paymentMode: 'DEMO', subtotalCrc: 5000 });
+    expect(first.body.order).toMatchObject({ userId: actor.id, status: 'PENDING', paymentStatus: 'UNPAID', subtotalCrc: 5000 });
     expect(replay.body).toEqual({ order: first.body.order, replay: true });
     expect(persist).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('selección excluyente del medio de pago', () => {
+  const proofImageDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/aDEAAAAASUVORK5CYII=';
+  const proofPayload = { orderId: 'o1', referenceNumber: 'SINPE-1234', sinpePhone: '8888-8888', proofImageDataUrl };
+
+  it.each([
+    [{ paypalCheckout: { status: 'CREATED' } }, 'PAYMENT_METHOD_CONFLICT'],
+    [{ paymentProof: { status: 'SUBMITTED' } }, 'PROOF_ALREADY_SUBMITTED'],
+    [{ sourceQuoteId: 'rq-1', scopeSnapshot: { quoteVersion: 2 } }, 'STATUS_CONFLICT'],
+  ])('no permite SINPE si existe otra vía de pago activa o la cotización no está aprobada %#', (orderFields, code) => {
+    const data = {
+      orders: [{ id: 'o1', userId: 'c1', status: 'PENDING', ...orderFields }],
+      customPrintRequests: [], users: [], activityLog: [],
+    };
+    expect(prepareOrderPaymentProof(data, { ...actor, status: 'ACTIVE' }, proofPayload, now).error).toBe(code);
+  });
+
+  it('no acepta el comprobante de una cotización cuya vigencia ya terminó', () => {
+    const data = {
+      orders: [{ id: 'o1', userId: 'c1', status: 'PENDING', sourceQuoteId: 'rq-1', scopeSnapshot: { quoteVersion: 2 } }],
+      customPrintRequests: [{ id: 'rq-1', status: 'APPROVED', quoteVersion: 2, quoteValidUntil: '2026-10-01T23:59:59-06:00' }],
+      users: [], activityLog: [],
+    };
+    expect(prepareOrderPaymentProof(data, { ...actor, status: 'ACTIVE' }, proofPayload, now))
+      .toMatchObject({ error: 'QUOTE_EXPIRED', status: 409 });
   });
 });

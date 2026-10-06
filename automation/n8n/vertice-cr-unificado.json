@@ -385,7 +385,7 @@
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const prepareQuoteEmail = function prepareQuoteEmail(data) {\n  const escape = value => String(value ?? '').replace(/[&<>\"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&#39;' }[char]));\n  const validEmail = value => /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(String(value || ''));\n  const amount = Number(data.amountCrc);\n  const date = new Date(`${String(data.validUntil || '').slice(0, 10)}T12:00:00Z`);\n  if (!data.requestId || !Number.isSafeInteger(amount) || amount <= 0 || (data.currency && data.currency !== 'CRC') || !validEmail(data.customerEmail) || !validEmail(data.adminEmail) || !Number.isFinite(date.getTime()) || !data.notes) {\n    throw new Error('La cotización o sus destinatarios no son válidos.');\n  }\n  const money = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC', maximumFractionDigits: 0 }).format(amount);\n  const until = new Intl.DateTimeFormat('es-CR', { dateStyle: 'long', timeZone: 'UTC' }).format(date);\n  const appUrl = new URL(data.appUrl || 'http://localhost:5173');\n  if (!['http:', 'https:'].includes(appUrl.protocol) || appUrl.username || appUrl.password) throw new Error('Dirección de la app inválida.');\n  const accountUrl = escape(new URL('/cuenta', appUrl).href);\n  const local = ['localhost', '127.0.0.1', '[::1]'].includes(appUrl.hostname);\n  const demo = data.mode === 'DEMO';\n  const row = (label, value) => `<tr><td style=\"padding:12px 0;border-bottom:1px solid #ded7cd;color:#71675e;width:35%;font-size:14px\">${label}</td><td style=\"padding:12px 0;border-bottom:1px solid #ded7cd;color:#201b16;font-size:15px;text-align:right;word-break:break-word\">${escape(value)}</td></tr>`;\n  const html = `<!doctype html><html lang=\"es\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><body style=\"margin:0;background:#ece6dc;font-family:Arial,Helvetica,sans-serif;color:#201b16\">\n<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#ece6dc\"><tr><td align=\"center\" style=\"padding:24px 12px\">\n<!--[if mso]><table role=\"presentation\" width=\"600\"><tr><td><![endif]-->\n<table role=\"presentation\" align=\"center\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"width:100%;max-width:600px;background:#faf7f1;border:1px solid #d8cfc2\">\n<tr><td style=\"padding:28px 24px;background:#181510;border-bottom:3px solid #ff5500\"><p style=\"margin:0;color:#faf7f1;font-size:22px;font-weight:bold;letter-spacing:2px\">VÉRTICE <span style=\"color:#ff5500\">CR</span></p><p style=\"margin:8px 0 0;color:#c0b5a6;font-size:13px\">Impresión 3D · Cotización ${escape(data.requestId)}</p></td></tr>\n<tr><td style=\"padding:28px 24px\">\n${demo || data.test ? '<p style=\"margin:0 0 20px;padding:12px;background:#f1e6d7;color:#754217;font-size:13px;line-height:1.5\"><strong>Demostración académica.</strong> Este correo no solicita una transferencia ni autoriza producción.</p>' : ''}\n<h1 style=\"margin:0 0 12px;font-size:26px;line-height:1.2\">Tu pieza, con los detalles claros.</h1>\n<p style=\"margin:0 0 24px;color:#71675e;font-size:15px;line-height:1.6\">${data.test ? 'Esta es una prueba de la cotización.' : `Hola ${escape(data.customerName || '')}.`} Revisá la pieza, el precio y las condiciones. La aprobación o solicitud de cambios se hace desde tu cuenta.</p>\n<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" aria-label=\"Detalles del encargo\">${row('Pieza', data.piece || `Solicitud ${data.requestId}`)}${row('Cantidad', data.quantity || 'Por confirmar')}${row('Polímero propuesto', data.material || 'Por confirmar')}</table>\n<p style=\"margin:24px 0 6px;color:#71675e;font-size:13px\">${demo ? 'Monto de demostración' : 'Precio cotizado'}</p><p style=\"margin:0;color:#201b16;font-size:34px;font-weight:bold\">${money}</p><p style=\"margin:8px 0 24px;color:#71675e;font-size:14px\">CRC · Vigencia: ${escape(until)}</p>\n<h2 style=\"margin:0 0 10px;font-size:17px\">Qué incluye y qué debés revisar</h2><p style=\"margin:0 0 24px;color:#51483f;font-size:14px;line-height:1.7\">${escape(data.notes).replace(/\\n/g, '<br>')}</p>\n<table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td bgcolor=\"#c84408\" style=\"padding:15px 22px\"><a href=\"${accountUrl}\" style=\"color:#ffffff;text-decoration:none;font-size:15px;font-weight:bold\">Revisar cotización en mi cuenta →</a></td></tr></table>\n${local ? '<p style=\"margin:14px 0 0;color:#71675e;font-size:13px;line-height:1.5\">Enlace de presentación local: abrilo en la computadora donde está ejecutándose Vértice. No es un sitio publicado.</p>' : ''}\n<p style=\"margin:20px 0 0;color:#71675e;font-size:14px;line-height:1.6\">En tu cuenta podés aprobar o solicitar cambios cuando la cotización esté enviada para aprobación. Recibir este correo no confirma un pago. La producción empieza después de la verificación del taller.</p>\n</td></tr><tr><td style=\"padding:20px 24px;border-top:1px solid #ded7cd;color:#71675e;font-size:12px;line-height:1.6\">VÉRTICE CR · Fabricación bajo pedido<br>Conservá la referencia ${escape(data.requestId)} para el seguimiento de tu pieza.</td></tr></table>\n<!--[if mso]></td></tr></table><![endif]-->\n</td></tr></table></body></html>`;\n  return { customerEmail: data.customerEmail, adminEmail: data.adminEmail, subject: `${demo ? '[DEMO] ' : ''}${data.test ? '[PRUEBA] ' : ''}Cotización Vértice CR · Solicitud ${data.requestId}`, html, deliveryKey: data.deliveryKey };\n};\nreturn [{ json: prepareQuoteEmail($input.first().json.body ?? $input.first().json) }];"
+        "jsCode": "const prepareQuoteEmail = function prepareQuoteEmail(data) {\n  const escape = value => String(value ?? '').replace(/[&<>\"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&#39;' }[char]));\n  const validEmail = value => /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(String(value || ''));\n  const amount = Number(data.amountCrc);\n  const date = new Date(`${String(data.validUntil || '').slice(0, 10)}T12:00:00Z`);\n  if (!data.requestId || !Number.isSafeInteger(amount) || amount <= 0 || (data.currency && data.currency !== 'CRC') || !validEmail(data.customerEmail) || !validEmail(data.adminEmail) || !Number.isFinite(date.getTime()) || !data.notes) {\n    throw new Error('La cotización o sus destinatarios no son válidos.');\n  }\n  const money = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC', maximumFractionDigits: 0 }).format(amount);\n  const until = new Intl.DateTimeFormat('es-CR', { dateStyle: 'long', timeZone: 'UTC' }).format(date);\n  // n8n Code nodes do not expose the browser/Node URL global. Keep this\n  // embedded renderer self-contained and accept only explicit HTTP origins.\n  const origin = /^(https?):\\/\\/([a-z0-9.-]+|\\[::1\\])(?::([0-9]{1,5}))?(?:[/?#][^\\s]*)?$/i.exec(String(data.appUrl || 'http://localhost:5173'));\n  if (!origin || (origin[3] && (Number(origin[3]) < 1 || Number(origin[3]) > 65535))) throw new Error('Dirección de la app inválida.');\n  const accountUrl = escape(`${origin[1]}://${origin[2]}${origin[3] ? `:${origin[3]}` : ''}/cuenta`);\n  const local = ['localhost', '127.0.0.1', '[::1]'].includes(origin[2].toLowerCase());\n  const demo = data.mode === 'DEMO';\n  const row = (label, value) => `<tr><td style=\"padding:12px 0;border-bottom:1px solid #ded7cd;color:#71675e;width:35%;font-size:14px\">${label}</td><td style=\"padding:12px 0;border-bottom:1px solid #ded7cd;color:#201b16;font-size:15px;text-align:right;word-break:break-word\">${escape(value)}</td></tr>`;\n  const html = `<!doctype html><html lang=\"es\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><body style=\"margin:0;background:#ece6dc;font-family:Arial,Helvetica,sans-serif;color:#201b16\">\n<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#ece6dc\"><tr><td align=\"center\" style=\"padding:24px 12px\">\n<!--[if mso]><table role=\"presentation\" width=\"600\"><tr><td><![endif]-->\n<table role=\"presentation\" align=\"center\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"width:100%;max-width:600px;background:#faf7f1;border:1px solid #d8cfc2\">\n<tr><td style=\"padding:28px 24px;background:#181510;border-bottom:3px solid #ff5500\"><p style=\"margin:0;color:#faf7f1;font-size:22px;font-weight:bold;letter-spacing:2px\">VÉRTICE <span style=\"color:#ff5500\">CR</span></p><p style=\"margin:8px 0 0;color:#c0b5a6;font-size:13px\">Impresión 3D · Cotización ${escape(data.requestId)}</p></td></tr>\n<tr><td style=\"padding:28px 24px\">\n${demo || data.test ? '<p style=\"margin:0 0 20px;padding:12px;background:#f1e6d7;color:#754217;font-size:13px;line-height:1.5\"><strong>Demostración académica.</strong> Este correo no solicita una transferencia ni autoriza producción.</p>' : ''}\n<h1 style=\"margin:0 0 12px;font-size:26px;line-height:1.2\">Tu pieza, con los detalles claros.</h1>\n<p style=\"margin:0 0 24px;color:#71675e;font-size:15px;line-height:1.6\">${data.test ? 'Esta es una prueba de la cotización.' : `Hola ${escape(data.customerName || '')}.`} Revisá la pieza, el precio y las condiciones. La aprobación o solicitud de cambios se hace desde tu cuenta.</p>\n<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" aria-label=\"Detalles del encargo\">${row('Pieza', data.piece || `Solicitud ${data.requestId}`)}${row('Cantidad', data.quantity || 'Por confirmar')}${row('Polímero propuesto', data.material || 'Por confirmar')}</table>\n<p style=\"margin:24px 0 6px;color:#71675e;font-size:13px\">${demo ? 'Monto de demostración' : 'Precio cotizado'}</p><p style=\"margin:0;color:#201b16;font-size:34px;font-weight:bold\">${money}</p><p style=\"margin:8px 0 24px;color:#71675e;font-size:14px\">CRC · Vigencia: ${escape(until)}</p>\n<h2 style=\"margin:0 0 10px;font-size:17px\">Qué incluye y qué debés revisar</h2><p style=\"margin:0 0 24px;color:#51483f;font-size:14px;line-height:1.7\">${escape(data.notes).replace(/\\n/g, '<br>')}</p>\n<table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td bgcolor=\"#c84408\" style=\"padding:15px 22px\"><a href=\"${accountUrl}\" style=\"color:#ffffff;text-decoration:none;font-size:15px;font-weight:bold\">Revisar cotización en mi cuenta →</a></td></tr></table>\n${local ? '<p style=\"margin:14px 0 0;color:#71675e;font-size:13px;line-height:1.5\">Enlace de presentación local: abrilo en la computadora donde está ejecutándose Vértice. No es un sitio publicado.</p>' : ''}\n<p style=\"margin:20px 0 0;color:#71675e;font-size:14px;line-height:1.6\">En tu cuenta podés aprobar o solicitar cambios cuando la cotización esté enviada para aprobación. Recibir este correo no confirma un pago. La producción empieza después de la verificación del taller.</p>\n</td></tr><tr><td style=\"padding:20px 24px;border-top:1px solid #ded7cd;color:#71675e;font-size:12px;line-height:1.6\">VÉRTICE CR · Fabricación bajo pedido<br>Conservá la referencia ${escape(data.requestId)} para el seguimiento de tu pieza.</td></tr></table>\n<!--[if mso]></td></tr></table><![endif]-->\n</td></tr></table></body></html>`;\n  return { customerEmail: data.customerEmail, adminEmail: data.adminEmail, subject: `${demo ? '[DEMO] ' : ''}${data.test ? '[PRUEBA] ' : ''}Cotización Vértice CR · Solicitud ${data.requestId}`, html, deliveryKey: data.deliveryKey };\n};\nreturn [{ json: prepareQuoteEmail($input.first().json.body ?? $input.first().json) }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -433,6 +433,74 @@
       }
     },
     {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vertice-payment-email",
+        "authentication": "headerAuth",
+        "responseMode": "lastNode",
+        "options": {},
+        "responseData": "firstEntryJson"
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        180,
+        2010
+      ],
+      "id": "entry-payment-email",
+      "name": "Entrada — aviso de pago"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const data = $input.first().json.body ?? $input.first().json;\nconst requiredText = (value, field, maxLength) => {\n  if (typeof value !== 'string' || !value.trim() || value.trim().length > maxLength) throw new Error('Campo inválido: ' + field);\n  return value.trim();\n};\nconst escapeHtml = value => String(value ?? '').replace(/[&<>\"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[char]));\nconst validEmail = value => /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value);\nconst orderId = requiredText(data.orderId, 'orderId', 128);\nif (!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(orderId)) throw new Error('orderId inválido');\nconst customerEmail = requiredText(data.customerEmail ?? data.to, 'customerEmail', 254);\nconst workshopEmail = requiredText(data.workshopEmail ?? data.bcc, 'workshopEmail', 254);\nif (!validEmail(customerEmail) || !validEmail(workshopEmail)) throw new Error('Correo destinatario inválido');\nconst rawPaymentMode = requiredText(data.paymentMode, 'paymentMode', 24).toUpperCase();\nif (!['DEMO', 'SANDBOX', 'PAYPAL_SANDBOX', 'SINPE_MANUAL'].includes(rawPaymentMode)) throw new Error('paymentMode debe ser DEMO, SANDBOX o SINPE_MANUAL');\nconst paymentMode = rawPaymentMode === 'PAYPAL_SANDBOX' ? 'SANDBOX' : rawPaymentMode;\nif ((data.orderStatus !== undefined && String(data.orderStatus).toUpperCase() !== 'CONFIRMED') || (data.paymentStatus !== undefined && String(data.paymentStatus).toUpperCase() !== 'PAID')) throw new Error('El recibo requiere orderStatus CONFIRMED y paymentStatus PAID');\nconst amountValue = data.amountCrc ?? data.totalCrc;\nconst amountCrc = Number(amountValue);\nif (amountValue === '' || amountValue === null || !Number.isSafeInteger(amountCrc) || amountCrc <= 0 || (data.currency !== undefined && data.currency !== 'CRC')) throw new Error('amountCrc debe ser un monto CRC entero y positivo');\nconst paidAt = requiredText(data.paidAt, 'paidAt', 40);\nif (!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d{1,3})?)?(?:Z|[+-]\\d{2}:\\d{2})$/.test(paidAt)) throw new Error('paidAt debe incluir fecha ISO 8601 con zona horaria');\nconst paidDate = new Date(paidAt);\nif (!Number.isFinite(paidDate.getTime())) throw new Error('paidAt inválido');\nconst deliveryKey = requiredText(data.deliveryKey, 'deliveryKey', 300);\nconst paymentMethod = typeof data.paymentMethod === 'string' ? data.paymentMethod.trim().slice(0, 60) : '';\nconst paymentReference = typeof data.paymentReference === 'string' ? data.paymentReference.trim().slice(0, 120) : '';\nconst rawLines = data.orderLines ?? data.lines;\nif (rawLines !== undefined && rawLines !== null && (!Array.isArray(rawLines) || rawLines.length > 40)) throw new Error('orderLines debe ser una lista válida de máximo 40 elementos');\nconst orderLines = (rawLines || []).map((line, index) => {\n  if (!line || typeof line !== 'object' || Array.isArray(line)) throw new Error('orderLines[' + index + '] inválido');\n  const description = requiredText(line.description ?? line.productName ?? line.name, 'orderLines[' + index + '].description', 180);\n  const quantity = line.quantity == null || line.quantity === '' ? null : Number(line.quantity);\n  if (quantity !== null && (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > 10000)) throw new Error('orderLines[' + index + '].quantity inválida');\n  return {description, quantity};\n});\nconst summary = data.summary == null || (typeof data.summary === 'string' && !data.summary.trim()) ? '' : requiredText(data.summary, 'summary', 300);\nconst amount = new Intl.NumberFormat('es-CR', {style:'currency', currency:'CRC', maximumFractionDigits:0}).format(amountCrc);\nconst date = new Intl.DateTimeFormat('es-CR', {dateStyle:'long', timeStyle:'short', timeZone:'America/Costa_Rica'}).format(paidDate);\nconst modeNotice = paymentMode === 'DEMO'\n  ? 'Pago DEMO registrado para presentación académica. No se transfirió dinero real.'\n  : paymentMode === 'SINPE_MANUAL'\n    ? 'Comprobante SINPE Móvil verificado manualmente por el taller.'\n    : 'Pago de PayPal SANDBOX registrado en entorno de pruebas. No se transfirió dinero real.';\nconst row = (label, value) => '<tr><th align=\"left\" style=\"padding:12px 8px;border-bottom:1px solid #ded7cd;color:#71675e;font-size:14px\">' + escapeHtml(label) + '</th><td align=\"right\" style=\"padding:12px 8px;border-bottom:1px solid #ded7cd;color:#201b16;font-size:14px;word-break:break-word\">' + escapeHtml(value) + '</td></tr>';\nconst lineRows = orderLines.map(line => '<tr><td style=\"padding:10px 8px;border-bottom:1px solid #ded7cd;color:#201b16;font-size:14px;word-break:break-word\">' + escapeHtml(line.description) + '</td><td align=\"right\" style=\"padding:10px 8px;border-bottom:1px solid #ded7cd;color:#71675e;font-size:14px;white-space:nowrap\">' + (line.quantity === null ? '—' : String(line.quantity)) + '</td></tr>').join('');\nconst orderDetails = summary || lineRows\n  ? '<h2 style=\"margin:24px 0 10px;font-size:17px\">Detalle del pedido</h2>' + (summary ? '<p style=\"margin:0 0 12px;color:#51483f;font-size:14px;line-height:1.6\">' + escapeHtml(summary) + '</p>' : '') + (lineRows ? '<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">' + lineRows + '</table>' : '')\n  : '';\nconst realPaymentNotice = paymentMode === 'SINPE_MANUAL' ? 'El taller revisó y registró el comprobante informado.' : 'No se transfirió dinero real.';\nconst html = '<!doctype html><html lang=\"es\"><head><meta charset=\"utf-8\"></head><body style=\"margin:0;background:#ece6dc;font-family:Arial,Helvetica,sans-serif;color:#201b16\"><table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#ece6dc\"><tr><td align=\"center\" style=\"padding:24px 12px\"><table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%;max-width:600px;background:#faf7f1;border:1px solid #d8cfc2\"><tr><td style=\"padding:26px 24px;background:#181510;border-bottom:3px solid #ff5500;color:#faf7f1\"><strong style=\"font-size:22px;letter-spacing:2px\">VÉRTICE <span style=\"color:#ff5500\">CR</span></strong><div style=\"margin-top:8px;color:#c0b5a6;font-size:13px\">PAYMENT_MODE: ' + paymentMode + ' · Pedido ' + escapeHtml(orderId) + '</div></td></tr><tr><td style=\"padding:26px 24px\"><p style=\"margin:0 0 18px;padding:14px;background:#f1e6d7;color:#754217;font-size:14px;line-height:1.6\"><strong>' + escapeHtml(modeNotice) + '</strong></p><h1 style=\"margin:0 0 10px;font-size:25px\">Recibo de pago</h1><p style=\"margin:0 0 22px;color:#71675e;font-size:15px;line-height:1.6\">Registramos el pago asociado a tu pedido. Conservá este mensaje como comprobante de la operación en el entorno indicado.</p>' + orderDetails + '<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin-top:22px\">' + row('Pedido', orderId) + row('Monto', amount + ' CRC') + row('Fecha', date) + row('Modo', paymentMode) + (paymentMethod ? row('Método', paymentMethod) : '') + (paymentReference ? row('Referencia', paymentReference) : '') + '</table><p style=\"margin:22px 0 0;color:#71675e;font-size:13px;line-height:1.6\">' + escapeHtml(realPaymentNotice) + '</p></td></tr><tr><td style=\"padding:18px 24px;border-top:1px solid #ded7cd;color:#71675e;font-size:12px\">VÉRTICE CR · Impresión 3D bajo pedido · Referencia ' + escapeHtml(orderId) + '</td></tr></table></td></tr></table></body></html>';\nreturn [{json:{customerEmail, workshopEmail, orderId, paymentMode, amountCrc, paidAt, deliveryKey, orderLines, summary, subject:'[' + paymentMode + '] Pago registrado · Pedido ' + orderId, html}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        470,
+        2010
+      ],
+      "id": "prepare-payment-email",
+      "name": "Preparar recibo de pago"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $json.customerEmail }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}",
+        "options": {
+          "bccEmail": "={{ $json.workshopEmail }}",
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        790,
+        2010
+      ],
+      "id": "send-payment-email",
+      "name": "Enviar recibo al cliente + BCC taller"
+    },
+    {
+      "name": "Confirmar recibo de pago",
+      "id": "confirm-payment-email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1110,
+        2010
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const sent=$input.first().json; const context=$('Preparar recibo de pago').first().json;\nif (!sent.id) throw new Error('Gmail no confirmó messageId');\nreturn [{json:{delivered:true,messageId:sent.id,orderId:context.orderId,deliveryKey:context.deliveryKey}}];"
+      }
+    },
+    {
       "name": "Mapa del flujo",
       "id": "unified-setup-guide",
       "type": "n8n-nodes-base.stickyNote",
@@ -444,7 +512,7 @@
       "parameters": {
         "width": 1220,
         "height": 330,
-        "content": "# Vértice CR · DeepSeek y automatizaciones\n\nTres agentes separados (público, Admin y cotización) comparten DeepSeek Chat Model. Selecciona la credencial DeepSeek existente y un modelo disponible en tu cuenta. Cada agente tiene instrucciones y herramientas por rol. Admin prepara CRUD; el guardado se confirma en la app.\n\nGmail conserva su rama determinista: validar correo → enviar → confirmar messageId. Selecciona Gmail OAuth2 existente y Header Auth en las cinco entradas. No se incluyen claves en el JSON.\n\nConfigura las URLs y VERTICE_ASSISTANT_TOOLS_URL en la API. Para Docker, el callback debe alcanzar el host (host.docker.internal), no localhost. Workflow inactivo al importar; asigna las credenciales y publica. Las cotizaciones y pagos son DEMO."
+        "content": "# Vértice CR · DeepSeek y automatizaciones\n\nTres agentes separados (público, Admin y cotización) comparten DeepSeek Chat Model. Selecciona la credencial DeepSeek existente y un modelo disponible en tu cuenta. Cada agente tiene instrucciones y herramientas por rol. Admin prepara CRUD; el guardado se confirma en la app.\n\nLos correos son ramas deterministas: cotización → validar → Gmail → messageId; aviso de pago → validar orderId, monto CRC, fecha y deliveryKey → recibo con orderLines/summary opcionales → Gmail → messageId + deliveryKey. Se acepta PAYMENT_MODE DEMO, SANDBOX/PAYPAL_SANDBOX o SINPE_MANUAL con la etiqueta correspondiente. El cliente recibe el correo y bcc/workshopEmail queda en copia oculta. Selecciona la credencial Gmail OAuth2 existente y Header Auth compartido en las seis entradas. No se incluyen secretos en el JSON ni hay agente de IA en la ruta de correo de pago.\n\nConfigura las URLs y VERTICE_ASSISTANT_TOOLS_URL en la API. Para Docker, el callback debe alcanzar el host (host.docker.internal), no localhost. Workflow inactivo al importar; asigna las credenciales y publica."
       }
     }
   ],
@@ -662,6 +730,39 @@
         [
           {
             "node": "Confirmar aceptación de Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Entrada — aviso de pago": {
+      "main": [
+        [
+          {
+            "node": "Preparar recibo de pago",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar recibo de pago": {
+      "main": [
+        [
+          {
+            "node": "Enviar recibo al cliente + BCC taller",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar recibo al cliente + BCC taller": {
+      "main": [
+        [
+          {
+            "node": "Confirmar recibo de pago",
             "type": "main",
             "index": 0
           }

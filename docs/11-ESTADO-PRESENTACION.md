@@ -1,6 +1,49 @@
 # Estado y bloques de trabajo — Pruebas
 
-## Visión confirmada
+## Corte vigente — 2026-10-05
+
+Rama `Pruebas`, HEAD `e41099d` publicado; CI de ese commit verde. Esta sesión
+trabaja sobre el seed y el recorrido de catálogo, no sobre `main`.
+
+La semilla remota tenía 25 productos, 6 `ACTIVE` y 19 `DRAFT`; la base de casa
+tiene los mismos 25 modelos completos/visibles. La comparación de colecciones
+confirmó que **solo cambia `products`**. Se lleva únicamente esa colección al
+seed de presentación; el `db.json` runtime no debe mezclarse entero porque sus
+pedidos/cotizaciones pueden ser pruebas locales.
+
+Los 25 precios se presentan como `DEMO`; p1–p6 no tienen origen comercial
+verificable, medidas/peso heredados sin prueba de laminador ni confirmación de
+precio. Las imágenes son referencias, no prueba de fabricación. Catálogo,
+tarjeta y ficha avisan que las imágenes son ilustrativas, los precios
+referenciales y el pago no confirma producción/entrega. Se revisó Dark escritorio
+(1265 × 720): 25 modelos, filtros y rejilla de tres columnas; Light, móvil
+(375/768) y detalles de las fichas siguen pendientes. Gates locales pasan; CI
+verde solo corresponde al baseline `e41099d`, no a estos cambios locales.
+Verificación local: 51 suites / 304 tests, lint, `check:ui`, 270
+comprobaciones de automatización, build y `git diff --check` pasan.
+
+La promesa principal es IA integrada para organizar referencias y automatizar
+el armado de cotizaciones sin pedir datos técnicos manuales. El código actual
+solo pasa texto al agente; los adjuntos quedan en la solicitud y no se analizan.
+El motor de precio sigue en DEMO; la cotización multimodal no está validada.
+Flujo de negocio: cliente inicia → IA organiza/procesa → Admin atiende o valida
+con acciones → cliente aprueba y paga DEMO → seguimiento.
+
+El MCP image-to-3D identificado es Meshy (`@meshy-ai/meshy-mcp-server`), pero el
+usuario decidió aplazarlo en esta entrega. No es dependencia del recorrido que
+cerraremos ahora; ver `docs/07` para sus límites técnicos y tarifas.
+
+El usuario confirma impresora Creality K1C. En el checkout no se encontraron
+archivos STL/3MF/OBJ ni metadatos de fuente/licencia; por eso aún no hay medidas
+de laminador para el seed. Se documentó un batch de Creality Print CLI con preset
+K1C como alternativa, sujeto a recuperar y comprobar los diseños autorizados. El
+valor nominal de placa (350 W) no se usa como consumo medio. La galería pública
+puede ser solo cuatro imágenes renderizadas del mismo modelo fuente.
+
+El contenido de abajo conserva el checkpoint anterior a esta integración; sus
+cifras, `db.json` y pendientes no representan el estado vigente anterior.
+
+## Historial de checkpoint anterior a la integración del catálogo
 
 ### Integración en casa — 2026-10-05
 

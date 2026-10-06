@@ -13,6 +13,7 @@ export function ProductCard({
   layout = 'standard',
   showMadeToOrder = false,
   showPrice = false,
+  demoPriceLabel = 'Precio referencial',
   viewLabel = 'Ver ficha',
   imageUnavailableLabel = 'Imagen no disponible',
 }) {
@@ -44,6 +45,7 @@ export function ProductCard({
         <h3>{product.name}</h3>
         <p>{product.description}</p>
         {showPrice && <PriceTag amount={product.price} />}
+        {showPrice && product.priceSource === 'DEMO' && <small className="v-product-price-note">{demoPriceLabel}</small>}
         <div className="v-product-footer">
           {!featured && <span>{product.categoryName}</span>}
           <LinkText as={linkAs} href={href} to={to} aria-label={viewLabel + ': ' + product.name}>{viewLabel}</LinkText>

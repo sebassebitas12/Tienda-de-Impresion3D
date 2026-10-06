@@ -18,7 +18,6 @@ export function CustomerOrderDetailPage() {
   const [version, setVersion] = useState(0);
   const requestKey = `${id}:${token || ''}:${version}`;
   const [state, setState] = useState({ key: '', loading: true, error: '', order: null });
-
   useEffect(() => {
     const controller = new AbortController();
     fetchMyOrders({ token, signal: controller.signal })
@@ -35,16 +34,16 @@ export function CustomerOrderDetailPage() {
   const text = es ? {
     back: 'Volver a mis pedidos', title: 'Detalle del pedido', loading: 'Cargando pedido…', retry: 'Reintentar',
     error: 'No pudimos cargar el pedido. Revisá tu conexión e intentá de nuevo.', missing: 'No encontramos ese pedido en tu cuenta.',
-    progress: 'Avance del taller', parts: 'Piezas incluidas', subtotal: 'Subtotal de piezas', total: 'Comprobante DEMO',
-    amountNote: 'Pago simulado · DEMO. No se transfirió dinero real; la entrega se coordina aparte.', payment: 'Estado del pago',
-    status: { PENDING: 'Pago DEMO pendiente', CONFIRMED: 'Confirmado', IN_PRODUCTION: 'En producción', READY: 'Listo', SHIPPED: 'Enviado', DELIVERED: 'Entregado', COMPLETED: 'Completado', CANCELLED: 'Cancelado', REJECTED: 'Rechazado' },
+    progress: 'Avance del taller', parts: 'Piezas incluidas', subtotal: 'Subtotal de piezas', total: paid => paid ? 'Comprobante de pago' : 'Resumen del pedido',
+    amountNote: 'La tienda es una demo académica. PayPal Sandbox usa saldo de prueba; SINPE se confirma manualmente. No se procesan cobros reales.', payment: 'Estado del pago',
+    status: { PENDING: 'Pago pendiente', CONFIRMED: 'Pago confirmado', IN_PRODUCTION: 'En producción', READY: 'Listo', SHIPPED: 'Enviado', DELIVERED: 'Entregado', COMPLETED: 'Completado', CANCELLED: 'Cancelado', REJECTED: 'Rechazado' },
     steps: ['Recibido', 'Confirmado', 'En producción', 'Listo', 'Enviado', 'Entregado'], quantity: 'Cantidad', unit: 'Por unidad',
   } : {
     back: 'Back to my orders', title: 'Order details', loading: 'Loading order…', retry: 'Try again',
     error: 'We could not load this order. Check your connection and try again.', missing: 'We could not find that order in your account.',
-    progress: 'Workshop progress', parts: 'Included parts', subtotal: 'Parts subtotal', total: 'DEMO receipt',
-    amountNote: 'Simulated payment · DEMO. No real money was transferred; delivery is arranged separately.', payment: 'Payment status',
-    status: { PENDING: 'DEMO payment pending', CONFIRMED: 'Confirmed', IN_PRODUCTION: 'In production', READY: 'Ready', SHIPPED: 'Shipped', DELIVERED: 'Delivered', COMPLETED: 'Completed', CANCELLED: 'Cancelled', REJECTED: 'Rejected' },
+    progress: 'Workshop progress', parts: 'Included parts', subtotal: 'Parts subtotal', total: paid => paid ? 'Payment receipt' : 'Order summary',
+    amountNote: 'This is an academic demo. PayPal Sandbox uses test funds; SINPE is confirmed manually. No real charges are processed.', payment: 'Payment status',
+    status: { PENDING: 'Payment pending', CONFIRMED: 'Payment confirmed', IN_PRODUCTION: 'In production', READY: 'Ready', SHIPPED: 'Shipped', DELIVERED: 'Delivered', COMPLETED: 'Completed', CANCELLED: 'Cancelled', REJECTED: 'Rejected' },
     steps: ['Received', 'Confirmed', 'In production', 'Ready', 'Shipped', 'Delivered'], quantity: 'Quantity', unit: 'Each',
   };
 
@@ -53,6 +52,7 @@ export function CustomerOrderDetailPage() {
   if (!state.order) return <section className="customer-order-detail"><Link className="quote-back" to="/cuenta?tab=orders">← {text.back}</Link><p role="status">{text.missing}</p></section>;
 
   const order = state.order;
+  const proofStatus = order.paymentProof?.status;
   const current = INDEX[order.status];
   const amount = order.total ?? order.subtotalCrc ?? order.subtotal;
   const date = order.createdAt && new Date(order.createdAt);
@@ -64,7 +64,7 @@ export function CustomerOrderDetailPage() {
     <Link className="quote-back" to="/cuenta?tab=orders">← {text.back}</Link>
     <header className="customer-order-detail__heading">
       <div><span className="quote-eyebrow">{order.id}{dateLabel ? ` · ${dateLabel}` : ''}</span><h1 id="customer-order-detail-title">{text.title}</h1></div>
-      <span className={`v-badge v-badge--request status-${String(order.status || '').toLowerCase()}`} data-status={order.status}>{text.status[order.status] || order.status || '—'}</span>
+      <span className={`v-badge v-badge--request status-${String(order.status || '').toLowerCase()}`} data-status={order.status}>{proofStatus === 'SUBMITTED' ? (es ? 'Comprobante en revisión' : 'Proof under review') : proofStatus === 'REJECTED' ? (es ? 'Comprobante observado' : 'Proof needs changes') : text.status[order.status] || order.status || '—'}</span>
     </header>
 
     {Number.isInteger(current) && <section className="customer-order-detail__progress" aria-label={text.progress}>
@@ -89,13 +89,17 @@ export function CustomerOrderDetailPage() {
       </section>
 
       <aside className="customer-order-detail__summary">
-        <span className="quote-eyebrow">{text.total}</span>
+        <span className="quote-eyebrow">{text.total(order.paymentStatus === 'PAID')}</span>
         <strong>{formatCRC(amount) || '—'}</strong>
         {Number.isFinite(order.subtotalCrc ?? order.subtotal) && <p>{text.subtotal}: {formatCRC(order.subtotalCrc ?? order.subtotal)}</p>}
         <p>{text.amountNote}</p>
         {order.paymentStatus === 'PAID'
-          ? <p className="customer-order-detail__payment" role="status">{order.paymentMode === 'DEMO' ? (es ? 'Pago simulado registrado · DEMO' : 'Simulated payment recorded · DEMO') : (es ? 'Pago registrado' : 'Payment recorded')}</p>
-          : order.status === 'PENDING' && <p className="customer-order-detail__payment" role="status">{es ? 'El pago DEMO todavía está pendiente. Podés completarlo desde Mis pedidos.' : 'DEMO payment is still pending. Complete it from My orders.'}</p>}
+          ? <p className="customer-order-detail__payment" role="status">{order.paymentMode === 'PAYPAL_SANDBOX' ? (es ? 'Pago completado en PayPal Sandbox · fondos de prueba.' : 'Payment completed in PayPal Sandbox · test funds.') : order.paymentMode === 'SINPE_MANUAL' ? (es ? 'Comprobante SINPE revisado y confirmado por el taller.' : 'SINPE proof reviewed and confirmed by the workshop.') : order.paymentMode === 'DEMO' ? (es ? 'Pago simulado registrado · DEMO. No se transfirió dinero real.' : 'Simulated payment recorded · DEMO. No real money was transferred.') : (es ? 'Pago registrado' : 'Payment recorded')}</p>
+          : proofStatus === 'SUBMITTED' ? <p className="customer-order-detail__payment" role="status">{es ? 'Recibimos tu comprobante SINPE. El pedido sigue pendiente mientras el taller revisa la referencia y el archivo.' : 'Your SINPE proof was received. The order remains pending while the workshop reviews its reference and file.'}</p>
+            : proofStatus === 'REJECTED' ? <p className="customer-order-detail__payment" role="alert">{es ? `El taller pidió corregir el comprobante: ${order.paymentProof.rejectionReason || 'revisá los datos'}.` : `The workshop requested a proof correction: ${order.paymentProof.rejectionReason || 'check the details'}.`}</p>
+              : order.paymentStatus === 'REVIEW_REQUIRED' ? <p className="customer-order-detail__payment" role="alert">{es ? 'El pago requiere revisión. No lo vuelvas a iniciar; consultá el seguimiento del taller.' : 'Payment needs review. Do not start it again; contact the workshop.'}</p>
+                : order.status === 'PENDING' && <p className="customer-order-detail__payment" role="status">{es ? 'El encargo está guardado, pero todavía no está confirmado. Elegí PayPal Sandbox o reportá un SINPE desde el carrito.' : 'Your order is saved but not confirmed. Choose PayPal Sandbox or report SINPE from the cart.'}</p>}
+        {order.status === 'PENDING' && order.paymentStatus !== 'PAID' && <Link className="v-button v-button--primary" to={`/carrito?orderId=${encodeURIComponent(order.id)}`}>{proofStatus === 'REJECTED' ? (es ? 'Corregir comprobante en el carrito' : 'Correct proof in cart') : proofStatus === 'SUBMITTED' ? (es ? 'Ver estado del pago en el carrito' : 'View payment status in cart') : (es ? 'Continuar al pago en el carrito' : 'Continue to payment in cart')}</Link>}
         <Link className="v-button v-button--secondary" to="/cuenta?tab=orders">{es ? 'Abrir Mis pedidos' : 'Open My orders'}</Link>
       </aside>
     </div>

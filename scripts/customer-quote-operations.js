@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { sessionActor } from './session-access.js';
-import { prepareQuoteFulfillment } from './quote-fulfillment.js';
+import { prepareQuoteCheckout } from './quote-fulfillment.js';
 
 const CUSTOMER_DECISIONS = new Set(['APPROVED', 'CHANGES_REQUESTED', 'REJECTED']);
 
@@ -76,9 +76,9 @@ export function installCustomerQuoteOperations({ registerAction, db, serialize, 
 
   registerAction('/quotes/respond', respond(null));
 
-  registerAction('/quotes/pay-demo', async (req, res) => {
+  registerAction('/quotes/checkout', async (req, res) => {
     const actor = sessionActor(req.headers.authorization, db.data);
-    if (actor?.role !== 'customer') return failure(res, 'CUSTOMER_REQUIRED', 403);
+    if (actor?.role !== 'customer' || actor.status !== 'ACTIVE') return failure(res, 'CUSTOMER_REQUIRED', 403);
     const payload = req.body || {};
     if (typeof payload.requestId !== 'string' || !payload.requestId || !Number.isSafeInteger(payload.expectedVersion)) {
       return failure(res, 'INVALID_ACTION');
@@ -86,25 +86,20 @@ export function installCustomerQuoteOperations({ registerAction, db, serialize, 
     try {
       const result = await serialize(async () => {
         const request = (db.data.customPrintRequests || []).find(row => String(row.id) === payload.requestId);
-        if (!request || String(request.userId) !== String(actor.id)) return { error: 'REQUEST_NOT_FOUND' };
-        if (request.status === 'PAID' && request.paymentMode === 'DEMO') {
-          const order = (db.data.orders || []).find(row => String(row.customPrintRequestId) === String(request.id));
-          return order ? { replay: true, order, request } : { error: 'QUOTE_NOT_READY' };
-        }
-        if (request.quotePricing?.mode !== 'DEMO') return { error: 'PAYMENT_MODE_INVALID' };
-        const action = prepareQuoteFulfillment(db.data, request,
-          { mode: 'DEMO', expectedVersion: payload.expectedVersion }, actor, new Date().toISOString());
+        const action = prepareQuoteCheckout(db.data, request, actor, payload, new Date().toISOString());
         if (action.error) return action;
         if (!action.replay) await persist(action.next);
         return action;
       });
       if (result.error) {
         const status = result.error === 'REQUEST_NOT_FOUND' ? 404
-          : ['QUOTE_NOT_READY', 'STATUS_CONFLICT', 'QUOTE_EXPIRED'].includes(result.error) ? 409
+          : ['QUOTE_NOT_READY', 'STATUS_CONFLICT', 'QUOTE_EXPIRED', 'QUOTE_ALREADY_PAID'].includes(result.error) ? 409
             : result.error === 'CUSTOMER_REQUIRED' ? 403 : 400;
         return failure(res, result.error, status);
       }
       return res.json({ request: result.request, order: result.order, replay: Boolean(result.replay) });
     } catch { return failure(res, 'ACTION_PERSISTENCE_FAILED', 500); }
   });
+
+  registerAction('/quotes/pay-demo', (_req, res) => failure(res, 'PAYMENT_MUST_START_IN_CART', 409));
 }
